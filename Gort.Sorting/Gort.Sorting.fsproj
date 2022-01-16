@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Switch.fs" />
+    <Compile Include="SortingTypes.fs" />
+    <Compile Include="Stage.fs" />
+    <Compile Include="Sorter.fs" />
+    <Compile Include="Sortable.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
+  </ItemGroup>
+
+</Project>
