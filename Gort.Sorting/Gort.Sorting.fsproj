@@ -10,7 +10,7 @@
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />
-    <Compile Include="Sortable.fs" />
+    <Compile Include="SortableSet.fs" />
   </ItemGroup>
 
   <ItemGroup>

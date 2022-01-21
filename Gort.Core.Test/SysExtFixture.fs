@@ -23,6 +23,19 @@ type SysExtFixture () =
         Assert.AreEqual(v, uv);
 
 
+    [<TestMethod>]
+    member this.intAt () =
+        let v = 5uL;
+        let v0 = v.intAt 0
+        let v1 = v.intAt 1
+        let v2 = v.intAt 2
+        let v3 = v.intAt 3
+
+        Assert.AreEqual(v0, 1);
+        Assert.AreEqual(v1, 0);
+        Assert.AreEqual(v2, 1);
+        Assert.AreEqual(v3, 0);
+
 
     //[<TestMethod>]
     //member this.TestMethodPassing () =

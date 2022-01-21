@@ -22,6 +22,15 @@ module Bitwise =
         allSorted_uL |> List.contains bitRep
 
 
+    let toIntArray (dg:degree) (data:uint64) = 
+        Array.init (Degree.value dg) data.intAt
+
+
+    let fromIntArray (data:int[]) (oneThresh:int)= 
+        let mutable rv = 0uL
+        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
+        rv
+
     let mergeUp (lowDegree:degree) (lowVal:uint64) (hiVal:uint64) =
         (hiVal <<< (Degree.value lowDegree)) &&& lowVal
 
@@ -73,6 +82,29 @@ module Bitwise =
 
 
 
+    let bitPackedtoBitStriped2D (dg:degree)
+                               (packedArray:uint64[]) =
+        try
+            let stripedArrayLength = cratesFor 64 packedArray.Length
+            let stripedArray = Array2D.zeroCreate<uint64> (Degree.value dg) stripedArrayLength
+            let mutable i = 0
+            let mutable block = - 1
+            while i < packedArray.Length do
+                let mutable stripe = 0
+                block <- block + 1
+                while ((stripe < 64) && (i < packedArray.Length)) do
+                    for j = 0 to (Degree.value dg) - 1 do
+                        if packedArray.[i].isset j then
+                            stripedArray.[j, block] <- stripedArray.[j, block].set stripe
+                    i <- i + 1
+                    stripe <- stripe + 1
+            stripedArray |> Ok
+        with
+            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
+
+
+
+
     let bitStripeToBitPack (dg:degree)
                            (packedArray:uint64[])
                            (stripeLoad:int)
@@ -97,7 +129,6 @@ module Bitwise =
             packedArray |> Ok
         with
             | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
-
 
 
 

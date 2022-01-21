@@ -147,7 +147,7 @@ type BenchConj() =
 
 [<MemoryDiagnoser>]
 type BenchRollout() =
-    let deg = Degree.create 16
+    let deg = Degree.create 20
     let bpa = Bitwise.allBitPackForDegree deg |> Result.ExtractOrThrow
     
     [<Benchmark>]
@@ -156,10 +156,16 @@ type BenchRollout() =
         0
 
     [<Benchmark>]
-    member this.roundTrip() =
-        let bsa = bpa |> Bitwise.bitPackedtoBitStriped deg |> Result.ExtractOrThrow
-        let bpaBack = bsa |> Bitwise.bitStripedToBitPacked deg bpa.Length |> Result.ExtractOrThrow
+    member this.toBitStriped2D() =
+        let bsa = bpa |> Bitwise.bitPackedtoBitStriped2D deg |> Result.ExtractOrThrow
         0
+
+    //[<Benchmark>]
+    //member this.roundTrip() =
+    //    let bsa = bpa |> Bitwise.bitPackedtoBitStriped deg |> Result.ExtractOrThrow
+    //    let bpaBack = bsa |> Bitwise.bitStripedToBitPacked deg bpa.Length |> Result.ExtractOrThrow
+    //    0
+
 
 
 

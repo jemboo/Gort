@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Gort.UI.View.Pages;
+using Gort.UI.ViewModel;
+using Gort.UI.ViewModel.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,26 +13,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Gort.UI
+namespace Gort.UI.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private IDisposable unsubscriber;
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void tb_Click(object sender, RoutedEventArgs e)
-        {
-            var rng = RngGen.lcgFromNow();
-            var val = Rando.fromRngGen(rng).NextFloat.ToString();
-            tb.Content = val;
+            ViewModel.Services.MrNav = _mainFrame.NavigationService;
         }
     }
 }
