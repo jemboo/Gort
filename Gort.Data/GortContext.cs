@@ -22,23 +22,16 @@ namespace Gort.Data
         }
 
         public DbSet<Workspace> Workspaces { get; set; }
-
-        public DbSet<Cause> Causes { get; set; }
         public DbSet<CauseTypeGroup> CauseTypeGroups { get; set; }
+        public DbSet<CauseType> CauseTypes { get; set; }
+        public DbSet<CauseTypeParam> CauseTypeParams { get; set; }
+        public DbSet<Cause> Causes { get; set; }
+        public DbSet<CauseParam> CauseParams { get; set; }
+        public DbSet<RndGen> RndGens { get; set; }
+        public DbSet<SortableSet> SortableSets { get; set; }
+        public DbSet<Sorter> Sorters { get; set; }
+        public DbSet<SorterSet> SorterSets { get; set; }
+        public DbSet<PerfBinSet> PerfBinSets { get; set; }
     }
-
-    //public class GortDBInitializer : DropCreateDatabaseAlways<GortContext>
-    //{
-    //    protected override void Seed(GortContext context)
-    //    {
-    //        IList<CauseTypeGroup> defaultCauseTypeGroups = new List<CauseTypeGroup>();
-
-    //        defaultCauseTypeGroups.Add(new CauseTypeGroup() { CauseTypeGroupId = 1, Name = "root", ParentGroup=null });
-    //        context.CauseTypeGroups.AddRange(defaultCauseTypeGroups);
-
-    //        base.Seed(context);
-    //    }
-    //}
-
 
 }
