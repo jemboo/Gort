@@ -3,6 +3,17 @@ open System
 
 
 module Collections =
+    
+    let takeUpto<'a> (maxCt:int) (source:seq<'a>) = 
+        source |> Seq.mapi(fun dex v -> (dex, v))
+               |> Seq.takeWhile(fun tup -> (fst tup) < maxCt)
+               |> Seq.map(snd)
+
+
+    let arrayEquals<'a when 'a:equality> (lhs:'a[]) (rhs:'a[]) =
+        (lhs.Length = rhs.Length) &&
+        lhs |> Array.forall2 (fun re le -> re = le) rhs
+
 
     let isSorted_idiom (values:'a[]) =
         seq { 1 .. (values.Length - 1) }

@@ -6,7 +6,7 @@ let main argv =
 
   //  BatchRuns.Proc BatchRuns.SayHi
 
-    let summary = BenchmarkRunner.Run<BenchRollout>()
+    let summary = BenchmarkRunner.Run<BenchConj>()
     printfn "%A" summary
     Console.Read() |> ignore
     0

@@ -7,6 +7,25 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type CollectionsFixture () =
 
+
+    [<TestMethod>]
+    member this.takeUpto () =
+        let a1 = [|1;2;3;4;5;6;7;8|]
+        let yab = a1 |> Collections.takeUpto 3 |> Seq.toArray
+        let zab = a1 |> Collections.takeUpto 30 |> Seq.toArray
+        Assert.IsTrue(yab.Length = 3)
+        Assert.IsTrue(zab.Length = 8)
+
+    [<TestMethod>]
+    member this.arrayEquals () =
+        let a1 = [|1;2;3;|]
+        let a2 = [|1;2;3;|]
+        let a3 = [|1;2;4;|]
+        
+        Assert.IsTrue(Collections.arrayEquals a1 a2)
+        Assert.IsFalse(Collections.arrayEquals a1 a3)
+
+
     [<TestMethod>]
     member this.isSorted_idiom () =
         let aSrted = [|0;1;2;3|]

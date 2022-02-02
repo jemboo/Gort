@@ -12,6 +12,7 @@
     <Compile Include="CommonTypes.fs" />
     <Compile Include="Collections.fs" />
     <Compile Include="Bitwise.fs" />
+    <Compile Include="GuidUtils.fs" />
     <Compile Include="Comby.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="RndGen.fs" />

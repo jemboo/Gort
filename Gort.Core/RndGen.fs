@@ -112,5 +112,5 @@ module RndGen =
                     if (srcA.[i] < cap) then yield i }
             |> Seq.toList
 
-        randomPermutations rnd (Degree.create n) |> Seq.map(_capN n m)
+        randomPermutations rnd (Degree.createNr n) |> Seq.map(_capN n m)
 

@@ -5,18 +5,31 @@ namespace Gort.Data
 {
     internal static class CauseSeed
     {
-
-        public static void Ass()
+        public static void TryThis()
         {
             var ctxt = new GortContext();
-            GetRndGens(ctxt);
-            GetCauseTypeGroup(ctxt);
-            GetCauseTypes(ctxt);
-            GetCauseTypeParams(ctxt);
-            //AddRndGens(ctxt);
-            //AddCauseTypeGroups(ctxt);
-            //AddCauseTypes(ctxt);
-            //AddCauseTypeParams(ctxt);
+            var wrkSpace = new Workspace() { Name = "workspace1" };
+            var cause1 = new Cause() { Workspace = wrkSpace };
+            ctxt.Workspaces.Add(wrkSpace);
+            ctxt.Causes.Add(cause1);
+            ctxt.SaveChanges();
+            var wsBack = ctxt.Workspaces.Where(x => x.Name == "workspace1");
+            //var s = new Sorter() { CauseId}
+
+        }
+
+
+        public static void Init()
+        {
+            var ctxt = new GortContext();
+            //GetRndGens(ctxt);
+            //GetCauseTypeGroup(ctxt);
+            //GetCauseTypes(ctxt);
+            //GetCauseTypeParams(ctxt);
+            AddRndGens(ctxt);
+            AddCauseTypeGroups(ctxt);
+            AddCauseTypes(ctxt);
+            AddCauseTypeParams(ctxt);
 
             ctxt.SaveChanges();
         }
@@ -83,10 +96,10 @@ namespace Gort.Data
 
         public static void AddRndGens(GortContext gortContext)
         {
-            rndGenA = new RndGen() { Seed = 1234, Type = "lcg" }.AddId();
-            rndGenB = new RndGen() { Seed = 1334, Type = "lcg" }.AddId();
-            rndGenC = new RndGen() { Seed = 1434, Type = "lcg" }.AddId();
-            rndGenD = new RndGen() { Seed = 1534, Type = "lcg" }.AddId();
+            rndGenA = new RndGen() { Seed = 1234, RndGenType = RndGenType.Lcg }.AddId();
+            rndGenB = new RndGen() { Seed = 1334, RndGenType = RndGenType.Lcg }.AddId();
+            rndGenC = new RndGen() { Seed = 1434, RndGenType = RndGenType.Lcg }.AddId();
+            rndGenD = new RndGen() { Seed = 1534, RndGenType = RndGenType.Lcg }.AddId();
 
             gortContext.RndGens.Add(rndGenA);
             gortContext.RndGens.Add(rndGenB);
@@ -192,37 +205,37 @@ namespace Gort.Data
 
         public static void AddCauseTypeParams(GortContext gortContext)
         {
-            causeTypeParamStdSortables_MinDegree = new CauseTypeParam() { Name = "minDegree", CauseType = causeTypeStdSortables, DataType="int" }.AddId();
-            causeTypeParamStdSortables_MaxDegree = new CauseTypeParam() { Name = "maxDegree", CauseType = causeTypeStdSortables, DataType = "int" }.AddId();
+            causeTypeParamStdSortables_MinDegree = new CauseTypeParam() { Name = "minDegree", CauseType = causeTypeStdSortables, DataType = DataType.Integer }.AddId();
+            causeTypeParamStdSortables_MaxDegree = new CauseTypeParam() { Name = "maxDegree", CauseType = causeTypeStdSortables, DataType = DataType.Integer }.AddId();
 
-            causeTypeParamRefSorterSets_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeRefSorterSets, DataType = "string" }.AddId();
+            causeTypeParamRefSorterSets_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeRefSorterSets, DataType = DataType.String }.AddId();
 
-            causeTypeParamStdSortables_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeStdSortables, DataType = "string" }.AddId();
+            causeTypeParamStdSortables_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeStdSortables, DataType = DataType.String }.AddId();
 
-            causeTypeParamRndSorterSetsBySwitch_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySwitch, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_SwitchCount = new CauseTypeParam() { Name = "switchCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySwitch, DataType = "rndGen" }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = "rndGen" }.AddId();
+            causeTypeParamRndSorterSetsBySwitch_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySwitch_SwitchCount = new CauseTypeParam() { Name = "switchCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySwitch_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Rng }.AddId();
+            causeTypeParamRndSorterSetsBySwitch_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Rng }.AddId();
 
-            causeTypeParamRndSorterSetsByStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsByStage, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsByStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsByStage, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsByStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsByStage, DataType = "rndGen" }.AddId();
-            causeTypeParamRndSorterSetsByStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsByStage, DataType = "int" }.AddId();
+            causeTypeParamRndSorterSetsByStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsByStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsByStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Rng }.AddId();
+            causeTypeParamRndSorterSetsByStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
 
-            causeTypeParamRndSorterSetsBySymmetricStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = "rndGen" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = "int" }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Rng }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
 
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = "int" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = "rndGen" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = "rndGen" }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount = new CauseTypeParam() { Name = "buddyCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = "int" }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Rng }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Rng }.AddId();
+            causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount = new CauseTypeParam() { Name = "buddyCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
 
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet = new CauseTypeParam() { Name = "sorterSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = "sorterSet" }.AddId();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet = new CauseTypeParam() { Name = "sortableSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = "sortableSet" }.AddId();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode = new CauseTypeParam() { Name = "sorterSaveMode", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = "string" }.AddId();
+            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet = new CauseTypeParam() { Name = "sorterSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.SorterSet }.AddId();
+            causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet = new CauseTypeParam() { Name = "sortableSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.SortableSet }.AddId();
+            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode = new CauseTypeParam() { Name = "sorterSaveMode", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.String }.AddId();
 
             gortContext.CauseTypeParams.Add(causeTypeParamStdSortables_MinDegree);
             gortContext.CauseTypeParams.Add(causeTypeParamStdSortables_MaxDegree);

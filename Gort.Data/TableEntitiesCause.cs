@@ -21,6 +21,7 @@ namespace Gort.Data
         public Guid CauseId { get; set; }
         public string Description { get; set; } 
         public CauseType CauseType { get; set; }
+        public CauseStatus CauseStatus { get; set; }
         public ICollection<CauseParam> CauseParams { get; set; } =
             new ObservableCollection<CauseParam>();
         public int Index { get; set; }
@@ -50,12 +51,6 @@ namespace Gort.Data
         public virtual CauseTypeGroup CauseTypeGroup { get; set; }
     }
 
-
-    //migrationBuilder.InsertData(
-    //    table: "CauseTypeGroups",
-    //            columns: new[] { "Name" },
-    //            values: new object[] { "root" });
-
 public class CauseTypeGroup
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -66,6 +61,7 @@ public class CauseTypeGroup
         public virtual CauseTypeGroup? Parent { get; set; }
     }
 
+
     public class CauseTypeParam
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -74,18 +70,16 @@ public class CauseTypeGroup
         public string Name { get; set; }         
         public Guid CauseTypeId { get; set; }  
         public virtual CauseType CauseType { get; set; }
-        public string DataType { get; set; }
+        public DataType DataType { get; set; }
     }
-
 
     public class RndGen
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid RndGenId { get; set; }
-        public string Type { get; set; }
+        public RndGenType RndGenType { get; set; }
         public int Seed { get; set; }
     }
-
 
 }

@@ -90,42 +90,98 @@ type BenchIsSorted_filterByPickList () =
         0
 
 
+//[<MemoryDiagnoser>]
+//type BenchProd() =
+//    let aCore = [|0 .. 31|]
+//    let aConj = [|0 .. 31|]
+//    let aOut = Array.zeroCreate<int> 32
 
-// degree 32
-//|          Method |      Mean |    Error |   StdDev |    Median |  Gen 0 | Allocated |
-//|---------------- |----------:|---------:|---------:|----------:|-------:|----------:|
-//| inverseMapArray |  36.70 ns | 0.768 ns | 1.346 ns |  36.43 ns | 0.0352 |     152 B |
-//|   compIntArrays |  36.37 ns | 0.749 ns | 1.209 ns |  35.75 ns | 0.0352 |     152 B |
-//|   conjIntArrays |  53.81 ns | 0.382 ns | 0.299 ns |  53.80 ns | 0.0352 |     152 B |
-//|  conjIntArraysR | 299.90 ns | 5.137 ns | 4.805 ns | 297.87 ns | 0.1183 |     512 B |
-//| compIntArraysNr |  19.39 ns | 0.298 ns | 0.278 ns |  19.23 ns |      - |         - |
-//| conjIntArraysNr |  26.14 ns | 0.291 ns | 0.272 ns |  26.01 ns |      - |         - |
+//    let aCore16 = [|0us .. 31us|]
+//    let aConj16 = [|0us .. 31us|]
+//    let aOut16 = Array.zeroCreate<uint16> 32
 
+//    [<Benchmark>]
+//    member this.inverseMapArray() =
+//        let ssR = Comby.intArrayProduct aCore (Array.zeroCreate aConj.Length)
+                    
+//        0
+
+//    [<Benchmark>]
+//    member this.intArrayProduct() =
+//        let ssR = Comby.intArrayProduct aConj aCore (Array.zeroCreate aConj.Length)
+//        0
+
+
+
+//|               Method |      Mean |    Error |   StdDev |  Gen 0 | Allocated |
+//|--------------------- |----------:|---------:|---------:|-------:|----------:|
+//|          invertArray |  47.11 ns | 0.736 ns | 0.756 ns | 0.0705 |     304 B |
+//|      arrayProductInt |  32.80 ns | 0.576 ns | 0.539 ns | 0.0352 |     152 B |
+//| conjIntArraysNoAlloc |  20.58 ns | 0.322 ns | 0.301 ns |      - |         - |
+//|       arrayProduct16 |  28.50 ns | 0.049 ns | 0.038 ns |      - |         - |
+//|        arrayProduct8 |  28.95 ns | 0.496 ns | 0.464 ns |      - |         - |
+//|     arrayProductIntR |  26.43 ns | 0.335 ns | 0.313 ns |      - |         - |
+//|        conjIntArrays |  53.66 ns | 0.814 ns | 0.761 ns | 0.0352 |     152 B |
+//|       conjIntArraysR | 324.93 ns | 6.525 ns | 6.103 ns | 0.1554 |     672 B |
 
 [<MemoryDiagnoser>]
 type BenchConj() =
-    let degree = Degree.create 16
-    //let aCore = [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15;|]
-    //let aConj = [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15;|]
-    let aCore = [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31|]
-    let aConj = [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31|]
+    let aCore = [|0 .. 31|]
+    let aConj = [|0 .. 31|]
     let aOut = Array.zeroCreate<int> 32
 
+    let aCore16 = [|0us .. 31us|]
+    let aConj16 = [|0us .. 31us|]
+    let aOut16 = Array.zeroCreate<uint16> 32
+
+    let aCore8 = [|0uy .. 31uy|]
+    let aConj8 = [|0uy .. 31uy|]
+    let aOut8 = Array.zeroCreate<uint8> 32
+
+
     [<Benchmark>]
-    member this.inverseMapArray() =
-        let ssR = Comby.inverseMapArray aCore
+    member this.invertArray() =
+        let ssR = Comby.invertArray aCore (Array.zeroCreate aConj.Length)
                     |> Result.ExtractOrThrow
         0
 
+
     [<Benchmark>]
-    member this.compIntArrays() =
-        let ssR = Comby.compIntArrays aConj aCore
+    member this.arrayProductInt() =
+        let ssR = Comby.arrayProductInt aConj aCore (Array.zeroCreate aConj.Length)
+        0
+
+
+    [<Benchmark>]
+    member this.conjIntArraysNoAlloc() =
+        let ssR = Comby.arrayProductInt aConj aCore aOut
         0
 
     [<Benchmark>]
-    member this.conjIntArrays() =
-        let ssR = Comby.conjIntArrays aConj aCore
+    member this.arrayProduct16() =
+        let ssR = Comby.arrayProduct16 aConj16 aCore16 aOut16 //(Array.zeroCreate<uint16> aConj.Length)
         0
+
+
+    [<Benchmark>]
+    member this.arrayProduct8() =
+        let ssR = Comby.arrayProduct8 aConj8 aCore8 aOut8 //(Array.zeroCreate<uint8> aConj.Length)
+        0
+
+
+    [<Benchmark>]
+    member this.arrayProductIntR() =
+        let ssR = Comby.arrayProductIntR aConj aCore aOut
+                    |> Result.ExtractOrThrow
+        0
+
+
+    [<Benchmark>]
+    member this.conjIntArrays() =
+        let ssR = Comby.conjIntArrays aConj aCore 
+                    |> Result.ExtractOrThrow
+        0
+
 
     [<Benchmark>]
     member this.conjIntArraysR() =
@@ -133,21 +189,12 @@ type BenchConj() =
                     |> Result.ExtractOrThrow
         0
 
-    [<Benchmark>]
-    member this.compIntArraysNr() =
-        let ssR = Comby.compIntArraysNr aConj aCore aOut
-        0
-
-    [<Benchmark>]
-    member this.conjIntArraysNr() =
-        let ssR = Comby.conjIntArraysNr aConj aCore aOut
-        0
 
 
 
 [<MemoryDiagnoser>]
 type BenchRollout() =
-    let deg = Degree.create 20
+    let deg = Degree.createNr 20
     let bpa = Bitwise.allBitPackForDegree deg |> Result.ExtractOrThrow
     
     [<Benchmark>]
@@ -160,11 +207,87 @@ type BenchRollout() =
         let bsa = bpa |> Bitwise.bitPackedtoBitStriped2D deg |> Result.ExtractOrThrow
         0
 
-    //[<Benchmark>]
-    //member this.roundTrip() =
-    //    let bsa = bpa |> Bitwise.bitPackedtoBitStriped deg |> Result.ExtractOrThrow
-    //    let bpaBack = bsa |> Bitwise.bitStripedToBitPacked deg bpa.Length |> Result.ExtractOrThrow
-    //    0
+
+[<MemoryDiagnoser>]
+type PermutationBench() =
+
+    let permA = Permutation.create [|0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;|] |> Result.ExtractOrThrow
+    let permB = Permutation.create [|10;9;2;3;4;5;6;7;8;1;0;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;|] |> Result.ExtractOrThrow
+
+    [<Benchmark>]
+    member this.product() =
+        let bsa = Permutation.product permA permB |> Result.ExtractOrThrow
+        0
+
+    [<Benchmark>]
+    member this.productNr() =
+        let bsa = Permutation.productNr permA permB
+        0
+
+        
+//|  Method |      Mean |     Error |    StdDev |    Gen 0 |    Gen 1 |    Gen 2 | Allocated |
+//|-------- |----------:|----------:|----------:|---------:|---------:|---------:|----------:|
+//|  Alloc8 |  6.919 us | 0.1323 us | 0.1238 us |  31.2424 |  31.2424 |  31.2424 |     98 KB |
+//| Alloc16 | 10.918 us | 0.2178 us | 0.2674 us |  62.4847 |  62.4847 |  62.4847 |    195 KB |
+//| Alloc32 | 22.582 us | 0.4483 us | 1.1491 us | 124.9695 | 124.9695 | 124.9695 |    391 KB |
+//| Alloc64 | 59.300 us | 1.1651 us | 2.0098 us | 249.9390 | 249.9390 | 249.9390 |    781 KB |
+[<MemoryDiagnoser>]
+type ArrayAllocBench() =
+
+    [<Benchmark>]
+    member this.Alloc8() =
+        let bsa = Array.zeroCreate<uint8> 100000
+        0
+
+    [<Benchmark>]
+    member this.Alloc16() =
+        let bsa = Array.zeroCreate<uint16> 100000
+        0
+
+    [<Benchmark>]
+    member this.Alloc32() =
+        let bsa = Array.zeroCreate<uint32> 100000
+        0
+
+
+    [<Benchmark>]
+    member this.Alloc64() =
+        let bsa = Array.zeroCreate<uint64> 100000
+        0
+
+
+
+//| Method |      Mean |    Error |   StdDev |    Gen 0 |    Gen 1 |    Gen 2 | Allocated |
+//|------- |----------:|---------:|---------:|---------:|---------:|---------:|----------:|
+//|  Init8 |  89.95 us | 1.050 us | 0.982 us |  31.1279 |  31.1279 |  31.1279 |     98 KB |
+//| Init16 | 134.67 us | 2.679 us | 3.755 us |  62.2559 |  62.2559 |  62.2559 |    195 KB |
+//| Init32 | 225.47 us | 3.467 us | 3.243 us | 124.7559 | 124.7559 | 124.7559 |    391 KB |
+//| Init64 | 423.21 us | 4.887 us | 4.332 us | 249.5117 | 249.5117 | 249.5117 |    781 KB |
+
+[<MemoryDiagnoser>]
+type ArrayInitBench() =
+
+    [<Benchmark>]
+    member this.Init8() =
+        let bsa = Array.init<uint8> 100000 (id >> uint8)
+        0
+
+    [<Benchmark>]
+    member this.Init16() =
+        let bsa = Array.init<uint16> 100000 (id >> uint16)
+        0
+
+    [<Benchmark>]
+    member this.Init32() =
+        let bsa = Array.init<uint32> 100000 (id >> uint32)
+        0
+
+
+    [<Benchmark>]
+    member this.Init64() =
+        let bsa = Array.init<uint64> 100000 (id >> uint64)
+        0
+
 
 
 

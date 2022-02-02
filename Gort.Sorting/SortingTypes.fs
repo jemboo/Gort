@@ -145,3 +145,6 @@ module StageWindowSize =
     let ToSwitchCount (dg:degree) (tWz:stageWindowSize) =
         SwitchCount.create ((Degree.value dg) * (value tWz) / 2)
     let fromInt v = create v
+
+
+

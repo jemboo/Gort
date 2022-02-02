@@ -32,14 +32,10 @@ type RndGenFixture () =
         let arraySize = 16
         let cycleCount = 2
         let block = RndGen.rndTwoCycleArray rndy arraySize cycleCount
-        let isTc = Comby.isTwoCycle block
-                    |> Result.ExtractOrThrow
-        Assert.IsTrue (isTc)
+        Assert.IsTrue (Comby.isTwoCycle block)
         let cycleCount = 8
         let block2 = RndGen.rndTwoCycleArray rndy arraySize cycleCount
-        let isTc = Comby.isTwoCycle block2
-                        |> Result.ExtractOrThrow
-        Assert.IsTrue (isTc)
+        Assert.IsTrue (Comby.isTwoCycle block2)
 
 
     [<TestMethod>]

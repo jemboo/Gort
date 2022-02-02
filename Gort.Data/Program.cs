@@ -2,5 +2,5 @@
 using Gort.Data;
 
 Console.WriteLine("Hello, World!");
-CauseSeed.Ass();
+CauseSeed.Init();
 Console.WriteLine("Goodbye, World!");

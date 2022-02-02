@@ -5,8 +5,11 @@ type degree = private Degree of int
 
 module Degree =
     let value (Degree v) = v
+    let create (value:int) =
+        if (value > 0) then value |> Degree |> Ok
+        else "degree must be greater than 0" |> Error
 
-    let create (value:int) = 
+    let createNr (value:int) = 
         value |> Degree
 
     let within (b:degree) v =
@@ -18,7 +21,7 @@ module Degree =
     let add (degs:degree seq) =
         degs |> Seq.map(value) 
              |> Seq.reduce(+)
-             |> create
+             |> createNr
 
     let reflect (dg:degree) (src:int) =
         (value dg) - src - 1
@@ -29,33 +32,11 @@ module Degree =
     let bitMaskUint64 (dg:degree) =
          (1uL <<< (value dg)) - 1uL
 
-
-//type smallDegree = private SmallDegree of int
-
-//module SmallDegree =
-//    let value (SmallDegree v) = v
-
-//    let maxValue = 64
-
-//    let create (value:int) = 
-//        match value with
-//        | dInt when ((dInt > maxValue) || (dInt > 1))  -> 
-//                    dInt |> SmallDegree |> Ok
-//        | foul -> (sprintf "%d not in range for smallDegree" foul) 
-//                  |> Error
-
-//    let fromDegree (degree:degree) = 
-//        create (Degree.value degree)
-
-//    let toDegree (sd:smallDegree) = 
-//        Degree.create (value sd)
-
-//    let binExp (smallDegree:smallDegree) =
-//        (1 <<< (value smallDegree)) 
-
-//    let bitMaskUint64 (sDg:smallDegree) =
-//         (1uL <<< (value sDg)) - 1uL
-
+    let bytesNeededFor (dg:degree) =
+        match (value dg) with
+        | x when (x < 256)  -> 1
+        | x when (x < 256 * 256)  -> 2
+        | _  -> 4
 
 
 type mutationRate = private MutationRate of float
