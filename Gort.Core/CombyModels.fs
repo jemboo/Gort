@@ -94,19 +94,19 @@ module Permutation =
 
 
     let makeFromBytes (dg:degree) (data:byte[]) = 
-        IntSet.makeFromBytes dg permFrom8bits permFrom16bits data
+        ByteArray.makeFromBytes dg permFrom8bits permFrom16bits data
 
 
     let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        IntSet.makeArrayFromBytes dg permFrom8bits permFrom16bits data
+        ByteArray.makeArrayFromBytes dg permFrom8bits permFrom16bits data
 
 
     let toBytes (perm:permutation) =
-        IntSet.toBytes (perm |> toIntSet)
+        ByteArray.toBytes (perm.values)
 
 
     let arrayToBytes (perms:permutation[]) =
-        IntSet.arrayToBytes (perms |> Array.map(toIntSet))
+        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
 //*************************************************************
@@ -151,7 +151,7 @@ module TwoCycle =
         | x when (x < 256)  -> twoCycleFrom8bits data
         | x when (x < 256 * 256)  -> 
               result {
-                let! u16s = Bitwise.getUint16arrayFromBytes data (data.Length / 2) 0
+                let! u16s = ByteArray.getUint16arrayFromBytes data (data.Length / 2) 0
                 return! twoCycleFrom16bits u16s
               }
         | _ -> "invalid degree" |> Error

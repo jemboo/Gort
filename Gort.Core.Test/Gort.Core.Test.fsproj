@@ -10,7 +10,8 @@
   <ItemGroup>
     <Compile Include="SysExtFixture.fs" />
     <Compile Include="CollectionExtFixture.fs" />
-    <Compile Include="BitwiseFixture.fs" />
+    <Compile Include="ByteUtilsFixture.fs" />
+    <Compile Include="ByteArrayFixture.fs" />
     <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CombyFixture.fs" />
     <Compile Include="RandoFixture.fs" />

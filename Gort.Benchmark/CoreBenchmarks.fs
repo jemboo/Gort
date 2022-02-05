@@ -79,13 +79,13 @@ type BenchIsSorted_filterByPickList () =
 
     [<Benchmark>]
     member this.filterByPickList() =
-        let ssR = Bitwise.filterByPickList testArray pickArray
+        let ssR = CollectionOps.filterByPickList testArray pickArray
                   |> Result.ExtractOrThrow
         0
 
     [<Benchmark>]
     member this.filterByPickList2() =
-        let ssR = Bitwise.filterByPickList testArray pickArray
+        let ssR = CollectionOps.filterByPickList testArray pickArray
                   |> Result.ExtractOrThrow
         0
 
@@ -195,16 +195,16 @@ type BenchConj() =
 [<MemoryDiagnoser>]
 type BenchRollout() =
     let deg = Degree.createNr 20
-    let bpa = Bitwise.allBitPackForDegree deg |> Result.ExtractOrThrow
+    let bpa = Degree.allUint64ForDegree deg |> Result.ExtractOrThrow
     
     [<Benchmark>]
     member this.toBitStriped() =
-        let bsa = bpa |> Bitwise.bitPackedtoBitStriped deg |> Result.ExtractOrThrow
+        let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         0
 
     [<Benchmark>]
     member this.toBitStriped2D() =
-        let bsa = bpa |> Bitwise.bitPackedtoBitStriped2D deg |> Result.ExtractOrThrow
+        let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped2D deg |> Result.ExtractOrThrow
         0
 
 

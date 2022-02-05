@@ -45,7 +45,7 @@ type SortableSetFixture () =
                       |> List.toArray
         let offset = 7
         let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-        byteStore <- Bitwise.degreeArrayToBytes byteStore offset degrees
+        byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
                      |> Result.ExtractOrThrow
         let degreeSection = byteStore.[offset ..]
         let res = SortableSet.makeStackInts degree degreeSection

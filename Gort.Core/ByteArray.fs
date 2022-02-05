@@ -6,148 +6,8 @@ open System.Security.Cryptography
 open System.IO
 
 
-module Bitwise =
-    
-    let bitMask_uL (bitCt:int) = 
-        (1uL <<< bitCt) - 1uL
 
-
-    let IdMap_ints = 
-        [|for deg=0 to 64 do 
-                yield if deg = 0 then [||] else [| 0 .. deg - 1 |] |]
-
-
-    let allSorted_uL =
-        [for deg=0 to 63 do 
-                yield bitMask_uL deg]
-
-
-    let isSorted (bitRep:uint64) = 
-        allSorted_uL |> List.contains bitRep
-
-
-    let noRepeats (items:uint64[]) =
-        items |> Array.distinct
-
-
-    let toIntArray (dg:degree) (data:uint64) = 
-        Array.init (Degree.value dg) data.intAt
-
-
-    let fromIntArray (data:int[]) (oneThresh:int)= 
-        let mutable rv = 0uL
-        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
-        rv
-
-
-    let allBitVersions (intVers:int[]) =
-        seq { 0 .. (intVers.Length - 1) } |> Seq.map(fromIntArray intVers)
-        
-
-    let toUniqueBitVersions (intVersions:int[] seq) =
-        intVersions |> Seq.map(allBitVersions) 
-                    |> Seq.concat
-                    |> Seq.distinct
-
-
-    let mergeUp (lowDegree:degree) (lowVal:uint64) (hiVal:uint64) =
-        (hiVal <<< (Degree.value lowDegree)) &&& lowVal
-
-
-    let mergeUpSeq (lowDegree:degree) (lowVals:uint64 seq) (hiVals:uint64 seq) =
-        let _mh (lv:uint64) =
-            hiVals |> Seq.map(mergeUp lowDegree lv)
-        lowVals |> Seq.map(_mh) |> Seq.concat
-
-
-    let cratesFor (itemsPerCrate:int) (items:int) = 
-        let fullCrates = items / itemsPerCrate
-        let leftOvers = items % itemsPerCrate
-        if (leftOvers = 0) then fullCrates else fullCrates + 1
-
-
-    let allBitPackForDegree (degree:degree) =
-        try
-            let itemCt = degree |> Degree.binExp
-            Array.init<uint64> itemCt (uint64) |> Ok
-        with
-            | ex -> ("error in allBitPackForDegree: " + ex.Message ) 
-                    |> Result.Error
-
-
-    let bitPacktoBitStripe (dg:degree) 
-                           (stripeArray:uint64[]) 
-                           (stripedOffset:int) 
-                           (bitPos:int) 
-                           (packedBits:uint64) =
-        for i = 0 to (Degree.value dg) - 1 do
-            if packedBits.isset i then
-                stripeArray.[stripedOffset + i] <- 
-                                stripeArray.[stripedOffset + i].set bitPos
-
-
-    let bitPackedtoBitStriped (dg:degree)
-                              (packedArray:uint64[]) =
-        try
-            let stripedArrayLength = cratesFor 64 packedArray.Length * (Degree.value dg)
-            let stripedArray = Array.zeroCreate stripedArrayLength
-            for i = 0 to packedArray.Length - 1 do
-                let stripedOffset = (i / 64) * (Degree.value dg)
-                let bitPos = i % 64
-                packedArray.[i] |> bitPacktoBitStripe dg stripedArray stripedOffset bitPos
-            stripedArray |> Ok
-        with
-            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
-
-
-
-    let bitPackedtoBitStriped2D (dg:degree)
-                                (packedArray:uint64[]) =
-        try
-            let stripedArrayLength = cratesFor 64 packedArray.Length
-            let stripedArray = Array2D.zeroCreate<uint64> (Degree.value dg) stripedArrayLength
-            let mutable i = 0
-            let mutable block = - 1
-            while i < packedArray.Length do
-                let mutable stripe = 0
-                block <- block + 1
-                while ((stripe < 64) && (i < packedArray.Length)) do
-                    for j = 0 to (Degree.value dg) - 1 do
-                        if packedArray.[i].isset j then
-                            stripedArray.[j, block] <- stripedArray.[j, block].set stripe
-                    i <- i + 1
-                    stripe <- stripe + 1
-            stripedArray |> Ok
-        with
-            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
-
-
-
-    let bitStripeToBitPack (dg:degree)
-                           (packedArray:uint64[])
-                           (stripeLoad:int)
-                           (stripedOffset:int) 
-                           (stripeArray:uint64)  =
-        let packedArrayBtPos = (stripedOffset % (Degree.value dg))
-        let packedArrayRootOffset = (stripedOffset / (Degree.value dg)) * 64
-        for i = 0 to stripeLoad - 1 do
-            if (stripeArray.isset i) then
-                 packedArray.[packedArrayRootOffset + i]  <-  
-                    packedArray.[packedArrayRootOffset + i].set packedArrayBtPos
-
-
-    let bitStripedToBitPacked (dg:degree)
-                              (itemCount:int) 
-                              (stripedArray:uint64[]) =
-        try
-            let packedArray = Array.zeroCreate itemCount
-            for i = 0 to stripedArray.Length - 1 do
-                let stripeLoad = Math.Min(64, itemCount - (i / (Degree.value dg)) * 64)
-                stripedArray.[i] |> bitStripeToBitPack dg packedArray stripeLoad i
-            packedArray |> Ok
-        with
-            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
-
+module ByteArray =
 
     /// ***********************************************************
     /// ******** uint64 mapping from byte arrays ******************
@@ -204,7 +64,6 @@ module Bitwise =
             | ex -> ("error in bytesFromUint64: " + ex.Message ) |> Result.Error
 
 
-
     /// ***********************************************************
     /// ******** uint32 mapping from byte arrays ******************
     /// ***********************************************************
@@ -250,7 +109,6 @@ module Bitwise =
             blob |> Ok
         with
             | ex -> ("error in bytesFromUint32: " + ex.Message ) |> Result.Error
-
 
 
     /// ***********************************************************
@@ -341,25 +199,104 @@ module Bitwise =
             | ex -> ("error in bytesFromUint8: " + ex.Message ) |> Result.Error
 
 
-    let filterByPickList (data:'a[]) (picks:bool[]) =
+
+//*************************************************************
+//********  degree dependent byte array conversions  *********
+//*************************************************************
+
+    let fromUint8<'T> (dg:degree) 
+                      (ctor8:byte[] -> Result<'T, string>) 
+                      (data:byte[]) = 
         try
-            let pickCount = picks |> Array.map(fun v -> if v then 1 else 0)
-                                  |> Array.sum
-            let filtAr = Array.zeroCreate pickCount
-            let mutable newDex = 0
-            for i = 0 to (data.Length - 1) do
-                if picks.[i] then 
-                    filtAr.[newDex] <- data.[i] 
-                    newDex <- newDex + 1
-            filtAr |> Ok
+            if (data.Length) % (Degree.value dg) <> 0 then
+                "data length is incorrect for degree" |> Error
+            else
+                result {
+                    let! permsR =
+                        data |> Array.chunkBySize (Degree.value dg) 
+                             |> Array.map(ctor8)
+                             |> Array.toList
+                             |> Result.sequence
+                    return permsR |> List.toArray
+                }
         with
-            | ex -> ("error in filterByPickList: " + ex.Message ) |> Result.Error
+          | ex -> ("error in permsFromUint8: " + ex.Message ) 
+                  |> Result.Error
 
 
-    /// ***********************************************************
-    /// ****** degree dependent maps to byte arrays ***************
-    /// ***********************************************************
+    let fromUint16s (dg:degree) 
+                    (ctor16:uint16[] -> Result<'T, string>) 
+                    (data:byte[]) = 
+        try
+            if (data.Length) % (2 * (Degree.value dg)) <> 0 then
+                "data length is incorrect for degree" |> Error
+            else
+                result {
+                    let! u16s = getUint16arrayFromBytes data (data.Length / 2) 0
+                    let! permsR =
+                        u16s |> Array.chunkBySize (Degree.value dg)
+                             |> Array.map(ctor16)
+                             |> Array.toList
+                             |> Result.sequence
+                    return permsR |> List.toArray
+                }
+        with
+          | ex -> ("error in permsFromUint8: " + ex.Message ) 
+                  |> Result.Error
 
+
+    let makeFromBytes (dg:degree) 
+                      (ctor8:uint8[] -> Result<'T, string>)  
+                      (ctor16:uint16[] -> Result<'T, string>) 
+                      (data:byte[]) = 
+        match (Degree.value dg) with
+        | x when (x < 256)  ->
+              result {
+                        let! u8s = getUint8arrayFromBytes data data.Length 0
+                        return! ctor8 u8s
+              }
+        | x when (x < 256 * 256)  -> 
+              result {
+                let! u16s = getUint16arrayFromBytes data (data.Length / 2) 0
+                return! ctor16 u16s
+              }
+        | _ -> "invalid degree" |> Error
+
+
+    let makeArrayFromBytes (dg:degree)
+                           (ctor8:uint8[] -> Result<'T, string>)  
+                           (ctor16:uint16[] -> Result<'T, string>) 
+                           (data:byte[]) = 
+        match (Degree.value dg) with
+        | x when (x < 256)  -> fromUint8 dg ctor8 data
+        | x when (x < 256 * 256)  -> fromUint16s dg ctor16 data
+        | _ -> "invalid degree" |> Error
+
+
+    let toBytes (inst:int[]) =
+        match (inst.Length) with
+        | x when (x < 256)  -> 
+              result {
+                let uint8Array = inst |> Array.map(uint8)
+                let data = Array.zeroCreate<byte> inst.Length
+                return! data |>  mapUint8arrayToBytes uint8Array 0
+              }
+        | x when (x < 256 * 256)  -> 
+              result {
+                  let uint16Array = inst |> Array.map(uint16)
+                  let data = Array.zeroCreate<byte> (inst.Length * 2)
+                  return! data |>  mapUint16arrayToBytes uint16Array 0
+              }
+        | _ -> "invalid degree" |> Error
+
+
+    let arrayToBytes (insts:int[][]) =
+                result {
+                    let! wak = insts |> Array.map(toBytes)
+                                     |> Array.toList
+                                     |> Result.sequence
+                    return wak |> Array.concat
+                }
 
 
 
@@ -398,73 +335,3 @@ module Bitwise =
             let uint16Array = dgs |> Array.map(Degree.value >> uint16)
             return! data |>  mapUint16arrayToBytes uint16Array offset
         }
-
-
-
-
-
-
-module ByteUtils =
-
-    let structHash (o:obj) =
-        let s = sprintf "%A" o
-        let inputBytes = System.Text.Encoding.ASCII.GetBytes(s);
-        let md5 = MD5.Create();
-        md5.ComputeHash(inputBytes)
-
-
-    let hashObjs (oes:obj seq) =
-        use stream = new MemoryStream()
-        use writer = new BinaryWriter(stream)
-        oes |> Seq.iter(fun o -> writer.Write(sprintf "%A" o))
-        let md5 = MD5.Create();
-        md5.ComputeHash(stream.ToArray())
-        
-
-    let trueBitCount32 (u32:uint) =
-        let mutable tc = 0
-        for i in 0 .. 31 do
-            let qua = (u32 &&& (1u <<< i)) > 0u
-            if qua then
-                tc <- tc + 1
-        tc
-
-
-    let trueBitCount64 (u64:uint64) =
-        let mutable tc = 0
-        for i in 0 .. 63 do
-            let qua = (u64 &&& (1UL <<< i)) > 0UL
-            if qua then
-                tc <- tc + 1
-        tc
-
-
-    let trueBitIndexes64 (u64:uint64) =
-        seq {
-                for i in 0 .. 63 do
-                    if (u64 &&& (1UL <<< i)) > 0UL then
-                        yield i
-            }
-
-
-    let stripeWrite (uBits:uint64[]) 
-                    (intBits:int[]) 
-                    (pos:int) = 
-        let one = (1UL <<< pos)
-        let proc dex =
-            if (intBits.[dex] > 0) then
-                uBits.[dex] <- 
-                            uBits.[dex] ||| one
-    
-        for i=0 to (uBits.Length - 1) do
-            proc i
-
-
-    let stripeRead (uBits:uint64[]) 
-                   (pos:int) = 
-        let one = (1UL <<< pos)
-        let proc dex v =
-            if ((uBits.[dex] &&& one) > 0UL) then
-                1
-            else 0
-        uBits |> Array.mapi (proc)

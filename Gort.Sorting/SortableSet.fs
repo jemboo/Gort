@@ -52,11 +52,12 @@ module SortableSet =
 
     let makeAllBits (dg:degree) = 
         result {
-            let! sortables = Bitwise.allBitPackForDegree dg
-            let! rollout = sortables |> Bitwise.bitPackedtoBitStriped dg
+            let! sortables = Degree.allUint64ForDegree dg
+            let! rollout = sortables |> ByteUtils.uint64ArraytoBitStriped dg
             let gen = sortableSetGen.Explicit dg
             return { sortableSet.gen = gen; impl = rollout |> sortableSetImpl.Bp64 }
         }
+
 
     let makeExplicitBp64 (dg:degree) (data:byte[]) = 
         result {
@@ -65,6 +66,7 @@ module SortableSet =
                      impl = perms |> Array.map(Permutation.toIntSet)
                                   |> sortableSetImpl.Ints }
         }
+
 
     let makeOrbiInts (dg:degree) (data:byte[]) = 
         result {
@@ -76,21 +78,25 @@ module SortableSet =
                                     |> sortableSetImpl.Ints }
         }
 
+
     let makeStackInts (dg:degree) (data:byte[]) = 
         result {
-            let! degrees = Bitwise.bytesToDegreeArray data
+            let! degrees = ByteArray.bytesToDegreeArray data
             let degTot = Degree.add degrees
             if degTot <> dg then
                 return! "degree list is incorrect" |> Error
             else
-                let sortables = IntSet.stackSortedBlocks degrees |> Seq.toArray
+                let sortables = CollectionOps.stackSortedBlocks degrees
+                                |> Seq.map(IntSet.create)
+                                |> Seq.toArray
                 return { sortableSet.gen = sortableSetGen.Stack degrees; 
                          impl = sortables |> sortableSetImpl.Ints }
         }
 
+
     let makeStackInts8 (dg:degree) (data:byte[]) = 
         result {
-            let! degrees = Bitwise.bytesToDegreeArray data
+            let! degrees = ByteArray.bytesToDegreeArray data
             let degTot = Degree.add degrees
             if degTot <> dg then
                 return! "degree list is incorrect" |> Error

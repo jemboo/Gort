@@ -5,7 +5,7 @@ open BenchmarkDotNet.Attributes
 [<MemoryDiagnoser>]
 type BenchMakeSorableStack() =
     let degree = Degree.create 16 |> Result.ExtractOrThrow
-    let degrees = [|Degree.create 8; Degree.create 4; Degree.create 2; Degree.create 2|]
+    let degrees = [| Degree.create 8; Degree.create 4; Degree.create 2; Degree.create 2 |]
                   |> Array.toList
                   |> Result.sequence
                   |> Result.ExtractOrThrow
@@ -16,7 +16,7 @@ type BenchMakeSorableStack() =
     [<Benchmark>]
     member this.makeStack() =
         let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-        byteStore <- Bitwise.degreeArrayToBytes byteStore offset degrees
+        byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
                      |> Result.ExtractOrThrow
         let degreeSection = byteStore.[offset ..]
         let res = SortableSet.makeStackInts degree degreeSection
@@ -27,7 +27,7 @@ type BenchMakeSorableStack() =
     [<Benchmark>]
     member this.makeStack8() =
         let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-        byteStore <- Bitwise.degreeArrayToBytes byteStore offset degrees
+        byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
                      |> Result.ExtractOrThrow
         let degreeSection = byteStore.[offset ..]
         let res = SortableSet.makeStackInts8 degree degreeSection

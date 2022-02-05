@@ -10,8 +10,9 @@
     <Compile Include="SysExt.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="CommonTypes.fs" />
-    <Compile Include="Bitwise.fs" />
     <Compile Include="CollectionExt.fs" />
+    <Compile Include="ByteUtils.fs" />
+    <Compile Include="ByteArray.fs" />
     <Compile Include="GuidUtils.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="RndGen.fs" />

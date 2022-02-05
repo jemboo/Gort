@@ -36,7 +36,7 @@ type CombyModelsFixture () =
         let _cycT (perm:permutation) =
             perm |> Permutation.powers 
                  |> CollectionOps.takeUpto maxSz
-                 |> Seq.map(fun p -> Bitwise.allBitVersions (Permutation.getArray p))
+                 |> Seq.map(fun p -> ByteUtils.allUint64s (Permutation.getArray p))
                  |> Seq.concat
                  |> Seq.toArray
         let _ctups (perm:permutation) =

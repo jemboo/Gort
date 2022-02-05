@@ -81,6 +81,12 @@ module CollectionProps =
         weights |> Array.scan (fun cum cur -> cum + cur) startVal
 
 
+    let cratesFor (itemsPerCrate:int) (items:int) = 
+        let fullCrates = items / itemsPerCrate
+        let leftOvers = items % itemsPerCrate
+        if (leftOvers = 0) then fullCrates else fullCrates + 1
+
+
     let fixedPointCount (a:int[]) =
         a |> Array.mapi(fun dex e -> if (dex = e) then 1 else 0)
           |> Array.reduce(+)
@@ -297,4 +303,44 @@ module CollectionOps =
         seq {for i = 0 to (Degree.value(degree) - 1) do
                 for j = 0 to i - 1 do
                     yield makeMonoTwoCycle degree i j}
+
+
+    let filterByPickList (data:'a[]) (picks:bool[]) =
+        try
+            let pickCount = picks |> Array.map(fun v -> if v then 1 else 0)
+                                  |> Array.sum
+            let filtAr = Array.zeroCreate pickCount
+            let mutable newDex = 0
+            for i = 0 to (data.Length - 1) do
+                if picks.[i] then 
+                    filtAr.[newDex] <- data.[i] 
+                    newDex <- newDex + 1
+            filtAr |> Ok
+        with
+            | ex -> ("error in filterByPickList: " + ex.Message ) |> Result.Error
+
+
+
+//*************************************************************
+//***********    Array Stacking    ****************************
+//*************************************************************
+
+    let isSorted (ints:int[]) =
+        CollectionProps.isSorted_inline ints
+
+    let stack (lowTohi: int[] seq) =
+        lowTohi |> Seq.concat
+                |> Seq.toArray
+
+    let comboStack (subSeqs: int[][] seq) =
+        let rec _cart LL =
+            match LL with
+            | [] -> Seq.singleton []
+            | L::Ls -> seq {for x in L do for xs in _cart Ls -> x::xs}
+        _cart (subSeqs |> Seq.toList) |> Seq.map(stack)
+
+    let stackSortedBlocks (blockSizes:degree seq) =
+        blockSizes |> Seq.map(Degree.sorted_0_1_Sequences >> Seq.toArray)
+                    |> comboStack
+
         
