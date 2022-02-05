@@ -25,8 +25,10 @@ module Bitwise =
     let isSorted (bitRep:uint64) = 
         allSorted_uL |> List.contains bitRep
 
+
     let noRepeats (items:uint64[]) =
         items |> Array.distinct
+
 
     let toIntArray (dg:degree) (data:uint64) = 
         Array.init (Degree.value dg) data.intAt
@@ -36,6 +38,7 @@ module Bitwise =
         let mutable rv = 0uL
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
+
 
     let allBitVersions (intVers:int[]) =
         seq { 0 .. (intVers.Length - 1) } |> Seq.map(fromIntArray intVers)
@@ -294,7 +297,6 @@ module Bitwise =
 
 
 
-
     /// ***********************************************************
     /// ******** uint8 mapping from byte arrays *******************
     /// ***********************************************************
@@ -306,7 +308,9 @@ module Bitwise =
             | ex -> ("error in uInt8FromBytes: " + ex.Message ) |> Result.Error
 
 
-    let getUint8arrayFromBytes (blob:byte[]) (arrayLen:int) (offset:int) =
+    let getUint8arrayFromBytes (blob:byte[]) 
+                               (arrayLen:int) 
+                               (offset:int) =
         try
             let rollout = Array.zeroCreate<uint8> arrayLen
             for i = 0 to (arrayLen - 1) do
@@ -316,7 +320,9 @@ module Bitwise =
             | ex -> ("error in uInt8sFromBytes: " + ex.Message ) |> Result.Error
 
 
-    let mapUint8arrayToBytes (uintA:uint8[]) (offset:int) (blob:byte[]) =
+    let mapUint8arrayToBytes (uintA:uint8[]) 
+                             (offset:int) 
+                             (blob:byte[]) =
         try
             for i = 0 to (uintA.Length - 1) do
                 blob.[offset + i] <- uintA.[i]
@@ -325,18 +331,14 @@ module Bitwise =
             | ex -> ("error in mapUint8arrayToBytes: " + ex.Message ) |> Result.Error
 
 
-    let mapUint8toBytes (uintV:uint8) (offset:int) (blob:byte[]) =
+    let mapUint8toBytes (uintV:uint8) 
+                        (offset:int) 
+                        (blob:byte[]) =
         try
             blob.[offset] <- uintV
             blob |> Ok
         with
             | ex -> ("error in bytesFromUint8: " + ex.Message ) |> Result.Error
-
-
-
-
-
-
 
 
     let filterByPickList (data:'a[]) (picks:bool[]) =
@@ -352,6 +354,53 @@ module Bitwise =
             filtAr |> Ok
         with
             | ex -> ("error in filterByPickList: " + ex.Message ) |> Result.Error
+
+
+    /// ***********************************************************
+    /// ****** degree dependent maps to byte arrays ***************
+    /// ***********************************************************
+
+
+
+
+    /// ***********************************************************
+    /// ******** degree mapping from byte arrays ******************
+    /// ***********************************************************
+
+    let bytesToDegree (data:byte[]) =
+        result {
+            let! v = getUint16FromBytes 0 data
+            return! v |> int |> Degree.create
+        }
+
+    let bytesToDegreeArray (data:byte[]) =
+        result {
+            if data.Length % 2 <> 0 then
+                return!   "incorrect byte format for degreeArrayFromBytes" |> Error
+            else
+                let! vs = data |> Array.chunkBySize 2
+                               |> Array.map(getUint16FromBytes 0)
+                               |> Array.toList
+                               |> Result.sequence
+
+                return! vs |> List.map(int >> Degree.create)
+                           |> Result.sequence
+        }
+
+    let degreeToBytes (data:byte[]) (offset:int) (dg:degree) =
+        result {
+            let uint16Value = (Degree.value dg) |> uint16
+            return! data |>  mapUint16toBytes uint16Value offset
+        }
+
+    let degreeArrayToBytes (data:byte[]) (offset:int) (dgs:degree[]) =
+        result {
+            let uint16Array = dgs |> Array.map(Degree.value >> uint16)
+            return! data |>  mapUint16arrayToBytes uint16Array offset
+        }
+
+
+
 
 
 

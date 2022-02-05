@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <Compile Include="SwitchFixture.fs" />
-    <Compile Include="Tests - Copy (2).fs" />
+    <Compile Include="SortableSetFixture.fs" />
     <Compile Include="Tests - Copy.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

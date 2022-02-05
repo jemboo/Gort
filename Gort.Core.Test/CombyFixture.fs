@@ -11,8 +11,8 @@ type CombyFixture () =
     member this.isIdentity() =
         let testArray = [|2; 3; 4; 5;|]
         let testArray2 = [|0; 1; 2; 3; 4; 5;|]
-        Assert.IsFalse(Comby.isIdentity testArray)
-        Assert.IsTrue(Comby.isIdentity testArray2)
+        Assert.IsFalse(CollectionProps.isIdentity testArray)
+        Assert.IsTrue(CollectionProps.isIdentity testArray2)
 
 
     [<TestMethod>]
@@ -20,7 +20,7 @@ type CombyFixture () =
         let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0|]
         let startVal = 3.5
         let expectedResult = [|3.5; 5.5; 8.5; 12.5; 17.5; 23.5; 30.5; 38.5; 47.5; 57.5|]
-        let actualResult = Comby.toCumulative startVal testArray
+        let actualResult = CollectionProps.asCumulative startVal testArray
         Assert.AreEqual(expectedResult.[8], actualResult.[8])
 
 
@@ -31,11 +31,11 @@ type CombyFixture () =
         let mutable i = 0
         while i<100 do
             let bloke = RndGen.randomPermutation randy degree
-            let inv = Comby.invertArray bloke (Array.zeroCreate (Degree.value degree))
+            let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Degree.value degree))
                         |> Result.ExtractOrThrow
-            let prod = Comby.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
+            let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
                         |> Result.ExtractOrThrow
-            Assert.IsTrue((prod = (Comby.identity (Degree.value degree))))
+            Assert.IsTrue((prod = (CollectionProps.identity (Degree.value degree))))
             i <- i+1
 
 
@@ -47,8 +47,8 @@ type CombyFixture () =
         let aBAexp = [|1; 4; 0; 3; 2;|]
         let aABact = [|0; 0; 0; 0; 0;|]
         let aBAact = [|0; 0; 0; 0; 0;|]
-        Comby.arrayProductInt aA aB aABact
-        Comby.arrayProductInt  aB aA aBAact
+        CollectionOps.arrayProductInt aA aB aABact
+        CollectionOps.arrayProductInt  aB aA aBAact
         let abExp = aABexp |> Array.toList
         let baExp = aBAexp |> Array.toList
         let abAct = aABact |> Array.toList
@@ -65,7 +65,7 @@ type CombyFixture () =
         let aABactA = [|3us; 1us; 0us; 4us; 2us;|]
         let aABact = [|3us; 1us; 0us; 4us; 2us;|]
        // let aBAact = [|0; 0; 0; 0; 0;|]
-        let aABact = Comby.arrayProduct16 aA aB aABact
+        let aABact = CollectionOps.arrayProduct16 aA aB aABact
         //Comby.arrayProduct16 aB aA aBAact
         let abExp = aABexp |> Array.toList
         //let baExp = aBAexp |> Array.toList
@@ -84,18 +84,18 @@ type CombyFixture () =
             let conjer = RndGen.randomPermutation randy degree
             let core1 = RndGen.randomPermutation randy degree
             let core2 = RndGen.randomPermutation randy degree
-            let coreProd = Comby.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
+            let coreProd = CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
-            let conj1 = core1 |> Comby.conjIntArraysR conjer  
+            let conj1 = core1 |> CollectionOps.conjIntArraysR conjer  
                               |> Result.ExtractOrThrow
-            let conj2 = core2 |> Comby.conjIntArraysR conjer 
+            let conj2 = core2 |> CollectionOps.conjIntArraysR conjer 
                               |> Result.ExtractOrThrow
 
-            let prodOfConj = Comby.arrayProductIntR conj1 conj2 (Array.zeroCreate conj1.Length)
+            let prodOfConj = CollectionOps.arrayProductIntR conj1 conj2 (Array.zeroCreate conj1.Length)
                                 |> Result.ExtractOrThrow
                                 |> Array.toList
-            let coreProdConj = coreProd |> Comby.conjIntArraysR conjer
+            let coreProdConj = coreProd |> CollectionOps.conjIntArraysR conjer
                                         |> Result.ExtractOrThrow
                                         |> Array.toList
             Assert.IsTrue((coreProdConj=prodOfConj))
@@ -111,18 +111,18 @@ type CombyFixture () =
             let conjer = RndGen.randomPermutation randy degree
             let core1 = RndGen.randomPermutation randy degree
             let core2 = RndGen.randomPermutation randy degree
-            let coreProd = Comby.arrayProductIntR core1 core2  (Array.zeroCreate core1.Length)
+            let coreProd = CollectionOps.arrayProductIntR core1 core2  (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
-            let conj1 = core1 |> Comby.conjIntArrays conjer  
+            let conj1 = core1 |> CollectionOps.conjIntArrays conjer  
                                 |> Result.ExtractOrThrow
-            let conj2 = core2 |> Comby.conjIntArrays conjer 
+            let conj2 = core2 |> CollectionOps.conjIntArrays conjer 
                                 |> Result.ExtractOrThrow
 
-            let prodOfConj = Comby.arrayProductIntR conj1 conj2  (Array.zeroCreate conj1.Length)
+            let prodOfConj = CollectionOps.arrayProductIntR conj1 conj2  (Array.zeroCreate conj1.Length)
                                 |> Result.ExtractOrThrow
                                 |> Array.toList
-            let coreProdConj = coreProd |> Comby.conjIntArrays conjer
+            let coreProdConj = coreProd |> CollectionOps.conjIntArrays conjer
                                         |> Result.ExtractOrThrow
                                         |> Array.toList
             Assert.IsTrue((coreProdConj=prodOfConj))
@@ -132,7 +132,7 @@ type CombyFixture () =
     [<TestMethod>]
     member this.allPowers () =
         let tc =  [|1;2;3;4;5;6;0|]
-        let orbit = Comby.allPowers tc |> Seq.toArray
+        let orbit = CollectionOps.allPowers tc |> Seq.toArray
         Assert.AreEqual(orbit.Length, 7);
 
 
@@ -145,12 +145,12 @@ type CombyFixture () =
         let tc3 =  [|0;4;2;3;1;6;5|]
         let ntc3 = [|1;1;2;3;6;5;4|]
 
-        Assert.IsTrue(Comby.isTwoCycle tc);
-        Assert.IsFalse(Comby.isTwoCycle ntc);
-        Assert.IsTrue(Comby.isTwoCycle tc2);
-        Assert.IsFalse(Comby.isTwoCycle ntc2);
-        Assert.IsTrue(Comby.isTwoCycle tc3);
-        Assert.IsFalse(Comby.isTwoCycle ntc3);
+        Assert.IsTrue(CollectionProps.isTwoCycle tc);
+        Assert.IsFalse(CollectionProps.isTwoCycle ntc);
+        Assert.IsTrue(CollectionProps.isTwoCycle tc2);
+        Assert.IsFalse(CollectionProps.isTwoCycle ntc2);
+        Assert.IsTrue(CollectionProps.isTwoCycle tc3);
+        Assert.IsFalse(CollectionProps.isTwoCycle ntc3);
 
 
     [<TestMethod>]
@@ -162,12 +162,12 @@ type CombyFixture () =
         let tc3 =  [|0;4;2;3;1;6;5|]
         let ntc3 = [|1;1;2;3;6;5;4|]
 
-        Assert.IsTrue(Comby.isPermutation tc);
-        Assert.IsFalse(Comby.isPermutation ntc);
-        Assert.IsTrue(Comby.isPermutation tc2);
-        Assert.IsFalse(Comby.isPermutation ntc2);
-        Assert.IsTrue(Comby.isPermutation tc3);
-        Assert.IsFalse(Comby.isPermutation ntc3);
+        Assert.IsTrue(CollectionProps.isPermutation tc);
+        Assert.IsFalse(CollectionProps.isPermutation ntc);
+        Assert.IsTrue(CollectionProps.isPermutation tc2);
+        Assert.IsFalse(CollectionProps.isPermutation ntc2);
+        Assert.IsTrue(CollectionProps.isPermutation tc3);
+        Assert.IsFalse(CollectionProps.isPermutation ntc3);
 
 
 
@@ -191,16 +191,11 @@ type CombyFixture () =
     member this.enumNchooseM() =
         let n = 8
         let m = 5
-        let res = Comby.enumNchooseM n m 
+        let res = CollectionProps.enumNchooseM n m 
                     |> Seq.map(List.toArray)
                     |> Seq.toList
-        Assert.IsTrue(res |> Seq.forall(Collections.isSorted))
+        Assert.IsTrue(res |> Seq.forall(CollectionProps.isSorted))
         Assert.AreEqual(res.Length, 56)
-
-
-
-
-
 
 
 

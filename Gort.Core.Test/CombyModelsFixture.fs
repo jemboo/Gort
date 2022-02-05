@@ -1,11 +1,9 @@
 namespace Gort.Core.Test
 
-open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type PermutationFixture () =
-
+type CombyModelsFixture () =
 
     [<TestMethod>]
     member this.product() =
@@ -16,13 +14,12 @@ type PermutationFixture () =
         Assert.AreEqual(1, 1)
 
 
-
     [<TestMethod>]
     member this.randomCycles () =
         let maxSz = 100000
         let _cycT (perm:permutation) =
             perm |> Permutation.powers 
-                 |> Collections.takeUpto maxSz
+                 |> CollectionOps.takeUpto maxSz
                  |> Seq.length
                     
         let randy = Rando.create rngType.Lcg (RandomSeed.fromNow())
@@ -33,13 +30,12 @@ type PermutationFixture () =
         Assert.AreEqual(1, 1)
 
 
-
     [<TestMethod>]
     member this.randomCycles2 () =
         let maxSz = 100
         let _cycT (perm:permutation) =
             perm |> Permutation.powers 
-                 |> Collections.takeUpto maxSz
+                 |> CollectionOps.takeUpto maxSz
                  |> Seq.map(fun p -> Bitwise.allBitVersions (Permutation.getArray p))
                  |> Seq.concat
                  |> Seq.toArray

@@ -26,25 +26,25 @@ type BenchIsSorted_Arrays() =
 
     [<Benchmark>]
     member this.isSorted_idiom() =
-        let ssR = Collections.isSorted_idiom this.testArray
+        let ssR = CollectionProps.isSorted_idiom this.testArray
         0
 
     
     [<Benchmark>]
     member this.isSorted_uL() =
-        let ssR = Collections.isSorted_uL this.testArray
+        let ssR = CollectionProps.isSorted_uL this.testArray
         0
 
 
     [<Benchmark>]
     member this.isSorted_inline() =
-        let ssR = Collections.isSorted_inline this.testArray
+        let ssR = CollectionProps.isSorted_inline this.testArray
         0
 
 
     [<Benchmark>]
     member this.isSorted() =
-        let ssR = Collections.isSorted this.testArray
+        let ssR = CollectionProps.isSorted this.testArray
         0
 
 
@@ -141,51 +141,51 @@ type BenchConj() =
 
     [<Benchmark>]
     member this.invertArray() =
-        let ssR = Comby.invertArray aCore (Array.zeroCreate aConj.Length)
+        let ssR = CollectionOps.invertArray aCore (Array.zeroCreate aConj.Length)
                     |> Result.ExtractOrThrow
         0
 
 
     [<Benchmark>]
     member this.arrayProductInt() =
-        let ssR = Comby.arrayProductInt aConj aCore (Array.zeroCreate aConj.Length)
+        let ssR = CollectionOps.arrayProductInt aConj aCore (Array.zeroCreate aConj.Length)
         0
 
 
     [<Benchmark>]
     member this.conjIntArraysNoAlloc() =
-        let ssR = Comby.arrayProductInt aConj aCore aOut
+        let ssR = CollectionOps.arrayProductInt aConj aCore aOut
         0
 
     [<Benchmark>]
     member this.arrayProduct16() =
-        let ssR = Comby.arrayProduct16 aConj16 aCore16 aOut16 //(Array.zeroCreate<uint16> aConj.Length)
+        let ssR = CollectionOps.arrayProduct16 aConj16 aCore16 aOut16 //(Array.zeroCreate<uint16> aConj.Length)
         0
 
 
     [<Benchmark>]
     member this.arrayProduct8() =
-        let ssR = Comby.arrayProduct8 aConj8 aCore8 aOut8 //(Array.zeroCreate<uint8> aConj.Length)
+        let ssR = CollectionOps.arrayProduct8 aConj8 aCore8 aOut8 //(Array.zeroCreate<uint8> aConj.Length)
         0
 
 
     [<Benchmark>]
     member this.arrayProductIntR() =
-        let ssR = Comby.arrayProductIntR aConj aCore aOut
+        let ssR = CollectionOps.arrayProductIntR aConj aCore aOut
                     |> Result.ExtractOrThrow
         0
 
 
     [<Benchmark>]
     member this.conjIntArrays() =
-        let ssR = Comby.conjIntArrays aConj aCore 
+        let ssR = CollectionOps.conjIntArrays aConj aCore 
                     |> Result.ExtractOrThrow
         0
 
 
     [<Benchmark>]
     member this.conjIntArraysR() =
-        let ssR = Comby.conjIntArraysR aConj aCore
+        let ssR = CollectionOps.conjIntArraysR aConj aCore
                     |> Result.ExtractOrThrow
         0
 

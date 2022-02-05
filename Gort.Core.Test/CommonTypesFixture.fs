@@ -31,4 +31,11 @@ type CommonTypesFixture () =
 
     [<TestMethod>]
     member this.TestMethodPassing () =
+        let woop (hork:int[]) =
+            hork
+        let grok = [|0 .. 10|]
+        
+        let weez = woop grok.[3 .. ]
+        let wren = woop grok.[3 .. ]
+        let woop = woop grok.[3 .. 6]
         Assert.IsTrue(true);

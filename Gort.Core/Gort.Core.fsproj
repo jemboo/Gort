@@ -10,13 +10,13 @@
     <Compile Include="SysExt.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="CommonTypes.fs" />
-    <Compile Include="Collections.fs" />
     <Compile Include="Bitwise.fs" />
+    <Compile Include="CollectionExt.fs" />
     <Compile Include="GuidUtils.fs" />
-    <Compile Include="Comby.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="RndGen.fs" />
-    <Compile Include="Permutation.fs" />
+    <Compile Include="IntSet.fs" />
+    <Compile Include="CombyModels.fs" />
     <Compile Include="SwitchRfl.fs" />
     <Compile Include="File.fs" />
   </ItemGroup>

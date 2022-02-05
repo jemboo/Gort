@@ -39,6 +39,7 @@ module Degree =
         | _  -> 4
 
 
+
 type mutationRate = private MutationRate of float
 
 module MutationRate =

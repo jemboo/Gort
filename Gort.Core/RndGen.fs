@@ -42,14 +42,14 @@ module RndGen =
 
     let rndMonoTwoCycle (degree:degree) (rnd:IRando) =
         let tup = drawTwoWithoutRep degree rnd
-        Comby.makeMonoTwoCycle degree (fst tup) (snd tup)
+        CollectionOps.makeMonoTwoCycle degree (fst tup) (snd tup)
 
 
     let fromWeightedDistribution (weightFunction:float->float) 
                                  (rnd:IRando) 
                                  (items:float[]) =
         let bins = items |> Array.map(weightFunction)
-                         |> Comby.toCumulative 0.0
+                         |> CollectionProps.asCumulative 0.0
         let _nextBin () = 
                 let nextSamp = rnd.NextFloat * bins.[bins.Length - 1]
                 let nextIndex = bins |> Array.findIndexBack(fun av -> av < nextSamp)

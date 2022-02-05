@@ -2,17 +2,16 @@
 open System
 
 
-//type sortableB64 = { degree:degree; sortables:uint64[] }
-//type sortableB64Roll = { degree:degree; count:int; rollout:uint64[] }
 type sortableSetImpl = 
     | Bp64 of uint64[]
-    | Ints of permutation[]
+    | Ints of intSet[]
+    | Ints8 of intSet8[]
 
 
 type sortableSetGen =
-    | Explicit of degree
     | AllBits of degree
-    | CoreAndConj of twoCycle*permutation
+    | Explicit of degree
+    | Orbit of permutation
     | Stack of List<degree>
 
 
@@ -26,13 +25,10 @@ module SortableSetGen =
             return sortableSetGen.AllBits dg
         }
 
-    let makeCoreAndConj (twoCycle:int[]) (perm:int[]) =
+    let makeOrbit (perm:int[]) =
         result {
-            let! tc = TwoCycle.create twoCycle
             let! perm = Permutation.create perm
-            if ((tc |> TwoCycle.getDegree) <> (perm |> Permutation.getDegree)) then
-                return "degree does not match stack sum" |> Error
-            else return sortableSetGen.CoreAndConj (tc, perm) |> Ok
+            return sortableSetGen.Orbit perm |> Ok
         }
 
     let makeStack (dgs:int[]) =
@@ -47,14 +43,14 @@ module SortableSetGen =
         match ssgen with
         | Explicit dg -> dg
         | AllBits dg -> dg
-        | CoreAndConj (tc, _) -> TwoCycle.getDegree tc
+        | Orbit perm -> Permutation.getDegree perm
         | Stack dgs -> Degree.add dgs
 
 
 
 module SortableSet =
 
-    let allBp64ForDegree (dg:degree) = 
+    let makeAllBits (dg:degree) = 
         result {
             let! sortables = Bitwise.allBitPackForDegree dg
             let! rollout = sortables |> Bitwise.bitPackedtoBitStriped dg
@@ -62,43 +58,44 @@ module SortableSet =
             return { sortableSet.gen = gen; impl = rollout |> sortableSetImpl.Bp64 }
         }
 
-    let makePermutationSet (dg:degree) (data:byte[]) = 
+    let makeExplicitBp64 (dg:degree) (data:byte[]) = 
         result {
             let! perms = Permutation.makeArrayFromBytes dg data
             return { sortableSet.gen = sortableSetGen.Explicit dg; 
-                     impl = perms |> sortableSetImpl.Ints }
+                     impl = perms |> Array.map(Permutation.toIntSet)
+                                  |> sortableSetImpl.Ints }
         }
 
-    let makeCoreAndConj (dg:degree) (data:byte[]) = 
+    let makeOrbiInts (dg:degree) (data:byte[]) = 
         result {
-            let arrayLen = (Degree.value dg) * (Degree.bytesNeededFor dg)
-            let! tcA = data.[0 .. (arrayLen - 1)] |> Permutation.makeFromBytes dg
-            let! permA = data.[arrayLen ..] |> Permutation.makeFromBytes dg
-            let allConjugators = Permutation.powers permA |> Seq.toArray
-            return None
+            let arrayLen = (Degree.value dg) * (dg |> Degree.bytesNeededFor)
+            let! perm = data.[0 .. (arrayLen - 1)] |> Permutation.makeFromBytes dg
+            let orbit = Permutation.powers perm |> Seq.toArray
+            return { sortableSet.gen = sortableSetGen.Orbit perm; 
+                     impl = orbit   |> Array.map(Permutation.toIntSet)
+                                    |> sortableSetImpl.Ints }
         }
 
-    //let stackSets (ssets:sortableSet list) =
-    //    None
+    let makeStackInts (dg:degree) (data:byte[]) = 
+        result {
+            let! degrees = Bitwise.bytesToDegreeArray data
+            let degTot = Degree.add degrees
+            if degTot <> dg then
+                return! "degree list is incorrect" |> Error
+            else
+                let sortables = IntSet.stackSortedBlocks degrees |> Seq.toArray
+                return { sortableSet.gen = sortableSetGen.Stack degrees; 
+                         impl = sortables |> sortableSetImpl.Ints }
+        }
 
-    //let allForDegree (degree:degree) = 
-    //    result {
-        
-    //        let! sortables = Bitwise.allBitPackForDegree degree
-    //        return  { 
-    //                    sortableB64.degree = degree; 
-    //                    sortableB64.sortables = sortables
-    //                }
-    //    }
-
-    //let rndForDegree (degree:degree) (itemCt:int) (rnd:IRando) = 
-    //    try
-    //        { 
-    //            sortableB64.degree = degree; 
-    //            sortableB64.sortables = Array.init<uint64> 
-    //                                        itemCt 
-    //                                        (fun _ -> RndGen.rndBitsUint64 degree rnd)
-    //        } |> Ok
-    //    with
-    //        | ex -> ("error in allBitPackForDegree: " + ex.Message ) |> Result.Error
-
+    let makeStackInts8 (dg:degree) (data:byte[]) = 
+        result {
+            let! degrees = Bitwise.bytesToDegreeArray data
+            let degTot = Degree.add degrees
+            if degTot <> dg then
+                return! "degree list is incorrect" |> Error
+            else
+                let sortables = IntSet8.stackSortedBlocks degrees |> Seq.toArray
+                return { sortableSet.gen = sortableSetGen.Stack degrees; 
+                         impl = sortables |> sortableSetImpl.Ints8 }
+        }

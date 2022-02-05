@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <Compile Include="SysExtFixture.fs" />
-    <Compile Include="CollectionsFixture.fs" />
+    <Compile Include="CollectionExtFixture.fs" />
     <Compile Include="BitwiseFixture.fs" />
     <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CombyFixture.fs" />
     <Compile Include="RandoFixture.fs" />
-    <Compile Include="PermutationFixture.fs" />
+    <Compile Include="CombyModelsFixture.fs" />
     <Compile Include="RndGenFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

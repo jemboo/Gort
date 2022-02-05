@@ -6,7 +6,7 @@ type permutation = private {values:int[] }
 module Permutation =
 
     let create (vals:int[]) =
-        if Comby.isPermutation vals then
+        if CollectionProps.isPermutation vals then
              { permutation.values = vals} |> Ok
         else
         "not a permutation" |> Error
@@ -17,33 +17,33 @@ module Permutation =
         Degree.createNr perm.values.Length
 
     let identity (degree:degree) = 
-        { values= Comby.identity (Degree.value degree)}
+        { values= CollectionProps.identity (Degree.value degree)}
 
-    let permFrom8bits (b:byte[]) =
-        create (b |> Array.map(int))
+    let toIntSet (perm:permutation) =
+        {intSet.values = perm.values}
 
-    let permFrom16bits (b:uint16[]) =
-        create (b |> Array.map(int))
+    let toIntSet8 (perm:permutation) =
+        {intSet8.values = perm.values |> Array.map(uint8)}
 
     let rotate (degree:degree) (dir:int) = 
         let d = (Degree.value degree)
         { values=Array.init d (fun i-> (i + dir) % d)}
 
     let isTwoCycle (perm:permutation) =
-        Comby.isTwoCycle perm.values
+        CollectionProps.isTwoCycle perm.values
 
     let inRange (degree:degree) (value:int) =
        ((value > -1) && (value < (Degree.value degree)))
 
     let inverse (p:permutation)
                 (a_out:array<int>) =
-        { values = Comby.invertArrayNr p.values a_out }
+        { values = CollectionOps.invertArrayNr p.values a_out }
 
     // will work without error if the permutations are the same size
     let productNr (lhs:permutation) 
                   (rhs:permutation) =
         { permutation.values =  
-                Comby.arrayProductInt
+                CollectionOps.arrayProductInt
                     (lhs.values)
                     (rhs.values)
                     (Array.zeroCreate lhs.values.Length) }
@@ -55,7 +55,7 @@ module Permutation =
             "permuation degrees dont match" |> Error
         else
             { permutation.values =  
-                        Comby.arrayProductInt
+                        CollectionOps.arrayProductInt
                             (lhs.values)
                             (rhs.values)
                             (Array.zeroCreate lhs.values.Length) } |> Ok
@@ -63,7 +63,7 @@ module Permutation =
 
     let conjugate (pA:permutation) (conj:permutation) =
         result {
-            let! res = Comby.conjIntArrays 
+            let! res = CollectionOps.conjIntArrays 
                                 (pA |> getArray)
                                 (conj |> getArray)
             return create res
@@ -71,7 +71,7 @@ module Permutation =
 
 
     let powers (perm:permutation)  =
-        perm.values |> Comby.allPowers
+        perm.values |> CollectionOps.allPowers
                     |> Seq.map(fun vs -> {permutation.values = vs})
 
 
@@ -80,59 +80,36 @@ module Permutation =
         powers r1 |> Seq.toArray
 
 
-    let permArrayFromUint8 (dg:degree) (data:byte[]) = 
-        try
-            if (data.Length) % (Degree.value dg) <> 0 then
-                "data length is incorrect for degree" |> Error
-            else
-                result {
-                    let! permsR =
-                        data |> Array.chunkBySize (Degree.value dg) 
-                             |> Array.map(permFrom8bits)
-                             |> Array.toList
-                             |> Result.sequence
-                    return permsR |> List.toArray
-                }
-        with
-          | ex -> ("error in permsFromUint8: " + ex.Message ) 
-                  |> Result.Error
+
+//*************************************************************
+//***************  byte conversions****************************
+//*************************************************************
+
+    let permFrom8bits (b:uint8[]) =
+        create (b |> Array.map(int))
 
 
-    let permArrayFromUint16 (dg:degree) (data:byte[]) = 
-        try
-            if (data.Length) % (2 * (Degree.value dg)) <> 0 then
-                "data length is incorrect for degree" |> Error
-            else
-                result {
-                    let! u16s = Bitwise.getUint16arrayFromBytes data (data.Length / 2) 0
-                    let! permsR =
-                        u16s |> Array.chunkBySize (Degree.value dg)
-                             |> Array.map(permFrom16bits)
-                             |> Array.toList
-                             |> Result.sequence
-                    return permsR |> List.toArray
-                }
-        with
-          | ex -> ("error in permsFromUint8: " + ex.Message ) 
-                  |> Result.Error
-
-
-    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        match (Degree.value dg) with
-        | x when (x < 256)  -> permArrayFromUint8 dg data
-        | x when (x < 256 * 256)  -> permArrayFromUint16 dg data
-        | _ -> "invalid degree" |> Error
+    let permFrom16bits (b:uint16[]) =
+        create (b |> Array.map(int))
 
 
     let makeFromBytes (dg:degree) (data:byte[]) = 
-        match (Degree.value dg) with
-        | x when (x < 256)  -> permFrom8bits data
-        | x when (x < 256 * 256)  -> 
-              result {
-                let! u16s = Bitwise.getUint16arrayFromBytes data (data.Length / 2) 0
-                return! permFrom16bits u16s
-              }
-        | _ -> "invalid degree" |> Error
+        IntSet.makeFromBytes dg permFrom8bits permFrom16bits data
+
+
+    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+        IntSet.makeArrayFromBytes dg permFrom8bits permFrom16bits data
+
+
+    let toBytes (perm:permutation) =
+        IntSet.toBytes (perm |> toIntSet)
+
+
+    let arrayToBytes (perms:permutation[]) =
+        IntSet.arrayToBytes (perms |> Array.map(toIntSet))
+
+
+//*************************************************************
 
 
     // IRando dependent
@@ -151,7 +128,7 @@ type twoCycle = private { values:int[] }
 module TwoCycle = 
 
     let create (vals:int[]) =
-        if Comby.isTwoCycle vals then
+        if CollectionProps.isTwoCycle vals then
              { twoCycle.values = vals} |> Ok
         else
             "not a two cycle" |> Error
@@ -181,8 +158,7 @@ module TwoCycle =
 
     let conjugate (tc:twoCycle) (perm:permutation) =
         { twoCycle.values =
-            Comby.conjIntArraysNr (Permutation.getArray perm)
+            CollectionOps.conjIntArraysNr (Permutation.getArray perm)
                                   (getArray tc)
                                   (Array.zeroCreate perm.values.Length)
         }
-

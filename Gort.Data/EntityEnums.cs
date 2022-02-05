@@ -40,7 +40,7 @@
         IntSets,
         Rollout,
         AllBits,
-        CoreAndConj,
+        Orbit,
         Stack
     }
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SortingBenchmark.fs" />
     <Compile Include="BatchRuns.fs" />
     <Compile Include="CoreBenchmarks.fs" />
     <Compile Include="Library.fs" />
