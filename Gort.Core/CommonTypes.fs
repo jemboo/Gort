@@ -9,6 +9,10 @@ module Degree =
         if (value > 0) then value |> Degree |> Ok
         else "degree must be greater than 0" |> Error
 
+    let create8 (value:int) =
+        if (value > 0) && (value < 9) then value |> Degree |> Ok
+        else "degree must be greater than 0 and less than 9" |> Error
+
     let createNr (value:int) = 
         value |> Degree
 

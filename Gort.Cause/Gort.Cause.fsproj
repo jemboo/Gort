@@ -6,18 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Switch.fs" />
-    <Compile Include="SwitchGen.fs" />
-    <Compile Include="SortingTypes.fs" />
-    <Compile Include="Stage.fs" />
-    <Compile Include="Sorter.fs" />
-    <Compile Include="SortableSetO.fs" />
-    <Compile Include="SortableSet.fs" />
-    <Compile Include="BinRep.fs" />
+    <Compile Include="cSortableSet.fs" />
+    <Compile Include="Library.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
+    <ProjectReference Include="..\Gort.Data\Gort.Data.csproj" />
+    <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
   </ItemGroup>
 
 </Project>

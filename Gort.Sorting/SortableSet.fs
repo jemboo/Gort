@@ -2,7 +2,7 @@
 open System
 
 
-type sortableSetImpl = 
+type sortableSetImpl2 = 
     | Bp64 of uint64[]
     | Ints of intSet[]
     | Ints8 of intSet8[]
@@ -15,7 +15,11 @@ type sortableSetGen =
     | Stack of List<degree>
 
 
-type sortableSet = {gen:sortableSetGen; impl:sortableSetImpl}
+type sortableSet2 = {gen:sortableSetGen; impl:sortableSetImpl2}
+
+
+
+type sortableSet = {id:sortableSetId; impl:sortableSetImpl2}
     
 module SortableSetGen =
 
@@ -55,16 +59,16 @@ module SortableSet =
             let! sortables = Degree.allUint64ForDegree dg
             let! rollout = sortables |> ByteUtils.uint64ArraytoBitStriped dg
             let gen = sortableSetGen.Explicit dg
-            return { sortableSet.gen = gen; impl = rollout |> sortableSetImpl.Bp64 }
+            return { sortableSet2.gen = gen; impl = rollout |> sortableSetImpl2.Bp64 }
         }
 
 
     let makeExplicitBp64 (dg:degree) (data:byte[]) = 
         result {
             let! perms = Permutation.makeArrayFromBytes dg data
-            return { sortableSet.gen = sortableSetGen.Explicit dg; 
+            return { sortableSet2.gen = sortableSetGen.Explicit dg; 
                      impl = perms |> Array.map(Permutation.toIntSet)
-                                  |> sortableSetImpl.Ints }
+                                  |> sortableSetImpl2.Ints }
         }
 
 
@@ -73,9 +77,9 @@ module SortableSet =
             let arrayLen = (Degree.value dg) * (dg |> Degree.bytesNeededFor)
             let! perm = data.[0 .. (arrayLen - 1)] |> Permutation.makeFromBytes dg
             let orbit = Permutation.powers perm |> Seq.toArray
-            return { sortableSet.gen = sortableSetGen.Orbit perm; 
+            return { sortableSet2.gen = sortableSetGen.Orbit perm; 
                      impl = orbit   |> Array.map(Permutation.toIntSet)
-                                    |> sortableSetImpl.Ints }
+                                    |> sortableSetImpl2.Ints }
         }
 
 
@@ -89,11 +93,11 @@ module SortableSet =
                 let sortables = CollectionOps.stackSortedBlocks degrees
                                 |> Seq.map(IntSet.create)
                                 |> Seq.toArray
-                return { sortableSet.gen = sortableSetGen.Stack degrees; 
-                         impl = sortables |> sortableSetImpl.Ints }
+                return { sortableSet2.gen = sortableSetGen.Stack degrees; 
+                         impl = sortables |> sortableSetImpl2.Ints }
         }
-
-
+        
+        
     let makeStackInts8 (dg:degree) (data:byte[]) = 
         result {
             let! degrees = ByteArray.bytesToDegreeArray data
@@ -101,7 +105,9 @@ module SortableSet =
             if degTot <> dg then
                 return! "degree list is incorrect" |> Error
             else
-                let sortables = IntSet8.stackSortedBlocks degrees |> Seq.toArray
-                return { sortableSet.gen = sortableSetGen.Stack degrees; 
-                         impl = sortables |> sortableSetImpl.Ints8 }
+                let sortables = CollectionOps.stackSortedBlocks degrees
+                                |> Seq.map(IntSet8.create)
+                                |> Seq.toArray
+                return { sortableSet2.gen = sortableSetGen.Stack degrees; 
+                            impl = sortables |> sortableSetImpl2.Ints8 }
         }

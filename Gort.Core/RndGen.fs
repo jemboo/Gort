@@ -40,11 +40,6 @@ module RndGen =
         else bBit, aBit
 
 
-    let rndMonoTwoCycle (degree:degree) (rnd:IRando) =
-        let tup = drawTwoWithoutRep degree rnd
-        CollectionOps.makeMonoTwoCycle degree (fst tup) (snd tup)
-
-
     let fromWeightedDistribution (weightFunction:float->float) 
                                  (rnd:IRando) 
                                  (items:float[]) =

@@ -93,15 +93,6 @@ type BitwiseFixture () =
         Assert.IsTrue(bsa2.Length > 1)
 
 
-    [<TestMethod>]
-    member this.filterByPickList () =
-        let data = [|0uL; 1uL; 2uL; 3uL; 4uL; 5uL;|]
-        let picks = [|true; false; true; true; false; true;|]
-        let expected = [|0uL; 2uL; 3uL; 5uL;|]
-        let filtered = CollectionOps.filterByPickList data picks
-                        |> Result.ExtractOrThrow
-        Assert.AreEqual(expected |> Array.toList, filtered |> Array.toList);
-
 
     [<TestMethod>]
     member this.rolloutAndSortedFilter () =
@@ -111,6 +102,7 @@ type BitwiseFixture () =
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
         let srtedBack = bpaBack |> Array.filter(fun srtbl -> srtbl |> ByteUtils.isSorted |> not)
         Assert.AreEqual(1, 1);
+
 
     [<TestMethod>]
     member this.hashObjs () =

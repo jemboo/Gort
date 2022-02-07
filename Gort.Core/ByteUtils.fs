@@ -22,24 +22,22 @@ module ByteUtils =
         let md5 = MD5.Create();
         md5.ComputeHash(stream.ToArray())
         
-    
-    let bitMask_uL (bitCt:int) = 
-        (1uL <<< bitCt) - 1uL
 
     let IdMap_ints = 
         [|for deg=0 to 64 do 
                 yield if deg = 0 then [||] else [| 0 .. deg - 1 |] |]
 
     let allSorted_uL =
-        [for deg=0 to 63 do yield bitMask_uL deg]
+        [for deg = 0 to 63 do yield (1uL <<< deg) - 1uL]
 
     let isSorted (bitRep:uint64) = 
         allSorted_uL |> List.contains bitRep
 
-
-    let intToIntArray (dg:degree) (data:int) = 
-        let d64 = data |> uint64
+    let intToIntArray (dg:degree) (d64:uint64) = 
         Array.init (Degree.value dg) d64.intAt
+
+    let intToIntArray8 (dg:degree) (d64:uint64) = 
+        Array.init (Degree.value dg) d64.intAt8
 
     let uint64toIntArray (dg:degree) (d64:uint64) = 
         Array.init (Degree.value dg) d64.intAt
@@ -50,6 +48,11 @@ module ByteUtils =
         rv
 
     let intArrayToUint64 (data:int[]) (oneThresh:int)= 
+        let mutable rv = 0uL
+        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
+        rv
+
+    let int8ArrayToUint64 (data:uint8[]) (oneThresh:uint8)= 
         let mutable rv = 0uL
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
@@ -90,7 +93,7 @@ module ByteUtils =
 
 
     let uint64ArraytoBitStriped (dg:degree)
-                              (packedArray:uint64[]) =
+                                (packedArray:uint64[]) =
         try
             let stripedArrayLength = CollectionProps.cratesFor 
                                         64 packedArray.Length * (Degree.value dg)

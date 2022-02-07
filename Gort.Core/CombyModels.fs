@@ -1,5 +1,4 @@
 ﻿namespace global
-open System
 
 // a permutation of the set {0, 1,.. (degree-1)}
 type permutation = private {values:int[] }
@@ -11,10 +10,38 @@ module Permutation =
         else
         "not a permutation" |> Error
 
-    let getArray (perm:permutation) = perm.values
+    let create8 (b:uint8[]) =
+        create (b |> Array.map(int))
 
+    let create16 (b:uint16[]) =
+        create (b |> Array.map(int))
+
+    let getArray (perm:permutation) = perm.values
+        
     let getDegree (perm:permutation) =
         Degree.createNr perm.values.Length
+
+    let rotate (degree:degree) (dir:int) = 
+        let d = (Degree.value degree)
+        { values=Array.init d (fun i-> (i + dir) % d)}
+
+
+    let powers (perm:permutation)  =
+        perm.values |> CollectionOps.allPowers
+                    |> Seq.map(fun vs -> {permutation.values = vs})
+
+    let conjugate (conj:permutation)  (pA:permutation) =
+        result {
+            let! res = CollectionOps.conjIntArrays 
+                                (pA |> getArray)
+                                (conj |> getArray)
+            return create res
+        }
+
+    let cyclicGroup (degree:degree) = 
+
+        let r1 = rotate degree 1
+        powers r1 |> Seq.toArray
 
     let identity (degree:degree) = 
         { values= CollectionProps.identity (Degree.value degree)}
@@ -25,19 +52,18 @@ module Permutation =
     let toIntSet8 (perm:permutation) =
         {intSet8.values = perm.values |> Array.map(uint8)}
 
-    let rotate (degree:degree) (dir:int) = 
-        let d = (Degree.value degree)
-        { values=Array.init d (fun i-> (i + dir) % d)}
-
-    let isTwoCycle (perm:permutation) =
-        CollectionProps.isTwoCycle perm.values
-
     let inRange (degree:degree) (value:int) =
        ((value > -1) && (value < (Degree.value degree)))
 
-    let inverse (p:permutation)
+    let inverse (perm:permutation)
                 (a_out:array<int>) =
-        { values = CollectionOps.invertArrayNr p.values a_out }
+        { values = CollectionOps.invertArrayNr perm.values a_out }
+
+    let isSorted (perm:permutation) =
+        CollectionProps.isSorted_inline perm.values
+
+    let isTwoCycle (perm:permutation) =
+        CollectionProps.isTwoCycle perm.values
 
     // will work without error if the permutations are the same size
     let productNr (lhs:permutation) 
@@ -61,44 +87,17 @@ module Permutation =
                             (Array.zeroCreate lhs.values.Length) } |> Ok
 
 
-    let conjugate (pA:permutation) (conj:permutation) =
-        result {
-            let! res = CollectionOps.conjIntArrays 
-                                (pA |> getArray)
-                                (conj |> getArray)
-            return create res
-        }
-
-
-    let powers (perm:permutation)  =
-        perm.values |> CollectionOps.allPowers
-                    |> Seq.map(fun vs -> {permutation.values = vs})
-
-
-    let cyclicGroup (degree:degree) = 
-        let r1 = rotate degree 1
-        powers r1 |> Seq.toArray
-
-
-
 //*************************************************************
 //***************  byte conversions****************************
 //*************************************************************
 
-    let permFrom8bits (b:uint8[]) =
-        create (b |> Array.map(int))
-
-
-    let permFrom16bits (b:uint16[]) =
-        create (b |> Array.map(int))
-
 
     let makeFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeFromBytes dg permFrom8bits permFrom16bits data
+        ByteArray.makeFromBytes dg create8 create16 data
 
 
     let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeArrayFromBytes dg permFrom8bits permFrom16bits data
+        ByteArray.makeArrayFromBytes dg create8 create16 data
 
 
     let toBytes (perm:permutation) =
@@ -109,10 +108,10 @@ module Permutation =
         ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
+
 //*************************************************************
-
-
-    // IRando dependent
+//***************    IRando dependent   ***********************
+//*************************************************************
 
     let createRandom (degree:degree) (rnd:IRando) =
         let idArray = (identity degree) |> getArray  
@@ -133,6 +132,12 @@ module TwoCycle =
         else
             "not a two cycle" |> Error
 
+    let create8 (b:uint8[]) =
+        create (b |> Array.map(int))
+
+    let create16 (b:uint16[]) =
+        create (b |> Array.map(int))
+
     let getArray (tc:twoCycle) = tc.values
 
     let getDegree (tc:twoCycle) =
@@ -140,21 +145,23 @@ module TwoCycle =
 
     let identity (degree:int) = { twoCycle.values = [|0 .. degree-1|] }
     
-    let twoCycleFrom8bits (b:byte[]) =
-        create (b |> Array.map(int))
+    let isSorted (tc:twoCycle) =
+        CollectionProps.isSorted_inline tc.values
 
-    let twoCycleFrom16bits (b:uint16[]) =
-        create (b |> Array.map(int))
+    let monoTwoCycle (degree:degree) 
+                         (aDex:int) 
+                         (bDex:int) =
+        Array.init (Degree.value degree) (fun i -> 
+            if   (i = aDex) then bDex
+            elif (i = bDex) then aDex
+            else i)
 
-    let makeFromBytes (dg:degree) (data:byte[]) = 
-        match (Degree.value dg) with
-        | x when (x < 256)  -> twoCycleFrom8bits data
-        | x when (x < 256 * 256)  -> 
-              result {
-                let! u16s = ByteArray.getUint16arrayFromBytes data (data.Length / 2) 0
-                return! twoCycleFrom16bits u16s
-              }
-        | _ -> "invalid degree" |> Error
+
+    let allMonoTwoCycles (degree:degree) =
+        seq {for i = 0 to (Degree.value(degree) - 1) do
+                for j = 0 to i - 1 do
+                    yield monoTwoCycle degree i j}
+
 
     let conjugate (tc:twoCycle) (perm:permutation) =
         { twoCycle.values =
@@ -162,3 +169,34 @@ module TwoCycle =
                                   (getArray tc)
                                   (Array.zeroCreate perm.values.Length)
         }
+
+
+
+//*************************************************************
+//***************  byte conversions****************************
+//*************************************************************
+
+    let makeFromBytes (dg:degree) (data:byte[]) = 
+        ByteArray.makeFromBytes dg create8 create16 data
+
+
+    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+        ByteArray.makeArrayFromBytes dg create8 create16 data
+
+
+    let toBytes (perm:intSet) =
+        ByteArray.toBytes (perm.values)
+
+
+    let arrayToBytes (perms:intSet[]) =
+        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+
+
+
+//*************************************************************
+//***************    IRando dependent   ***********************
+//*************************************************************
+
+    let rndMono (degree:degree) (rnd:IRando) =
+        let tup = RndGen.drawTwoWithoutRep degree rnd
+        monoTwoCycle degree (fst tup) (snd tup)

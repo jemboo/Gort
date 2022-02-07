@@ -1,6 +1,4 @@
 namespace Gort.Core.Test
-
-open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -23,7 +21,6 @@ type RndGenFixture () =
                     |> Array.map(fun tup -> (fst tup, (snd tup).Length) )
 
         Assert.IsTrue (res.Length = testArray.Length)
-
 
 
     [<TestMethod>]

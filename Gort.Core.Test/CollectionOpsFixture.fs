@@ -1,43 +1,11 @@
 namespace Gort.Core.Test
 
 open System
+open SysExt
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type CombyFixture () =
-
-
-    [<TestMethod>]
-    member this.isIdentity() =
-        let testArray = [|2; 3; 4; 5;|]
-        let testArray2 = [|0; 1; 2; 3; 4; 5;|]
-        Assert.IsFalse(CollectionProps.isIdentity testArray)
-        Assert.IsTrue(CollectionProps.isIdentity testArray2)
-
-
-    [<TestMethod>]
-    member this.toCumulative() =
-        let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0|]
-        let startVal = 3.5
-        let expectedResult = [|3.5; 5.5; 8.5; 12.5; 17.5; 23.5; 30.5; 38.5; 47.5; 57.5|]
-        let actualResult = CollectionProps.asCumulative startVal testArray
-        Assert.AreEqual(expectedResult.[8], actualResult.[8])
-
-
-    [<TestMethod>]
-    member this.inverseMapArray() =
-        let degree = Degree.createNr 8 
-        let randy = Rando.fromRngGen (RngGen.lcgFromNow())
-        let mutable i = 0
-        while i<100 do
-            let bloke = RndGen.randomPermutation randy degree
-            let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Degree.value degree))
-                        |> Result.ExtractOrThrow
-            let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
-                        |> Result.ExtractOrThrow
-            Assert.IsTrue((prod = (CollectionProps.identity (Degree.value degree))))
-            i <- i+1
-
+type CollectionOpsFixture () =
 
     [<TestMethod>]
     member this.arrayProductInt() =
@@ -56,6 +24,7 @@ type CombyFixture () =
         Assert.AreEqual(abExp, abAct)
         Assert.AreEqual(baExp, baAct)
 
+
     [<TestMethod>]
     member this.arrayProductInt16() =
         let aA = [|2us; 0us; 4us; 1us; 3us;|]
@@ -73,6 +42,32 @@ type CombyFixture () =
         //let baAct = aBAact |> Array.toList
         Assert.AreEqual(abExp, abAct)
        // Assert.AreEqual(baExp, baAct)
+
+
+
+    [<TestMethod>]
+    member this.filterByPickList () =
+        let data = [|0uL; 1uL; 2uL; 3uL; 4uL; 5uL;|]
+        let picks = [|true; false; true; true; false; true;|]
+        let expected = [|0uL; 2uL; 3uL; 5uL;|]
+        let filtered = CollectionOps.filterByPickList data picks
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(expected |> Array.toList, filtered |> Array.toList);
+
+
+    [<TestMethod>]
+    member this.inverseMapArray() =
+        let degree = Degree.createNr 8 
+        let randy = Rando.fromRngGen (RngGen.lcgFromNow())
+        let mutable i = 0
+        while i<100 do
+            let bloke = RndGen.randomPermutation randy degree
+            let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Degree.value degree))
+                        |> Result.ExtractOrThrow
+            let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
+                        |> Result.ExtractOrThrow
+            Assert.IsTrue((prod = (CollectionProps.identity (Degree.value degree))))
+            i <- i+1
 
 
     [<TestMethod>]
@@ -137,68 +132,12 @@ type CombyFixture () =
 
 
     [<TestMethod>]
-    member this.isTwoCycle () =
-        let tc =  [|0;1;2;3;4;6;5|]
-        let ntc = [|0;1;2;3;6;4;5|]
-        let tc2 =  [|0;4;2;3;1;6;5|]
-        let ntc2 = [|9;1;2;3;6;5;4|]
-        let tc3 =  [|0;4;2;3;1;6;5|]
-        let ntc3 = [|1;1;2;3;6;5;4|]
-
-        Assert.IsTrue(CollectionProps.isTwoCycle tc);
-        Assert.IsFalse(CollectionProps.isTwoCycle ntc);
-        Assert.IsTrue(CollectionProps.isTwoCycle tc2);
-        Assert.IsFalse(CollectionProps.isTwoCycle ntc2);
-        Assert.IsTrue(CollectionProps.isTwoCycle tc3);
-        Assert.IsFalse(CollectionProps.isTwoCycle ntc3);
-
-
-    [<TestMethod>]
-    member this.isPermutation () =
-        let tc =  [|0;1;2;3;4;6;5|]
-        let ntc = [|1;1;2;3;6;4;5|]
-        let tc2 =  [|0;4;2;3;1;6;5|]
-        let ntc2 = [|9;1;2;3;6;5;4|]
-        let tc3 =  [|0;4;2;3;1;6;5|]
-        let ntc3 = [|1;1;2;3;6;5;4|]
-
-        Assert.IsTrue(CollectionProps.isPermutation tc);
-        Assert.IsFalse(CollectionProps.isPermutation ntc);
-        Assert.IsTrue(CollectionProps.isPermutation tc2);
-        Assert.IsFalse(CollectionProps.isPermutation ntc2);
-        Assert.IsTrue(CollectionProps.isPermutation tc3);
-        Assert.IsFalse(CollectionProps.isPermutation ntc3);
+    member this.takeUpto () =
+        let a1 = [|1;2;3;4;5;6;7;8|]
+        let yab = a1 |> CollectionOps.takeUpto 3 |> Seq.toArray
+        let zab = a1 |> CollectionOps.takeUpto 30 |> Seq.toArray
+        Assert.IsTrue(yab.Length = 3)
+        Assert.IsTrue(zab.Length = 8)
 
 
 
-    //[<TestMethod>]
-    //member this.conjugateIntArrays_preserves_twoCycle() =
-    //    let degree = Degree.create 8
-    //    let randy = Rando.fromRngGen (RngGen.lcgFromNow())
-    //    let mutable i = 0
-    //    while i<10 do
-    //        let tc = RndGen.rndFullTwoCycleArray randy (Degree.value degree)
-    //        let conjer = RndGen.conjIntArrayWsutation randy degree
-    //        let conj = Comby.conjIntArrays tc conjer
-    //                    |> Result.ExtractOrThrow
-    //        let isTc = Comby.isTwoCycle conj
-    //                    |> Result.ExtractOrThrow
-    //        Assert.IsTrue(isTc)
-    //        i <- i+1
-
-
-    [<TestMethod>]
-    member this.enumNchooseM() =
-        let n = 8
-        let m = 5
-        let res = CollectionProps.enumNchooseM n m 
-                    |> Seq.map(List.toArray)
-                    |> Seq.toList
-        Assert.IsTrue(res |> Seq.forall(CollectionProps.isSorted))
-        Assert.AreEqual(res.Length, 56)
-
-
-
-    [<TestMethod>]
-    member this.TestMethodPassing () =
-        Assert.IsTrue(true);

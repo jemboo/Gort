@@ -15,12 +15,14 @@ type SortableSetFixture () =
 
 
     [<TestMethod>]
-    member this.makeExplicit () =
+    member this.makeExplicitBp64 () =
         let degree = Degree.create 16 |> Result.ExtractOrThrow
         let randy = Rando.create rngType.Lcg (RandomSeed.fromNow())
         let perm = Permutation.createRandom degree randy
         let orbit = Permutation.powers perm
                         |> Seq.toArray
+
+
         let byteData =  orbit |> Permutation.arrayToBytes
         Assert.IsTrue(true);
 
