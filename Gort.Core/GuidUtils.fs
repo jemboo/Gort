@@ -1,10 +1,7 @@
 ﻿namespace global
-open System.Collections.Generic
 open Microsoft.FSharp.Core
 open System
 open System.Security.Cryptography
-open System.Runtime.Serialization.Formatters.Binary
-open System.IO
 
 module GuidUtils = 
 
@@ -35,6 +32,10 @@ module GuidUtils =
         | Some v1, None -> v1
         | None, None -> Guid.Empty
 
+
+    let guidFromBytes (objs:seq<byte>) =
+        let md5 = MD5.Create()
+        System.Guid(md5.ComputeHash(objs |> Seq.toArray))
 
     let guidFromObjs (objs:seq<obj>) =
         System.Guid(ByteUtils.hashObjs objs)

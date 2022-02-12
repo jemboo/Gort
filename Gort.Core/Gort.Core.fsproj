@@ -18,6 +18,7 @@
     <Compile Include="Rando.fs" />
     <Compile Include="RndGen.fs" />
     <Compile Include="IntSet.fs" />
+    <Compile Include="Rollout.fs" />
     <Compile Include="CombyModels.fs" />
     <Compile Include="SwitchRfl.fs" />
     <Compile Include="File.fs" />

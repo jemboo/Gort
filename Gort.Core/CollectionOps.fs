@@ -123,20 +123,23 @@ module CollectionOps =
 //*************************************************************
 
 
-    let stack (lowTohi: int[] seq) =
+    let stack (lowTohi: 'a[] seq) =
         lowTohi |> Seq.concat
                 |> Seq.toArray
 
-    let comboStack (subSeqs: int[][] seq) =
+    let comboStack (subSeqs: 'a[][] seq) =
         let rec _cart LL =
             match LL with
             | [] -> Seq.singleton []
             | L::Ls -> seq {for x in L do for xs in _cart Ls -> x::xs}
         _cart (subSeqs |> Seq.toList) |> Seq.map(stack)
 
-    let stackSortedBlocks (blockSizes:degree seq) =
-        blockSizes |> Seq.map(Degree.sorted_0_1_Sequences >> Seq.toArray)
-                    |> comboStack
+
+    let stackSortedBlocks (blockSizes:degree seq) (hival:'a) (lowval:'a) =
+        let _allSorted (deg:degree) = 
+             Degree.allTwoSymbolOrderedArrays deg hival lowval
+        blockSizes |> Seq.map(_allSorted >> Seq.toArray)
+                   |> comboStack
 
     let takeUpto<'a> (maxCt:int) (source:seq<'a>) = 
         source |> Seq.mapi(fun dex v -> (dex, v))

@@ -178,6 +178,26 @@ module CollectionProps =
         _cont
 
 
+    let isTwoCycle16 (a:uint16[]) =
+        let mutable dex = 0
+        let mutable _cont = true
+        while _cont && (dex <  a.Length - 1) do 
+            let dv = a.[dex] |> int
+            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint16))
+            dex <- dex + 1
+        _cont
+
+
+    let isTwoCycle32 (a:uint32[]) =
+        let mutable dex = 0
+        let mutable _cont = true
+        while _cont && (dex <  a.Length - 1) do 
+            let dv = a.[dex] |> int
+            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint32))
+            dex <- dex + 1
+        _cont
+
+
     let unsortednessSquared_uL (a:array<uint64>) =
         distanceSquared_uL a [|0uL .. ((uint64 a.Length ) - 1uL)|]
 

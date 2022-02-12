@@ -31,11 +31,9 @@ type CommonTypesFixture () =
 
     [<TestMethod>]
     member this.TestMethodPassing () =
-        let woop (hork:int[]) =
-            hork
-        let grok = [|0 .. 10|]
-        
-        let weez = woop grok.[3 .. ]
-        let wren = woop grok.[3 .. ]
-        let woop = woop grok.[3 .. 6]
-        Assert.IsTrue(true);
+        let dg = Degree.createNr 8
+        let sA = Degree.twoSymbolOrderedArray dg 6 1us 0us
+        let sAs = Degree.allTwoSymbolOrderedArrays dg 1us 0us
+                    |> Seq.toArray
+        Assert.AreEqual(sA.Length, (Degree.value dg));
+        Assert.AreEqual(sAs.Length, (Degree.value dg) + 1);

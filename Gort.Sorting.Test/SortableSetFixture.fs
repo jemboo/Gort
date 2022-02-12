@@ -23,7 +23,7 @@ type SortableSetFixture () =
                         |> Seq.toArray
 
 
-        let byteData =  orbit |> Permutation.arrayToBytes
+        //let byteData =  orbit |> Permutation.arrayToBytes
         Assert.IsTrue(true);
 
 
@@ -32,8 +32,8 @@ type SortableSetFixture () =
         let degree = Degree.create 16 |> Result.ExtractOrThrow
         let randy = Rando.create rngType.Lcg (RandomSeed.fromNow())
         let perm = Permutation.createRandom degree randy
-        let byteStore = perm |> Permutation.toBytes |> Result.ExtractOrThrow
-        let sortableSet = SortableSet.makeOrbiInts degree byteStore |> Result.ExtractOrThrow
+        //let byteStore = perm |> Permutation.toBytes |> Result.ExtractOrThrow
+        //let sortableSet = SortableSet.makeOrbiInts degree byteStore |> Result.ExtractOrThrow
         Assert.IsTrue(true);
 
 

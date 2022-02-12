@@ -19,9 +19,9 @@ module ByteUtils =
         use stream = new MemoryStream()
         use writer = new BinaryWriter(stream)
         oes |> Seq.iter(fun o -> writer.Write(sprintf "%A" o))
-        let md5 = MD5.Create();
+        let md5 = MD5.Create()
         md5.ComputeHash(stream.ToArray())
-        
+
 
     let IdMap_ints = 
         [|for deg=0 to 64 do 
@@ -39,6 +39,9 @@ module ByteUtils =
     let intToIntArray8 (dg:degree) (d64:uint64) = 
         Array.init (Degree.value dg) d64.intAt8
 
+    let intToIntArray16 (dg:degree) (d64:uint64) = 
+        Array.init (Degree.value dg) d64.intAt16
+
     let uint64toIntArray (dg:degree) (d64:uint64) = 
         Array.init (Degree.value dg) d64.intAt
 
@@ -47,12 +50,17 @@ module ByteUtils =
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
-    let intArrayToUint64 (data:int[]) (oneThresh:int)= 
+    let intArrayToUint64 (data:int[]) (oneThresh:int) = 
         let mutable rv = 0uL
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
     let int8ArrayToUint64 (data:uint8[]) (oneThresh:uint8)= 
+        let mutable rv = 0uL
+        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
+        rv
+
+    let int16ArrayToUint64 (data:uint16[]) (oneThresh:uint16)= 
         let mutable rv = 0uL
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv

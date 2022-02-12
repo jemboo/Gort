@@ -42,18 +42,26 @@ module Degree =
         | x when (x < 256 * 256)  -> 2
         | _  -> 4
 
-    let sorted_O_1_Sequence (degree:degree) 
-                            (onesCount:int) =
-        let totalSize = (value degree)
-        let numZeroes = totalSize - onesCount
-        Array.init totalSize 
-                   (fun i -> if i< numZeroes then 0 else 1)
+    let twoSymbolOrderedArray (deg:degree) (hiCt:int) (hiVal:'a) (loVal:'a) =
+        [| for i in 0 .. ((value deg) - hiCt - 1) -> loVal; 
+           for i in ((value deg) - hiCt) .. ((value deg) - 1)  -> hiVal |]
 
-    //Returns a degree + 1 length int array of
-    // of all possible sorted 0-1 sequences of length degree
-    let sorted_0_1_Sequences (degree:degree)  =
-        seq { for i = 0 to (value degree) do 
-                yield (sorted_O_1_Sequence degree i) }
+    let allTwoSymbolOrderedArrays (deg:degree) (hiVal:'a) (loVal:'a) =
+        seq { for i = 0 to (value deg) do 
+                yield (twoSymbolOrderedArray deg i hiVal loVal) }
+
+    //let sorted_O_1_Sequence (degree:degree) 
+    //                        (onesCount:int) =
+    //    let totalSize = (value degree)
+    //    let numZeroes = totalSize - onesCount
+    //    Array.init totalSize 
+    //               (fun i -> if i< numZeroes then 0 else 1)
+
+    ////Returns a degree + 1 length int array of
+    //// of all possible sorted 0-1 sequences of length degree
+    //let sorted_0_1_Sequences (degree:degree)  =
+    //    seq { for i = 0 to (value degree) do 
+    //            yield (sorted_O_1_Sequence degree i) }
 
 
     let allIntForDegree (degree:degree) =

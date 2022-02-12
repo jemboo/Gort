@@ -50,23 +50,23 @@ module IntSet =
 
 
 //*************************************************************
-//***************  byte conversions****************************
+//***************  byte conversions  **************************
 //*************************************************************
 
-    let makeFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeFromBytes dg create8 create16 data
+    //let makeFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeFromBytes dg create8 create16 data
 
 
-    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes dg create8 create16 data
 
 
-    let toBytes (perm:intSet) =
-        ByteArray.toBytes (perm.values)
+    //let toBytes (perm:intSet) =
+    //    ByteArray.toBytes (perm.values)
 
 
-    let arrayToBytes (perms:intSet[]) =
-        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+    //let arrayToBytes (perms:intSet[]) =
+    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
 
@@ -88,6 +88,111 @@ module IntSet =
 
 
 
+type intSet16 = private { values:uint16[] }
+module IntSet16 =
+
+    let create (avs:int[]) = 
+        {intSet16.values = avs |> Array.map(uint16)}
+
+    let create16 (avs:uint16[]) = 
+        {intSet16.values = avs} |> Ok
+
+    let create8 (b:uint8[]) =
+        create (b |> Array.map(int)) |> Result.Ok
+
+    let zeroCreate (count:int) = 
+        { intSet16.values = 
+                Array.create count 0us }
+
+    let getValues (is16:intSet16) = 
+        is16.values
+
+    let copy (intSet:intSet16) = 
+        {intSet16.values = Array.copy (intSet.values) }
+
+    let isZero (ibs:intSet16) = 
+        ibs.values |> Array.forall((=) 0us)
+
+    let isSorted (intSet:intSet16) =
+        CollectionProps.isSorted_inline intSet.values
+
+    let isTwoCycle (is16:intSet16) =
+        CollectionProps.isTwoCycle16 is16.values
+
+    let sorted_O_1_Sequence (degree:degree) 
+                            (onesCount:int) =
+        let totalSize = (Degree.value degree)
+        let numZeroes = totalSize - onesCount
+        { intSet16.values = Array.init totalSize 
+                    (fun i -> if i< numZeroes then 0us else 1us)}
+
+    //Returns a bloclLen + 1 length array of IntBits
+    // of all possible sorted 0-1 sequences of length degree
+    let sorted_0_1_Sequences (degree:degree)  =
+        seq { for i = 0 to (Degree.value degree) do 
+                yield (sorted_O_1_Sequence degree i) }
+
+    let fromInteger (dg:degree) (intVers:int) =
+        { intSet16.values = ByteUtils.intToIntArray16 dg (intVers |> uint64) }
+        
+    let toInteger (arrayVers:intSet16) (oneThresh:int) =
+        ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
+            
+    let fromUint64 (dg:degree) (intVal:uint64) =
+        { intSet16.values = ByteUtils.intToIntArray16 dg intVal}
+            
+    let toUint64 (intSt:intSet16) (oneThresh:uint16) = 
+        ByteUtils.int16ArrayToUint64 intSt.values oneThresh
+
+    let allForAsSeq (degree:degree) =
+        let dv = Degree.value degree 
+        {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger degree)
+
+    let allForAsArray (degree:degree) =
+        let order = (Degree.value degree)
+        Array.init (1 <<< order) (fromInteger degree)
+
+
+
+//*************************************************************
+//***************  byte conversions****************************
+//*************************************************************
+
+    //let makeFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeFromBytes dg create8 create16 data
+
+
+    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes dg create8 create16 data
+
+
+    //let toBytes (perm:intSet) =
+    //    ByteArray.toBytes (perm.values)
+
+
+    //let arrayToBytes (perms:intSet[]) =
+    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+
+
+
+//*************************************************************
+//***************    IRando dependent   ***********************
+//*************************************************************
+
+    let createRandom (degree:degree) (rando:IRando) = 
+        let perm = 
+            Array.init (Degree.value degree)
+                        (fun _ -> let q = rando.NextFloat
+                                  if (q > 0.5) then 1us else 0us )
+        {intSet16.values = perm }
+
+
+    let createRandoms (degree:degree) 
+                      (rnd:IRando) =
+        seq { while true do yield createRandom degree rnd }
+
+
+
 
 type intSet8 = private { values:uint8[] }
 module IntSet8 =
@@ -105,13 +210,14 @@ module IntSet8 =
         { intSet8.values = 
                 Array.create count 0uy }
 
+    let getValues (is8:intSet8) = 
+        is8.values
+
     let copy (intSet:intSet8) = 
         {intSet8.values = Array.copy (intSet.values) }
 
-
     let isZero (ibs:intSet8) = 
         ibs.values |> Array.forall((=) 0uy)
-
 
     let isSorted (intSet:intSet8) =
         CollectionProps.isSorted_inline intSet.values
@@ -144,12 +250,11 @@ module IntSet8 =
     let toUint64 (intSt:intSet8) (oneThresh:uint8) = 
         ByteUtils.int8ArrayToUint64 intSt.values oneThresh
 
-    let allForSeq (degree:degree) =
+    let allForAsSeq (degree:degree) =
         let dv = Degree.value degree 
         {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger degree)
 
-
-    let allForArray (degree:degree) =
+    let allForAsArray (degree:degree) =
         let order = (Degree.value degree)
         Array.init (1 <<< order) (fromInteger degree)
 
@@ -159,28 +264,26 @@ module IntSet8 =
 //***************  byte conversions****************************
 //*************************************************************
 
-
-    let makeFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeFromBytes dg create8 create16 data
-
-
-    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeFromBytes dg create8 create16 data
 
 
-    let toBytes (perm:intSet) =
-        ByteArray.toBytes (perm.values)
+    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes dg create8 create16 data
 
 
-    let arrayToBytes (perms:intSet[]) =
-        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+    //let toBytes (perm:intSet) =
+    //    ByteArray.toBytes (perm.values)
+
+
+    //let arrayToBytes (perms:intSet[]) =
+    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
 
 //*************************************************************
 //***************    IRando dependent   ***********************
 //*************************************************************
-
 
     let createRandom (degree:degree) (rando:IRando) = 
         let perm = 

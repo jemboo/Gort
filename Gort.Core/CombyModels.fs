@@ -92,20 +92,20 @@ module Permutation =
 //*************************************************************
 
 
-    let makeFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeFromBytes dg create8 create16 data
+    //let makeFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeFromBytes dg create8 create16 data
 
 
-    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes dg create8 create16 data
 
 
-    let toBytes (perm:permutation) =
-        ByteArray.toBytes (perm.values)
+    //let toBytes (perm:permutation) =
+    //    ByteArray.toBytes (perm.values)
 
 
-    let arrayToBytes (perms:permutation[]) =
-        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+    //let arrayToBytes (perms:permutation[]) =
+    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
 
@@ -176,20 +176,20 @@ module TwoCycle =
 //***************  byte conversions****************************
 //*************************************************************
 
-    let makeFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeFromBytes dg create8 create16 data
+    //let makeFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeFromBytes dg create8 create16 data
 
 
-    let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-        ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes dg create8 create16 data
 
 
-    let toBytes (perm:intSet) =
-        ByteArray.toBytes (perm.values)
+    //let toBytes (perm:intSet) =
+    //    ByteArray.toBytes (perm.values)
 
 
-    let arrayToBytes (perms:intSet[]) =
-        ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+    //let arrayToBytes (perms:intSet[]) =
+    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
 
 
 

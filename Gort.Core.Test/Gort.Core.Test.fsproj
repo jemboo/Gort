@@ -9,14 +9,15 @@
 
   <ItemGroup>
     <Compile Include="SysExtFixture.fs" />
+    <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CollectionPropsFixture.fs" />
     <Compile Include="CollectionOpsFixture.fs" />
     <Compile Include="ByteUtilsFixture.fs" />
     <Compile Include="ByteArrayFixture.fs" />
     <Compile Include="RandoFixture.fs" />
     <Compile Include="RndGenFixture.fs" />
-    <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="IntSetFixture.fs" />
+    <Compile Include="RolloutFixture.fs" />
     <Compile Include="CombyModelsFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

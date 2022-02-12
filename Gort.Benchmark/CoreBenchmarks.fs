@@ -292,6 +292,24 @@ type ArrayInitBench() =
 
 
 
+
+
+[<MemoryDiagnoser>]
+type ArrayFormatBench() =
+    let arrayLen = 100000
+    let byteLen = arrayLen * 8
+    let a64In = Array.init<uint64> arrayLen (uint64)
+
+    [<Benchmark>]
+    member this.MemCpy() =
+        let bytesIn = Array.zeroCreate<byte> byteLen
+        let bsa = ByteArray.mapUint64sToBytes 0 arrayLen bytesIn 0 a64In
+                    |> Result.ExtractOrThrow
+        0
+
+
+
+
 [<MemoryDiagnoser>]
 type Md5VsSha256() =
     let N = 100000
