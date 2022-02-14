@@ -37,11 +37,17 @@
 
     public enum SortableSetRep
     {
-        IntSets,
-        Rollout,
+        Explicit,
         AllBits,
         Orbit,
         Stack
+    }
+
+    public enum SortableSetDataFormat
+    {
+        b64,
+        u8,
+        u16
     }
 
     public enum SorterSetRep

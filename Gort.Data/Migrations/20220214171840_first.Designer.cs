@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gort.Data.Migrations
 {
     [DbContext(typeof(GortContext))]
-    [Migration("20220125171124_start")]
-    partial class start
+    [Migration("20220214171840_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -163,12 +163,18 @@ namespace Gort.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("ByteWidth")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
 
                     b.Property<byte[]>("Data")
                         .IsRequired()
                         .HasColumnType("longblob");
+
+                    b.Property<Guid>("DataId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Degree")
                         .HasColumnType("int");
@@ -196,12 +202,22 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("CausePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("Degree")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("SortableSetDataFormat")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StructureId")
+                        .HasColumnType("char(36)");
 
                     b.Property<byte[]>("SwitchList")
                         .IsRequired()

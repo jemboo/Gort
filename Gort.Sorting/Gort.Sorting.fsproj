@@ -11,7 +11,6 @@
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />
-    <Compile Include="SortableSetO.fs" />
     <Compile Include="SortableSet.fs" />
     <Compile Include="BinRep.fs" />
   </ItemGroup>

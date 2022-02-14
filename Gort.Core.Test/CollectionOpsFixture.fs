@@ -30,18 +30,13 @@ type CollectionOpsFixture () =
         let aA = [|2us; 0us; 4us; 1us; 3us;|]
         let aB = [|4us; 3us; 1us; 2us; 0us;|]
         let aABexp = [|3us; 1us; 0us; 4us; 2us;|]
-       // let aBAexp = [|1; 4; 0; 3; 2;|]
-        let aABactA = [|3us; 1us; 0us; 4us; 2us;|]
-        let aABact = [|3us; 1us; 0us; 4us; 2us;|]
-       // let aBAact = [|0; 0; 0; 0; 0;|]
-        let aABact = CollectionOps.arrayProduct16 aA aB aABact
-        //Comby.arrayProduct16 aB aA aBAact
-        let abExp = aABexp |> Array.toList
-        //let baExp = aBAexp |> Array.toList
-        let abAct = aABact |> Array.toList
-        //let baAct = aBAact |> Array.toList
-        Assert.AreEqual(abExp, abAct)
-       // Assert.AreEqual(baExp, baAct)
+        let aBAexp = [|1us; 4us; 0us; 3us; 2us;|]
+        let aABact = [|0us; 0us; 0us; 0us; 0us;|]
+        let aBAact = [|0us; 0us; 0us; 0us; 0us;|]
+        CollectionOps.arrayProduct16 aA aB aABact
+        CollectionOps.arrayProduct16 aB aA aBAact
+        Assert.AreEqual(aABact |> Array.toList, aABexp |> Array.toList)
+        Assert.AreEqual(aBAact |> Array.toList, aBAexp |> Array.toList)
 
 
 

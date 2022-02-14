@@ -30,8 +30,8 @@ type BitwiseFixture () =
     member this.toIntArray () =
         let uLun = [|0; 0; 1; 0; 1; 1; 0|]
         let dg = Degree.createNr uLun.Length
-        let uLRep = ByteUtils.intArrayToUint64 uLun 1
-        let aBack = uLRep |> ByteUtils.uint64toIntArray dg
+        let uLRep = ByteUtils.arrayToUint64 uLun 1
+        let aBack = uLRep |> ByteUtils.uint64To2ValArray dg 1 0
         Assert.AreEqual(uLun |> Array.toList, aBack |> Array.toList)
         Assert.IsTrue(true);
 

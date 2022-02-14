@@ -1,17 +1,6 @@
 ﻿namespace global
 open System
 
-
-type byteWidth = private ByteWidth of int
-module ByteWidth = 
-    let value (ByteWidth v) = v
-    let create (value:int) =
-        if (value = 1) || (value = 2) || (value = 4) || (value = 8) then value |> ByteWidth |> Ok
-        else "RollWidth must be 1, 2, 4 or 8" |> Error
-    //let unsignedUnitFor (bw:byteWidth)
-    //    match (ByteWidth bw) with
-    //    | 1 -> 
-
 type rollLength = private RollLength of int
 module RollLength = 
     let value (RollLength v) = v

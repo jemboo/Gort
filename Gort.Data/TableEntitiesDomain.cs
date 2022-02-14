@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.FSharp.Core;
 
 namespace Gort.Data
 {
@@ -10,10 +11,12 @@ namespace Gort.Data
         [Key]
         public Guid SortableSetId { get; set; }
         public Guid CauseId { get; set; }
+        public Guid DataId { get; set; }
         public virtual Cause Cause { get; set; }
         public string Description { get; set; }
         public SortableSetRep SortableSetRep { get; set; }
         public int Degree { get; set; }
+        public int ByteWidth { get; set; }
         public byte[] Data { get; set; }
     }
 
@@ -22,10 +25,13 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid SorterId { get; set; }
+        public Guid StructureId { get; set; }
+        public string CausePath { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
         public string Description { get; set; }
         public int Degree { get; set; }
+        public SortableSetDataFormat SortableSetDataFormat { get; set; }
         public byte[] SwitchList { get; set; }
 
     }

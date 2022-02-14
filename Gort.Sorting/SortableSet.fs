@@ -1,78 +1,58 @@
 ﻿namespace global
 open System
 
-type sortableFormat = 
-    | u8 = 0
-    | u16 = 1
-    | b64 = 2
-
-type sortableSetImpl2 = 
-    | Bp64 of uint64[]
-    | Ints of intSet[]
-    | Ints8 of intSet8[]
+//type SortableSetRep =
+//| Explicit
+//| AllBits
+//| Orbit
+//| Stack
 
 
-type sortableSetGen =
-    | AllBits of degree
-    | Explicit of degree
-    | Orbit of permutation
-    | Stack of List<degree>
+//type sortableSetGen =
+//    | AllBits of degree
+//    | Explicit of degree
+//    | Orbit of permutation
+//    | Stack of List<degree>
+
+//module SortableSetGen =
+
+//    let makeAllBits (dg:int) =
+//        result {
+//            let! dg = Degree.create dg
+//            return sortableSetGen.AllBits dg
+//        }
+
+//    let makeOrbit (perm:int[]) =
+//        result {
+//            let! perm = Permutation.create perm
+//            return sortableSetGen.Orbit perm |> Ok
+//        }
+
+//    let makeStack (dgs:int[]) =
+//        result {
+//            let! dgt = dgs |> Array.map(Degree.create)
+//                           |> Array.toList
+//                           |> Result.sequence
+//            return sortableSetGen.Stack dgt
+//        }
+
+//    let getDegree (ssgen:sortableSetGen) =
+//        match ssgen with
+//        | Explicit dg -> dg
+//        | AllBits dg -> dg
+//        | Orbit perm -> Permutation.getDegree perm
+//        | Stack dgs -> Degree.add dgs
 
 
-type sortableSet2 = {gen:sortableSetGen; impl:sortableSetImpl2}
 
 
 type sortableSet = {id:sortableSetId; rollout:rollout}
-    
-module SortableSetGen =
-
-    let makeAllBits (dg:int) =
-        result {
-            let! dg = Degree.create dg
-            return sortableSetGen.AllBits dg
-        }
-
-    let makeOrbit (perm:int[]) =
-        result {
-            let! perm = Permutation.create perm
-            return sortableSetGen.Orbit perm |> Ok
-        }
-
-    let makeStack (dgs:int[]) =
-        result {
-            let! dgt = dgs |> Array.map(Degree.create)
-                           |> Array.toList
-                           |> Result.sequence
-            return sortableSetGen.Stack dgt
-        }
-
-    let getDegree (ssgen:sortableSetGen) =
-        match ssgen with
-        | Explicit dg -> dg
-        | AllBits dg -> dg
-        | Orbit perm -> Permutation.getDegree perm
-        | Stack dgs -> Degree.add dgs
-
-
-
+ 
 module SortableSet =
 
-    let getSortableFormat (ss:sortableSet) =
-        match (Rollout.getRollWidth ss.rollout |> ByteWidth.value) with
-        | x when (x = 1)  ->
-            sortableFormat.u8
-        | x when (x = 2)  -> 
-            sortableFormat.u16
-        | x when (x = 4)  ->
-            "invalid rollWidth for sortableSet" |> failwith
-        | x when (x = 8)  -> 
-            sortableFormat.b64
-        | _ ->  "invalid rollWidth" |> failwith
-
-
-    let makeAllBits (dg:degree) (format:sortableFormat) = 
-        match format with
-        | sortableFormat.u8 -> 
+    let makeAllBits (dg:degree) (format:byteWidth) = 
+        match (ByteWidth.value format) with
+        | 1 -> 
             result {
                 let! sortables = IntSet8.allForAsSeq dg
                                 |> Seq.map(IntSet8.getValues)
@@ -86,7 +66,7 @@ module SortableSet =
                 let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
-        | sortableFormat.u16 -> 
+        | 2 -> 
             result {
                 let! sortables = IntSet16.allForAsSeq dg
                                  |> Seq.map(IntSet16.getValues)
@@ -100,16 +80,21 @@ module SortableSet =
                 let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
-        | sortableFormat.b64 -> 
+        | 8 -> 
             result {
-                let sortables = IntSet8.allForAsSeq dg
+
+                let stripeAs = IntSet8.allForAsSeq dg
                                 |> Seq.map(IntSet8.getValues)
-                                |> Seq.concat
-                                |> Seq.map(byte)
+                                |> ByteUtils.toStripeArrays 1uy dg
                                 |> Seq.toArray
+
+                let! sortables = stripeAs
+                                |> Array.concat
+                                |> ByteArray.convertUint64sToBytes
+
                 let! rollWdth = (ByteWidth.create 1)
                 let! rollLen = (RollLength.create (Degree.value dg))
-                let! rollCt = (RollCount.create (1 <<< (Degree.value dg)))
+                let! rollCt = (RollCount.create stripeAs.Length)
                 let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
                 let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
@@ -163,26 +148,6 @@ module SortableSet =
                 let! rollLen = RollLength.create (Degree.value dg)
                 let! rollCt = RollCount.create (sortables.Length / (ByteWidth.value bw))
                 let! rollout = sortables |> Rollout.init bw rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
-                return {sortableSet.id = ssId; rollout = rollout }
-        }
-        
-        
-    let makeStackInts8 (dg:degree) (data:byte[]) = 
-        result {
-            let! degrees = ByteArray.bytesToDegreeArray data
-            let  degTot = Degree.add degrees
-            if degTot <> dg then
-                return! "degree list is incorrect" |> Error
-            else
-                let! sortables = CollectionOps.stackSortedBlocks degrees 1uy 0uy
-                                    |> Seq.concat
-                                    |> Seq.toArray
-                                    |> ByteArray.convertUint8sToBytes
-                let! rollWdth = (ByteWidth.create 1)
-                let! rollLen = (RollLength.create (Degree.value dg))
-                let! rollCt = (RollCount.create sortables.Length )
-                let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
                 let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
         }

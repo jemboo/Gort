@@ -37,20 +37,20 @@ type SortableSetFixture () =
         Assert.IsTrue(true);
 
 
-    [<TestMethod>]
-    member this.makeStack () =
-        let degree = Degree.create 16 |> Result.ExtractOrThrow
-        let degrees = [|Degree.create 8; Degree.create 4; Degree.create 2; Degree.create 2|]
-                      |> Array.toList
-                      |> Result.sequence
-                      |> Result.ExtractOrThrow
-                      |> List.toArray
-        let offset = 7
-        let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-        byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
-                     |> Result.ExtractOrThrow
-        let degreeSection = byteStore.[offset ..]
-        let res = SortableSet.makeStackInts degree degreeSection
-                  |> Result.ExtractOrThrow
+    //[<TestMethod>]
+    //member this.makeStack () =
+    //    let degree = Degree.create 16 |> Result.ExtractOrThrow
+    //    let degrees = [|Degree.create 8; Degree.create 4; Degree.create 2; Degree.create 2|]
+    //                  |> Array.toList
+    //                  |> Result.sequence
+    //                  |> Result.ExtractOrThrow
+    //                  |> List.toArray
+    //    let offset = 7
+    //    let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
+    //    byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
+    //                 |> Result.ExtractOrThrow
+    //    let degreeSection = byteStore.[offset ..]
+    //    let res = SortableSet.makeStackInts degree degreeSection
+    //              |> Result.ExtractOrThrow
 
-        Assert.IsTrue(true);
+    //    Assert.IsTrue(true);

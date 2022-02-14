@@ -4,34 +4,100 @@ open SysExt
 open Microsoft.FSharp.Core
 
 
-
-
 module ByteArray =
 
     /// ***********************************************************
-    /// *************** int array mapping *************************
+    /// *************** int< ^a >[] <->  int< ^a >[]  *************************
     /// ***********************************************************
 
-
-
-    let mapIntArrays (src_offset:int) (src:int[]) (dest_offset:int) (dest:int[]) (src_Ct:int) =
+    let copyIntArray (src_offset:int) (src:int[]) (dest_offset:int) (dest:int[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
 
-    let mapUint8Arrays (src_offset:int) (src:uint8[]) (dest_offset:int) (dest:uint8[]) (src_Ct:int) =
+    let getIntArray(src_offset:int) (src_Ct:int) (src:int[]) =
+        let aout = Array.zeroCreate<int> src_Ct
+        copyIntArray src_offset src 0 aout src_Ct
+        aout
+
+    let copyUint8Array (src_offset:int) (src:uint8[]) (dest_offset:int) (dest:uint8[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset, dest, dest_offset, src_Ct)
 
-    let mapUint16Arrays (src_offset:int) (src:uint16[]) (dest_offset:int) (dest:uint16[]) (src_Ct:int) =
+    let getUintArray(src_offset:int) (src_Ct:int) (src:uint8[]) =
+        let aout = Array.zeroCreate<uint8> src_Ct
+        copyUint8Array src_offset src 0 aout src_Ct
+        aout
+
+    let copyUint16Array (src_offset:int) (src:uint16[]) (dest_offset:int) (dest:uint16[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 2, dest, dest_offset * 2, src_Ct * 2)
 
-    let mapUint32Arrays (src_offset:int) (src:uint32[]) (dest_offset:int) (dest:uint32[]) (src_Ct:int) =
+    let getUint16Array(src_offset:int) (src_Ct:int) (src:uint16[]) =
+        let aout = Array.zeroCreate<uint16> src_Ct
+        copyUint16Array src_offset src 0 aout src_Ct
+        aout
+
+    let copyUint32Array (src_offset:int) (src:uint32[]) (dest_offset:int) (dest:uint32[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
 
-    let mapUint64Arrays (src_offset:int) (src:uint64[]) (dest_offset:int) (dest:uint64[]) (src_Ct:int) =
+    let getUint32Array(src_offset:int) (src_Ct:int) (src:uint32[]) =
+        let aout = Array.zeroCreate<uint32> src_Ct
+        copyUint32Array src_offset src 0 aout src_Ct
+        aout
+
+    let copyUint64Array (src_offset:int) (src:uint64[]) (dest_offset:int) (dest:uint64[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 8, dest, dest_offset * 8, src_Ct * 8)
+
+    let getUint64Array(src_offset:int) (src_Ct:int) (src:uint64[]) =
+        let aout = Array.zeroCreate<uint64> src_Ct
+        copyUint64Array src_offset src 0 aout src_Ct
+        aout
+
 
 
     /// ***********************************************************
-    /// ******** uint64 mapping from byte arrays ******************
+    /// ******************   int[] <-> byte[]  ********************
+    /// ***********************************************************
+
+    let getIntfromBytes (offset:int) (blob:byte[]) =
+        try
+            BitConverter.ToUInt64(blob, offset) |> Ok
+        with
+            | ex -> ("error in getIntfromBytes: " + ex.Message ) |> Result.Error
+
+
+    let mapBytesToInts (blob_offset:int) (uintA:int[]) (uintA_offset:int) (blobLen:int) (blob:byte[]) =
+        try
+            Buffer.BlockCopy(blob, blob_offset, uintA, uintA_offset*4, blobLen)
+            uintA |> Ok
+        with
+            | ex -> ("error in mapBytesToInts: " + ex.Message ) |> Result.Error
+
+
+    let convertBytesToInts (blob:byte[]) =
+        try
+            let uints = Array.zeroCreate<int> (blob.Length / 4)
+            blob |> mapBytesToInts 0 uints 0 blob.Length
+        with
+            | ex -> ("error in convertBytesToInts: " + ex.Message ) |> Result.Error
+
+
+    let mapIntsToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) (blob_offset:int) (uintA:int[]) =
+        try
+            Buffer.BlockCopy(uintA, uintA_offset*8, blob, blob_offset, uint_ct * 4) 
+            blob |> Ok
+        with
+            | ex -> ("error in mapIntsToBytes: " + ex.Message ) |> Result.Error
+
+
+    let convertIntsToBytes (uintA:int[]) =
+        try
+            let blob = Array.zeroCreate<byte> (uintA.Length * 4)
+            uintA |> mapIntsToBytes 0 uintA.Length blob 0
+        with
+            | ex -> ("error in convertIntsToBytes: " + ex.Message ) |> Result.Error
+
+
+
+    /// ***********************************************************
+    /// ****************  uint64[] <-> byte[]   *******************
     /// ***********************************************************
 
     let getUint64fromBytes (offset:int) (blob:byte[]) =
@@ -75,7 +141,7 @@ module ByteArray =
 
 
     /// ***********************************************************
-    /// ******** uint32 mapping from byte arrays ******************
+    /// ****************** uint32[] <-> byte[] ********************
     /// ***********************************************************
 
     let getUint32FromBytes (offset:int) (blob:byte[]) =
@@ -85,44 +151,41 @@ module ByteArray =
             | ex -> ("error in uInt32FromBytes: " + ex.Message ) |> Result.Error
 
 
-    let getUint32arrayFromBytes (blob:byte[]) (arrayLen:int) (offset:int) =
+    let mapBytesToUint32s (blob_offset:int) (uintA:uint32[]) (uintA_offset:int) (uint_ct:int) (blob:byte[]) =
         try
-            let rollout = Array.zeroCreate<uint32> arrayLen
-            for i = 0 to (arrayLen - 1) do
-                rollout.[i] <- BitConverter.ToUInt32(blob, i * 4 + offset)
-            rollout |> Ok
+            Buffer.BlockCopy(blob, blob_offset, uintA, uintA_offset * 4, uint_ct)
+            uintA |> Ok
         with
-            | ex -> ("error in uInt32sFromBytes: " + ex.Message ) |> Result.Error
+            | ex -> ("error in mapBytesToUint32s: " + ex.Message ) |> Result.Error
 
 
-    let mapUint32arrayToBytes (uintA:uint32[]) (offset:int) (blob:byte[]) =
+    let convertBytesToUint32s (blob:byte[]) =
         try
-            for i = 0 to (uintA.Length - 1) do
-                let bA = BitConverter.GetBytes uintA.[i]
-                let blobOff = i * 4
-                blob.[blobOff + offset] <- bA.[0]
-                blob.[blobOff + offset + 1] <- bA.[1]
-                blob.[blobOff + offset + 2] <- bA.[2]
-                blob.[blobOff + offset + 3] <- bA.[3]
+            let uints = Array.zeroCreate<uint32> (blob.Length / 4)
+            blob |> mapBytesToUint32s 0 uints 0 blob.Length
+        with
+            | ex -> ("error in convertBytesToUint32s: " + ex.Message ) |> Result.Error
+
+    
+    let mapUint32sToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) (blob_offset:int) (uintA:uint32[]) =
+        try
+            Buffer.BlockCopy(uintA, uintA_offset * 4, blob, blob_offset, uint_ct * 4) 
             blob |> Ok
         with
-            | ex -> ("error in bytesFromUint32s: " + ex.Message ) |> Result.Error
+            | ex -> ("error in mapUint32sToBytes: " + ex.Message ) |> Result.Error
 
 
-    let mapUint32toBytes (uintV:uint32) (offset:int) (blob:byte[]) =
+    let convertUint32sToBytes (uintA:uint32[]) =
         try
-            let bA = BitConverter.GetBytes uintV
-            blob.[offset] <- bA.[0]
-            blob.[offset + 1] <- bA.[1]
-            blob.[offset + 2] <- bA.[2]
-            blob.[offset + 3] <- bA.[3]
-            blob |> Ok
+            let blob = Array.zeroCreate<byte> (uintA.Length * 4)
+            uintA |> mapUint32sToBytes 0 uintA.Length blob 0
         with
-            | ex -> ("error in bytesFromUint32: " + ex.Message ) |> Result.Error
+            | ex -> ("error in convertUint32sToBytes: " + ex.Message ) |> Result.Error
+
 
 
     /// ***********************************************************
-    /// ******** uint16 mapping from byte arrays ******************
+    /// ****************** uint16[] <-> byte[] ********************
     /// ***********************************************************
 
     let getUint16FromBytes (offset:int) (blob:byte[]) =
@@ -132,54 +195,20 @@ module ByteArray =
             | ex -> ("error in uInt16FromBytes: " + ex.Message ) |> Result.Error
 
 
-
     let mapBytesToUint16s (blob_offset:int) (uintA:uint16[]) (uintA_offset:int) (uint_ct:int) (blob:byte[]) =
         try
             Buffer.BlockCopy(blob, blob_offset, uintA, uintA_offset * 2, uint_ct)
             uintA |> Ok
         with
-            | ex -> ("error in uInt64sFromBytes: " + ex.Message ) |> Result.Error
+            | ex -> ("error in mapBytesToUint16s: " + ex.Message ) |> Result.Error
 
 
     let convertBytesToUint16s (blob:byte[]) =
         try
-            let uints = Array.zeroCreate<uint16> blob.Length
+            let uints = Array.zeroCreate<uint16> (blob.Length / 2)
             blob |> mapBytesToUint16s 0 uints 0 blob.Length
         with
-            | ex -> ("error in convertBytesToUint64s: " + ex.Message ) |> Result.Error
-
-
-    //let getUint16arrayFromBytes (blob:byte[]) (arrayLen:int) (offset:int) =
-    //    try
-    //        let rollout = Array.zeroCreate<uint16> arrayLen
-    //        for i = 0 to (arrayLen - 1) do
-    //            rollout.[i] <- BitConverter.ToUInt16(blob, i * 2 + offset)
-    //        rollout |> Ok
-    //    with
-    //        | ex -> ("error in uInt16sFromBytes: " + ex.Message ) |> Result.Error
-
-
-    //let mapUint16arrayToBytes (uintA:uint16[]) (offset:int) (blob:byte[]) =
-    //    try
-    //        for i = 0 to (uintA.Length - 1) do
-    //            let bA = BitConverter.GetBytes uintA.[i]
-    //            let blobOff = i * 2
-    //            blob.[blobOff + offset] <- bA.[0]
-    //            blob.[blobOff + offset + 1] <- bA.[1]
-    //        blob |> Ok
-    //    with
-    //        | ex -> ("error in bytesFromUint16s: " + ex.Message ) |> Result.Error
-
-
-    //let mapUint16toBytes (uintV:uint16) (offset:int) (blob:byte[]) =
-    //    try
-    //        let bA = BitConverter.GetBytes uintV
-    //        blob.[offset] <- bA.[0]
-    //        blob.[offset + 1] <- bA.[1]
-    //        blob |> Ok
-    //    with
-    //        | ex -> ("error in bytesFromUint16: " + ex.Message ) |> Result.Error
-
+            | ex -> ("error in convertBytesToUint16s: " + ex.Message ) |> Result.Error
 
 
     let mapUint16sToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) (blob_offset:int) (uintA:uint16[]) =
@@ -187,21 +216,21 @@ module ByteArray =
             Buffer.BlockCopy(uintA, uintA_offset * 2, blob, blob_offset, uint_ct * 2) 
             blob |> Ok
         with
-            | ex -> ("error in mapUint8sToBytes: " + ex.Message ) |> Result.Error
+            | ex -> ("error in mapUint16sToBytes: " + ex.Message ) |> Result.Error
 
 
     let convertUint16sToBytes (uintA:uint16[]) =
         try
-            let blob = Array.zeroCreate<byte> (uintA.Length)
+            let blob = Array.zeroCreate<byte> (uintA.Length * 2)
             uintA |> mapUint16sToBytes 0 uintA.Length blob 0
         with
-            | ex -> ("error in convertUint8sToBytes: " + ex.Message ) |> Result.Error
+            | ex -> ("error in convertUint16sToBytes: " + ex.Message ) |> Result.Error
 
 
 
 
     /// ***********************************************************
-    /// ******** uint8 mapping from byte arrays *******************
+    /// ******************  uint8[] <-> byte[] ********************
     /// ***********************************************************
 
     let getUint8FromBytes (offset:int) (blob:byte[]) =
@@ -216,7 +245,7 @@ module ByteArray =
             Buffer.BlockCopy(blob, blob_offset, uintA, uintA_offset, uint_ct)
             uintA |> Ok
         with
-            | ex -> ("error in uInt64sFromBytes: " + ex.Message ) |> Result.Error
+            | ex -> ("error in mapBytesToUint8s: " + ex.Message ) |> Result.Error
 
 
     let convertBytesToUint8s (blob:byte[]) =
@@ -224,7 +253,7 @@ module ByteArray =
             let uints = Array.zeroCreate<uint8> blob.Length
             blob |> mapBytesToUint8s 0 uints 0 blob.Length
         with
-            | ex -> ("error in convertBytesToUint64s: " + ex.Message ) |> Result.Error
+            | ex -> ("error in convertBytesToUint8s: " + ex.Message ) |> Result.Error
 
 
     let mapUint8sToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) (blob_offset:int) (uintA:uint8[]) =

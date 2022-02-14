@@ -14,7 +14,7 @@ module IntSet =
         create (b |> Array.map(int)) |> Result.Ok
 
     let zeroCreate (count:int) = 
-        { intSet.values = Array.create count 0 }
+        { intSet.values = Array.zeroCreate count }
 
     let copy (intSet:intSet) = 
         {intSet.values = Array.copy (intSet.values) }
@@ -29,16 +29,16 @@ module IntSet =
         ibs.values |> Array.forall((=) 0)
 
     let fromInteger (dg:degree) (intVers:int) =
-        { intSet.values = ByteUtils.intToIntArray dg (intVers |> uint64) }
+        { intSet.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0 1 }
 
     let toInteger (arrayVers:intSet) (oneThresh:int) =
         ByteUtils.intArrayToInt arrayVers.values oneThresh
                 
-    let fromUint64 (dg:degree) (intVal:uint64) =
-        { intSet.values = ByteUtils.uint64toIntArray dg intVal }
+    let fromUint64 (dg:degree) (intVers:uint64) =
+        { intSet.values = intVers |> ByteUtils.uint64To2ValArray dg 0 1 }
                 
     let toUint64 (intSt:intSet) (oneThresh:int) = 
-        ByteUtils.intArrayToUint64 intSt.values oneThresh
+        ByteUtils.arrayToUint64 intSt.values oneThresh
 
     let allForAsSeq (dg:degree) =
         { 0 .. (1 <<< (Degree.value dg)) - 1 }
@@ -53,22 +53,15 @@ module IntSet =
 //***************  byte conversions  **************************
 //*************************************************************
 
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
+    let fromBytes (dg:degree) (data:byte[]) = 
+        result {
 
+             let! ints =  ByteArray.convertBytesToInts data
+             return create ints
+        }
 
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
-
-
-    //let toBytes (perm:intSet) =
-    //    ByteArray.toBytes (perm.values)
-
-
-    //let arrayToBytes (perms:intSet[]) =
-    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
-
-
+    let toBytes (perm:intSet) =
+        ByteArray.convertIntsToBytes (perm.values)
 
 //*************************************************************
 //***************    IRando dependent   ***********************
@@ -101,8 +94,7 @@ module IntSet16 =
         create (b |> Array.map(int)) |> Result.Ok
 
     let zeroCreate (count:int) = 
-        { intSet16.values = 
-                Array.create count 0us }
+        { intSet16.values = Array.zeroCreate count }
 
     let getValues (is16:intSet16) = 
         is16.values
@@ -133,16 +125,16 @@ module IntSet16 =
                 yield (sorted_O_1_Sequence degree i) }
 
     let fromInteger (dg:degree) (intVers:int) =
-        { intSet16.values = ByteUtils.intToIntArray16 dg (intVers |> uint64) }
-        
+        { intSet16.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0us 1us }
+
+    let fromUint64 (dg:degree) (intVers:uint64) =
+        { intSet16.values = intVers |> ByteUtils.uint64To2ValArray dg 0us 1us }
+    
     let toInteger (arrayVers:intSet16) (oneThresh:int) =
         ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
             
-    let fromUint64 (dg:degree) (intVal:uint64) =
-        { intSet16.values = ByteUtils.intToIntArray16 dg intVal}
-            
     let toUint64 (intSt:intSet16) (oneThresh:uint16) = 
-        ByteUtils.int16ArrayToUint64 intSt.values oneThresh
+        ByteUtils.arrayToUint64 intSt.values oneThresh
 
     let allForAsSeq (degree:degree) =
         let dv = Degree.value degree 
@@ -158,21 +150,15 @@ module IntSet16 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
+    let fromBytes (dg:degree) (data:byte[]) = 
+        result {
 
+             let! ints =  ByteArray.convertBytesToInts data
+             return create ints
+        }
 
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
-
-
-    //let toBytes (perm:intSet) =
-    //    ByteArray.toBytes (perm.values)
-
-
-    //let arrayToBytes (perms:intSet[]) =
-    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
-
+    let toBytes (perm:intSet16) =
+        ByteArray.convertUint16sToBytes (perm.values)
 
 
 //*************************************************************
@@ -207,8 +193,7 @@ module IntSet8 =
         create (b |> Array.map(int)) |> Result.Ok
 
     let zeroCreate (count:int) = 
-        { intSet8.values = 
-                Array.create count 0uy }
+        { intSet8.values = Array.zeroCreate count }
 
     let getValues (is8:intSet8) = 
         is8.values
@@ -239,16 +224,16 @@ module IntSet8 =
                 yield (sorted_O_1_Sequence degree i) }
 
     let fromInteger (dg:degree) (intVers:int) =
-        { intSet8.values = ByteUtils.intToIntArray8 dg (intVers |> uint64) }
+        { intSet8.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0uy 1uy }
+
+    let fromUint64 (dg:degree) (intVers:uint64) =
+        { intSet8.values = intVers |> ByteUtils.uint64To2ValArray dg 0uy 1uy }
         
     let toInteger (arrayVers:intSet8) (oneThresh:int) =
         ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
             
-    let fromUint64 (dg:degree) (intVal:uint64) =
-        { intSet8.values = ByteUtils.intToIntArray8 dg intVal}
-            
     let toUint64 (intSt:intSet8) (oneThresh:uint8) = 
-        ByteUtils.int8ArrayToUint64 intSt.values oneThresh
+        ByteUtils.arrayToUint64 intSt.values oneThresh
 
     let allForAsSeq (degree:degree) =
         let dv = Degree.value degree 
@@ -264,20 +249,14 @@ module IntSet8 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
+    let fromBytes (dg:degree) (data:byte[]) = 
+        result {
+             let! ints =  ByteArray.convertBytesToUint8s data
+             return! create8 ints
+        }
 
-
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
-
-
-    //let toBytes (perm:intSet) =
-    //    ByteArray.toBytes (perm.values)
-
-
-    //let arrayToBytes (perms:intSet[]) =
-    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
+    let toBytes (perm:intSet8) =
+        ByteArray.convertUint8sToBytes (perm.values)
 
 
 

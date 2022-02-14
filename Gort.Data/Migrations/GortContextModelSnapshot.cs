@@ -161,12 +161,18 @@ namespace Gort.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("ByteWidth")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
 
                     b.Property<byte[]>("Data")
                         .IsRequired()
                         .HasColumnType("longblob");
+
+                    b.Property<Guid>("DataId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Degree")
                         .HasColumnType("int");
@@ -194,12 +200,22 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("CausePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("Degree")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("SortableSetDataFormat")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StructureId")
+                        .HasColumnType("char(36)");
 
                     b.Property<byte[]>("SwitchList")
                         .IsRequired()

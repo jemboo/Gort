@@ -6,13 +6,12 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type ByteArrayFixture () =
 
-
     [<TestMethod>]
     member this.mapIntArrays () =
         let srcA = [|199; 12345; 123456; 56585; 43211234; 567; 11998765; 432108; 9766 |]
         let destA = Array.zeroCreate<int> (srcA.Length)
-        let res = ByteArray.mapIntArrays 3 srcA 1 destA 4 // |> Result.ExtractOrThrow
-        Assert.AreEqual(1, 1);
+        ByteArray.copyIntArray 0 srcA  0 destA (srcA.Length)  //1  4 // |> Result.ExtractOrThrow
+        Assert.AreEqual(srcA |> Array.toList, srcA |> Array.toList);
 
 
     [<TestMethod>]
@@ -30,8 +29,7 @@ type ByteArrayFixture () =
         let data = [|0uL; 1uL; 2uL; 3uL; 4uL; 5uL;|]
         let picks = [|true; false; true; true; false; true;|]
         let expected = [|0uL; 2uL; 3uL; 5uL;|]
-        let filtered = CollectionOps.filterByPickList data picks
-                        |> Result.ExtractOrThrow
+        let filtered = CollectionOps.filterByPickList data picks |> Result.ExtractOrThrow
         Assert.AreEqual(expected |> Array.toList, filtered |> Array.toList);
         
 
@@ -47,11 +45,9 @@ type ByteArrayFixture () =
     [<TestMethod>]
     member this.blobToRolloutS32 () =
         let uintsA = [| 199126ul; 565823457ul; 11089766ul |]
-        let offset = 3
+        let blob = uintsA |> ByteArray.convertUint32sToBytes |> Result.ExtractOrThrow
+        let uintsAback = blob |> ByteArray.convertBytesToUint32s |> Result.ExtractOrThrow
         let expected = uintsA |> Array.toList
-        let blobIn = Array.zeroCreate<byte> (offset + uintsA.Length * 4)
-        let blob = blobIn |> (ByteArray.mapUint32arrayToBytes uintsA offset) |> Result.ExtractOrThrow
-        let uintsAback = ByteArray.getUint32arrayFromBytes blob offset uintsA.Length |> Result.ExtractOrThrow
 
         Assert.AreEqual(expected, uintsAback |> Array.toList );
 

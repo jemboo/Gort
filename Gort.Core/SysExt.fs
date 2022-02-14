@@ -98,10 +98,7 @@ type System.Int32 with                        // x=this
 type System.UInt64 with                        // x=this
     (* bit manipulation methods *)
     member x.isset i = x &&& (1uL <<< i) <> 0uL     // test if bit set at a specified position 
-    member x.get i = x &&& (1uL <<< i) <> 0uL 
-    member x.intAt i = ((x &&& (1uL <<< i)) >>> i) |> int  // returns 1 or zero based on the bit at position i 
-    member x.intAt8 i = ((x &&& (1uL <<< i)) >>> i) |> uint8  // returns 1 or zero based on the bit at position i 
-    member x.intAt16 i = ((x &&& (1uL <<< i)) >>> i) |> uint16  // returns 1 or zero based on the bit at position i 
+    member x.get i = x &&& (1uL <<< i) <> 0uL
     member x.set i = x ||| (1uL <<< i)            // set bit to 1 
     member x.unset i = x &&& ~~~(1uL <<< i)       // set bit from 0 
     member x.flip i = (x ^^^ (1uL <<< i))       // change bit  

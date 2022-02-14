@@ -46,30 +46,18 @@ module Degree =
         [| for i in 0 .. ((value deg) - hiCt - 1) -> loVal; 
            for i in ((value deg) - hiCt) .. ((value deg) - 1)  -> hiVal |]
 
+    // Returns a degree + 1 length int array of
+    // of all possible sorted 0-1 sequences of length degree
     let allTwoSymbolOrderedArrays (deg:degree) (hiVal:'a) (loVal:'a) =
         seq { for i = 0 to (value deg) do 
                 yield (twoSymbolOrderedArray deg i hiVal loVal) }
-
-    //let sorted_O_1_Sequence (degree:degree) 
-    //                        (onesCount:int) =
-    //    let totalSize = (value degree)
-    //    let numZeroes = totalSize - onesCount
-    //    Array.init totalSize 
-    //               (fun i -> if i< numZeroes then 0 else 1)
-
-    ////Returns a degree + 1 length int array of
-    //// of all possible sorted 0-1 sequences of length degree
-    //let sorted_0_1_Sequences (degree:degree)  =
-    //    seq { for i = 0 to (value degree) do 
-    //            yield (sorted_O_1_Sequence degree i) }
-
 
     let allIntForDegree (degree:degree) =
         try
             let itemCt = degree |> binExp
             Array.init<int> itemCt (id) |> Ok
         with
-            | ex -> ("error in allBitPackForDegree: " + ex.Message ) 
+            | ex -> ("error in allIntForDegree: " + ex.Message ) 
                     |> Result.Error
 
     let allUint64ForDegree (degree:degree) =
@@ -77,11 +65,17 @@ module Degree =
             let itemCt = degree |> binExp
             Array.init<uint64> itemCt (uint64) |> Ok
         with
-            | ex -> ("error in allBitPackForDegree: " + ex.Message ) 
+            | ex -> ("error in allUint64ForDegree: " + ex.Message ) 
                     |> Result.Error
 
 
 
+type byteWidth = private ByteWidth of int
+module ByteWidth = 
+    let value (ByteWidth v) = v
+    let create (value:int) =
+        if (value = 1) || (value = 2) || (value = 4) || (value = 8) then value |> ByteWidth |> Ok
+        else "RollWidth must be 1, 2, 4 or 8" |> Error
 
 
 type mutationRate = private MutationRate of float

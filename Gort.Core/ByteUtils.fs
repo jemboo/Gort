@@ -33,41 +33,27 @@ module ByteUtils =
     let isSorted (bitRep:uint64) = 
         allSorted_uL |> List.contains bitRep
 
-    let intToIntArray (dg:degree) (d64:uint64) = 
-        Array.init (Degree.value dg) d64.intAt
 
-    let intToIntArray8 (dg:degree) (d64:uint64) = 
-        Array.init (Degree.value dg) d64.intAt8
+    let inline uint64To2ValArray< ^a> (dg:degree)
+                                      (truVal:^a) (falseVal:^a)  
+                                      (d64:uint64) = 
+        Array.init (Degree.value dg) 
+                   (fun dex -> if (d64.get dex) then truVal else falseVal)
 
-    let intToIntArray16 (dg:degree) (d64:uint64) = 
-        Array.init (Degree.value dg) d64.intAt16
-
-    let uint64toIntArray (dg:degree) (d64:uint64) = 
-        Array.init (Degree.value dg) d64.intAt
 
     let intArrayToInt (data:int[]) (oneThresh:int) = 
         let mutable rv = 0
         data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
-    let intArrayToUint64 (data:int[]) (oneThresh:int) = 
+    let inline arrayToUint64< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
         let mutable rv = 0uL
-        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
-        rv
-
-    let int8ArrayToUint64 (data:uint8[]) (oneThresh:uint8)= 
-        let mutable rv = 0uL
-        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
-        rv
-
-    let int16ArrayToUint64 (data:uint16[]) (oneThresh:uint16)= 
-        let mutable rv = 0uL
-        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
+        array |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
     let allUint64s  (intVers:int[]) =
         let oneThresholds = seq { 0 .. (intVers.Length - 1) }
-        oneThresholds |> Seq.map(intArrayToUint64 intVers)
+        oneThresholds |> Seq.map(arrayToUint64 intVers)
         
 
     let toDistinctUint64s (intVersions:int[] seq) =
@@ -86,7 +72,7 @@ module ByteUtils =
 
 
 /// ***********************************************************
-/// ***************  bitstriped routines  *********************
+/// ***************  bitstriped <-> uint64  *******************
 /// ***********************************************************
 
     let uint64toBitStripe (dg:degree) 
@@ -134,7 +120,7 @@ module ByteUtils =
                     stripe <- stripe + 1
             stripedArray |> Ok
         with
-            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
+            | ex -> ("error in uint64ArraytoBitStriped2D: " + ex.Message ) |> Result.Error
 
 
     let bitStripeToUint64 (dg:degree)
@@ -160,4 +146,55 @@ module ByteUtils =
                 stripedArray.[i] |> bitStripeToUint64 dg packedArray stripeLoad i
             packedArray |> Ok
         with
-            | ex -> ("error in bitPackedtoBitStriped: " + ex.Message ) |> Result.Error
+            | ex -> ("error in bitStripedToUint64array: " + ex.Message ) |> Result.Error
+
+
+
+/// ***********************************************************
+/// ***************  bitstriped <-> 'a[]  *********************
+/// ***********************************************************
+
+    let inline writeStripe< ^a when ^a: comparison> 
+                                    (oneThresh:^a)  
+                                    (values:^a[]) 
+                                    (stripePos:int)
+                                    (stripedArray:uint64[]) =
+        for i = 0 to values.Length - 1 do
+            if values.[i] < oneThresh then
+                stripedArray.[i] <- 
+                        stripedArray.[i].set stripePos
+            
+            
+    let inline writeStripeArray< ^a when ^a: comparison> 
+                                    (oneThresh:^a)  
+                                    (dg:degree) 
+                                    (aValues:^a[][]) =
+        let stripedArray = Array.zeroCreate<uint64> (Degree.value dg)
+        for i = 0 to aValues.Length - 1 do
+            writeStripe oneThresh aValues.[i] i stripedArray
+        stripedArray
+
+
+    let inline toStripeArrays< ^a when ^a: comparison> 
+                                    (oneThresh:^a)  
+                                    (dg:degree) 
+                                    (aSeq:^a[] seq) =
+         aSeq |> Seq.chunkBySize 64
+              |> Seq.map(writeStripeArray oneThresh dg)
+
+
+    let fromStripeArrays (byteWidth:byteWidth) 
+                         (zero_v:'a)
+                         (one_v:'a)
+                         (dg:degree) 
+                         (strSeq:uint64 seq) =
+         let _poof (striped:uint64[]) =
+              seq {
+                    for i = 0 to 64 do
+                        yield Array.init 
+                                striped.Length 
+                                (fun dex -> if striped.[dex].get i then zero_v else one_v)
+                  }
+         strSeq |> Seq.chunkBySize (Degree.value dg)
+                |> Seq.map(_poof)
+                |> Seq.concat

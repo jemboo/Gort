@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Gort.Data.Migrations
 {
-    public partial class start : Migration
+    public partial class first : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -139,10 +139,12 @@ namespace Gort.Data.Migrations
                 {
                     SortableSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DataId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SortableSetRep = table.Column<int>(type: "int", nullable: false),
                     Degree = table.Column<int>(type: "int", nullable: false),
+                    ByteWidth = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
@@ -162,10 +164,14 @@ namespace Gort.Data.Migrations
                 columns: table => new
                 {
                     SorterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    StructureId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CausePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Degree = table.Column<int>(type: "int", nullable: false),
+                    SortableSetDataFormat = table.Column<int>(type: "int", nullable: false),
                     SwitchList = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
