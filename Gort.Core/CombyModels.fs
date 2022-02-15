@@ -39,7 +39,6 @@ module Permutation =
         }
 
     let cyclicGroup (degree:degree) = 
-
         let r1 = rotate degree 1
         powers r1 |> Seq.toArray
 

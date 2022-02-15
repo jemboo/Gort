@@ -183,18 +183,18 @@ module ByteUtils =
               |> Seq.map(writeStripeArray oneThresh dg)
 
 
-    let fromStripeArrays (byteWidth:byteWidth) 
-                         (zero_v:'a)
+    let fromStripeArray (zero_v:'a) (one_v:'a) (striped:uint64[])  =
+        seq {
+                for i = 0 to 63 do
+                    yield Array.init 
+                            striped.Length 
+                            (fun dex -> if striped.[dex].get i then zero_v else one_v)
+            }
+
+    let fromStripeArrays (zero_v:'a)
                          (one_v:'a)
                          (dg:degree) 
                          (strSeq:uint64 seq) =
-         let _poof (striped:uint64[]) =
-              seq {
-                    for i = 0 to 64 do
-                        yield Array.init 
-                                striped.Length 
-                                (fun dex -> if striped.[dex].get i then zero_v else one_v)
-                  }
          strSeq |> Seq.chunkBySize (Degree.value dg)
-                |> Seq.map(_poof)
+                |> Seq.map(fromStripeArray zero_v one_v)
                 |> Seq.concat

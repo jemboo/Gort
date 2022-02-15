@@ -49,16 +49,6 @@ type BitwiseFixture () =
 
 
     [<TestMethod>]
-    member this.cratesFor () =
-        let wak = CollectionProps.cratesFor 64 512
-        let rak = CollectionProps.cratesFor 64 513
-        let yak = CollectionProps.cratesFor 64 575
-        Assert.AreEqual(wak, 8)
-        Assert.AreEqual(rak, 9)
-        Assert.AreEqual(yak, 9)
-
-
-    [<TestMethod>]
     member this.allBitPackForDegree () =
         let deg = Degree.createNr 3
         let bitStrings = Degree.allUint64ForDegree deg |> Result.ExtractOrThrow
@@ -115,3 +105,23 @@ type BitwiseFixture () =
         let expected3 = ByteUtils.hashObjs [|ooga;|]
         
         Assert.AreEqual(1,1);
+
+
+
+    [<TestMethod>]
+    member this.stripeRnW () =
+        let dg = Degree.createNr 8
+        let intSetIn = IntSet8.allForAsSeq dg |> Seq.toArray
+        let stripeAs = intSetIn
+                        |> Seq.map(IntSet8.getValues)
+                        |> ByteUtils.toStripeArrays 1uy dg
+                        |> Seq.toArray
+                        |> Array.concat
+
+        let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy dg
+                                  |> Seq.map(IntSet8.fromBytes dg)
+                                  |> Seq.toList
+                                  |> Result.sequence
+                                  |> Result.ExtractOrThrow
+    
+        Assert.AreEqual(intSetIn |> Array.toList, intSetBack);

@@ -45,7 +45,6 @@ type CollectionPropsFixture () =
         Assert.IsTrue(CollectionProps.isIdentity testArray2)
 
 
-
     [<TestMethod>]
     member this.isPermutation () =
         let tc =  [|0;1;2;3;4;6;5|]
@@ -61,6 +60,16 @@ type CollectionPropsFixture () =
         Assert.IsFalse(CollectionProps.isPermutation ntc2);
         Assert.IsTrue(CollectionProps.isPermutation tc3);
         Assert.IsFalse(CollectionProps.isPermutation ntc3);
+
+
+    [<TestMethod>]
+    member this.cratesFor () =
+        let wak = CollectionProps.cratesFor 64 512
+        let rak = CollectionProps.cratesFor 64 513
+        let yak = CollectionProps.cratesFor 64 575
+        Assert.AreEqual(wak, 8)
+        Assert.AreEqual(rak, 9)
+        Assert.AreEqual(yak, 9)
 
 
     [<TestMethod>]

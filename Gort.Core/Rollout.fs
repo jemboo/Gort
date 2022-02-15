@@ -49,7 +49,7 @@ module Rollout =
         else
             {
                 rollout.rollWidth = rollWidth; rollLength = rollLength; rollCount=rollCount;
-                data = Array.zeroCreate<byte> ((ByteWidth.value rollWidth) * (RollLength.value rollLength) * (RollCount.value rollCount))
+                data = data //Array.zeroCreate<byte> ((ByteWidth.value rollWidth) * (RollLength.value rollLength) * (RollCount.value rollCount))
             } |> Ok
 
 
