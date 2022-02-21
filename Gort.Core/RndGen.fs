@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-module RndGen =
+module RandGen =
     
     let rndBitsUint64 (degree:degree) (rnd:IRando) = 
         rnd.NextULong &&& (degree |> Degree.bitMaskUint64)
@@ -80,7 +80,7 @@ module RndGen =
          Seq.initInfinite (fun _ -> randomPermutation rnd degree)
 
 
-    let rndTwoCycleArray (rnd:IRando) 
+    let rndTwoCycle (rnd:IRando) 
                          (arraysize:int) 
                          (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
@@ -93,9 +93,8 @@ module RndGen =
         arrayRet
 
 
-    let rndFullTwoCycleArray (rnd:IRando) 
-                             (arraysize:int) =
-        rndTwoCycleArray rnd arraysize (arraysize/2)
+    let rndFullTwoCycle (rnd:IRando) (arraysize:int) =
+        rndTwoCycle rnd arraysize (arraysize/2)
 
     
     // returns a sequence of int[] of length m, made by drawing m

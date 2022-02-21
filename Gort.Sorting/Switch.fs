@@ -53,66 +53,65 @@ module Switch =
                     if ((j > i ) && (i = pArray.[j]) ) then
                             yield {Switch.low=i; Switch.hi=j} }
 
-    //let fromPermutation (p:permutation) =
-    //    fromIntArrayAsPerm (Permutation.arrayValues p)
+    let fromPermutation (p:permutation) =
+        fromIntArrayAsPerm (Permutation.getArray p)
  
-    //let fromTwoCyclePerm (p:twoCyclePerm) =
-    //    fromIntArrayAsPerm (TwoCyclePerm.arrayValues p)
+    let fromTwoCyclePerm (tc:twoCycle) =
+        fromIntArrayAsPerm (TwoCycle.getArray tc)
 
-    //let switchCountForDegree (order:Degree)  =
-    //    uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
-
-
-    //let makeAltEvenOdd (degree:Degree) (stageCt:StageCount) =
-    //    result {
-    //        let! stages = TwoCycleGen.makeAltEvenOdd degree 
-    //                                  (Permutation.identity degree)
-    //                    |> Seq.take(StageCount.value stageCt)
-    //                    |> Seq.toList
-    //                    |> Result.sequence
-    //        return stages |> List.map(fromTwoCyclePerm)
-    //                      |> Seq.concat
-    //    }
-
-    //// IRando dependent
-    //let rndNonDegenSwitchesOfDegree (degree:Degree) 
-    //                                (rnd:IRando) =
-    //    let maxDex = switchCountForDegree degree
-    //    seq { while true do 
-    //                let p = (int (rnd.NextUInt % maxDex))
-    //                let sw = switchMap.[p] 
-    //                if (sw.low <> sw.hi) then
-    //                    yield sw }
-
-    //let rndSwitchesOfDegree (degree:Degree) 
-    //                        (rnd:IRando) =
-    //    let maxDex = switchCountForDegree degree
-    //    seq { while true do 
-    //                let p = (int (rnd.NextUInt % maxDex))
-    //                yield switchMap.[p] }
+    let switchCountForDegree (dg:degree)  =
+        uint32 ((Degree.value dg)*(Degree.value dg + 1) / 2)
 
 
-    //let rndSymmetric (degree:Degree)
-    //                 (rnd:IRando) =
-    //    let aa (rnd:IRando)  = 
-    //        (TwoCyclePerm.rndSymmetric 
-    //                            degree 
-    //                            rnd )
-    //                |> fromTwoCyclePerm
-    //    seq { while true do yield! (aa rnd) }
+    let makeAltEvenOdd (degree:degree) (stageCt:stageCount) =
+        result {
+            let stages = TwoCycle.makeAltEvenOdd degree 
+                                      (Permutation.identity degree)
+                        |> Seq.take(StageCount.value stageCt)
+
+            return stages |> Seq.map(fromTwoCyclePerm)
+                          |> Seq.concat
+        }
+
+    // IRando dependent
+    let rndNonDegenSwitchesOfDegree (degree:degree) 
+                                    (rnd:IRando) =
+        let maxDex = switchCountForDegree degree
+        seq { while true do 
+                    let p = (int (rnd.NextUInt % maxDex))
+                    let sw = switchMap.[p] 
+                    if (sw.low <> sw.hi) then
+                        yield sw }
+
+    let rndSwitchesOfDegree (degree:degree) 
+                            (rnd:IRando) =
+        let maxDex = switchCountForDegree degree
+        seq { while true do 
+                    let p = (int (rnd.NextUInt % maxDex))
+                    yield switchMap.[p] }
 
 
-    //let mutateSwitches (order:Degree) 
-    //                   (mutationRate:MutationRate) 
-    //                   (rnd:IRando) 
-    //                   (switches:seq<Switch>) =
-    //    let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
-    //    let mutateSwitch (switch:Switch) =
-    //        match rnd.NextFloat with
-    //        | k when k < (MutationRate.value mutationRate) -> 
-    //                    switchMap.[(int (rnd.NextUInt % mDex))] 
-    //        | _ -> switch
-    //    switches |> Seq.map(fun sw-> mutateSwitch sw)
+    let rndSymmetric (degree:degree)
+                     (rnd:IRando) =
+        let aa (rnd:IRando)  = 
+            (TwoCycle.rndSymmetric 
+                                degree 
+                                rnd )
+                    |> fromTwoCyclePerm
+        seq { while true do yield! (aa rnd) }
+
+
+    let mutateSwitches (order:degree) 
+                       (mutationRate:mutationRate) 
+                       (rnd:IRando) 
+                       (switches:seq<Switch>) =
+        let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
+        let mutateSwitch (switch:Switch) =
+            match rnd.NextFloat with
+            | k when k < (MutationRate.value mutationRate) -> 
+                        switchMap.[(int (rnd.NextUInt % mDex))] 
+            | _ -> switch
+        switches |> Seq.map(fun sw-> mutateSwitch sw)
 
 
     let reflect (dg:degree) 

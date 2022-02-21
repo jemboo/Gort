@@ -36,7 +36,6 @@ module SortableSet =
             }
         | 8 -> 
             result {
-
                 let stripeAs = IntSet8.allForAsSeq dg
                                 |> Seq.map(IntSet8.getValues)
                                 |> ByteUtils.toStripeArrays 1uy dg

@@ -37,3 +37,11 @@ type SysExtFixture () =
         let vv3n = v3n.count
         Assert.AreEqual(vv3, 4uL)
         Assert.AreEqual(vv3n, 60uL)
+
+
+    [<TestMethod>]
+    member this.count64b  () =
+        let bs25 = [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let uint64_25 = 1 |> ByteUtils.arrayToUint64 bs25
+        let onesCt = uint64_25.count
+        Assert.AreEqual(onesCt, 25)

@@ -4,6 +4,11 @@ open System
 
 module CollectionOps =
 
+    let takeUpto<'a> (maxCt:int) (source:seq<'a>) = 
+        source |> Seq.mapi(fun dex v -> (dex, v))
+               |> Seq.takeWhile(fun tup -> (fst tup) < maxCt)
+               |> Seq.map(snd)
+
     // product map composition: a(b()).
     let arrayProductInt (lhs:array<int>) 
                         (rhs:array<int>) 
@@ -122,10 +127,10 @@ module CollectionOps =
 //***********    Array Stacking    ****************************
 //*************************************************************
 
-
     let stack (lowTohi: 'a[] seq) =
         lowTohi |> Seq.concat
                 |> Seq.toArray
+
 
     let comboStack (subSeqs: 'a[][] seq) =
         let rec _cart LL =
@@ -140,8 +145,3 @@ module CollectionOps =
              Degree.allTwoSymbolOrderedArrays deg hival lowval
         blockSizes |> Seq.map(_allSorted >> Seq.toArray)
                    |> comboStack
-
-    let takeUpto<'a> (maxCt:int) (source:seq<'a>) = 
-        source |> Seq.mapi(fun dex v -> (dex, v))
-               |> Seq.takeWhile(fun tup -> (fst tup) < maxCt)
-               |> Seq.map(snd)

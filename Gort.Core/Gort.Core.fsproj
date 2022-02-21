@@ -19,8 +19,10 @@
     <Compile Include="RndGen.fs" />
     <Compile Include="IntSet.fs" />
     <Compile Include="Rollout.fs" />
-    <Compile Include="CombyModels.fs" />
+    <Compile Include="IntSeries.fs" />
+    <Compile Include="Permutation.fs" />
     <Compile Include="SwitchRfl.fs" />
+    <Compile Include="TwoCycle.fs" />
     <Compile Include="File.fs" />
   </ItemGroup>
 

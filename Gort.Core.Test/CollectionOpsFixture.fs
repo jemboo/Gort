@@ -8,6 +8,14 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type CollectionOpsFixture () =
 
     [<TestMethod>]
+    member this.takeUpto () =
+        let a1 = [|1;2;3;4;5;6;7;8|]
+        let yab = a1 |> CollectionOps.takeUpto 3 |> Seq.toArray
+        let zab = a1 |> CollectionOps.takeUpto 30 |> Seq.toArray
+        Assert.IsTrue(yab.Length = 3)
+        Assert.IsTrue(zab.Length = 8)
+
+    [<TestMethod>]
     member this.arrayProductInt() =
         let aA = [|2; 0; 4; 1; 3;|]
         let aB = [|4; 3; 1; 2; 0;|]
@@ -15,8 +23,8 @@ type CollectionOpsFixture () =
         let aBAexp = [|1; 4; 0; 3; 2;|]
         let aABact = [|0; 0; 0; 0; 0;|]
         let aBAact = [|0; 0; 0; 0; 0;|]
-        CollectionOps.arrayProductInt aA aB aABact
-        CollectionOps.arrayProductInt  aB aA aBAact
+        CollectionOps.arrayProductInt aA aB aABact |> ignore
+        CollectionOps.arrayProductInt  aB aA aBAact |> ignore
         let abExp = aABexp |> Array.toList
         let baExp = aBAexp |> Array.toList
         let abAct = aABact |> Array.toList
@@ -33,8 +41,8 @@ type CollectionOpsFixture () =
         let aBAexp = [|1us; 4us; 0us; 3us; 2us;|]
         let aABact = [|0us; 0us; 0us; 0us; 0us;|]
         let aBAact = [|0us; 0us; 0us; 0us; 0us;|]
-        CollectionOps.arrayProduct16 aA aB aABact
-        CollectionOps.arrayProduct16 aB aA aBAact
+        CollectionOps.arrayProduct16 aA aB aABact |> ignore
+        CollectionOps.arrayProduct16 aB aA aBAact |> ignore
         Assert.AreEqual(aABact |> Array.toList, aABexp |> Array.toList)
         Assert.AreEqual(aBAact |> Array.toList, aBAexp |> Array.toList)
 
@@ -56,7 +64,7 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<100 do
-            let bloke = RndGen.randomPermutation randy degree
+            let bloke = RandGen.randomPermutation randy degree
             let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Degree.value degree))
                         |> Result.ExtractOrThrow
             let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
@@ -71,9 +79,9 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RndGen.randomPermutation randy degree
-            let core1 = RndGen.randomPermutation randy degree
-            let core2 = RndGen.randomPermutation randy degree
+            let conjer = RandGen.randomPermutation randy degree
+            let core1 = RandGen.randomPermutation randy degree
+            let core2 = RandGen.randomPermutation randy degree
             let coreProd = CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
@@ -98,9 +106,9 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RndGen.randomPermutation randy degree
-            let core1 = RndGen.randomPermutation randy degree
-            let core2 = RndGen.randomPermutation randy degree
+            let conjer = RandGen.randomPermutation randy degree
+            let core1 = RandGen.randomPermutation randy degree
+            let core2 = RandGen.randomPermutation randy degree
             let coreProd = CollectionOps.arrayProductIntR core1 core2  (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
@@ -116,7 +124,7 @@ type CollectionOpsFixture () =
                                         |> Result.ExtractOrThrow
                                         |> Array.toList
             Assert.IsTrue((coreProdConj=prodOfConj))
-            i <- i+1
+            i <- i + 1
 
 
     [<TestMethod>]
@@ -127,12 +135,11 @@ type CollectionOpsFixture () =
 
 
     [<TestMethod>]
-    member this.takeUpto () =
-        let a1 = [|1;2;3;4;5;6;7;8|]
-        let yab = a1 |> CollectionOps.takeUpto 3 |> Seq.toArray
-        let zab = a1 |> CollectionOps.takeUpto 30 |> Seq.toArray
-        Assert.IsTrue(yab.Length = 3)
-        Assert.IsTrue(zab.Length = 8)
+    member this.stackSortedBlocks () =
+        let dgs = [4;2;2] |> List.map(Degree.createNr)
+        let blocks = CollectionOps.stackSortedBlocks dgs 0 1
+                     |> Seq.toArray
+        Assert.AreEqual(dgs.Length, 45);
 
 
 

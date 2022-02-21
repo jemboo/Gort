@@ -51,7 +51,7 @@ type BitwiseFixture () =
     [<TestMethod>]
     member this.allBitPackForDegree () =
         let deg = Degree.createNr 3
-        let bitStrings = Degree.allUint64ForDegree deg |> Result.ExtractOrThrow
+        let bitStrings = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
         Assert.AreEqual(Degree.value deg, Degree.value deg )
         Assert.AreEqual(bitStrings.Length, Degree.binExp deg )
 
@@ -59,14 +59,14 @@ type BitwiseFixture () =
     [<TestMethod>]
     member this.bitPackedtoBitStriped () =
         let deg = Degree.createNr 8
-        let bpa = Degree.allUint64ForDegree deg |> Result.ExtractOrThrow
+        let bpa = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
         let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
         Assert.AreEqual(bpa |> Array.toList, bpaBack |> Array.toList)
 
         let deg2 = Degree.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let bpa2 = Array.init 100 (fun _ -> RndGen.rndBitsUint64 deg2 randy)
+        let bpa2 = Array.init 100 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped deg2 |> Result.ExtractOrThrow
         let bpaBack2 = bsa2 |> ByteUtils.bitStripedToUint64array deg2 bpa2.Length |> Result.ExtractOrThrow
 
@@ -78,16 +78,15 @@ type BitwiseFixture () =
     member this.bitPackedtoBitStriped2D () =
         let deg2 = Degree.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let bpa2 = Array.init 1000 (fun _ -> RndGen.rndBitsUint64 deg2 randy)
+        let bpa2 = Array.init 1000 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped2D deg2 |> Result.ExtractOrThrow
         Assert.IsTrue(bsa2.Length > 1)
-
 
 
     [<TestMethod>]
     member this.rolloutAndSortedFilter () =
         let deg = Degree.createNr 8
-        let bpa = Degree.allUint64ForDegree deg |> Result.ExtractOrThrow
+        let bpa = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
         let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
         let srtedBack = bpaBack |> Array.filter(fun srtbl -> srtbl |> ByteUtils.isSorted |> not)
@@ -105,7 +104,6 @@ type BitwiseFixture () =
         let expected3 = ByteUtils.hashObjs [|ooga;|]
         
         Assert.AreEqual(1,1);
-
 
 
     [<TestMethod>]

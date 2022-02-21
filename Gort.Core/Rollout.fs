@@ -39,7 +39,9 @@ module Rollout =
     let create (rollWidth:byteWidth) (rollLength:rollLength) (rollCount:rollCount) =
         {
             rollout.rollWidth = rollWidth; rollLength = rollLength; rollCount=rollCount;
-            data = Array.zeroCreate<byte> ((ByteWidth.value rollWidth) * (RollLength.value rollLength) * (RollCount.value rollCount))
+            data = Array.zeroCreate<byte> ((ByteWidth.value rollWidth) * 
+                                           (RollLength.value rollLength) * 
+                                           (RollCount.value rollCount))
         }
 
     let init (rollWidth:byteWidth) (rollLength:rollLength) (rollCount:rollCount) (data:byte[]) =
@@ -49,7 +51,7 @@ module Rollout =
         else
             {
                 rollout.rollWidth = rollWidth; rollLength = rollLength; rollCount=rollCount;
-                data = data //Array.zeroCreate<byte> ((ByteWidth.value rollWidth) * (RollLength.value rollLength) * (RollCount.value rollCount))
+                data = data
             } |> Ok
 
 

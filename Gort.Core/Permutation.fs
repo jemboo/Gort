@@ -54,9 +54,9 @@ module Permutation =
     let inRange (degree:degree) (value:int) =
        ((value > -1) && (value < (Degree.value degree)))
 
-    let inverse (perm:permutation)
-                (a_out:array<int>) =
-        { values = CollectionOps.invertArrayNr perm.values a_out }
+    let inverse (perm:permutation ) =
+        let ia = Array.zeroCreate perm.values.Length
+        { values = CollectionOps.invertArrayNr perm.values ia }
 
     let isSorted (perm:permutation) =
         CollectionProps.isSorted_inline perm.values
@@ -87,7 +87,7 @@ module Permutation =
 
 
 //*************************************************************
-//***************  byte conversions****************************
+//***************  byte conversions  **************************
 //*************************************************************
 
 
@@ -114,88 +114,7 @@ module Permutation =
 
     let createRandom (degree:degree) (rnd:IRando) =
         let idArray = (identity degree) |> getArray  
-        { values=(RndGen.fisherYatesShuffle rnd idArray |> Seq.toArray)}
+        { values=(RandGen.fisherYatesShuffle rnd idArray |> Seq.toArray)}
 
     let createRandoms (degree:degree) (rnd:IRando) =
         Seq.initInfinite(fun _ -> createRandom degree rnd)
-
-
-
-// a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
-type twoCycle = private { values:int[] }
-module TwoCycle = 
-
-    let create (vals:int[]) =
-        if CollectionProps.isTwoCycle vals then
-             { twoCycle.values = vals} |> Ok
-        else
-            "not a two cycle" |> Error
-
-    let create8 (b:uint8[]) =
-        create (b |> Array.map(int))
-
-    let create16 (b:uint16[]) =
-        create (b |> Array.map(int))
-
-    let getArray (tc:twoCycle) = tc.values
-
-    let getDegree (tc:twoCycle) =
-        Degree.createNr tc.values.Length
-
-    let identity (degree:int) = { twoCycle.values = [|0 .. degree-1|] }
-    
-    let isSorted (tc:twoCycle) =
-        CollectionProps.isSorted_inline tc.values
-
-    let monoTwoCycle (degree:degree) 
-                         (aDex:int) 
-                         (bDex:int) =
-        Array.init (Degree.value degree) (fun i -> 
-            if   (i = aDex) then bDex
-            elif (i = bDex) then aDex
-            else i)
-
-
-    let allMonoTwoCycles (degree:degree) =
-        seq {for i = 0 to (Degree.value(degree) - 1) do
-                for j = 0 to i - 1 do
-                    yield monoTwoCycle degree i j}
-
-
-    let conjugate (tc:twoCycle) (perm:permutation) =
-        { twoCycle.values =
-            CollectionOps.conjIntArraysNr (Permutation.getArray perm)
-                                  (getArray tc)
-                                  (Array.zeroCreate perm.values.Length)
-        }
-
-
-
-//*************************************************************
-//***************  byte conversions****************************
-//*************************************************************
-
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
-
-
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
-
-
-    //let toBytes (perm:intSet) =
-    //    ByteArray.toBytes (perm.values)
-
-
-    //let arrayToBytes (perms:intSet[]) =
-    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
-
-
-
-//*************************************************************
-//***************    IRando dependent   ***********************
-//*************************************************************
-
-    let rndMono (degree:degree) (rnd:IRando) =
-        let tup = RndGen.drawTwoWithoutRep degree rnd
-        monoTwoCycle degree (fst tup) (snd tup)

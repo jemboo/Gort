@@ -22,6 +22,9 @@ module Degree =
     let maxSwitchesPerStage (degree:degree) =
         (value degree) / 2
 
+    let switchCount (degree:degree) =
+        ((value degree) * (value degree - 1) )/ 2
+
     let add (degs:degree seq) =
         degs |> Seq.map(value) 
              |> Seq.reduce(+)
@@ -52,7 +55,7 @@ module Degree =
         seq { for i = 0 to (value deg) do 
                 yield (twoSymbolOrderedArray deg i hiVal loVal) }
 
-    let allIntForDegree (degree:degree) =
+    let allSortableAsInt (degree:degree) =
         try
             let itemCt = degree |> binExp
             Array.init<int> itemCt (id) |> Ok
@@ -60,7 +63,7 @@ module Degree =
             | ex -> ("error in allIntForDegree: " + ex.Message ) 
                     |> Result.Error
 
-    let allUint64ForDegree (degree:degree) =
+    let allSortableAsUint64 (degree:degree) =
         try
             let itemCt = degree |> binExp
             Array.init<uint64> itemCt (uint64) |> Ok
@@ -79,7 +82,6 @@ module ByteWidth =
 
 
 type mutationRate = private MutationRate of float
-
 module MutationRate =
     let value (MutationRate v) = v
     let create (v:float) =
