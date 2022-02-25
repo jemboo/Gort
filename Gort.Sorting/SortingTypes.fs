@@ -10,6 +10,7 @@ type sorterSetId = private SorterSetId of Guid
 type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
 type switchCount = private SwitchCount of int
+type switchFrequency = private SwitchFrequency of float
 type switchUses = {weights:int[]}
 
 
@@ -38,7 +39,6 @@ module SortableSetId =
     let value (SortableSetId v) = v
     let create id = (SortableSetId id)
     let fromGuid (id:Guid) = create id
-
 
 module SwitchCount =
     let value (SwitchCount v) = v
@@ -84,6 +84,9 @@ module SwitchCount =
                     | _ -> 0
         create ct
 
+module SwitchFrequency =
+    let value (SwitchFrequency v) = v
+    let create id = StageCount id
 
 module StageCount =
     let value (StageCount v) = v
@@ -136,7 +139,6 @@ module StageCount =
                     | 24 | 25 -> 140
                     | _ -> 0
         create ct
-
 
 
 module StageWindowSize =

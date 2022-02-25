@@ -6,13 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterData.fs" />
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Switch.fs" />
     <Compile Include="SwitchGen.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />
     <Compile Include="SortableSet.fs" />
-    <Compile Include="BinRep.fs" />
+    <Compile Include="SortersFromData.fs" />
   </ItemGroup>
 
   <ItemGroup>

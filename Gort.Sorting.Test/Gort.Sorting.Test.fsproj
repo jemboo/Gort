@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SwitchFixture.fs" />
     <Compile Include="SortableSetFixture.fs" />
-    <Compile Include="Tests - Copy.fs" />
+    <Compile Include="SwitchFixture.fs" />
+    <Compile Include="StageFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

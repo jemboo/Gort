@@ -23,7 +23,7 @@ module SwitchGen =
                 seq {0 .. (length - d - 1) }
                 |> Seq.filter (fun v -> (v &&& p) = r)
                 |> Seq.iter (fun v -> 
-                    lret <- { Switch.low = v; Switch.hi = v + d} :: lret )
+                    lret <- { switch.low = v; hi = v + d} :: lret )
                 d <- q - p
                 q <- q /2
                 r <- p
@@ -45,7 +45,7 @@ module SwitchGen =
                 seq {0 .. (length - d - 1) }
                 |> Seq.filter (fun v -> (v &&& p) = r)
                 |> Seq.iter (fun v -> 
-                    lstage <- { Switch.low = v; Switch.hi = v + d} :: lstage )
+                    lstage <- { switch.low = v; hi = v + d} :: lstage )
                 d <- q - p
                 q <- q /2
                 r <- p

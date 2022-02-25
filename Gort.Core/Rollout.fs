@@ -31,7 +31,7 @@ module Rollout =
         rollout.rollLength
 
     let getRollCount (rollout:rollout) =
-        rollout.rollLength
+        rollout.rollCount
 
     let getData (rollout:rollout) =
         rollout.data

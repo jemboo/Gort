@@ -134,7 +134,9 @@ module SortableSet =
                 result {
                     let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
                                     |> Seq.toArray
-                    let! rBytes = stacked |> Array.concat |> ByteArray.convertUint8sToBytes
+                    let stripedAs = stacked |> ByteUtils.toStripeArrays 1uy dg
+                                            |> Seq.toArray
+                    let! rBytes = stripedAs |> Array.concat |> ByteArray.convertUint64sToBytes
                     let! rollLen = (RollLength.create (Degree.value dg))
                     let! rollCt = stacked.Length |> CollectionProps.cratesFor 64 |> RollCount.create
                     let! rollout = rBytes |> Rollout.init format rollLen rollCt

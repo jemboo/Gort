@@ -9,6 +9,7 @@ module CollectionOps =
                |> Seq.takeWhile(fun tup -> (fst tup) < maxCt)
                |> Seq.map(snd)
 
+
     // product map composition: a(b()).
     let arrayProductInt (lhs:array<int>) 
                         (rhs:array<int>) 
@@ -122,6 +123,19 @@ module CollectionOps =
             let! rhs = arrayProductIntR a_core a_conj_inv (Array.zeroCreate a_core.Length)
             return! arrayProductIntR a_conj rhs (Array.zeroCreate a_core.Length)
         }
+
+
+    let histogram<'d,'r when 'r:comparison> (keymaker:'d->'r) 
+                                            (qua:seq<'d>) =
+        qua
+        |> Seq.fold (fun acc fv ->
+                let kk = keymaker fv
+                if Map.containsKey kk acc
+                then Map.add kk (acc.[kk] + 1) acc
+                else Map.add kk 1 acc
+            ) Map.empty
+
+
 
 //*************************************************************
 //***********    Array Stacking    ****************************

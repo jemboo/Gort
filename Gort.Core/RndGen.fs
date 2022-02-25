@@ -80,9 +80,7 @@ module RandGen =
          Seq.initInfinite (fun _ -> randomPermutation rnd degree)
 
 
-    let rndTwoCycle (rnd:IRando) 
-                         (arraysize:int) 
-                         (cycleCount:int) =
+    let rndTwoCycle (rnd:IRando) (arraysize:int) (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
         let arrayRet = Array.init arraysize (id)
         let rndTupes = (fisherYatesShuffle rnd initialList) 

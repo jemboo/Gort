@@ -8,6 +8,16 @@ module CollectionProps =
         (lhs.Length = rhs.Length) &&
         lhs |> Array.forall2 (fun re le -> re = le) rhs
 
+    //returns the last n items of the list in the original order
+    let rec last n xs =
+      if List.length xs <= n then xs
+      else last n xs.Tail
+
+    //returns the first n items of the list in the original order,
+    //or all the items if it's shorter than n
+    let first n (xs:'a list) =
+        let mn = min n xs.Length
+        xs |> List.take mn
 
     // converts a density distr to a cumulative distr.
     let asCumulative (startVal:float) (weights:float[])  =
@@ -197,6 +207,16 @@ module CollectionProps =
             dex <- dex + 1
         _cont
 
+    // returns a sequence of items that occur more than once 
+    let itemsOccuringMoreThanOnce items =
+        seq {
+            let d = System.Collections.Generic.Dictionary()
+            for i in items do
+                match d.TryGetValue(i) with
+                | false, _    -> d.[i] <- false         // first observance
+                | true, false -> d.[i] <- true; yield i // second observance
+                | true, true  -> ()                     // already seen at least twice
+        }
 
     let unsortednessSquared_uL (a:array<uint64>) =
         distanceSquared_uL a [|0uL .. ((uint64 a.Length ) - 1uL)|]
