@@ -168,7 +168,6 @@ namespace Gort.Data
         }
 
 
-
         public static void GetCauseTypeParams(GortContext gortContext)
         {
             causeTypeParamStdSortables_MinDegree = gortContext.CauseTypeParams.Where(g => g.Name == "minDegree").First();

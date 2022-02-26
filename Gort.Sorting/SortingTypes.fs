@@ -84,9 +84,12 @@ module SwitchCount =
                     | _ -> 0
         create ct
 
+
 module SwitchFrequency =
     let value (SwitchFrequency v) = v
-    let create id = StageCount id
+    let create vv = SwitchFrequency vv
+    let max = create 1.0
+
 
 module StageCount =
     let value (StageCount v) = v

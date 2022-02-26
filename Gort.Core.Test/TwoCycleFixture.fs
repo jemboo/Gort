@@ -14,6 +14,11 @@ type TwoCycleFixture () =
         let stageTupes = seq {(0,1)}
         let twoCycle = TwoCycle.makeFromTupleSeq dg stageTupes
         Assert.AreEqual((TwoCycle.getArray twoCycle).Length, dg |> Degree.value)
+        Assert.IsTrue(twoCycle |> TwoCycle.isATwoCycle)
+        let stageTupes2 = seq {(0,1); (2,1)}
+        let twoCycle2 = TwoCycle.makeFromTupleSeq dg stageTupes2
+        Assert.AreEqual(twoCycle |> TwoCycle.getArray |> Array.toList, 
+                        twoCycle2 |> TwoCycle.getArray |> Array.toList)
 
 
     [<TestMethod>]

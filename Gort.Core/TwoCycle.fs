@@ -61,6 +61,11 @@ module TwoCycle =
 //*******************  properties  ****************************
 //*************************************************************
 
+    
+    let isATwoCycle (tcp:twoCycle) =
+        tcp |> getArray |> CollectionProps.isTwoCycle
+
+
     let hasAfixedPoint (tcp:twoCycle) =
         tcp.values |> Seq.mapi(fun dex v -> dex = v)
                    |> Seq.contains(true)

@@ -49,6 +49,10 @@ module StageCover =
                 stgCvrs <- nuCvr
                 yield dexed }
 
+    let getStageCount (sws:switch seq) =
+        sws |> addStageIndexes |> Seq.groupBy(snd) |> Seq.length |> StageCount.create
+
+
 
 type stage = {switches:switch list; degree:degree}
 module Stage =
