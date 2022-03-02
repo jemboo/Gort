@@ -2,12 +2,6 @@
 {
     public static class EntityUtils
     {
-        public static Sorter AddId(this Sorter sorter)
-        {
-            var id = GuidUtils.guidFromObjs(new object[1] {sorter.SwitchList});
-            return new Sorter() { SorterId = id, CauseId = sorter.CauseId, Description = sorter.Description, Degree = sorter.Degree, SwitchList = sorter.SwitchList };
-        }
-
         public static CauseTypeGroup AddId(this CauseTypeGroup ctg)
         {
             var id = GuidUtils.guidFromObjs(new object[2] { ctg.Name, ctg.ParentId});
@@ -38,11 +32,18 @@
             return new CauseParam() { CauseParamId = id, CauseId = cp.CauseId, CauseTypeParamId = cp.CauseTypeParamId, Value = cp.Value };
         }
 
-        public static RndGen AddId(this RndGen rg)
+        public static RandGen AddId(this RandGen rg)
         {
             var id = GuidUtils.guidFromObjs(new object[2] { rg.RndGenType, rg.Seed });
-            return new RndGen() { RndGenId = id, RndGenType = rg.RndGenType, Seed = rg.Seed };
+            return new RandGen() { RandGenId = rg.RandGenId, StructId = id, RndGenType = rg.RndGenType, Seed = rg.Seed, Description = rg.Description, CauseId = rg.CauseId };
         }
+
+        public static Sorter AddId(this Sorter sorter)
+        {
+            var id = GuidUtils.guidFromObjs(new object[1] { sorter.Data });
+            return new Sorter() { SorterId = sorter.SorterId, StructId = id, CauseId = sorter.CauseId, Description = sorter.Description, Order = sorter.Order, Data = sorter.Data };
+        }
+
 
         public static void makeSortableSetGen()
         {

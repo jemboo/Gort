@@ -154,8 +154,8 @@ module CollectionOps =
         _cart (subSeqs |> Seq.toList) |> Seq.map(stack)
 
 
-    let stackSortedBlocks (blockSizes:degree seq) (hival:'a) (lowval:'a) =
-        let _allSorted (deg:degree) = 
-             Degree.allTwoSymbolOrderedArrays deg hival lowval
+    let stackSortedBlocks (blockSizes:order seq) (hival:'a) (lowval:'a) =
+        let _allSorted (deg:order) = 
+             Order.allTwoSymbolOrderedArrays deg hival lowval
         blockSizes |> Seq.map(_allSorted >> Seq.toArray)
                    |> comboStack

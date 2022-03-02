@@ -110,7 +110,7 @@ module CollectionProps =
           |> Array.reduce(+)
 
 
-    let identity (degree:int) = [|0 .. degree-1|] 
+    let identity (order:int) = [|0 .. order-1|] 
 
     let isIdentity (wh:int[]) =
         wh |> arrayEquals (identity wh.Length)

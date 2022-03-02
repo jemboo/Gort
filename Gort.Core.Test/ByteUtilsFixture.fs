@@ -29,9 +29,9 @@ type BitwiseFixture () =
     [<TestMethod>]
     member this.toIntArray () =
         let uLun = [|0; 0; 1; 0; 1; 1; 0|]
-        let dg = Degree.createNr uLun.Length
+        let ord = Order.createNr uLun.Length
         let uLRep = ByteUtils.arrayToUint64 uLun 1
-        let aBack = uLRep |> ByteUtils.uint64To2ValArray dg 1 0
+        let aBack = uLRep |> ByteUtils.uint64To2ValArray ord 1 0
         Assert.AreEqual(uLun |> Array.toList, aBack |> Array.toList)
         Assert.IsTrue(true);
 
@@ -43,28 +43,28 @@ type BitwiseFixture () =
         let mergeUpCt = hiDegree * lowDegree
         let lowBand = ByteUtils.allSorted_uL |> List.take lowDegree
         let hiBand = ByteUtils.allSorted_uL |> List.take hiDegree
-        let mergedSet = ByteUtils.mergeUpSeq (Degree.createNr lowDegree) 
+        let mergedSet = ByteUtils.mergeUpSeq (Order.createNr lowDegree) 
                                              lowBand hiBand |> Seq.toArray
         Assert.AreEqual(mergedSet.Length, mergeUpCt)
 
 
     [<TestMethod>]
     member this.allBitPackForDegree () =
-        let deg = Degree.createNr 3
-        let bitStrings = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
-        Assert.AreEqual(Degree.value deg, Degree.value deg )
-        Assert.AreEqual(bitStrings.Length, Degree.binExp deg )
+        let deg = Order.createNr 3
+        let bitStrings = Order.allSortableAsUint64 deg |> Result.ExtractOrThrow
+        Assert.AreEqual(Order.value deg, Order.value deg )
+        Assert.AreEqual(bitStrings.Length, Order.binExp deg )
 
 
     [<TestMethod>]
     member this.bitPackedtoBitStriped () =
-        let deg = Degree.createNr 8
-        let bpa = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
+        let deg = Order.createNr 8
+        let bpa = Order.allSortableAsUint64 deg |> Result.ExtractOrThrow
         let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
         Assert.AreEqual(bpa |> Array.toList, bpaBack |> Array.toList)
 
-        let deg2 = Degree.createNr 16
+        let deg2 = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
         let bpa2 = Array.init 100 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped deg2 |> Result.ExtractOrThrow
@@ -76,7 +76,7 @@ type BitwiseFixture () =
 
     [<TestMethod>]
     member this.bitPackedtoBitStriped2D () =
-        let deg2 = Degree.createNr 16
+        let deg2 = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
         let bpa2 = Array.init 1000 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped2D deg2 |> Result.ExtractOrThrow
@@ -85,8 +85,8 @@ type BitwiseFixture () =
 
     [<TestMethod>]
     member this.rolloutAndSortedFilter () =
-        let deg = Degree.createNr 8
-        let bpa = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
+        let deg = Order.createNr 8
+        let bpa = Order.allSortableAsUint64 deg |> Result.ExtractOrThrow
         let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
         let srtedBack = bpaBack |> Array.filter(fun srtbl -> srtbl |> ByteUtils.isSorted |> not)
@@ -108,16 +108,16 @@ type BitwiseFixture () =
 
     [<TestMethod>]
     member this.stripeRnW () =
-        let dg = Degree.createNr 8
-        let intSetIn = IntSet8.allForAsSeq dg |> Seq.toArray
+        let ord = Order.createNr 8
+        let intSetIn = IntSet8.allForAsSeq ord |> Seq.toArray
         let stripeAs = intSetIn
                         |> Seq.map(IntSet8.getValues)
-                        |> ByteUtils.toStripeArrays 1uy dg
+                        |> ByteUtils.toStripeArrays 1uy ord
                         |> Seq.toArray
                         |> Array.concat
 
-        let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy dg
-                                  |> Seq.map(IntSet8.fromBytes dg)
+        let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
+                                  |> Seq.map(IntSet8.fromBytes ord)
                                   |> Seq.toList
                                   |> Result.sequence
                                   |> Result.ExtractOrThrow

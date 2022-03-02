@@ -44,8 +44,8 @@ module SwitchCount =
     let value (SwitchCount v) = v
     let create id = SwitchCount id
 
-    let degreeToRecordSwitchCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderToRecordSwitchCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 4 -> 5    | 5 -> 9    | 6 -> 12
                     | 7 -> 16   | 8 -> 19   | 9 -> 25
@@ -61,8 +61,8 @@ module SwitchCount =
         create ct
 
 
-    let degreeTo900SwitchCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderTo900SwitchCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 6  | 7 -> 100     | 8  | 9 -> 160
                     | 10 | 11 -> 300    | 12 | 13 -> 400
@@ -73,8 +73,8 @@ module SwitchCount =
         create ct
 
 
-    let degreeTo999SwitchCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderTo999SwitchCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 6  | 7 -> 600    | 8  | 9 -> 700
                     | 10 | 11 -> 800   | 12 | 13 -> 1000
@@ -94,12 +94,12 @@ module SwitchFrequency =
 module StageCount =
     let value (StageCount v) = v
     let create id = StageCount id
-    let toSwitchCount (dg:degree) (tCt:stageCount) =
-        SwitchCount.create ((Degree.value dg) * (value tCt) / 2)
+    let toSwitchCount (ord:order) (tCt:stageCount) =
+        SwitchCount.create ((Order.value ord) * (value tCt) / 2)
 
 
-    let degreeToRecordStageCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderToRecordStageCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 4 ->  3
                     | 5 | 6 ->  5
@@ -117,8 +117,8 @@ module StageCount =
                     | _ -> 0
         create ct
 
-    let degreeTo999StageCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderTo999StageCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 8 | 9 -> 140
                     | 10 | 11 | 12 | 13 | 14 | 15 -> 160
@@ -128,8 +128,8 @@ module StageCount =
                     | _ -> 0
         create ct
 
-    let degreeTo900StageCount (dg:degree) =
-        let d = (Degree.value dg)
+    let orderTo900StageCount (ord:order) =
+        let d = (Order.value ord)
         let ct = match d with
                     | 8 | 9 -> 35
                     | 10 | 11 -> 50
@@ -147,8 +147,8 @@ module StageCount =
 module StageWindowSize =
     let value (StageWindowSize v) = v
     let create v = StageWindowSize v
-    let ToSwitchCount (dg:degree) (tWz:stageWindowSize) =
-        SwitchCount.create ((Degree.value dg) * (value tWz) / 2)
+    let ToSwitchCount (ord:order) (tWz:stageWindowSize) =
+        SwitchCount.create ((Order.value ord) * (value tWz) / 2)
     let fromInt v = create v
 
 

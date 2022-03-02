@@ -3,8 +3,8 @@ open System
 
 module RandGen =
     
-    let rndBitsUint64 (degree:degree) (rnd:IRando) = 
-        rnd.NextULong &&& (degree |> Degree.bitMaskUint64)
+    let rndBitsUint64 (order:order) (rnd:IRando) = 
+        rnd.NextULong &&& (order |> Order.bitMaskUint64)
 
 
     let polarBoxMullerDist meanX stdDevX meanY stdDevY (rnd:IRando) = 
@@ -30,12 +30,12 @@ module RandGen =
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
 
 
-    let drawTwoWithoutRep (degree:degree) 
+    let drawTwoWithoutRep (order:order) 
                           (rnd:IRando) =
-        let aBit = rnd.NextPositiveInt % Degree.value(degree)
-        let mutable bBit = rnd.NextPositiveInt % Degree.value(degree)
+        let aBit = rnd.NextPositiveInt % Order.value(order)
+        let mutable bBit = rnd.NextPositiveInt % Order.value(order)
         while aBit = bBit do
-            bBit <- rnd.NextPositiveInt % Degree.value(degree)
+            bBit <- rnd.NextPositiveInt % Order.value(order)
         if aBit < bBit then aBit, bBit
         else bBit, aBit
 
@@ -72,12 +72,12 @@ module RandGen =
         |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
 
 
-    let randomPermutation (rnd:IRando) (degree:degree)  =
-         (fisherYatesShuffle rnd)  [|0 .. (Degree.value(degree) - 1)|] |> Seq.toArray
+    let randomPermutation (rnd:IRando) (order:order)  =
+         (fisherYatesShuffle rnd)  [|0 .. (Order.value(order) - 1)|] |> Seq.toArray
 
 
-    let randomPermutations (rnd:IRando) (degree:degree) =
-         Seq.initInfinite (fun _ -> randomPermutation rnd degree)
+    let randomPermutations (rnd:IRando) (order:order) =
+         Seq.initInfinite (fun _ -> randomPermutation rnd order)
 
 
     let rndTwoCycle (rnd:IRando) (arraysize:int) (cycleCount:int) =
@@ -104,5 +104,5 @@ module RandGen =
                     if (srcA.[i] < cap) then yield i }
             |> Seq.toList
 
-        randomPermutations rnd (Degree.createNr n) |> Seq.map(_capN n m)
+        randomPermutations rnd (Order.createNr n) |> Seq.map(_capN n m)
 

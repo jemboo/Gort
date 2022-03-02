@@ -5,18 +5,49 @@ using Microsoft.FSharp.Core;
 
 namespace Gort.Data
 {
+    public class RandGen
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid RandGenId { get; set; }
+        public Guid CauseId { get; set; }
+        public string CausePath { get; set; }
+        public Guid StructId { get; set; }
+        public virtual Cause Cause { get; set; }
+        public string Description { get; set; }
+        public int Seed { get; set; }
+        public RndGenType RndGenType { get; set; }
+    }
+
+    public class Sortable
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid SortableId { get; set; }
+        public Guid CauseId { get; set; }
+        public string CausePath { get; set; }
+        public Guid StructId { get; set; }
+        public Guid? SortableSetId { get; set; }
+        public virtual Cause Cause { get; set; }
+        public string Description { get; set; }
+        public int Order { get; set; }
+        public SortableFormat SortableFormat { get; set; }
+        public byte[] Data { get; set; }
+    }
+
     public class SortableSet
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid SortableSetId { get; set; }
         public Guid CauseId { get; set; }
-        public Guid DataId { get; set; }
+        public string CausePath { get; set; }
+        public Guid StructId { get; set; }
         public virtual Cause Cause { get; set; }
         public string Description { get; set; }
         public SortableSetRep SortableSetRep { get; set; }
-        public int Degree { get; set; }
-        public int ByteWidth { get; set; }
+        public int Order { get; set; }
+        public SortableFormat BinaryFormat { get; set; }
         public byte[] Data { get; set; }
     }
 
@@ -25,14 +56,14 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid SorterId { get; set; }
-        public Guid StructureId { get; set; }
-        public string CausePath { get; set; }
+        public Guid StructId { get; set; }
         public Guid CauseId { get; set; }
+        public string CausePath { get; set; }
         public virtual Cause Cause { get; set; }
         public string Description { get; set; }
-        public int Degree { get; set; }
-        public SortableSetDataFormat SortableSetDataFormat { get; set; }
-        public byte[] SwitchList { get; set; }
+        public int Order { get; set; }
+        public SortableFormat BinaryFormat { get; set; }
+        public byte[] Data { get; set; }
 
     }
 
@@ -43,13 +74,15 @@ namespace Gort.Data
         public Guid SorterPerfId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
+        public string CausePath { get; set; }
         public string Description { get; set; }
         public Guid SorterId { get; set; }
         public virtual Sorter Sorter { get; set; }
         public Guid SortableSetId { get; set; }
         public virtual SortableSet SortableSet { get; set; }
         public SorterPerfRep SorterPerfRep { get; set; }
-        public byte[] PerfData { get; set; }
+        public SortableFormat BinaryFormat { get; set; }
+        public byte[] Data { get; set; }
     }
 
     public class SorterSet
@@ -59,10 +92,12 @@ namespace Gort.Data
         public Guid SorterSetId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
+        public string CausePath { get; set; }
         public string Description { get; set; }
-        public int Degree { get; set; }
+        public int Order { get; set; }
         public SorterSetRep SorterSetRep { get; set; }
-        public byte[] SorterSetData { get; set; }
+        public SortableFormat BinaryFormat { get; set; }
+        public byte[] Data { get; set; }
     }
 
     public class SorterSetPerf
@@ -72,6 +107,7 @@ namespace Gort.Data
         public Guid SorterSetPerfId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
+        public string CausePath { get; set; }
         public string Description { get; set; }
         public Guid SorterSetId { get; set; }
         public virtual SorterSet SorterSet { get; set; }

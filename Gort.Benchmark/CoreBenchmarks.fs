@@ -194,8 +194,8 @@ type BenchConj() =
 
 [<MemoryDiagnoser>]
 type BenchRollout() =
-    let deg = Degree.createNr 20
-    let bpa = Degree.allSortableAsUint64 deg |> Result.ExtractOrThrow
+    let deg = Order.createNr 20
+    let bpa = Order.allSortableAsUint64 deg |> Result.ExtractOrThrow
     
     [<Benchmark>]
     member this.toBitStriped() =

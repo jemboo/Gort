@@ -1,71 +1,71 @@
 ﻿namespace global
 open System
 
-type degree = private Degree of int
+type order = private Order of int
 
-module Degree =
-    let value (Degree v) = v
+module Order =
+    let value (Order v) = v
     let create (value:int) =
-        if (value > 0) then value |> Degree |> Ok
-        else "degree must be greater than 0" |> Error
+        if (value > 0) then value |> Order |> Ok
+        else "order must be greater than 0" |> Error
 
     let create8 (value:int) =
-        if (value > 0) && (value < 9) then value |> Degree |> Ok
-        else "degree must be greater than 0 and less than 9" |> Error
+        if (value > 0) && (value < 9) then value |> Order |> Ok
+        else "order must be greater than 0 and less than 9" |> Error
 
     let createNr (value:int) = 
-        value |> Degree
+        value |> Order
 
-    let within (b:degree) v =
+    let within (b:order) v =
         (v >= 0) && (v < (value b))
     
-    let maxSwitchesPerStage (degree:degree) =
-        (value degree) / 2
+    let maxSwitchesPerStage (order:order) =
+        (value order) / 2
 
-    let switchCount (degree:degree) =
-        ((value degree) * (value degree - 1) )/ 2
+    let switchCount (order:order) =
+        ((value order) * (value order - 1) )/ 2
 
-    let add (degs:degree seq) =
+    let add (degs:order seq) =
         degs |> Seq.map(value) 
              |> Seq.reduce(+)
              |> createNr
 
-    let reflect (dg:degree) (src:int) =
-        (value dg) - src - 1
+    let reflect (ord:order) (src:int) =
+        (value ord) - src - 1
 
-    let binExp (dg:degree) =
-        (1 <<< (value dg))
+    let binExp (ord:order) =
+        (1 <<< (value ord))
 
-    let bitMaskUint64 (dg:degree) =
-         (1uL <<< (value dg)) - 1uL
+    let bitMaskUint64 (ord:order) =
+         (1uL <<< (value ord)) - 1uL
 
-    let bytesNeededFor (dg:degree) =
-        match (value dg) with
+    let bytesNeededFor (ord:order) =
+        match (value ord) with
         | x when (x < 256)  -> 1
         | x when (x < 256 * 256)  -> 2
         | _  -> 4
 
-    let twoSymbolOrderedArray (deg:degree) (hiCt:int) (hiVal:'a) (loVal:'a) =
+    let twoSymbolOrderedArray (deg:order) (hiCt:int) (hiVal:'a) (loVal:'a) =
         [| for i in 0 .. ((value deg) - hiCt - 1) -> loVal; 
            for i in ((value deg) - hiCt) .. ((value deg) - 1)  -> hiVal |]
 
-    // Returns a degree + 1 length int array of
-    // of all possible sorted 0-1 sequences of length degree
-    let allTwoSymbolOrderedArrays (deg:degree) (hiVal:'a) (loVal:'a) =
+    // Returns a order + 1 length int array of
+    // of all possible sorted 0-1 sequences of length order
+    let allTwoSymbolOrderedArrays (deg:order) (hiVal:'a) (loVal:'a) =
         seq { for i = 0 to (value deg) do 
                 yield (twoSymbolOrderedArray deg i hiVal loVal) }
 
-    let allSortableAsInt (degree:degree) =
+    let allSortableAsInt (order:order) =
         try
-            let itemCt = degree |> binExp
+            let itemCt = order |> binExp
             Array.init<int> itemCt (id) |> Ok
         with
             | ex -> ("error in allIntForDegree: " + ex.Message ) 
                     |> Result.Error
 
-    let allSortableAsUint64 (degree:degree) =
+    let allSortableAsUint64 (order:order) =
         try
-            let itemCt = degree |> binExp
+            let itemCt = order |> binExp
             Array.init<uint64> itemCt (uint64) |> Ok
         with
             | ex -> ("error in allUint64ForDegree: " + ex.Message ) 

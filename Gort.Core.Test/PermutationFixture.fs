@@ -8,18 +8,18 @@ type PermutationFixture () =
 
     [<TestMethod>]
     member this.Permutation_Identity() =
-      let dg = Degree.createNr 16
-      let expectedLen = (Degree.value dg)
+      let ord = Order.createNr 16
+      let expectedLen = (Order.value ord)
       let expectedSum = ( expectedLen * (expectedLen - 1)) / 2
-      let permutes = Permutation.identity  dg
+      let permutes = Permutation.identity  ord
       Assert.AreEqual(expectedLen, permutes |> Permutation.getArray |> Array.length)
       Assert.AreEqual(expectedSum, permutes |> Permutation.getArray |> Array.sum)
 
 
     [<TestMethod>]
     member this.Permutation_powers() =
-        let dg = Degree.createNr 16
-        let perm = Permutation.rotate dg 1
+        let ord = Order.createNr 16
+        let perm = Permutation.rotate ord 1
         let arA = perm |> Permutation.powers
                        |> Seq.toArray
         Assert.AreEqual (arA.Length, 16)
@@ -29,9 +29,9 @@ type PermutationFixture () =
     member this.Permutation_PowerDist() =
         let seed = RandomSeed.fromNow()
         let iRando = Rando.fromRngGen (RngGen.createNet seed)
-        let dg = Degree.createNr 16
+        let ord = Order.createNr 16
         let permCount = 1000
-        let randPerms = Permutation.createRandoms dg iRando
+        let randPerms = Permutation.createRandoms ord iRando
                         |> CollectionOps.takeUpto permCount
                         |> Seq.map((Permutation.powers) >> Seq.toArray)
                         |> Seq.toArray
@@ -45,11 +45,11 @@ type PermutationFixture () =
 
     [<TestMethod>]
     member this.Permutation_Inverse() =
-       let dg = Degree.createNr 16
-       let perm = Permutation.rotate dg 1
+       let ord = Order.createNr 16
+       let perm = Permutation.rotate ord 1
        let inv = Permutation.inverse perm
        let prod = Permutation.productNr perm inv 
-       let id = Permutation.identity dg
+       let id = Permutation.identity ord
        Assert.AreEqual(id, prod)
 
 

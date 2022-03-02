@@ -23,9 +23,9 @@ type IntSetFixture () =
                  |> Seq.length
                     
         let randy = Rando.create rngType.Lcg (RandomSeed.fromNow())
-        let dg = Degree.createNr 64
+        let ord = Order.createNr 64
         let permCt = 100
-        let randPerms = [| 1 .. permCt|] |> Array.map(fun _ -> Permutation.createRandom dg randy)
+        let randPerms = [| 1 .. permCt|] |> Array.map(fun _ -> Permutation.createRandom ord randy)
         let cts = randPerms |> Array.map(_cycT)
         Assert.AreEqual(1, 1)
 
@@ -45,9 +45,9 @@ type IntSetFixture () =
             (pps.Length, cds.Length)
 
         let randy = Rando.create rngType.Lcg (RandomSeed.fromNow())
-        let dg = Degree.createNr 16
+        let ord = Order.createNr 16
         let permCt = 1000
-        let randPerms = [| 1 .. permCt|] |> Array.map(fun _ -> Permutation.createRandom dg randy)
+        let randPerms = [| 1 .. permCt|] |> Array.map(fun _ -> Permutation.createRandom ord randy)
         let cts = randPerms |> Array.map(_ctups)
         cts |> Array.iter(fun tup -> System.Diagnostics.Debug.WriteLine(sprintf "%d\t%d" (fst tup) (snd tup) ))
         Assert.AreEqual(1, 1)

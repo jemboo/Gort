@@ -21,7 +21,7 @@ type SwitchFixture () =
 
     [<TestMethod>]
     member this.lowOverlapping() =
-        let degSrc = Degree.createNr 16
+        let degSrc = Order.createNr 16
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
         let switches = 
             Switch.rndNonDegenSwitchesOfDegree degSrc rndy
@@ -38,7 +38,7 @@ type SwitchFixture () =
 
     [<TestMethod>]
     member this.hiOverlapping() =
-        let degSrc = Degree.createNr 16
+        let degSrc = Order.createNr 16
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
         let switches = 
             Switch.rndNonDegenSwitchesOfDegree degSrc rndy
@@ -55,8 +55,8 @@ type SwitchFixture () =
 
     [<TestMethod>]
     member this.allMasks() =
-        let degSrc = Degree.createNr 16
-        let degDest = Degree.createNr 12
+        let degSrc = Order.createNr 16
+        let degDest = Order.createNr 12
         let srtGreen = RefSorter.createRefSorter RefSorter.End16
                        |> Result.ExtractOrThrow
         let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
@@ -70,8 +70,8 @@ type SwitchFixture () =
     [<TestMethod>]
     member this.rndMasks() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
-        let degSrc = Degree.createNr 16
-        let degDest = Degree.createNr 12
+        let degSrc = Order.createNr 16
+        let degDest = Order.createNr 12
         let srtGreen = RefSorter.createRefSorter RefSorter.End16
                        |> Result.ExtractOrThrow
         let subSorters = Switch.rndMasks degSrc degDest srtGreen.switches rndy

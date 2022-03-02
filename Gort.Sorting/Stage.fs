@@ -54,7 +54,7 @@ module StageCover =
 
 
 
-type stage = {switches:switch list; degree:degree}
+type stage = {switches:switch list; order:order}
 module Stage =
 
     // returns a list of switches found in all of the stages
@@ -69,9 +69,9 @@ module Stage =
         |> CollectionProps.itemsOccuringMoreThanOnce
 
 
-    let fromSwitches (degree:degree) 
+    let fromSwitches (order:order) 
                      (switches:seq<switch>) =
-        let mutable stageTracker = Array.init (Degree.value degree) 
+        let mutable stageTracker = Array.init (Order.value order) 
                                               (fun _ -> false)
         let switchesForStage = new ResizeArray<switch>()
         seq { 
@@ -79,21 +79,21 @@ module Stage =
                  if (sw.hi <> sw.low) then
                      if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
                         yield { stage.switches = switchesForStage |> Seq.toList; 
-                                stage.degree = degree }
-                        stageTracker <- Array.create (Degree.value degree) false
+                                stage.order = order }
+                        stageTracker <- Array.create (Order.value order) false
                         switchesForStage.Clear()
                      stageTracker.[sw.hi] <- true
                      stageTracker.[sw.low] <- true
                      switchesForStage.Add sw
               if switchesForStage.Count > 0 then
                 yield { stage.switches = switchesForStage |> Seq.toList; 
-                        degree = degree }
+                        order = order }
             }
 
 
-    let getStageIndexesFromSwitches (degree:degree) 
+    let getStageIndexesFromSwitches (order:order) 
                                     (switches:seq<switch>) =
-        let mutable stageTracker = Array.init (Degree.value degree) 
+        let mutable stageTracker = Array.init (Order.value order) 
                                               (fun _ -> false)
         let mutable curDex = 0
         seq { 
@@ -101,7 +101,7 @@ module Stage =
              for sw in switches do
                 if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
                     yield curDex
-                    stageTracker <- Array.create (Degree.value degree) false
+                    stageTracker <- Array.create (Order.value order) false
                 stageTracker.[sw.hi] <- true
                 stageTracker.[sw.low] <- true
                 curDex <- curDex + 1
@@ -109,16 +109,16 @@ module Stage =
            }
 
 
-    let getStageCount (degree:degree) 
+    let getStageCount (order:order) 
                       (switches:seq<switch>) =
-            fromSwitches degree switches 
+            fromSwitches order switches 
                     |> Seq.length
                     |> StageCount.create
 
 
     let convertToTwoCycle (stage:stage) =
         stage.switches |> Seq.map(fun s -> (s.low, s.hi))
-                       |> TwoCycle.makeFromTupleSeq stage.degree
+                       |> TwoCycle.makeFromTupleSeq stage.order
 
                        
     let mutateStageByPair (stage:stage) 
@@ -126,7 +126,7 @@ module Stage =
         let tcpM = stage |> convertToTwoCycle 
                          |> TwoCycle.mutateByPair pair
         let sA = Switch.extractFromInts (tcpM |> TwoCycle.getArray) |> Seq.toList
-        {switches=sA; degree=stage.degree}
+        {switches=sA; order=stage.order}
 
 
     let mutateStageReflByPair (stage:stage) 
@@ -134,39 +134,39 @@ module Stage =
         let tcpM = stage |> convertToTwoCycle 
                          |> TwoCycle.mutateByReflPair pairs
         let sA = Switch.extractFromInts (tcpM |> TwoCycle.getArray) |> Seq.toList
-        {switches=sA; degree=stage.degree}
+        {switches=sA; order=stage.order}
 
 
     // IRando dependent
-    let rndSeq (degree:degree) 
+    let rndSeq (order:order) 
                (switchFreq:switchFrequency) 
                (rnd:IRando) =
 
         let aa (rnd:IRando)  = 
             {
                 switches = TwoCycle.rndTwoCycle 
-                                    degree
+                                    order
                                     (SwitchFrequency.value switchFreq)
                                     rnd
                                |> Switch.fromTwoCycle
                                |> Seq.toList;
-                degree=degree
+                order=order
             }
         seq { while true do yield (aa rnd) }
 
 
     let rndSymmetric 
-                (degree:degree) 
+                (order:order) 
                 (rnd:IRando) =
         let aa (rnd:IRando)  = 
             { 
                 stage.switches = 
                     TwoCycle.rndSymmetric 
-                            degree
+                            order
                             rnd
                     |> Switch.fromTwoCycle
                     |> Seq.toList
-                degree = degree
+                order = order
             }
 
         seq { while true do yield (aa rnd) }
@@ -178,7 +178,7 @@ module Stage =
         match rnd.NextFloat with
             | k when k < (MutationRate.value mutationRate) -> 
                         let tcp = RandGen.drawTwoWithoutRep 
-                                                    stage.degree 
+                                                    stage.order 
                                                     rnd
                         mutateStageByPair stage tcp
             | _ -> stage
@@ -193,7 +193,7 @@ module Stage =
                                 while true do 
                                 yield 
                                     RandGen.drawTwoWithoutRep 
-                                                    stage.degree 
+                                                    stage.order 
                                                     rnd }
                         mutateStageReflByPair stage tcp 
             | _ -> stage
@@ -239,10 +239,10 @@ module Stage =
 
     let rndBuddyStages (stageWindowSize:stageCount)
                         (switchFreq:switchFrequency) 
-                        (degree:degree) 
+                        (order:order) 
                         (rnd:IRando) 
                         (stagesPfx:stage list)  =
-        let stageSeq = rndSeq degree switchFreq rnd
+        let stageSeq = rndSeq order switchFreq rnd
         let maxWindow = (StageCount.value stageWindowSize)
         let mutable window = stagesPfx |> CollectionProps.last maxWindow
         let trim() =
@@ -270,7 +270,7 @@ module Stage =
     let rec rndSymmetricBuddyStages 
                 (stageWindowSize:stageCount)
                 (switchFreq:switchFrequency) 
-                (degree:degree) 
+                (order:order) 
                 (rnd:IRando) 
                 (stagesPfx:stage list)
                 (trialStageCount:stageCount) 
@@ -278,7 +278,7 @@ module Stage =
 
          let trial = toBuddyStages stagesPfx
                         stageWindowSize
-                        (rndSymmetric degree rnd)
+                        (rndSymmetric order rnd)
                         stageCount
                         trialStageCount
                         |> Seq.toArray
@@ -287,7 +287,7 @@ module Stage =
          else rndSymmetricBuddyStages
                     stageWindowSize
                     switchFreq
-                    degree
+                    order
                     rnd
                     stagesPfx
                     trialStageCount
@@ -315,15 +315,15 @@ module IndexedSelector =
 
 
 
-//type buddyTrack = { degree:degree;
+//type buddyTrack = { order:order;
 //                    traces:CircularBuffer<bool*bool>[]; 
 //                    buffSz:stageCount; }
 
 //module BuddyTrack =
 
-//    let make (degree:degree) 
+//    let make (order:order) 
 //             (buffSz:stageCount) =
-//        let tSide = (Degree.value degree)
+//        let tSide = (Order.value order)
 //        let arrayLen = (tSide) * (tSide + 1) / 2
 //        let cbs = Array.init 
 //                    arrayLen 
@@ -331,7 +331,7 @@ module IndexedSelector =
 //                                (false,false), 
 //                                (StageCount.value buffSz)))
 //        {
-//            degree = degree;
+//            order = order;
 //            buddyTrack.traces = cbs;
 //            buffSz = buffSz;
 //        }
@@ -348,8 +348,8 @@ module IndexedSelector =
 //    let update (bt:buddyTrack) 
 //               (swDex:int) =
 //        let switch = Switch.switchMap.[swDex]
-//        let lds = Switch.lowOverlapping bt.degree switch.low |> Seq.toArray
-//        let hds = Switch.hiOverlapping bt.degree switch.hi |> Seq.toArray
+//        let lds = Switch.lowOverlapping bt.order switch.low |> Seq.toArray
+//        let hds = Switch.hiOverlapping bt.order switch.hi |> Seq.toArray
 //        lds |> Array.map(fun dex -> updateCb dex true false bt) |> ignore
 //        hds |> Array.map(fun dex -> updateCb dex false true bt) |> ignore
         
@@ -391,7 +391,7 @@ module IndexedSelector =
 //            | None -> None
 
 //        bt |> prepNextStage |> ignore
-//        seq { for dex = 0 to ((bt.degree |> Degree.maxSwitchesPerStage) - 1) do
+//        seq { for dex = 0 to ((bt.order |> Order.maxSwitchesPerStage) - 1) do
 //                   let wNx = _nextW bt
 //                   if (wNx |> Option.isSome) then
 //                    yield (wNx |> Option.get)  }

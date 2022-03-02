@@ -1,6 +1,6 @@
 ﻿namespace global
 
-// a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
+// a permutation of the set {0, 1,.. (order-1)}, that is it's own inverse
 type twoCycle = private { values:int[] }
 module TwoCycle = 
 
@@ -29,29 +29,29 @@ module TwoCycle =
     let getArray (tc:twoCycle) = tc.values
 
     let getDegree (tc:twoCycle) =
-        Degree.createNr tc.values.Length
+        Order.createNr tc.values.Length
 
-    let identity (degree:int) = { twoCycle.values = [|0 .. degree-1|] }
+    let identity (order:int) = { twoCycle.values = [|0 .. order-1|] }
     
     let isSorted (tc:twoCycle) =
         CollectionProps.isSorted_inline tc.values
 
-    let makeMonoCycle (degree:degree) 
+    let makeMonoCycle (order:order) 
                          (aDex:int) 
                          (bDex:int) =
         { values = 
-            Array.init (Degree.value degree) (fun i -> 
+            Array.init (Order.value order) (fun i -> 
                 if   (i = aDex) then bDex
                 elif (i = bDex) then aDex
                 else i) }
 
-    let makeAllMonoCycles (dg:degree) =
-        seq {for i = 0 to (Degree.value(dg) - 1) do
+    let makeAllMonoCycles (ord:order) =
+        seq {for i = 0 to (Order.value(ord) - 1) do
                 for j = 0 to i - 1 do
-                    yield makeMonoCycle dg i j}
+                    yield makeMonoCycle ord i j}
 
     let makeReflection (tc:twoCycle) =
-        let _ref pos = Degree.reflect (getDegree tc) pos
+        let _ref pos = Order.reflect (getDegree tc) pos
         {values = Array.init (tc.values.Length)
                              (fun dex -> tc.values.[_ref dex] |> _ref)}
 
@@ -90,7 +90,7 @@ module TwoCycle =
 
     let reflect (tcp:twoCycle) =
         let _refV pos = 
-            Degree.reflect (Degree.createNr tcp.values.Length) pos
+            Order.reflect (Order.createNr tcp.values.Length) pos
 
         let _refl = Array.init (tcp.values.Length)
                                (fun dex -> tcp.values.[_refV dex] |> _refV)
@@ -124,7 +124,7 @@ module TwoCycle =
     
     let mutateByReflPair (pairs: seq<(int*int)>) 
                          (tcp:twoCycle) =
-        let dg = tcp.values.Length |> Degree.createNr
+        let ord = tcp.values.Length |> Order.createNr
         //true if _mutato will always turn this into another twoCyclePerm
         let _isMutatoCompatable (mut:twoCycle) =
             (CollectionProps.isTwoCycle mut.values) &&
@@ -135,8 +135,8 @@ module TwoCycle =
             let tca = tcp |> getArray |> Array.copy
             let pA, pB = pair
             let tpA, tpB = tca.[pA], tca.[pB]
-            let rA, rB = (pA |> Degree.reflect dg), (pB |> Degree.reflect dg)
-            let rtA, rtB = (tpA |> Degree.reflect dg), (tpB |> Degree.reflect dg)
+            let rA, rB = (pA |> Order.reflect ord), (pB |> Order.reflect ord)
+            let rtA, rtB = (tpA |> Order.reflect ord), (tpB |> Order.reflect ord)
 
             tca.[pA] <- tpB
             tca.[tpB] <- pA
@@ -169,12 +169,12 @@ module TwoCycle =
 //***************  byte conversions  **************************
 //*************************************************************
 
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
+    //let makeFromBytes (ord:order) (data:byte[]) = 
+    //    ByteArray.makeFromBytes ord create8 create16 data
 
 
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeArrayFromBytes (ord:order) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes ord create8 create16 data
 
 
     //let toBytes (perm:intSet) =
@@ -195,12 +195,12 @@ module TwoCycle =
 
 
     // does not error - ignores bad inputs
-    let makeFromTupleSeq (dg:degree) (tupes:seq<int*int>) =
-        let curPa = [|0 .. (Degree.value dg)-1|]
+    let makeFromTupleSeq (ord:order) (tupes:seq<int*int>) =
+        let curPa = [|0 .. (Order.value ord)-1|]
         let _validTupe t =
             ((fst t) <> (snd t)) &&
-            (Degree.within dg (fst t)) &&
-            (Degree.within dg (snd t))
+            (Order.within ord (fst t)) &&
+            (Order.within ord (snd t))
         let _usableTup t =
             (curPa.[fst(t)] = fst(t)) &&
             (curPa.[snd(t)] = snd(t))
@@ -217,12 +217,12 @@ module TwoCycle =
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let makeRndMonoCycle (degree:degree) (rnd:IRando) =
-        let tup = RandGen.drawTwoWithoutRep degree rnd
-        makeMonoCycle degree (fst tup) (snd tup)
+    let makeRndMonoCycle (order:order) (rnd:IRando) =
+        let tup = RandGen.drawTwoWithoutRep order rnd
+        makeMonoCycle order (fst tup) (snd tup)
 
 
-    let rndTwoCycle (degree:degree) (switchFreq:float) (rnd:IRando) =
+    let rndTwoCycle (order:order) (switchFreq:float) (rnd:IRando) =
         let _multiDraw (rnd:IRando) (freq:float) (numDraws:int)  =
             let __draw (randy:IRando) =
                 if randy.NextFloat < freq then 1 else 0
@@ -234,17 +234,17 @@ module TwoCycle =
             successCount
 
         let switchCount = _multiDraw rnd switchFreq 
-                            (degree |> Degree.maxSwitchesPerStage)
-        { values = RandGen.rndTwoCycle rnd (Degree.value degree) switchCount }
+                            (order |> Order.maxSwitchesPerStage)
+        { values = RandGen.rndTwoCycle rnd (Order.value order) switchCount }
 
 
-    let rndFullTwoCycle (degree:degree) (rnd:IRando) =
-        { values = RandGen.rndFullTwoCycle rnd (Degree.value degree) }
+    let rndFullTwoCycle (order:order) (rnd:IRando) =
+        { values = RandGen.rndFullTwoCycle rnd (Order.value order) }
 
 
-    let rndSymmetric (dg:degree) 
+    let rndSymmetric (ord:order) 
                      (rnd:IRando) =
-        let deg = (Degree.value dg)
+        let deg = (Order.value ord)
         let aRet = Array.init deg (id)
         let chunkRi (rfls:switchRfl) =
             match rfls with
@@ -262,13 +262,13 @@ module TwoCycle =
             | LeftOver (i, j, d)       ->  aRet.[i] <- j
                                            aRet.[j] <- i
 
-        SwitchRfl.rndReflectivePairs dg rnd |> Seq.iter(chunkRi)
+        SwitchRfl.rndReflectivePairs ord rnd |> Seq.iter(chunkRi)
 
         { values=aRet }
 
 
-    let evenMode (degree:degree) =
-        let d = (Degree.value degree)
+    let evenMode (order:order) =
+        let d = (Order.value order)
         let dm = if (d%2 > 0) then d-1 else d
         let yak p =
             if p = dm then p
@@ -277,8 +277,8 @@ module TwoCycle =
         { values=Array.init d (yak) }
 
 
-    let oddMode (degree:degree) =
-        let d = (Degree.value degree)
+    let oddMode (order:order) =
+        let d = (Order.value order)
         let dm = if (d%2 = 0) then d-1 else d
         let yak p =
             if p = dm then p
@@ -288,8 +288,8 @@ module TwoCycle =
         { values=Array.init d (yak) }
 
 
-    let oddModeFromEvenDegreeWithCap (degree:degree) =
-        let d = (Degree.value degree)
+    let oddModeFromEvenDegreeWithCap (order:order) =
+        let d = (Order.value order)
         let yak p =
             if p = 0 then d-1
             else if p = d-1 then 0
@@ -298,24 +298,24 @@ module TwoCycle =
         { values=Array.init d (yak) }
 
 
-    let oddModeWithCap (degree:degree) =
-        let d = (Degree.value degree)
-        if (d%2 = 0) then oddModeFromEvenDegreeWithCap degree
-        else oddMode degree
+    let oddModeWithCap (order:order) =
+        let d = (Order.value order)
+        if (d%2 = 0) then oddModeFromEvenDegreeWithCap order
+        else oddMode order
 
 
-    let makeAltEvenOdd (degree:degree) (conj:permutation) =
+    let makeAltEvenOdd (order:order) (conj:permutation) =
         seq {while true do 
-                yield conjugate (evenMode degree) conj; 
-                yield conjugate (oddModeWithCap degree) conj; }
+                yield conjugate (evenMode order) conj; 
+                yield conjugate (oddModeWithCap order) conj; }
 
 
     let makeCoConjugateEvenOdd (conj:permutation list) =
-        let dg = Degree.createNr conj.[0].values.Length
+        let ord = Order.createNr conj.[0].values.Length
         let coes (conj:permutation) =
             result {
-                    let eve =  conjugate (evenMode dg) conj
-                    let odd =  conjugate (oddModeWithCap dg) conj
+                    let eve =  conjugate (evenMode ord) conj
+                    let odd =  conjugate (oddModeWithCap ord) conj
                     return seq { yield eve; yield odd; }
                    }
         result {

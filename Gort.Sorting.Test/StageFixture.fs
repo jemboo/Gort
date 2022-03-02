@@ -13,7 +13,7 @@ type StageFixture () =
 
     [<TestMethod>]
     member this.addStageIndexes () =
-        let deg = Degree.createNr 32
+        let deg = Order.createNr 32
         let l = [1 .. 200]
         let newRes = l |> Switch.fromIndexesNonDeg 
                   |> StageCover.addStageIndexes
@@ -30,14 +30,14 @@ type StageFixture () =
 
     [<TestMethod>]
     member this.Stage_switchIntersection() =
-        let degree = Degree.createNr 16
+        let order = Order.createNr 16
         let randy = RngGen.createLcg (RandomSeed.create 1234) 
                         |> Rando.fromRngGen
         let stageCount = StageCount.create 2
 
         let startingStages() = 
             Stage.rndSymmetric
-                        degree
+                        order
                         randy
                 |> Seq.take (StageCount.value stageCount)
                 |> Stage.switchIntersection
@@ -52,12 +52,12 @@ type StageFixture () =
 
     [<TestMethod>]
     member this.Stage_switchPairwiseIntersections() =
-        let degree = Degree.createNr 16
+        let order = Order.createNr 16
         let randy = RngGen.createLcg (RandomSeed.create 1234) |> Rando.fromRngGen
         let stageCount = StageCount.create 4
 
         let startingStages() = 
-            Stage.rndSymmetric degree randy
+            Stage.rndSymmetric order randy
                 |> Seq.take (StageCount.value stageCount)
                 |> Stage.switchPairwiseIntersections
                 |> Seq.length
@@ -70,14 +70,14 @@ type StageFixture () =
 
     //[<TestMethod>]
     //member this.Stage_windowBuddies() =
-    //    let degree = Degree.create 16
+    //    let order = Order.create 16
     //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
     //    let stageCount = StageCount.create 10
     //    let windowSize = 4
 
     //    let startingStages = 
     //        Stage.makeRandomReflSymmetricStages
-    //                    degree
+    //                    order
     //                    randy
     //            |> Seq.take (StageCount.value stageCount)
     //            |> Seq.toArray
@@ -92,7 +92,7 @@ type StageFixture () =
 
 //[<TestMethod>]
 //member this.Stage_buddyStages() =
-//    let degree = Degree.createNr 16
+//    let order = Order.createNr 16
 //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
 //    let stageWindowSize = StageCount.fromInt 10
 //    let windowSize = 4
@@ -100,7 +100,7 @@ type StageFixture () =
 //    let buddyStages = Stage.makeBuddyStages 
 //                        stageWindowSize
 //                        SwitchFrequency.max
-//                        degree
+//                        order
 //                        randy
 //                        List.Empty 
 //                     |> Seq.take 100
@@ -117,7 +117,7 @@ type StageFixture () =
 
 //[<TestMethod>]
 //member this.Stage_buddyStages2() =
-//    let degree = Degree.createNr 10
+//    let order = Order.createNr 10
 //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
 //    let stageWindowSize = StageCount.fromInt 4
 //    let maxStageTry = (StageCount.fromInt 10000)
@@ -126,7 +126,7 @@ type StageFixture () =
 //    let (occCum, totCum) = 
 //                    Stage.makeReflBuddyStats
 //                        stageWindowSize
-//                        degree
+//                        order
 //                        randy
 //                        maxStageTry
 //                        sampleCount
@@ -137,7 +137,7 @@ type StageFixture () =
 
 //    totCum |> Array.iteri(fun i v -> Console.WriteLine (
 //                                            sprintf "%d\t%d\t%d\t%d"
-//                                                (Degree.value degree) 
+//                                                (Order.value order) 
 //                                                (StageCount.value stageWindowSize)
 //                                                i
 //                                                v))
@@ -147,7 +147,7 @@ type StageFixture () =
 
     [<TestMethod>]
     member this.rndSymmetricBuddyStages() =
-        let degree = Degree.createNr 10
+        let order = Order.createNr 10
         let randy = RngGen.createLcg (RandomSeed.create 7234) |> Rando.fromRngGen
         let stageWindowSize = StageCount.create 4
         let maxStageTry = (StageCount.create 1200)
@@ -156,7 +156,7 @@ type StageFixture () =
             Stage.rndSymmetricBuddyStages
                             stageWindowSize
                             SwitchFrequency.max
-                            degree
+                            order
                             randy
                             List.Empty 
                             maxStageTry
@@ -168,10 +168,10 @@ type StageFixture () =
 
     //[<TestMethod>]
     //member this.BuddyTrack_makeQualifier() =
-    //    let degree = Degree.createNr 16
+    //    let order = Order.createNr 16
     //    let buffSz = StageCount.create 5
     //    let testDepth = StageCount.create 3
-    //    let bt = BuddyTrack.make degree buffSz
+    //    let bt = BuddyTrack.make order buffSz
     //    bt |> BuddyTrack.prepNextStage |> ignore
     //    let quali = BuddyTrack.makeQualifier testDepth
     //    let res = bt.traces.[1] |> quali
@@ -185,14 +185,14 @@ type StageFixture () =
     //member this.BuddyTrack_makeNextStage() =
     //    let randy = RngGen.createLcg (RandomSeed.create 234) 
     //                    |> Rando.fromRngGen
-    //    let degree = Degree.createNr 24
+    //    let order = Order.createNr 24
     //    let buffSz = StageCount.create 4
     //    let testDepth = StageCount.create 4
-    //    let bt = BuddyTrack.make degree buffSz
+    //    let bt = BuddyTrack.make order buffSz
 
     //    let newStage() =
     //        {
-    //            stage.degree = degree;
+    //            stage.order = order;
     //            switches = BuddyTrack.makeNextStage bt testDepth randy
     //                        |> Seq.toList
     //        }

@@ -121,12 +121,12 @@ type CollectionPropsFixture () =
 
     //[<TestMethod>]
     //member this.conjugateIntArrays_preserves_twoCycle() =
-    //    let degree = Degree.create 8
+    //    let order = Order.create 8
     //    let randy = Rando.fromRngGen (RngGen.lcgFromNow())
     //    let mutable i = 0
     //    while i<10 do
-    //        let tc = RndGen.rndFullTwoCycleArray randy (Degree.value degree)
-    //        let conjer = RndGen.conjIntArrayWsutation randy degree
+    //        let tc = RndGen.rndFullTwoCycleArray randy (Order.value order)
+    //        let conjer = RndGen.conjIntArrayWsutation randy order
     //        let conj = Comby.conjIntArrays tc conjer
     //                    |> Result.ExtractOrThrow
     //        let isTc = Comby.isTwoCycle conj

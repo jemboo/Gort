@@ -34,7 +34,7 @@ namespace Gort.Data
                     .HasConversion<int>();
 
 
-            modelBuilder.Entity<RndGen>()
+            modelBuilder.Entity<RandGen>()
                     .Property(c => c.RndGenType)
                     .HasConversion<int>();
 
@@ -68,7 +68,7 @@ namespace Gort.Data
         public DbSet<CauseTypeParam> CauseTypeParams { get; set; }
         public DbSet<Cause> Causes { get; set; }
         public DbSet<CauseParam> CauseParams { get; set; }
-        public DbSet<RndGen> RndGens { get; set; }
+        public DbSet<RandGen> RandGens { get; set; }
         public DbSet<SortableSet> SortableSets { get; set; }
         public DbSet<Sorter> Sorters { get; set; }
         public DbSet<SorterSet> SorterSets { get; set; }

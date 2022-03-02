@@ -3,7 +3,7 @@ open System
 
 module SortersFromData =
 
-    let ParseToStages (degree:degree) (stagesStr:string) =
+    let ParseToStages (order:order) (stagesStr:string) =
         let MakeSwitch (s:string) =
             let pcs = s.Split([|',';|])
                         |> Seq.map(fun i -> i |> int)
@@ -16,23 +16,23 @@ module SortersFromData =
                                 |> Seq.map(fun pcs -> MakeSwitch pcs)
                                 |> Seq.toList
                         )
-            |> Seq.map(fun sws -> {stage.switches = sws; degree=degree} )
+            |> Seq.map(fun sws -> {stage.switches = sws; order=order} )
 
 
-    let ParseToSwitches (stagesStr:string) (degree:degree)=
+    let ParseToSwitches (stagesStr:string) (order:order)=
          result {
-            let! stages = Result.ErrorOnException (ParseToStages degree) stagesStr
+            let! stages = Result.ErrorOnException (ParseToStages order) stagesStr
             return stages |> Seq.map(fun s -> s.switches |> List.toSeq)
                           |> Seq.concat
          }
 
 
-    let ParseToSorter (sorterString:string) (degree:degree) =
+    let ParseToSorter (sorterString:string) (order:order) =
         result {
-           let! switchSeq = ParseToSwitches sorterString degree
+           let! switchSeq = ParseToSwitches sorterString order
            let switches = switchSeq |> Seq.toArray
            let switchCount = SwitchCount.create switches.Length 
-           return { sorter.degree = degree; 
+           return { sorter.order = order; 
                     switchCount = switchCount;
                     switches = switches }
         }
@@ -52,8 +52,8 @@ module SorterWriter =
         st.switches |> List.iter(formatSwitch)
         myPrint"]\n"
 
-    let private _formatSwitches (degree:degree) (switches:seq<switch>) =
-        let stages = Stage.fromSwitches degree switches
+    let private _formatSwitches (order:order) (switches:seq<switch>) =
+        let stages = Stage.fromSwitches order switches
         stages |> Seq.iter(_formatStage)
         myPrint"\n"
 
@@ -66,8 +66,8 @@ module SorterWriter =
     let formatStage (st:stage) =
         _runWriter (_formatStage st)
 
-    let formatSwitches (degree:degree) (switches:seq<switch>) =
-        _runWriter (_formatSwitches degree switches)
+    let formatSwitches (order:order) (switches:seq<switch>) =
+        _runWriter (_formatSwitches order switches)
 
 
 
@@ -90,7 +90,7 @@ module RefSorter =
 
     let getStringAndDegree (refSorter:RefSorter) =
         let d (v:int) =
-            let qua = (Degree.create v) |> Result.toOption
+            let qua = (Order.create v) |> Result.toOption
             qua.Value
 
         match refSorter with
@@ -115,13 +115,13 @@ module RefSorter =
 
     let createRefSorter (refSorter:RefSorter) =
         result {
-            let! (sorterString, degree) = (getStringAndDegree refSorter)
-            return! SortersFromData.ParseToSorter sorterString degree
+            let! (sorterString, order) = (getStringAndDegree refSorter)
+            return! SortersFromData.ParseToSorter sorterString order
         }
 
 
-    let private _goodRefSorterForDegree (degree:degree) =
-        let d = (Degree.value degree)
+    let private _goodRefSorterForDegree (order:order) =
+        let d = (Order.value order)
         match d with
         | 3 -> RefSorter.Degree3 |> Ok    | 4 -> RefSorter.Degree4 |> Ok
         | 5 -> RefSorter.Degree5 |> Ok    | 6 -> RefSorter.Degree6 |> Ok
@@ -141,8 +141,8 @@ module RefSorter =
         | _ -> "no match found in RefSorterForDegree" |> Error
 
 
-    let goodRefSorterForDegree (degree:degree) =
+    let goodRefSorterForDegree (order:order) =
         result {
-            let! refSorter = _goodRefSorterForDegree degree
+            let! refSorter = _goodRefSorterForDegree order
             return! createRefSorter refSorter
         }

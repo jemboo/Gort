@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Gort.Data
 {
-    internal static class CauseSeed
+    internal static partial class CauseSeed
     {
         public static void TryThis()
         {
@@ -26,7 +26,7 @@ namespace Gort.Data
             //GetCauseTypeGroup(ctxt);
             //GetCauseTypes(ctxt);
             //GetCauseTypeParams(ctxt);
-            AddRndGens(ctxt);
+            //AddRndGens(ctxt);
             AddCauseTypeGroups(ctxt);
             AddCauseTypes(ctxt);
             AddCauseTypeParams(ctxt);
@@ -34,242 +34,209 @@ namespace Gort.Data
             ctxt.SaveChanges();
         }
 
-        public static RndGen? rndGenA;
-        public static RndGen? rndGenB;
-        public static RndGen? rndGenC;
-        public static RndGen? rndGenD;
-
-        public static CauseTypeGroup? ctgRoot;
-        public static CauseTypeGroup? ctgSortableSets;
-        public static CauseTypeGroup? ctgSorterSets;
-        public static CauseTypeGroup? ctgSorterPerfBins;
-        public static CauseTypeGroup? ctgSorterGa;
-        public static CauseTypeGroup? ctgRndSorterSets;
-
-        public static CauseType? causeTypeStdSortables;
-        public static CauseType? causeTypeRefSorterSets;
-        public static CauseType? causeTypeRndSorterSetsBySwitch;
-        public static CauseType? causeTypeRndSorterSetsByStage;
-        public static CauseType? causeTypeRndSorterSetsBySymetricStage;
-        public static CauseType? causeTypeRndSorterSetsBySymetricStageBuddies;
-        public static CauseType? causeTypeSorterSetPerfBinsBySortableSet;
-
-        public static CauseTypeParam? causeTypeParamStdSortables_MinDegree;
-        public static CauseTypeParam? causeTypeParamStdSortables_MaxDegree;
-
-        public static CauseTypeParam? causeTypeParamStdSortables_Name;
-
-        public static CauseTypeParam? causeTypeParamRefSorterSets_Name;
-
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySwitch_Degree;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySwitch_RndGen;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySwitch_SwitchCount;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySwitch_SorterCount;
-
-        public static CauseTypeParam? causeTypeParamRndSorterSetsByStage_Degree;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsByStage_StageCount;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsByStage_RndGen;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsByStage_SorterCount;
-
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStage_Degree;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStage_StageCount;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStage_RndGen;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStage_SorterCount;
-
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount;
-        public static CauseTypeParam? causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount;
-
-        public static CauseTypeParam? causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet;
-        public static CauseTypeParam? causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet;
-        public static CauseTypeParam? causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode;
-
-        public static void GetRndGens(GortContext gortContext)
-        {
-            rndGenA = gortContext.RndGens.Where(g => g.Seed == 1234).First();
-            rndGenB = gortContext.RndGens.Where(g => g.Seed == 1334).First();
-            rndGenC = gortContext.RndGens.Where(g => g.Seed == 1434).First();
-            rndGenD = gortContext.RndGens.Where(g => g.Seed == 1534).First();
-        }
-
-        public static void AddRndGens(GortContext gortContext)
-        {
-            rndGenA = new RndGen() { Seed = 1234, RndGenType = RndGenType.Lcg }.AddId();
-            rndGenB = new RndGen() { Seed = 1334, RndGenType = RndGenType.Lcg }.AddId();
-            rndGenC = new RndGen() { Seed = 1434, RndGenType = RndGenType.Lcg }.AddId();
-            rndGenD = new RndGen() { Seed = 1534, RndGenType = RndGenType.Lcg }.AddId();
-
-            gortContext.RndGens.Add(rndGenA);
-            gortContext.RndGens.Add(rndGenB);
-            gortContext.RndGens.Add(rndGenC);
-            gortContext.RndGens.Add(rndGenD);
-        }
 
         public static void GetCauseTypeGroup(GortContext gortContext)
         {
             ctgRoot = gortContext.CauseTypeGroups.Where(g => g.Name == "root").First();
-            ctgSortableSets = gortContext.CauseTypeGroups.Where(g => g.Name == "SortableSets").First();
-            ctgSorterSets = gortContext.CauseTypeGroups.Where(g => g.Name == "SorterSets").First();
-            ctgSorterPerfBins = gortContext.CauseTypeGroups.Where(g => g.Name == "SorterPerfBins").First();
+            ctgRandGen = gortContext.CauseTypeGroups.Where(g => g.Name == "randGens").First();
+            ctgSortable = gortContext.CauseTypeGroups.Where(g => g.Name == "Sortables").First();
+            ctgSortableSet = gortContext.CauseTypeGroups.Where(g => g.Name == "SortableSets").First();
+            ctgSorter = gortContext.CauseTypeGroups.Where(g => g.Name == "Sorters").First();
+            ctgSorterSet = gortContext.CauseTypeGroups.Where(g => g.Name == "SorterSets").First();
+            ctgSorterSetRand = gortContext.CauseTypeGroups.Where(g => g.Name == "RndSorterSets").First();
+            ctgSorterPerf = gortContext.CauseTypeGroups.Where(g => g.Name == "SorterPerfs").First();
             ctgSorterGa = gortContext.CauseTypeGroups.Where(g => g.Name == "SorterGa").First();
-            ctgRndSorterSets = gortContext.CauseTypeGroups.Where(g => g.Name == "RndSorterSets").First();
         }
 
         public static void AddCauseTypeGroups(GortContext gortContext)
         {
             ctgRoot = new CauseTypeGroup() { Name = "root", Parent = null }.AddId();
-            ctgSortableSets = new CauseTypeGroup() { Name = "SortableSets", Parent = ctgRoot }.AddId();
-            ctgSorterSets = new CauseTypeGroup() { Name = "SorterSets", Parent = ctgRoot }.AddId();
+            ctgRandGen = new CauseTypeGroup() { Name = "randGens", Parent = ctgRoot }.AddId();
+            ctgSortable = new CauseTypeGroup() { Name = "Sortables", Parent = ctgRoot }.AddId();
+            ctgSortableSet = new CauseTypeGroup() { Name = "SortableSets", Parent = ctgRoot }.AddId();
+            ctgSorter = new CauseTypeGroup() { Name = "Sorters", Parent = ctgRoot }.AddId();
+            ctgSorterSet = new CauseTypeGroup() { Name = "SorterSets", Parent = ctgRoot }.AddId();
+            ctgSorterSetRand = new CauseTypeGroup() { Name = "RndSorterSets", Parent = ctgSorterSet }.AddId();
+            ctgSorterPerf = new CauseTypeGroup() { Name = "SorterPerfs", Parent = ctgRoot }.AddId();
             ctgSorterGa = new CauseTypeGroup() { Name = "SorterGa", Parent = ctgRoot }.AddId();
-            ctgRndSorterSets = new CauseTypeGroup() { Name = "RndSorterSets", Parent = ctgSorterSets }.AddId();
-            ctgSorterPerfBins = new CauseTypeGroup() { Name = "SorterPerfBins", Parent = ctgRoot }.AddId();
 
-
-            gortContext.CauseTypeGroups.Add(ctgSortableSets);
-            gortContext.CauseTypeGroups.Add(ctgSorterSets);
-            gortContext.CauseTypeGroups.Add(ctgSorterPerfBins);
+            gortContext.CauseTypeGroups.Add(ctgRoot);
+            gortContext.CauseTypeGroups.Add(ctgRandGen);
+            gortContext.CauseTypeGroups.Add(ctgSortable);
+            gortContext.CauseTypeGroups.Add(ctgSortableSet);
+            gortContext.CauseTypeGroups.Add(ctgSorter);
+            gortContext.CauseTypeGroups.Add(ctgSorterSet);
+            gortContext.CauseTypeGroups.Add(ctgSorterSetRand);
+            gortContext.CauseTypeGroups.Add(ctgSorterPerf);
             gortContext.CauseTypeGroups.Add(ctgSorterGa);
-            gortContext.CauseTypeGroups.Add(ctgRndSorterSets);
-
-            /// delete from causetypegroups;
         }
 
         public static void GetCauseTypes(GortContext gortContext)
         {
-            causeTypeStdSortables = gortContext.CauseTypes.Where(g => g.Name == "standard").First();
-            causeTypeRefSorterSets = gortContext.CauseTypes.Where(g => g.Name == "reference").First();
-            causeTypeRndSorterSetsBySwitch = gortContext.CauseTypes.Where(g => g.Name == "randomBySwitch").First();
-            causeTypeRndSorterSetsByStage = gortContext.CauseTypes.Where(g => g.Name == "randomByStage").First();
-            causeTypeRndSorterSetsBySymetricStage = gortContext.CauseTypes.Where(g => g.Name == "randomBySymetricStage").First();
-            causeTypeRndSorterSetsBySymetricStageBuddies = gortContext.CauseTypes.Where(g => g.Name == "randomBySymetricStageBuddies").First();
-            causeTypeSorterSetPerfBinsBySortableSet = gortContext.CauseTypes.Where(g => g.Name == "sorterSetPerfBinsBySortableSet").First();
+            causeTypeRandGen = gortContext.CauseTypes.Where(g => g.Name == "randGen").First();
+            causeTypeRandGenSet = gortContext.CauseTypes.Where(g => g.Name == "rnadGenSet").First();
+
+            causeTypeSortable = gortContext.CauseTypes.Where(g => g.Name == "sortable").First();
+            causeTypeSortableImport = gortContext.CauseTypes.Where(g => g.Name == "sortableImport").First();
+
+            causeTypeSortableSet = gortContext.CauseTypes.Where(g => g.Name == "sortableSet").First();
+            causeTypeSortableSetImport = gortContext.CauseTypes.Where(g => g.Name == "sortableSetImport").First();
+            causeTypeSortableSetAllForOrder = gortContext.CauseTypes.Where(g => g.Name == "sortableSetAllForOrder").First();
+            causeTypeSortableSetOrbit = gortContext.CauseTypes.Where(g => g.Name == "sortableSetOrbit").First();
+            causeTypeSortableSetStacked = gortContext.CauseTypes.Where(g => g.Name == "sortableSetStacked").First();
+
+            causeTypeSorter = gortContext.CauseTypes.Where(g => g.Name == "sorter").First();
+            causeTypeSorterImport = gortContext.CauseTypes.Where(g => g.Name == "sorterImport").First();
+
+            causeTypeSorterSetRef = gortContext.CauseTypes.Where(g => g.Name == "sorterSet").First();
+            causeTypeSorterSetImport = gortContext.CauseTypes.Where(g => g.Name == "sorterSetImport").First();
+
+            causeTypeSorterSetRndBySwitch = gortContext.CauseTypes.Where(g => g.Name == "sorterSetRandBySwitch").First();
+            causeTypeSorterSetRndByStage = gortContext.CauseTypes.Where(g => g.Name == "sorterSetRandByStage").First();
+            causeTypeSorterSetRndBySymetricStage = gortContext.CauseTypes.Where(g => g.Name == "sorterSetRandBySymmetricStage").First();
+            causeTypeSorterSetRndBySymetricStageBuddies = gortContext.CauseTypes.Where(g => g.Name == "sorterSetRandBySymmetricStageBuddies").First();
+
+            causeTypeSorterPerf = gortContext.CauseTypes.Where(g => g.Name == "sorterPerf").First();
+            causeTypeSorterSetPerfBins = gortContext.CauseTypes.Where(g => g.Name == "sorterSetPerfBins").First();
         }
 
         public static void AddCauseTypes(GortContext gortContext)
         {
-            causeTypeStdSortables = new CauseType() { Name = "standard", CauseTypeGroup = ctgSortableSets }.AddId();
-            causeTypeRefSorterSets = new CauseType() { Name = "reference", CauseTypeGroup = ctgSorterSets }.AddId();
-            causeTypeRndSorterSetsBySwitch = new CauseType() { Name = "randomBySwitch", CauseTypeGroup = ctgRndSorterSets }.AddId();
-            causeTypeRndSorterSetsByStage = new CauseType() { Name = "randomByStage", CauseTypeGroup = ctgRndSorterSets }.AddId();
-            causeTypeRndSorterSetsBySymetricStage = new CauseType() { Name = "randomBySymetricStage", CauseTypeGroup = ctgRndSorterSets }.AddId();
-            causeTypeRndSorterSetsBySymetricStageBuddies = new CauseType() { Name = "randomBySymetricStageBuddies", CauseTypeGroup = ctgRndSorterSets }.AddId();
-            causeTypeSorterSetPerfBinsBySortableSet = new CauseType() { Name = "sorterSetPerfBinsBySortableSet", CauseTypeGroup = ctgSorterPerfBins }.AddId();
+            causeTypeRandGen = new CauseType() { Name = "randGen", CauseTypeGroup = ctgRandGen }.AddId();
+            causeTypeRandGenSet = new CauseType() { Name = "rnadGenSet", CauseTypeGroup = ctgRandGen }.AddId();
+
+            causeTypeSortable = new CauseType() { Name = "sortable", CauseTypeGroup = ctgSortable }.AddId();
+            causeTypeSortableImport = new CauseType() { Name = "sortableImport", CauseTypeGroup = ctgSortable }.AddId();
+
+            causeTypeSortableSet = new CauseType() { Name = "sortableSet", CauseTypeGroup = ctgSortableSet }.AddId();
+            causeTypeSortableSetImport = new CauseType() { Name = "sortableSetImport", CauseTypeGroup = ctgSortableSet }.AddId();
+            causeTypeSortableSetAllForOrder = new CauseType() { Name = "sortableSetAllForOrder", CauseTypeGroup = ctgSortableSet }.AddId();
+            causeTypeSortableSetOrbit = new CauseType() { Name = "sortableSetOrbit", CauseTypeGroup = ctgSortableSet }.AddId();
+            causeTypeSortableSetStacked = new CauseType() { Name = "sortableSetStacked", CauseTypeGroup = ctgSortableSet }.AddId();
+
+            causeTypeSorter = new CauseType() { Name = "sorter", CauseTypeGroup = ctgSorter }.AddId();
+            causeTypeSorterImport = new CauseType() { Name = "sorterImport", CauseTypeGroup = ctgSorter }.AddId();
+
+            causeTypeSorterSetRef = new CauseType() { Name = "sorterSet", CauseTypeGroup = ctgSorterSet }.AddId();
+            causeTypeSorterSetImport = new CauseType() { Name = "sorterSetImport", CauseTypeGroup = ctgSorterSet }.AddId();
+
+            causeTypeSorterSetRndBySwitch = new CauseType() { Name = "sorterSetRandBySwitch", CauseTypeGroup = ctgSorterSetRand }.AddId();
+            causeTypeSorterSetRndByStage = new CauseType() { Name = "sorterSetRandByStage", CauseTypeGroup = ctgSorterSetRand }.AddId();
+            causeTypeSorterSetRndBySymetricStage = new CauseType() { Name = "sorterSetRandBySymmetricStage", CauseTypeGroup = ctgSorterSetRand }.AddId();
+            causeTypeSorterSetRndBySymetricStageBuddies = new CauseType() { Name = "sorterSetRandBySymmetricStageBuddies", CauseTypeGroup = ctgSorterSetRand }.AddId();
+
+            causeTypeSorterPerf = new CauseType() { Name = "sorterPerf", CauseTypeGroup = ctgSorterPerf }.AddId();
+            causeTypeSorterSetPerfBins = new CauseType() { Name = "sorterSetPerfBins", CauseTypeGroup = ctgSorterPerf }.AddId();
 
 
-            gortContext.CauseTypes.Add(causeTypeStdSortables);
-            gortContext.CauseTypes.Add(causeTypeRefSorterSets);
-            gortContext.CauseTypes.Add(causeTypeRndSorterSetsBySwitch);
-            gortContext.CauseTypes.Add(causeTypeRndSorterSetsByStage);
-            gortContext.CauseTypes.Add(causeTypeRndSorterSetsBySymetricStage);
-            gortContext.CauseTypes.Add(causeTypeRndSorterSetsBySymetricStageBuddies);
-            gortContext.CauseTypes.Add(causeTypeSorterSetPerfBinsBySortableSet);
+            gortContext.CauseTypes.Add(causeTypeRandGen);
+            gortContext.CauseTypes.Add(causeTypeRandGenSet);
+
+            gortContext.CauseTypes.Add(causeTypeSortable);
+            gortContext.CauseTypes.Add(causeTypeSortableImport);
+
+            gortContext.CauseTypes.Add(causeTypeSortableSet);
+            gortContext.CauseTypes.Add(causeTypeSortableSetImport);
+            gortContext.CauseTypes.Add(causeTypeSortableSetAllForOrder);
+            gortContext.CauseTypes.Add(causeTypeSortableSetOrbit);
+            gortContext.CauseTypes.Add(causeTypeSortableSetStacked);
+
+            gortContext.CauseTypes.Add(causeTypeSorter);
+            gortContext.CauseTypes.Add(causeTypeSorterImport);
+
+            gortContext.CauseTypes.Add(causeTypeSorterSetRef);
+            gortContext.CauseTypes.Add(causeTypeSorterSetImport);
+            gortContext.CauseTypes.Add(causeTypeSorterSetRndBySwitch);
+            gortContext.CauseTypes.Add(causeTypeSorterSetRndByStage);
+            gortContext.CauseTypes.Add(causeTypeSorterSetRndBySymetricStage);
+            gortContext.CauseTypes.Add(causeTypeSorterSetRndBySymetricStageBuddies);
+
+            gortContext.CauseTypes.Add(causeTypeSorterPerf);
+            gortContext.CauseTypes.Add(causeTypeSorterSetPerfBins);
         }
 
 
         public static void GetCauseTypeParams(GortContext gortContext)
         {
-            causeTypeParamStdSortables_MinDegree = gortContext.CauseTypeParams.Where(g => g.Name == "minDegree").First();
-            causeTypeParamStdSortables_MaxDegree = gortContext.CauseTypeParams.Where(g => g.Name == "maxDegree").First();
-            causeTypeParamRefSorterSets_Name = gortContext.CauseTypeParams.Where(g => (g.Name == "name") && (g.CauseTypeId == causeTypeRefSorterSets.CauseTypeId)).First();
-            causeTypeParamStdSortables_Name = gortContext.CauseTypeParams.Where(g => (g.Name == "name") && (g.CauseTypeId == causeTypeStdSortables.CauseTypeId)).First();
+            causeTypeParamRndGen_Seed = gortContext.CauseTypeParams.Where(g => (g.Name == "Seed") && (g.CauseTypeId == causeTypeRandGen.CauseTypeId)).First();
+            causeTypeParamRndGen_Type = gortContext.CauseTypeParams.Where(g => (g.Name == "Type") && (g.CauseTypeId == causeTypeRandGen.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySwitch_Degree = gortContext.CauseTypeParams.Where(g => (g.Name == "degree") && (g.CauseTypeId == causeTypeRndSorterSetsBySwitch.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySwitch_SwitchCount = gortContext.CauseTypeParams.Where(g => (g.Name == "switchCount") && (true)).First();
-            causeTypeParamRndSorterSetsBySwitch_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "rndGen") && (g.CauseTypeId == causeTypeRndSorterSetsBySwitch.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySwitch_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySwitch.CauseTypeId)).First();
+            causeTypeParamRndGenSet_Seed = gortContext.CauseTypeParams.Where(g => (g.Name == "Seed") && (g.CauseTypeId == causeTypeRandGenSet.CauseTypeId)).First();
+            causeTypeParamRndGenSet_Type = gortContext.CauseTypeParams.Where(g => (g.Name == "Type") && (g.CauseTypeId == causeTypeRandGenSet.CauseTypeId)).First();
+            causeTypeParamRndGenSet_Count = gortContext.CauseTypeParams.Where(g => (g.Name == "Count") && (g.CauseTypeId == causeTypeRandGenSet.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsByStage_Degree = gortContext.CauseTypeParams.Where(g => (g.Name == "degree") && (g.CauseTypeId == causeTypeRndSorterSetsByStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsByStage_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "stageCount") && (g.CauseTypeId == causeTypeRndSorterSetsByStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsByStage_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "rndGen") && (g.CauseTypeId == causeTypeRndSorterSetsByStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsByStage_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterCount") && (g.CauseTypeId == causeTypeRndSorterSetsByStage.CauseTypeId)).First();
+            causeTypeParamSortable_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
+            causeTypeParamSortable_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
+            causeTypeParamSortable_Format = gortContext.CauseTypeParams.Where(g => (g.Name == "Format") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
+            causeTypeParamSortable_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySymmetricStage_Degree = gortContext.CauseTypeParams.Where(g => (g.Name == "degree") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStage_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "stageCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStage_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "rndGen") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStage.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStage_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStage.CauseTypeId)).First();
+            causeTypeParamSortableImport_Workspace = gortContext.CauseTypeParams.Where(g => (g.Name == "Workspace") && (g.CauseTypeId == causeTypeSortableImport.CauseTypeId)).First();
+            causeTypeParamSortableImport_Table = gortContext.CauseTypeParams.Where(g => (g.Name == "Table") && (g.CauseTypeId == causeTypeSortableImport.CauseTypeId)).First();
+            causeTypeParamSortableImport_Record = gortContext.CauseTypeParams.Where(g => (g.Name == "Record") && (g.CauseTypeId == causeTypeSortableImport.CauseTypeId)).First();
+            causeTypeParamSortableImport_Path = gortContext.CauseTypeParams.Where(g => (g.Name == "Path") && (g.CauseTypeId == causeTypeSortableImport.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree = gortContext.CauseTypeParams.Where(g => (g.Name == "degree") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStageBuddies.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "stageCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStageBuddies.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "rndGen") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStageBuddies.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStageBuddies.CauseTypeId)).First();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount = gortContext.CauseTypeParams.Where(g => (g.Name == "buddyCount") && (g.CauseTypeId == causeTypeRndSorterSetsBySymetricStageBuddies.CauseTypeId)).First();
+            causeTypeParamSortableSet_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
+            causeTypeParamSortableSet_Count = gortContext.CauseTypeParams.Where(g => (g.Name == "Count") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
+            causeTypeParamSortableSet_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
+            causeTypeParamSortableSet_Format = gortContext.CauseTypeParams.Where(g => (g.Name == "Format") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
+            causeTypeParamSortableSet_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
 
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterSet") && (g.CauseTypeId == causeTypeSorterSetPerfBinsBySortableSet.CauseTypeId)).First();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet = gortContext.CauseTypeParams.Where(g => (g.Name == "sortableSet") && (g.CauseTypeId == causeTypeSorterSetPerfBinsBySortableSet.CauseTypeId)).First();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode = gortContext.CauseTypeParams.Where(g => (g.Name == "sorterSaveMode") && (g.CauseTypeId == causeTypeSorterSetPerfBinsBySortableSet.CauseTypeId)).First();
-        }
+            causeTypeParamSortableSetImport_Workspace = gortContext.CauseTypeParams.Where(g => (g.Name == "Workspace") && (g.CauseTypeId == causeTypeSortableSetImport.CauseTypeId)).First();
+            causeTypeParamSortableSetImport_Table = gortContext.CauseTypeParams.Where(g => (g.Name == "Table") && (g.CauseTypeId == causeTypeSortableSetImport.CauseTypeId)).First();
+            causeTypeParamSortableSetImport_Record = gortContext.CauseTypeParams.Where(g => (g.Name == "Record") && (g.CauseTypeId == causeTypeSortableSetImport.CauseTypeId)).First();
 
+            causeTypeParamSortableSetAllForOrder_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSortableSetAllForOrder.CauseTypeId)).First();
 
-        public static void AddCauseTypeParams(GortContext gortContext)
-        {
-            causeTypeParamStdSortables_MinDegree = new CauseTypeParam() { Name = "minDegree", CauseType = causeTypeStdSortables, DataType = DataType.Integer }.AddId();
-            causeTypeParamStdSortables_MaxDegree = new CauseTypeParam() { Name = "maxDegree", CauseType = causeTypeStdSortables, DataType = DataType.Integer }.AddId();
+            causeTypeParamSortableSetOrbit_Perm = gortContext.CauseTypeParams.Where(g => (g.Name == "Perm") && (g.CauseTypeId == causeTypeSortableSetOrbit.CauseTypeId)).First();
+            causeTypeParamSortableSetOrbit_MaxLen = gortContext.CauseTypeParams.Where(g => (g.Name == "MaxLen") && (g.CauseTypeId == causeTypeSortableSetOrbit.CauseTypeId)).First();
 
-            causeTypeParamRefSorterSets_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeRefSorterSets, DataType = DataType.String }.AddId();
+            causeTypeParamSortableSetStacked_Orders = gortContext.CauseTypeParams.Where(g => (g.Name == "Orders") && (g.CauseTypeId == causeTypeSortableSetStacked.CauseTypeId)).First();
 
-            causeTypeParamStdSortables_Name = new CauseTypeParam() { Name = "name", CauseType = causeTypeStdSortables, DataType = DataType.String }.AddId();
+            causeTypeParamSorter_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
+            causeTypeParamSorter_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
+            causeTypeParamSorter_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySwitch_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_SwitchCount = new CauseTypeParam() { Name = "switchCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Rng }.AddId();
-            causeTypeParamRndSorterSetsBySwitch_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySwitch, DataType = DataType.Rng }.AddId();
+            causeTypeParamSorterImport_Workspace = gortContext.CauseTypeParams.Where(g => (g.Name == "Workspace") && (g.CauseTypeId == causeTypeSorterImport.CauseTypeId)).First();
+            causeTypeParamSorterImport_Table = gortContext.CauseTypeParams.Where(g => (g.Name == "Table") && (g.CauseTypeId == causeTypeSorterImport.CauseTypeId)).First();
+            causeTypeParamSorterImport_Record = gortContext.CauseTypeParams.Where(g => (g.Name == "Record") && (g.CauseTypeId == causeTypeSorterImport.CauseTypeId)).First();
+            causeTypeParamSorterImport_Path = gortContext.CauseTypeParams.Where(g => (g.Name == "Path") && (g.CauseTypeId == causeTypeSorterImport.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsByStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsByStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsByStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Rng }.AddId();
-            causeTypeParamRndSorterSetsByStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsByStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamSorterSetRef_Source = gortContext.CauseTypeParams.Where(g => (g.Name == "Source") && (g.CauseTypeId == causeTypeSorterSetRef.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySymmetricStage_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Rng }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStage_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStage, DataType = DataType.Integer }.AddId();
+            causeTypeParamSorterSetImport_Workspace = gortContext.CauseTypeParams.Where(g => (g.Name == "Workspace") && (g.CauseTypeId == causeTypeSorterSetImport.CauseTypeId)).First();
+            causeTypeParamSorterSetImport_Table = gortContext.CauseTypeParams.Where(g => (g.Name == "Table") && (g.CauseTypeId == causeTypeSorterSetImport.CauseTypeId)).First();
+            causeTypeParamSorterSetImport_Record = gortContext.CauseTypeParams.Where(g => (g.Name == "Record") && (g.CauseTypeId == causeTypeSorterSetImport.CauseTypeId)).First();
+            causeTypeParamSorterSetImport_Path = gortContext.CauseTypeParams.Where(g => (g.Name == "Path") && (g.CauseTypeId == causeTypeSorterSetImport.CauseTypeId)).First();
 
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree = new CauseTypeParam() { Name = "degree", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount = new CauseTypeParam() { Name = "stageCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen = new CauseTypeParam() { Name = "rndGen", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Rng }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount = new CauseTypeParam() { Name = "sorterCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Rng }.AddId();
-            causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount = new CauseTypeParam() { Name = "buddyCount", CauseType = causeTypeRndSorterSetsBySymetricStageBuddies, DataType = DataType.Integer }.AddId();
+            causeTypeParamSorterSetRndBySwitch_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorterSetRndBySwitch.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySwitch_SwitchCount = gortContext.CauseTypeParams.Where(g => (g.Name == "SwitchCount") && (g.CauseTypeId == causeTypeSorterSetRndBySwitch.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySwitch_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "RndGen") && (g.CauseTypeId == causeTypeSorterSetRndBySwitch.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySwitch_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterCount") && (g.CauseTypeId == causeTypeSorterSetRndBySwitch.CauseTypeId)).First();
 
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet = new CauseTypeParam() { Name = "sorterSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.SorterSet }.AddId();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet = new CauseTypeParam() { Name = "sortableSet", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.SortableSet }.AddId();
-            causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode = new CauseTypeParam() { Name = "sorterSaveMode", CauseType = causeTypeSorterSetPerfBinsBySortableSet, DataType = DataType.String }.AddId();
+            causeTypeParamSorterSetRndByStage_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorterSetRndByStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndByStage_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "RndGen") && (g.CauseTypeId == causeTypeSorterSetRndByStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndByStage_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "StageCount") && (g.CauseTypeId == causeTypeSorterSetRndByStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndByStage_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterCount") && (g.CauseTypeId == causeTypeSorterSetRndByStage.CauseTypeId)).First();
 
-            gortContext.CauseTypeParams.Add(causeTypeParamStdSortables_MinDegree);
-            gortContext.CauseTypeParams.Add(causeTypeParamStdSortables_MaxDegree);
+            causeTypeParamSorterSetRndBySymmetricStage_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStage_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "StageCount") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStage_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "RndGen") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStage.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStage_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterCount") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStage.CauseTypeId)).First();
 
-            gortContext.CauseTypeParams.Add(causeTypeParamRefSorterSets_Name);
+            causeTypeParamSorterSetRndBySymmetricStageBuddies_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStageBuddies.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStageBuddies_StageCount = gortContext.CauseTypeParams.Where(g => (g.Name == "StageCount") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStageBuddies.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStageBuddies_RndGen = gortContext.CauseTypeParams.Where(g => (g.Name == "RndGen") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStageBuddies.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStageBuddies_SorterCount = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterCount") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStageBuddies.CauseTypeId)).First();
+            causeTypeParamSorterSetRndBySymmetricStageBuddies_BuddyCount = gortContext.CauseTypeParams.Where(g => (g.Name == "BuddyCount") && (g.CauseTypeId == causeTypeSorterSetRndBySymetricStageBuddies.CauseTypeId)).First();
 
-            gortContext.CauseTypeParams.Add(causeTypeParamStdSortables_Name);
+            causeTypeParamSorterPerf_Sorter = gortContext.CauseTypeParams.Where(g => (g.Name == "Sorter") && (g.CauseTypeId == causeTypeSorterPerf.CauseTypeId)).First();
+            causeTypeParamSorterPerf_SortableSet = gortContext.CauseTypeParams.Where(g => (g.Name == "SortableSet") && (g.CauseTypeId == causeTypeSorterPerf.CauseTypeId)).First();
 
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySwitch_Degree);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySwitch_SwitchCount);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySwitch_RndGen);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySwitch_SorterCount);
-
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsByStage_Degree);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsByStage_StageCount);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsByStage_RndGen);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsByStage_SorterCount);
-
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStage_Degree);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStage_StageCount);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStage_RndGen);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStage_SorterCount);
-
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStageBuddies_Degree);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStageBuddies_StageCount);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStageBuddies_RndGen);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStageBuddies_SorterCount);
-            gortContext.CauseTypeParams.Add(causeTypeParamRndSorterSetsBySymmetricStageBuddies_BuddyCount);
-
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetPerfBinsBySortableSet_SorterSet);
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetPerfBinsBySortableSet_SortableSet);
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetPerfBinsBySortableSet_SorterSaveMode);
+            causeTypeParamSorterSetPerfBins_SorterSet = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterSet") && (g.CauseTypeId == causeTypeSorterSetPerfBins.CauseTypeId)).First();
+            causeTypeParamSorterSetPerfBins_SortableSet = gortContext.CauseTypeParams.Where(g => (g.Name == "SortableSet") && (g.CauseTypeId == causeTypeSorterSetPerfBins.CauseTypeId)).First();
+            causeTypeParamSorterSetPerfBins_SorterSaveMode = gortContext.CauseTypeParams.Where(g => (g.Name == "SorterSaveMode") && (g.CauseTypeId == causeTypeSorterSetPerfBins.CauseTypeId)).First();
 
         }
-
 
     }
 }

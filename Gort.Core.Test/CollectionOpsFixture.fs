@@ -60,28 +60,28 @@ type CollectionOpsFixture () =
 
     [<TestMethod>]
     member this.inverseMapArray() =
-        let degree = Degree.createNr 8 
+        let order = Order.createNr 8 
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<100 do
-            let bloke = RandGen.randomPermutation randy degree
-            let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Degree.value degree))
+            let bloke = RandGen.randomPermutation randy order
+            let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Order.value order))
                         |> Result.ExtractOrThrow
             let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
                         |> Result.ExtractOrThrow
-            Assert.IsTrue((prod = (CollectionProps.identity (Degree.value degree))))
+            Assert.IsTrue((prod = (CollectionProps.identity (Order.value order))))
             i <- i+1
 
 
     [<TestMethod>]
     member this.conjIntArrays0() =
-        let degree = Degree.createNr 8 
+        let order = Order.createNr 8 
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RandGen.randomPermutation randy degree
-            let core1 = RandGen.randomPermutation randy degree
-            let core2 = RandGen.randomPermutation randy degree
+            let conjer = RandGen.randomPermutation randy order
+            let core1 = RandGen.randomPermutation randy order
+            let core2 = RandGen.randomPermutation randy order
             let coreProd = CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
@@ -102,13 +102,13 @@ type CollectionOpsFixture () =
 
     [<TestMethod>]
     member this.conjIntArrays() =
-        let degree = Degree.createNr 16
+        let order = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RandGen.randomPermutation randy degree
-            let core1 = RandGen.randomPermutation randy degree
-            let core2 = RandGen.randomPermutation randy degree
+            let conjer = RandGen.randomPermutation randy order
+            let core1 = RandGen.randomPermutation randy order
+            let core2 = RandGen.randomPermutation randy order
             let coreProd = CollectionOps.arrayProductIntR core1 core2  (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
@@ -136,7 +136,7 @@ type CollectionOpsFixture () =
 
     [<TestMethod>]
     member this.stackSortedBlocks () =
-        let dgs = [4;2;2] |> List.map(Degree.createNr)
+        let dgs = [4;2;2] |> List.map(Order.createNr)
         let blocks = CollectionOps.stackSortedBlocks dgs 0 1
                      |> Seq.toArray
         Assert.AreEqual(dgs.Length, 45);

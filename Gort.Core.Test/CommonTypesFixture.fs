@@ -8,19 +8,19 @@ type CommonTypesFixture () =
 
     [<TestMethod>]
     member this.Degree_maxSwitchesPerStage() =
-        let degree = Degree.createNr 7
+        let order = Order.createNr 7
         let msw = 3
-        let cc = Degree.maxSwitchesPerStage degree
+        let cc = Order.maxSwitchesPerStage order
         Assert.AreEqual(msw, cc)
     
     [<TestMethod>]
     member this.Degree_reflect() =
-        let degree7 = Degree.createNr 7
-        let degree6 = Degree.createNr 6
-        let d7r3 = 3 |> Degree.reflect degree7
-        let d7r2 = 2 |> Degree.reflect degree7
-        let d6r3 = 3 |> Degree.reflect degree6
-        let d6r2 = 2 |> Degree.reflect degree6
+        let order7 = Order.createNr 7
+        let order6 = Order.createNr 6
+        let d7r3 = 3 |> Order.reflect order7
+        let d7r2 = 2 |> Order.reflect order7
+        let d6r3 = 3 |> Order.reflect order6
+        let d6r2 = 2 |> Order.reflect order6
 
         Assert.AreEqual(d7r3, 3)
         Assert.AreEqual(d7r2, 4)
@@ -31,9 +31,9 @@ type CommonTypesFixture () =
 
     [<TestMethod>]
     member this.TestMethodPassing () =
-        let dg = Degree.createNr 8
-        let sA = Degree.twoSymbolOrderedArray dg 6 1us 0us
-        let sAs = Degree.allTwoSymbolOrderedArrays dg 1us 0us
+        let ord = Order.createNr 8
+        let sA = Order.twoSymbolOrderedArray ord 6 1us 0us
+        let sAs = Order.allTwoSymbolOrderedArrays ord 1us 0us
                     |> Seq.toArray
-        Assert.AreEqual(sA.Length, (Degree.value dg));
-        Assert.AreEqual(sAs.Length, (Degree.value dg) + 1);
+        Assert.AreEqual(sA.Length, (Order.value ord));
+        Assert.AreEqual(sAs.Length, (Order.value ord) + 1);

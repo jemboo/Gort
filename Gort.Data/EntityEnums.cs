@@ -11,15 +11,15 @@
 
     public enum DataType
     {
-        Integer,
+        Int,
+        IntArray,
         Float,
+        FloatArray,
         String,
-        Rng,
-        Sorter,
-        SorterSet,
-        Sortable,
-        SortableSet,
-        SorterSaveMode
+        StringArray,
+        Guid,
+        GuidArray,
+        ByteArray
     }
 
     public enum RndGenType
@@ -43,7 +43,7 @@
         Stack
     }
 
-    public enum SortableSetDataFormat
+    public enum SortableFormat
     {
         b64,
         u8,

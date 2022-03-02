@@ -3,7 +3,7 @@ open System
 
 type sorter = 
     { 
-        degree:degree; 
+        order:order; 
         switches:array<switch>; 
         switchCount:switchCount
     }
@@ -15,25 +15,25 @@ module Sorter =
         SorterId.create gu
 
 
-    let fromSwitches (degree:degree) 
+    let fromSwitches (order:order) 
                      (switches:seq<switch>) =
         let switchArray = switches |> Seq.toArray
         let switchCount = SwitchCount.create switchArray.Length
         {
-            sorter.degree=degree;
+            sorter.order=order;
             switchCount=switchCount;
             switches = switchArray
         }
 
 
-    let fromStages (degree:degree) 
+    let fromStages (order:order) 
                    (stages:seq<stage>) =
         let switchArray = stages |> Seq.map(fun st->st.switches)
                                     |> Seq.concat
                                     |> Seq.toArray
         let switchCount = SwitchCount.create switchArray.Length
         {
-            sorter.degree=degree;
+            sorter.order=order;
             switchCount=switchCount;
             switches = switchArray
         }
@@ -44,7 +44,7 @@ module Sorter =
         let newSwitches = (switches |> Seq.toArray) |> Array.append sorter.switches
         let newSwitchCount = SwitchCount.create newSwitches.Length
         {
-            sorter.degree = sorter.degree;
+            sorter.order = sorter.order;
             switchCount=newSwitchCount;
             switches = newSwitches
         }
@@ -60,7 +60,7 @@ module Sorter =
                            | _ -> sorter.switches 
                                       |> Array.skip((sorter.switches.Length) - (SwitchCount.value newLength))
         {
-            sorter.degree = sorter.degree;
+            sorter.order = sorter.order;
             switchCount = newLength;
             switches = newSwitches
         } |> Ok
@@ -68,7 +68,7 @@ module Sorter =
 
     let getSwitchPrefix (stageCount:stageCount) 
                         (sorter:sorter) =
-        sorter.switches |> Stage.fromSwitches sorter.degree
+        sorter.switches |> Stage.fromSwitches sorter.order
                         |> Seq.take(StageCount.value stageCount)
                         |> Seq.map(fun t -> t.switches)
                         |> Seq.concat

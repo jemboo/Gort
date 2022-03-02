@@ -1,6 +1,6 @@
 ﻿namespace global
 
-// a permutation of the set {0, 1,.. (degree-1)}
+// a permutation of the set {0, 1,.. (order-1)}
 type permutation = private {values:int[] }
 module Permutation =
 
@@ -19,10 +19,10 @@ module Permutation =
     let getArray (perm:permutation) = perm.values
         
     let getDegree (perm:permutation) =
-        Degree.createNr perm.values.Length
+        Order.createNr perm.values.Length
 
-    let rotate (degree:degree) (dir:int) = 
-        let d = (Degree.value degree)
+    let rotate (order:order) (dir:int) = 
+        let d = (Order.value order)
         { values=Array.init d (fun i-> (i + dir) % d)}
 
 
@@ -38,12 +38,12 @@ module Permutation =
             return create res
         }
 
-    let cyclicGroup (degree:degree) = 
-        let r1 = rotate degree 1
+    let cyclicGroup (order:order) = 
+        let r1 = rotate order 1
         powers r1 |> Seq.toArray
 
-    let identity (degree:degree) = 
-        { values= CollectionProps.identity (Degree.value degree)}
+    let identity (order:order) = 
+        { values= CollectionProps.identity (Order.value order)}
 
     let toIntSet (perm:permutation) =
         {intSet.values = perm.values}
@@ -51,8 +51,8 @@ module Permutation =
     let toIntSet8 (perm:permutation) =
         {intSet8.values = perm.values |> Array.map(uint8)}
 
-    let inRange (degree:degree) (value:int) =
-       ((value > -1) && (value < (Degree.value degree)))
+    let inRange (order:order) (value:int) =
+       ((value > -1) && (value < (Order.value order)))
 
     let inverse (perm:permutation ) =
         let ia = Array.zeroCreate perm.values.Length
@@ -77,7 +77,7 @@ module Permutation =
     let product (lhs:permutation) 
                 (rhs:permutation) =
         if (lhs.values.Length <> rhs.values.Length) then
-            "permuation degrees dont match" |> Error
+            "permuation orders dont match" |> Error
         else
             { permutation.values =  
                         CollectionOps.arrayProductInt
@@ -91,12 +91,12 @@ module Permutation =
 //*************************************************************
 
 
-    //let makeFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeFromBytes dg create8 create16 data
+    //let makeFromBytes (ord:order) (data:byte[]) = 
+    //    ByteArray.makeFromBytes ord create8 create16 data
 
 
-    //let makeArrayFromBytes (dg:degree) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes dg create8 create16 data
+    //let makeArrayFromBytes (ord:order) (data:byte[]) = 
+    //    ByteArray.makeArrayFromBytes ord create8 create16 data
 
 
     //let toBytes (perm:permutation) =
@@ -112,9 +112,9 @@ module Permutation =
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (degree:degree) (rnd:IRando) =
-        let idArray = (identity degree) |> getArray  
+    let createRandom (order:order) (rnd:IRando) =
+        let idArray = (identity order) |> getArray  
         { values=(RandGen.fisherYatesShuffle rnd idArray |> Seq.toArray)}
 
-    let createRandoms (degree:degree) (rnd:IRando) =
-        Seq.initInfinite(fun _ -> createRandom degree rnd)
+    let createRandoms (order:order) (rnd:IRando) =
+        Seq.initInfinite(fun _ -> createRandom order rnd)

@@ -38,7 +38,7 @@ namespace Gort.Data
         public virtual Cause Cause { get; set; }
         public Guid CauseTypeParamId { get; set; }
         public virtual CauseTypeParam CauseTypeParam { get; set; }
-        public string Value { get; set; }
+        public byte[] Value { get; set; }
     }
 
     public class CauseType
@@ -73,13 +73,13 @@ public class CauseTypeGroup
         public DataType DataType { get; set; }
     }
 
-    public class RndGen
-    {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public Guid RndGenId { get; set; }
-        public RndGenType RndGenType { get; set; }
-        public int Seed { get; set; }
-    }
+    //public class RndGen
+    //{
+    //    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    //    [Key]
+    //    public Guid RndGenId { get; set; }
+    //    public RndGenType RndGenType { get; set; }
+    //    public int Seed { get; set; }
+    //}
 
 }

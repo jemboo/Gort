@@ -17,8 +17,8 @@ module Switch =
 
     let mapIndexUb = switchMap.Length
     
-    let maxMapIndexForDegree (dg:degree)  =
-        uint32 ((Degree.value dg)*(Degree.value dg + 1) / 2)
+    let maxMapIndexForDegree (ord:order)  =
+        uint32 ((Order.value ord)*(Order.value ord + 1) / 2)
     
     let fromIndexes (dexes:int seq) = 
         dexes |> Seq.map(fun dex -> switchMap.[dex])
@@ -29,14 +29,14 @@ module Switch =
     let getIndex (switch:switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
         
-    // all switch indexes for degree with lowVal
-    let lowOverlapping (dg:degree) 
+    // all switch indexes for order with lowVal
+    let lowOverlapping (ord:order) 
                        (lowVal:int) =
-        seq { for hv = (lowVal + 1) to (Degree.value dg) - 1 do
+        seq { for hv = (lowVal + 1) to (Order.value ord) - 1 do
                     yield (hv * (hv + 1)) / 2 + lowVal  }
 
-    // all switch indexes for degree with hiVal
-    let hiOverlapping (dg:degree) 
+    // all switch indexes for order with hiVal
+    let hiOverlapping (ord:order) 
                       (hiVal:int) =
         seq { for lv = 0 to (hiVal - 1) do
                  yield (hiVal * (hiVal + 1)) / 2 + lv  }
@@ -57,10 +57,10 @@ module Switch =
     let fromTwoCycle (tc:twoCycle) =
         extractFromInts (TwoCycle.getArray tc)
 
-    let makeAltEvenOdd (degree:degree) (stageCt:stageCount) =
+    let makeAltEvenOdd (order:order) (stageCt:stageCount) =
         result {
-            let stages = TwoCycle.makeAltEvenOdd degree 
-                                      (Permutation.identity degree)
+            let stages = TwoCycle.makeAltEvenOdd order 
+                                      (Permutation.identity order)
                         |> Seq.take(StageCount.value stageCt)
 
             return stages |> Seq.map(fromTwoCycle)
@@ -68,35 +68,35 @@ module Switch =
         }
 
     // IRando dependent
-    let rndNonDegenSwitchesOfDegree (degree:degree) 
+    let rndNonDegenSwitchesOfDegree (order:order) 
                                     (rnd:IRando) =
-        let maxDex = maxMapIndexForDegree degree
+        let maxDex = maxMapIndexForDegree order
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
                     let sw = switchMap.[p] 
                     if (sw.low <> sw.hi) then
                         yield sw }
 
-    let rndSwitchesOfDegree (degree:degree) 
+    let rndSwitchesOfDegree (order:order) 
                             (rnd:IRando) =
-        let maxDex = maxMapIndexForDegree degree
+        let maxDex = maxMapIndexForDegree order
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
                     yield switchMap.[p] }
 
 
-    let rndSymmetric (degree:degree)
+    let rndSymmetric (order:order)
                      (rnd:IRando) =
         let aa (rnd:IRando)  = 
-            (TwoCycle.rndSymmetric degree rnd) |> fromTwoCycle
+            (TwoCycle.rndSymmetric order rnd) |> fromTwoCycle
         seq { while true do yield! (aa rnd) }
 
 
-    let mutateSwitches (order:degree) 
+    let mutateSwitches (order:order) 
                        (mutationRate:mutationRate) 
                        (rnd:IRando) 
                        (switches:seq<switch>) =
-        let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
+        let mDex = uint32 ((Order.value order)*(Order.value order + 1) / 2) 
         let mutateSwitch (switch:switch) =
             match rnd.NextFloat with
             | k when k < (MutationRate.value mutationRate) -> 
@@ -105,10 +105,10 @@ module Switch =
         switches |> Seq.map(fun sw-> mutateSwitch sw)
 
 
-    let reflect (dg:degree) 
+    let reflect (ord:order) 
                 (sw:switch) =
-        { switch.low = sw.hi |> Degree.reflect dg;
-          switch.hi = sw.low |> Degree.reflect dg; }
+        { switch.low = sw.hi |> Order.reflect ord;
+          switch.hi = sw.low |> Order.reflect ord; }
 
 
 
@@ -116,13 +116,13 @@ module Switch =
     // indexes that are not in subset. It then relabels the indexes
     // according to the subset. Ex, if the subset was [2;5;8], then
     // index 2 -> 0; index 5-> 1; index 8 -> 2
-    let rebufo (degree:degree)
+    let rebufo (order:order)
                (swa:switch array) 
                (subset: int list) =
 
-        let _mapSubset (degree:degree)
+        let _mapSubset (order:order)
                        (subset: int list)  =
-            let aRet = Array.create (Degree.value degree) None 
+            let aRet = Array.create (Order.value order) None 
             subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
             aRet
 
@@ -133,34 +133,34 @@ module Switch =
             | Some l, Some h -> Some {switch.low=l; hi=h;}
             | _ , _ -> None
 
-        let redMap = _mapSubset degree subset
+        let redMap = _mapSubset order subset
         swa |> Array.map(_reduce redMap)
             |> Array.filter(Option.isSome)
             |> Array.map(Option.get)
 
 
     // returns a sequence containing all the possible
-    // degree reductions of the switch array
-    let allMasks (degreeSource:degree)
-                 (degreeDest:degree)
+    // order reductions of the switch array
+    let allMasks (orderSource:order)
+                 (orderDest:order)
                  (swa:switch array) =
-        let sd = (Degree.value degreeSource)
-        let dd = (Degree.value degreeDest)
+        let sd = (Order.value orderSource)
+        let dd = (Order.value orderDest)
         if sd < dd then
-            failwith "source degree cannot be smaller than dest"
+            failwith "source order cannot be smaller than dest"
         CollectionProps.enumNchooseM sd dd
-        |> Seq.map(rebufo degreeSource swa)
+        |> Seq.map(rebufo orderSource swa)
 
     // returns a sequence containing random
-    // degree reductions of the switch array
-    let rndMasks (degreeSource:degree)
-                 (degreeDest:degree)
+    // order reductions of the switch array
+    let rndMasks (orderSource:order)
+                 (orderDest:order)
                  (swa:switch array)
                  (rnd:IRando) =
-        let sd = (Degree.value degreeSource)
-        let dd = (Degree.value degreeDest)
+        let sd = (Order.value orderSource)
+        let dd = (Order.value orderDest)
         if sd < dd then
-            failwith "source degree cannot be smaller than dest"
+            failwith "source order cannot be smaller than dest"
         RandGen.rndNchooseM sd dd rnd
-        |> Seq.map(rebufo degreeSource swa)
+        |> Seq.map(rebufo orderSource swa)
 

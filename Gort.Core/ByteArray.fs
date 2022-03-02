@@ -274,19 +274,19 @@ module ByteArray =
 
 
 //*************************************************************
-//********  degree dependent byte array conversions  *********
+//********  order dependent byte array conversions  *********
 //*************************************************************
 
-    let fromUint8<'T> (dg:degree) 
+    let fromUint8<'T> (ord:order) 
                       (ctor8:byte[] -> Result<'T, string>) 
                       (data:byte[]) = 
         try
-            if (data.Length) % (Degree.value dg) <> 0 then
-                "data length is incorrect for degree" |> Error
+            if (data.Length) % (Order.value ord) <> 0 then
+                "data length is incorrect for order" |> Error
             else
                 result {
                     let! permsR =
-                        data |> Array.chunkBySize (Degree.value dg) 
+                        data |> Array.chunkBySize (Order.value ord) 
                              |> Array.map(ctor8)
                              |> Array.toList
                              |> Result.sequence
@@ -297,17 +297,17 @@ module ByteArray =
                   |> Result.Error
 
 
-    let fromUint16s (dg:degree) 
+    let fromUint16s (ord:order) 
                     (ctor16:uint16[] -> Result<'T, string>) 
                     (data:byte[]) = 
         try
-            if (data.Length) % (2 * (Degree.value dg)) <> 0 then
-                "data length is incorrect for degree" |> Error
+            if (data.Length) % (2 * (Order.value ord)) <> 0 then
+                "data length is incorrect for order" |> Error
             else
                 result {
                     let! u16s = convertBytesToUint16s data
                     let! permsR =
-                        u16s |> Array.chunkBySize (Degree.value dg)
+                        u16s |> Array.chunkBySize (Order.value ord)
                              |> Array.map(ctor16)
                              |> Array.toList
                              |> Result.sequence
@@ -318,11 +318,11 @@ module ByteArray =
                   |> Result.Error
 
 
-    //let makeFromBytes (dg:degree) 
+    //let makeFromBytes (ord:order) 
     //                  (ctor8:uint8[] -> Result<'T, string>)  
     //                  (ctor16:uint16[] -> Result<'T, string>) 
     //                  (data:byte[]) = 
-    //    match (Degree.value dg) with
+    //    match (Order.value ord) with
     //    | x when (x < 256)  ->
     //          result {
     //                    let! u8s = convertBytesToUint8s data
@@ -333,17 +333,17 @@ module ByteArray =
     //            let! u16s = convertBytesToUint16s data
     //            return! ctor16 u16s
     //          }
-    //    | _ -> "invalid degree" |> Error
+    //    | _ -> "invalid order" |> Error
 
 
-    //let makeArrayFromBytes (dg:degree)
+    //let makeArrayFromBytes (ord:order)
     //                       (ctor8:uint8[] -> Result<'T, string>)  
     //                       (ctor16:uint16[] -> Result<'T, string>) 
     //                       (data:byte[]) = 
-    //    match (Degree.value dg) with
-    //    | x when (x < 256)  -> fromUint8 dg ctor8 data
-    //    | x when (x < 256 * 256)  -> fromUint16s dg ctor16 data
-    //    | _ -> "invalid degree" |> Error
+    //    match (Order.value ord) with
+    //    | x when (x < 256)  -> fromUint8 ord ctor8 data
+    //    | x when (x < 256 * 256)  -> fromUint16s ord ctor16 data
+    //    | _ -> "invalid order" |> Error
 
 
     //let toBytes (inst:int[]) =
@@ -359,7 +359,7 @@ module ByteArray =
     //              let data = Array.zeroCreate<byte> (inst.Length * 2)
     //              return! data |>  mapUint16arrayToBytes uint16Array 0
     //          }
-    //    | _ -> "invalid degree" |> Error
+    //    | _ -> "invalid order" |> Error
 
 
     //let arrayToBytes (insts:int[][]) =
@@ -373,37 +373,37 @@ module ByteArray =
 
 
     /// ***********************************************************
-    /// ******** degree list <-> byte arrays ******************
+    /// ******** order list <-> byte arrays ******************
     /// ***********************************************************
 
     let bytesToDegree (data:byte[]) =
         result {
             let! v = getUint16FromBytes 0 data
-            return! v |> int |> Degree.create
+            return! v |> int |> Order.create
         }
 
     let bytesToDegreeArray (data:byte[]) =
         result {
             if data.Length % 2 <> 0 then
-                return!   "incorrect byte format for degreeArrayFromBytes" |> Error
+                return!   "incorrect byte format for orderArrayFromBytes" |> Error
             else
                 let! vs = data |> Array.chunkBySize 2
                                |> Array.map(getUint16FromBytes 0)
                                |> Array.toList
                                |> Result.sequence
 
-                return! vs |> List.map(int >> Degree.create)
+                return! vs |> List.map(int >> Order.create)
                            |> Result.sequence
         }
 
-    let degreeToBytes (data:byte[]) (offset:int) (dg:degree) =
+    let orderToBytes (data:byte[]) (offset:int) (ord:order) =
         result {
-            let uint16Value = (Degree.value dg) |> uint16
+            let uint16Value = (Order.value ord) |> uint16
             return! [| uint16Value |] |> mapUint16sToBytes 0 1 data offset
         }
 
-    let degreeArrayToBytes (data:byte[]) (offset:int) (dgs:degree[]) =
+    let orderArrayToBytes (data:byte[]) (offset:int) (dgs:order[]) =
         result {
-            let uint16Array = dgs |> Array.map(Degree.value >> uint16)
+            let uint16Array = dgs |> Array.map(Order.value >> uint16)
             return! uint16Array |>  mapUint16sToBytes 0 uint16Array.Length data offset
         }

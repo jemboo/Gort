@@ -4,8 +4,8 @@ open BenchmarkDotNet.Attributes
 
 [<MemoryDiagnoser>]
 type BenchMakeSorableStack() =
-    let degree = Degree.create 16 |> Result.ExtractOrThrow
-    let degrees = [| Degree.create 8; Degree.create 4; Degree.create 2; Degree.create 2 |]
+    let order = Order.create 16 |> Result.ExtractOrThrow
+    let orders = [| Order.create 8; Order.create 4; Order.create 2; Order.create 2 |]
                   |> Array.toList
                   |> Result.sequence
                   |> Result.ExtractOrThrow
@@ -16,10 +16,10 @@ type BenchMakeSorableStack() =
     //[<Benchmark>]
     //member this.makeStack() =
     //    let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-    //    byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
+    //    byteStore <- ByteArray.orderArrayToBytes byteStore offset orders
     //                 |> Result.ExtractOrThrow
-    //    let degreeSection = byteStore.[offset ..]
-    //    let res = SortableSet.makeStackInts degree degreeSection
+    //    let orderSection = byteStore.[offset ..]
+    //    let res = SortableSet.makeStackInts order orderSection
     //              |> Result.ExtractOrThrow
     //    ()
 
@@ -27,9 +27,9 @@ type BenchMakeSorableStack() =
     //[<Benchmark>]
     //member this.makeStack8() =
     //    let mutable byteStore = Array.zeroCreate<byte> (offset + 8)
-    //    byteStore <- ByteArray.degreeArrayToBytes byteStore offset degrees
+    //    byteStore <- ByteArray.orderArrayToBytes byteStore offset orders
     //                 |> Result.ExtractOrThrow
-    //    let degreeSection = byteStore.[offset ..]
-    //    let res = SortableSet.makeStackInts8 degree degreeSection
+    //    let orderSection = byteStore.[offset ..]
+    //    let res = SortableSet.makeStackInts8 order orderSection
     //              |> Result.ExtractOrThrow
     //    0

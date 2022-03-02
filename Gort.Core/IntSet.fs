@@ -28,32 +28,31 @@ module IntSet =
     let isZero (ibs:intSet) = 
         ibs.values |> Array.forall((=) 0)
 
-    let fromInteger (dg:degree) (intVers:int) =
-        { intSet.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0 1 }
+    let fromInteger (ord:order) (intVers:int) =
+        { intSet.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray ord 0 1 }
 
     let toInteger (arrayVers:intSet) (oneThresh:int) =
         ByteUtils.intArrayToInt arrayVers.values oneThresh
                 
-    let fromUint64 (dg:degree) (intVers:uint64) =
-        { intSet.values = intVers |> ByteUtils.uint64To2ValArray dg 0 1 }
+    let fromUint64 (ord:order) (intVers:uint64) =
+        { intSet.values = intVers |> ByteUtils.uint64To2ValArray ord 0 1 }
                 
     let toUint64 (intSt:intSet) (oneThresh:int) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (dg:degree) =
-        { 0 .. (1 <<< (Degree.value dg)) - 1 }
-        |> Seq.map (fun i -> fromInteger dg i)
+    let allForAsSeq (ord:order) =
+        { 0 .. (1 <<< (Order.value ord)) - 1 }
+        |> Seq.map (fun i -> fromInteger ord i)
 
-    let allForAsArray (dg:degree) =
-        let order = (Degree.value dg)
-        Array.init (1 <<< order) (fun i -> fromInteger dg i)
+    let allForAsArray (ord:order) =
+        Array.init (1 <<< (Order.value ord)) (fromInteger ord)
 
 
 //*************************************************************
 //***************  byte conversions  **************************
 //*************************************************************
 
-    let fromBytes (dg:degree) (data:byte[]) = 
+    let fromBytes (ord:order) (data:byte[]) = 
         result {
 
              let! ints =  ByteArray.convertBytesToInts data
@@ -67,17 +66,17 @@ module IntSet =
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (degree:degree) (rando:IRando) = 
+    let createRandom (order:order) (rando:IRando) = 
         let perm = 
-            Array.init (Degree.value degree)
+            Array.init (Order.value order)
                         (fun _ -> let q = rando.NextFloat
                                   if (q > 0.5) then 1 else 0 )
         {intSet.values = perm }
 
-    let createRandoms (degree:degree) 
+    let createRandoms (order:order) 
                       (rnd:IRando) =
         seq { while true do 
-                yield createRandom degree rnd }
+                yield createRandom order rnd }
 
 
 
@@ -111,24 +110,24 @@ module IntSet16 =
     let isTwoCycle (is16:intSet16) =
         CollectionProps.isTwoCycle16 is16.values
 
-    let sorted_O_1_Sequence (degree:degree) 
+    let sorted_O_1_Sequence (order:order) 
                             (onesCount:int) =
-        let totalSize = (Degree.value degree)
+        let totalSize = (Order.value order)
         let numZeroes = totalSize - onesCount
         { intSet16.values = Array.init totalSize 
                     (fun i -> if i< numZeroes then 0us else 1us)}
 
     //Returns a bloclLen + 1 length array of IntBits
-    // of all possible sorted 0-1 sequences of length degree
-    let sorted_0_1_Sequences (degree:degree)  =
-        seq { for i = 0 to (Degree.value degree) do 
-                yield (sorted_O_1_Sequence degree i) }
+    // of all possible sorted 0-1 sequences of length order
+    let sorted_0_1_Sequences (order:order)  =
+        seq { for i = 0 to (Order.value order) do 
+                yield (sorted_O_1_Sequence order i) }
 
-    let fromInteger (dg:degree) (intVers:int) =
-        { intSet16.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0us 1us }
+    let fromInteger (ord:order) (intVers:int) =
+        { intSet16.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray ord 0us 1us }
 
-    let fromUint64 (dg:degree) (intVers:uint64) =
-        { intSet16.values = intVers |> ByteUtils.uint64To2ValArray dg 0us 1us }
+    let fromUint64 (ord:order) (intVers:uint64) =
+        { intSet16.values = intVers |> ByteUtils.uint64To2ValArray ord 0us 1us }
     
     let toInteger (arrayVers:intSet16) (oneThresh:int) =
         ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
@@ -136,13 +135,12 @@ module IntSet16 =
     let toUint64 (intSt:intSet16) (oneThresh:uint16) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (degree:degree) =
-        let dv = Degree.value degree 
-        {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger degree)
+    let allForAsSeq (order:order) =
+        let dv = Order.value order 
+        {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger order)
 
-    let allForAsArray (degree:degree) =
-        let order = (Degree.value degree)
-        Array.init (1 <<< order) (fromInteger degree)
+    let allForAsArray (ord:order) =
+        Array.init (1 <<< (Order.value ord)) (fromInteger ord)
 
 
 
@@ -150,7 +148,7 @@ module IntSet16 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    let fromBytes (dg:degree) (data:byte[]) = 
+    let fromBytes (ord:order) (data:byte[]) = 
         result {
 
              let! ints =  ByteArray.convertBytesToInts data
@@ -165,17 +163,17 @@ module IntSet16 =
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (degree:degree) (rando:IRando) = 
+    let createRandom (order:order) (rando:IRando) = 
         let perm = 
-            Array.init (Degree.value degree)
+            Array.init (Order.value order)
                         (fun _ -> let q = rando.NextFloat
                                   if (q > 0.5) then 1us else 0us )
         {intSet16.values = perm }
 
 
-    let createRandoms (degree:degree) 
+    let createRandoms (order:order) 
                       (rnd:IRando) =
-        seq { while true do yield createRandom degree rnd }
+        seq { while true do yield createRandom order rnd }
 
 
 
@@ -210,24 +208,24 @@ module IntSet8 =
     let isTwoCycle (is8:intSet8) =
         CollectionProps.isTwoCycle8 is8.values
 
-    let sorted_O_1_Sequence (degree:degree) 
+    let sorted_O_1_Sequence (order:order) 
                             (onesCount:int) =
-        let totalSize = (Degree.value degree)
+        let totalSize = (Order.value order)
         let numZeroes = totalSize - onesCount
         { intSet8.values = Array.init totalSize 
                     (fun i -> if i< numZeroes then 0uy else 1uy)}
 
     //Returns a bloclLen + 1 length array of IntBits
-    // of all possible sorted 0-1 sequences of length degree
-    let sorted_0_1_Sequences (degree:degree)  =
-        seq { for i = 0 to (Degree.value degree) do 
-                yield (sorted_O_1_Sequence degree i) }
+    // of all possible sorted 0-1 sequences of length order
+    let sorted_0_1_Sequences (order:order)  =
+        seq { for i = 0 to (Order.value order) do 
+                yield (sorted_O_1_Sequence order i) }
 
-    let fromInteger (dg:degree) (intVers:int) =
-        { intSet8.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray dg 0uy 1uy }
+    let fromInteger (ord:order) (intVers:int) =
+        { intSet8.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray ord 0uy 1uy }
 
-    let fromUint64 (dg:degree) (intVers:uint64) =
-        { intSet8.values = intVers |> ByteUtils.uint64To2ValArray dg 0uy 1uy }
+    let fromUint64 (ord:order) (intVers:uint64) =
+        { intSet8.values = intVers |> ByteUtils.uint64To2ValArray ord 0uy 1uy }
         
     let toInteger (arrayVers:intSet8) (oneThresh:int) =
         ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
@@ -235,13 +233,12 @@ module IntSet8 =
     let toUint64 (intSt:intSet8) (oneThresh:uint8) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (degree:degree) =
-        let dv = Degree.value degree 
-        {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger degree)
+    let allForAsSeq (order:order) =
+        let dv = Order.value order 
+        {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger order)
 
-    let allForAsArray (degree:degree) =
-        let order = (Degree.value degree)
-        Array.init (1 <<< order) (fromInteger degree)
+    let allForAsArray (ord:order) =
+        Array.init (1 <<<  (Order.value ord)) (fromInteger ord)
 
 
 
@@ -249,7 +246,7 @@ module IntSet8 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    let fromBytes (dg:degree) (data:byte[]) = 
+    let fromBytes (ord:order) (data:byte[]) = 
         result {
              let! ints =  ByteArray.convertBytesToUint8s data
              return! create8 ints
@@ -264,16 +261,16 @@ module IntSet8 =
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (degree:degree) (rando:IRando) = 
+    let createRandom (order:order) (rando:IRando) = 
         let perm = 
-            Array.init (Degree.value degree)
+            Array.init (Order.value order)
                         (fun _ -> let q = rando.NextFloat
                                   if (q > 0.5) then 1uy else 0uy )
         {intSet8.values = perm }
 
 
-    let createRandoms (degree:degree) 
+    let createRandoms (order:order) 
                       (rnd:IRando) =
-        seq { while true do yield createRandom degree rnd }
+        seq { while true do yield createRandom order rnd }
 
 
