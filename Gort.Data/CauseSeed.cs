@@ -28,8 +28,8 @@ namespace Gort.Data
             //GetCauseTypeParams(ctxt);
             //AddRndGens(ctxt);
             AddCauseTypeGroups(ctxt);
-            AddCauseTypes(ctxt);
-            AddCauseTypeParams(ctxt);
+            //AddCauseTypes(ctxt);
+            //AddCauseTypeParams(ctxt);
 
             ctxt.SaveChanges();
         }
@@ -166,7 +166,6 @@ namespace Gort.Data
             causeTypeParamRndGenSet_Count = gortContext.CauseTypeParams.Where(g => (g.Name == "Count") && (g.CauseTypeId == causeTypeRandGenSet.CauseTypeId)).First();
 
             causeTypeParamSortable_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
-            causeTypeParamSortable_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
             causeTypeParamSortable_Format = gortContext.CauseTypeParams.Where(g => (g.Name == "Format") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
             causeTypeParamSortable_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSortable.CauseTypeId)).First();
 
@@ -177,7 +176,6 @@ namespace Gort.Data
 
             causeTypeParamSortableSet_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
             causeTypeParamSortableSet_Count = gortContext.CauseTypeParams.Where(g => (g.Name == "Count") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
-            causeTypeParamSortableSet_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
             causeTypeParamSortableSet_Format = gortContext.CauseTypeParams.Where(g => (g.Name == "Format") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
             causeTypeParamSortableSet_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSortableSet.CauseTypeId)).First();
 
@@ -193,7 +191,6 @@ namespace Gort.Data
             causeTypeParamSortableSetStacked_Orders = gortContext.CauseTypeParams.Where(g => (g.Name == "Orders") && (g.CauseTypeId == causeTypeSortableSetStacked.CauseTypeId)).First();
 
             causeTypeParamSorter_Order = gortContext.CauseTypeParams.Where(g => (g.Name == "Order") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
-            causeTypeParamSorter_Descr = gortContext.CauseTypeParams.Where(g => (g.Name == "Descr") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
             causeTypeParamSorter_Data = gortContext.CauseTypeParams.Where(g => (g.Name == "Data") && (g.CauseTypeId == causeTypeSorter.CauseTypeId)).First();
 
             causeTypeParamSorterImport_Workspace = gortContext.CauseTypeParams.Where(g => (g.Name == "Workspace") && (g.CauseTypeId == causeTypeSorterImport.CauseTypeId)).First();

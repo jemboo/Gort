@@ -60,7 +60,6 @@ namespace Gort.Data
         public static CauseTypeParam? causeTypeParamRndGenSet_Count;
 
         public static CauseTypeParam? causeTypeParamSortable_Order;
-        public static CauseTypeParam? causeTypeParamSortable_Descr;
         public static CauseTypeParam? causeTypeParamSortable_Format;
         public static CauseTypeParam? causeTypeParamSortable_Data;
 
@@ -71,7 +70,6 @@ namespace Gort.Data
 
         public static CauseTypeParam? causeTypeParamSortableSet_Order;
         public static CauseTypeParam? causeTypeParamSortableSet_Count;
-        public static CauseTypeParam? causeTypeParamSortableSet_Descr;
         public static CauseTypeParam? causeTypeParamSortableSet_Format;
         public static CauseTypeParam? causeTypeParamSortableSet_Data;
 
@@ -87,7 +85,6 @@ namespace Gort.Data
         public static CauseTypeParam? causeTypeParamSortableSetStacked_Orders;
 
         public static CauseTypeParam? causeTypeParamSorter_Order;
-        public static CauseTypeParam? causeTypeParamSorter_Descr;
         public static CauseTypeParam? causeTypeParamSorter_Data;
 
         public static CauseTypeParam? causeTypeParamSorterImport_Workspace;
@@ -107,20 +104,16 @@ namespace Gort.Data
         public static CauseTypeParam? causeTypeParamSorterSetRndBySwitch_SwitchCount;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySwitch_SorterCount;
 
-        public static CauseTypeParam? causeTypeParamSorterSetRndByStage_Descr;
         public static CauseTypeParam? causeTypeParamSorterSetRndByStage_Order;
         public static CauseTypeParam? causeTypeParamSorterSetRndByStage_StageCount;
         public static CauseTypeParam? causeTypeParamSorterSetRndByStage_RndGen;
         public static CauseTypeParam? causeTypeParamSorterSetRndByStage_SorterCount;
 
-        public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStage_Descr;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStage_Order;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStage_StageCount;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStage_RndGen;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStage_SorterCount;
 
-
-        public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStageBuddies_Descr;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStageBuddies_Order;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStageBuddies_StageCount;
         public static CauseTypeParam? causeTypeParamSorterSetRndBySymmetricStageBuddies_RndGen;
@@ -149,7 +142,6 @@ namespace Gort.Data
             causeTypeParamRndGenSet_Count = new CauseTypeParam() { Name = "Count", CauseType = causeTypeRandGenSet, DataType = DataType.Int }.AddId();
 
             causeTypeParamSortable_Order = new CauseTypeParam() { Name = "Order", CauseType = causeTypeSortable, DataType = DataType.Int }.AddId();
-            causeTypeParamSortable_Descr = new CauseTypeParam() { Name = "Descr", CauseType = causeTypeSortable, DataType = DataType.String }.AddId();
             causeTypeParamSortable_Format = new CauseTypeParam() { Name = "Format", CauseType = causeTypeSortable, DataType = DataType.Int }.AddId();
             causeTypeParamSortable_Data = new CauseTypeParam() { Name = "Data", CauseType = causeTypeSortable, DataType = DataType.ByteArray }.AddId();
 
@@ -160,7 +152,6 @@ namespace Gort.Data
 
             causeTypeParamSortableSet_Order = new CauseTypeParam() { Name = "Order", CauseType = causeTypeSortableSet, DataType = DataType.Int }.AddId();
             causeTypeParamSortableSet_Count = new CauseTypeParam() { Name = "Count", CauseType = causeTypeSortableSet, DataType = DataType.Int }.AddId();
-            causeTypeParamSortableSet_Descr = new CauseTypeParam() { Name = "Descr", CauseType = causeTypeSortableSet, DataType = DataType.String }.AddId();
             causeTypeParamSortableSet_Format = new CauseTypeParam() { Name = "Format", CauseType = causeTypeSortableSet, DataType = DataType.Int }.AddId();
             causeTypeParamSortableSet_Data = new CauseTypeParam() { Name = "Data", CauseType = causeTypeSortableSet, DataType = DataType.ByteArray }.AddId();
 
@@ -176,7 +167,6 @@ namespace Gort.Data
             causeTypeParamSortableSetStacked_Orders = new CauseTypeParam() { Name = "Orders", CauseType = causeTypeSortableSetStacked, DataType = DataType.IntArray }.AddId();
 
             causeTypeParamSorter_Order = new CauseTypeParam() { Name = "Order", CauseType = causeTypeSorter, DataType = DataType.Int }.AddId();
-            causeTypeParamSorter_Descr = new CauseTypeParam() { Name = "Descr", CauseType = causeTypeSorter, DataType = DataType.String }.AddId();
             causeTypeParamSorter_Data = new CauseTypeParam() { Name = "Data", CauseType = causeTypeSorter, DataType = DataType.ByteArray }.AddId();
 
             causeTypeParamSorterImport_Workspace = new CauseTypeParam() { Name = "Workspace", CauseType = causeTypeSorterImport, DataType = DataType.Guid }.AddId();
@@ -228,7 +218,6 @@ namespace Gort.Data
             gortContext.CauseTypeParams.Add(causeTypeParamRndGenSet_Count);
 
             gortContext.CauseTypeParams.Add(causeTypeParamSortable_Order);
-            gortContext.CauseTypeParams.Add(causeTypeParamSortable_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSortable_Format);
             gortContext.CauseTypeParams.Add(causeTypeParamSortable_Data);
 
@@ -239,7 +228,6 @@ namespace Gort.Data
 
             gortContext.CauseTypeParams.Add(causeTypeParamSortableSet_Order);
             gortContext.CauseTypeParams.Add(causeTypeParamSortableSet_Count);
-            gortContext.CauseTypeParams.Add(causeTypeParamSortableSet_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSortableSet_Format);
             gortContext.CauseTypeParams.Add(causeTypeParamSortableSet_Data);
 
@@ -255,7 +243,6 @@ namespace Gort.Data
             gortContext.CauseTypeParams.Add(causeTypeParamSortableSetStacked_Orders);
 
             gortContext.CauseTypeParams.Add(causeTypeParamSorter_Order);
-            gortContext.CauseTypeParams.Add(causeTypeParamSorter_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSorter_Data);
 
             gortContext.CauseTypeParams.Add(causeTypeParamSorterImport_Workspace);
@@ -265,24 +252,26 @@ namespace Gort.Data
 
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRef_Source);
 
+            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetImport_Workspace);
+            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetImport_Table);
+            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetImport_Record);
+            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetImport_Path);
+
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySwitch_Order);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySwitch_RndGen);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySwitch_SwitchCount);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySwitch_SorterCount);
 
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_Order);
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_StageCount);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_RndGen);
+            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_StageCount);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndByStage_SorterCount);
 
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStage_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStage_Order);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStage_StageCount);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStage_RndGen);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStage_SorterCount);
 
-            gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStageBuddies_Descr);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStageBuddies_Order);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStageBuddies_StageCount);
             gortContext.CauseTypeParams.Add(causeTypeParamSorterSetRndBySymmetricStageBuddies_RndGen);
