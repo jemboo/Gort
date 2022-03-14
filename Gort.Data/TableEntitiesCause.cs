@@ -20,7 +20,8 @@ namespace Gort.Data
         [Key]
         public Guid CauseId { get; set; }
         public string Description { get; set; } 
-        public CauseType CauseType { get; set; }
+        public Guid CauseTypeID { get; set; }
+        public virtual CauseType CauseType { get; set; }
         public CauseStatus CauseStatus { get; set; }
         public ICollection<CauseParam> CauseParams { get; set; } =
             new ObservableCollection<CauseParam>();

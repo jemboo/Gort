@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Gort.Data.Migrations
 {
-    public partial class gort : Migration
+    public partial class gort1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,7 +13,7 @@ namespace Gort.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CauseTypeGroups",
+                name: "CauseTypeGroup",
                 columns: table => new
                 {
                     CauseTypeGroupId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -23,17 +23,17 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CauseTypeGroups", x => x.CauseTypeGroupId);
+                    table.PrimaryKey("PK_CauseTypeGroup", x => x.CauseTypeGroupId);
                     table.ForeignKey(
-                        name: "FK_CauseTypeGroups_CauseTypeGroups_ParentId",
+                        name: "FK_CauseTypeGroup_CauseTypeGroup_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "CauseTypeGroups",
+                        principalTable: "CauseTypeGroup",
                         principalColumn: "CauseTypeGroupId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Workspaces",
+                name: "Workspace",
                 columns: table => new
                 {
                     WorkspaceId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -42,12 +42,12 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Workspaces", x => x.WorkspaceId);
+                    table.PrimaryKey("PK_Workspace", x => x.WorkspaceId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CauseTypes",
+                name: "CauseType",
                 columns: table => new
                 {
                     CauseTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -57,48 +57,48 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CauseTypes", x => x.CauseTypeId);
+                    table.PrimaryKey("PK_CauseType", x => x.CauseTypeId);
                     table.ForeignKey(
-                        name: "FK_CauseTypes_CauseTypeGroups_CauseTypeGroupId",
+                        name: "FK_CauseType_CauseTypeGroup_CauseTypeGroupId",
                         column: x => x.CauseTypeGroupId,
-                        principalTable: "CauseTypeGroups",
+                        principalTable: "CauseTypeGroup",
                         principalColumn: "CauseTypeGroupId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Causes",
+                name: "Cause",
                 columns: table => new
                 {
                     CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CauseTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CauseTypeID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CauseStatus = table.Column<int>(type: "int", nullable: false),
                     Index = table.Column<int>(type: "int", nullable: false),
                     WorkspaceId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Causes", x => x.CauseId);
+                    table.PrimaryKey("PK_Cause", x => x.CauseId);
                     table.ForeignKey(
-                        name: "FK_Causes_CauseTypes_CauseTypeId",
-                        column: x => x.CauseTypeId,
-                        principalTable: "CauseTypes",
+                        name: "FK_Cause_CauseType_CauseTypeID",
+                        column: x => x.CauseTypeID,
+                        principalTable: "CauseType",
                         principalColumn: "CauseTypeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Causes_Workspaces_WorkspaceId",
+                        name: "FK_Cause_Workspace_WorkspaceId",
                         column: x => x.WorkspaceId,
-                        principalTable: "Workspaces",
+                        principalTable: "Workspace",
                         principalColumn: "WorkspaceId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CauseTypeParams",
+                name: "CauseTypeParam",
                 columns: table => new
                 {
                     CauseTypeParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -109,18 +109,18 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CauseTypeParams", x => x.CauseTypeParamId);
+                    table.PrimaryKey("PK_CauseTypeParam", x => x.CauseTypeParamId);
                     table.ForeignKey(
-                        name: "FK_CauseTypeParams_CauseTypes_CauseTypeId",
+                        name: "FK_CauseTypeParam_CauseType_CauseTypeId",
                         column: x => x.CauseTypeId,
-                        principalTable: "CauseTypes",
+                        principalTable: "CauseType",
                         principalColumn: "CauseTypeId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "RandGens",
+                name: "RandGen",
                 columns: table => new
                 {
                     RandGenId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -135,18 +135,46 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RandGens", x => x.RandGenId);
+                    table.PrimaryKey("PK_RandGen", x => x.RandGenId);
                     table.ForeignKey(
-                        name: "FK_RandGens_Causes_CauseId",
+                        name: "FK_RandGen_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SortableSets",
+                name: "Sortable",
+                columns: table => new
+                {
+                    SortableId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CausePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StructId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    SortableSetId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    SortableFormat = table.Column<int>(type: "int", nullable: false),
+                    Data = table.Column<byte[]>(type: "longblob", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sortable", x => x.SortableId);
+                    table.ForeignKey(
+                        name: "FK_Sortable_Cause_CauseId",
+                        column: x => x.CauseId,
+                        principalTable: "Cause",
+                        principalColumn: "CauseId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "SortableSet",
                 columns: table => new
                 {
                     SortableSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -158,23 +186,23 @@ namespace Gort.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SortableSetRep = table.Column<int>(type: "int", nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    BinaryFormat = table.Column<int>(type: "int", nullable: false),
+                    SortableFormat = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SortableSets", x => x.SortableSetId);
+                    table.PrimaryKey("PK_SortableSet", x => x.SortableSetId);
                     table.ForeignKey(
-                        name: "FK_SortableSets_Causes_CauseId",
+                        name: "FK_SortableSet_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Sorters",
+                name: "Sorter",
                 columns: table => new
                 {
                     SorterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -185,23 +213,22 @@ namespace Gort.Data.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    BinaryFormat = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sorters", x => x.SorterId);
+                    table.PrimaryKey("PK_Sorter", x => x.SorterId);
                     table.ForeignKey(
-                        name: "FK_Sorters_Causes_CauseId",
+                        name: "FK_Sorter_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SorterSets",
+                name: "SorterSet",
                 columns: table => new
                 {
                     SorterSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -211,24 +238,24 @@ namespace Gort.Data.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    SorterSetRep = table.Column<int>(type: "int", nullable: false),
-                    BinaryFormat = table.Column<int>(type: "int", nullable: false),
+                    SwitchLength = table.Column<int>(type: "int", nullable: false),
+                    IsGenerated = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SorterSets", x => x.SorterSetId);
+                    table.PrimaryKey("PK_SorterSet", x => x.SorterSetId);
                     table.ForeignKey(
-                        name: "FK_SorterSets_Causes_CauseId",
+                        name: "FK_SorterSet_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CauseParams",
+                name: "CauseParam",
                 columns: table => new
                 {
                     CauseParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -238,24 +265,24 @@ namespace Gort.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CauseParams", x => x.CauseParamId);
+                    table.PrimaryKey("PK_CauseParam", x => x.CauseParamId);
                     table.ForeignKey(
-                        name: "FK_CauseParams_Causes_CauseId",
+                        name: "FK_CauseParam_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CauseParams_CauseTypeParams_CauseTypeParamId",
+                        name: "FK_CauseParam_CauseTypeParam_CauseTypeParamId",
                         column: x => x.CauseTypeParamId,
-                        principalTable: "CauseTypeParams",
+                        principalTable: "CauseTypeParam",
                         principalColumn: "CauseTypeParamId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SorterPerfs",
+                name: "SorterPerf",
                 columns: table => new
                 {
                     SorterPerfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -266,36 +293,35 @@ namespace Gort.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SorterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     SortableSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    SorterPerfRep = table.Column<int>(type: "int", nullable: false),
-                    BinaryFormat = table.Column<int>(type: "int", nullable: false),
+                    NumberFormat = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SorterPerfs", x => x.SorterPerfId);
+                    table.PrimaryKey("PK_SorterPerf", x => x.SorterPerfId);
                     table.ForeignKey(
-                        name: "FK_SorterPerfs_Causes_CauseId",
+                        name: "FK_SorterPerf_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SorterPerfs_SortableSets_SortableSetId",
+                        name: "FK_SorterPerf_SortableSet_SortableSetId",
                         column: x => x.SortableSetId,
-                        principalTable: "SortableSets",
+                        principalTable: "SortableSet",
                         principalColumn: "SortableSetId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SorterPerfs_Sorters_SorterId",
+                        name: "FK_SorterPerf_Sorter_SorterId",
                         column: x => x.SorterId,
-                        principalTable: "Sorters",
+                        principalTable: "Sorter",
                         principalColumn: "SorterId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SorterSetPerfs",
+                name: "SorterSetPerf",
                 columns: table => new
                 {
                     SorterSetPerfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -306,156 +332,164 @@ namespace Gort.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SorterSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     SortableSetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    SorterSetPerfRep = table.Column<int>(type: "int", nullable: false),
-                    SorterSetPerfData = table.Column<byte[]>(type: "longblob", nullable: false)
+                    NumberFormat = table.Column<int>(type: "int", nullable: false),
+                    Data = table.Column<byte[]>(type: "longblob", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SorterSetPerfs", x => x.SorterSetPerfId);
+                    table.PrimaryKey("PK_SorterSetPerf", x => x.SorterSetPerfId);
                     table.ForeignKey(
-                        name: "FK_SorterSetPerfs_Causes_CauseId",
+                        name: "FK_SorterSetPerf_Cause_CauseId",
                         column: x => x.CauseId,
-                        principalTable: "Causes",
+                        principalTable: "Cause",
                         principalColumn: "CauseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SorterSetPerfs_SortableSets_SortableSetId",
+                        name: "FK_SorterSetPerf_SortableSet_SortableSetId",
                         column: x => x.SortableSetId,
-                        principalTable: "SortableSets",
+                        principalTable: "SortableSet",
                         principalColumn: "SortableSetId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SorterSetPerfs_SorterSets_SorterSetId",
+                        name: "FK_SorterSetPerf_SorterSet_SorterSetId",
                         column: x => x.SorterSetId,
-                        principalTable: "SorterSets",
+                        principalTable: "SorterSet",
                         principalColumn: "SorterSetId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseParams_CauseId",
-                table: "CauseParams",
-                column: "CauseId");
+                name: "IX_Cause_CauseTypeID",
+                table: "Cause",
+                column: "CauseTypeID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseParams_CauseTypeParamId",
-                table: "CauseParams",
-                column: "CauseTypeParamId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Causes_CauseTypeId",
-                table: "Causes",
-                column: "CauseTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Causes_WorkspaceId",
-                table: "Causes",
+                name: "IX_Cause_WorkspaceId",
+                table: "Cause",
                 column: "WorkspaceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseTypeGroups_ParentId",
-                table: "CauseTypeGroups",
-                column: "ParentId");
+                name: "IX_CauseParam_CauseId",
+                table: "CauseParam",
+                column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseTypeParams_CauseTypeId",
-                table: "CauseTypeParams",
-                column: "CauseTypeId");
+                name: "IX_CauseParam_CauseTypeParamId",
+                table: "CauseParam",
+                column: "CauseTypeParamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseTypes_CauseTypeGroupId",
-                table: "CauseTypes",
+                name: "IX_CauseType_CauseTypeGroupId",
+                table: "CauseType",
                 column: "CauseTypeGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RandGens_CauseId",
-                table: "RandGens",
+                name: "IX_CauseTypeGroup_ParentId",
+                table: "CauseTypeGroup",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CauseTypeParam_CauseTypeId",
+                table: "CauseTypeParam",
+                column: "CauseTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RandGen_CauseId",
+                table: "RandGen",
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SortableSets_CauseId",
-                table: "SortableSets",
+                name: "IX_Sortable_CauseId",
+                table: "Sortable",
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterPerfs_CauseId",
-                table: "SorterPerfs",
+                name: "IX_SortableSet_CauseId",
+                table: "SortableSet",
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterPerfs_SortableSetId",
-                table: "SorterPerfs",
+                name: "IX_Sorter_CauseId",
+                table: "Sorter",
+                column: "CauseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SorterPerf_CauseId",
+                table: "SorterPerf",
+                column: "CauseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SorterPerf_SortableSetId",
+                table: "SorterPerf",
                 column: "SortableSetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterPerfs_SorterId",
-                table: "SorterPerfs",
+                name: "IX_SorterPerf_SorterId",
+                table: "SorterPerf",
                 column: "SorterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sorters_CauseId",
-                table: "Sorters",
+                name: "IX_SorterSet_CauseId",
+                table: "SorterSet",
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterSetPerfs_CauseId",
-                table: "SorterSetPerfs",
+                name: "IX_SorterSetPerf_CauseId",
+                table: "SorterSetPerf",
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterSetPerfs_SortableSetId",
-                table: "SorterSetPerfs",
+                name: "IX_SorterSetPerf_SortableSetId",
+                table: "SorterSetPerf",
                 column: "SortableSetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SorterSetPerfs_SorterSetId",
-                table: "SorterSetPerfs",
+                name: "IX_SorterSetPerf_SorterSetId",
+                table: "SorterSetPerf",
                 column: "SorterSetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SorterSets_CauseId",
-                table: "SorterSets",
-                column: "CauseId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CauseParams");
+                name: "CauseParam");
 
             migrationBuilder.DropTable(
-                name: "RandGens");
+                name: "RandGen");
 
             migrationBuilder.DropTable(
-                name: "SorterPerfs");
+                name: "Sortable");
 
             migrationBuilder.DropTable(
-                name: "SorterSetPerfs");
+                name: "SorterPerf");
 
             migrationBuilder.DropTable(
-                name: "CauseTypeParams");
+                name: "SorterSetPerf");
 
             migrationBuilder.DropTable(
-                name: "Sorters");
+                name: "CauseTypeParam");
 
             migrationBuilder.DropTable(
-                name: "SortableSets");
+                name: "Sorter");
 
             migrationBuilder.DropTable(
-                name: "SorterSets");
+                name: "SortableSet");
 
             migrationBuilder.DropTable(
-                name: "Causes");
+                name: "SorterSet");
 
             migrationBuilder.DropTable(
-                name: "CauseTypes");
+                name: "Cause");
 
             migrationBuilder.DropTable(
-                name: "Workspaces");
+                name: "CauseType");
 
             migrationBuilder.DropTable(
-                name: "CauseTypeGroups");
+                name: "Workspace");
+
+            migrationBuilder.DropTable(
+                name: "CauseTypeGroup");
         }
     }
 }

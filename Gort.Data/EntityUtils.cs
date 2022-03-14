@@ -22,8 +22,8 @@
 
         public static Cause AddId(this Cause cs)
         {
-            var id = GuidUtils.guidFromObjs(new object[2] { cs.Index, cs.WorkspaceId });
-            return new Cause() { CauseId = id, Description = cs.Description, CauseType = cs.CauseType, CauseParams = cs.CauseParams, Index=cs.Index, WorkspaceId = cs.WorkspaceId };
+            var id = GuidUtils.guidFromObjs(new object[4] { cs.Index, cs.WorkspaceId, cs.CauseTypeID, cs.CauseParams });
+            return new Cause() { CauseId = id, Description = cs.Description, CauseTypeID = cs.CauseTypeID, CauseParams = cs.CauseParams, Index=cs.Index, WorkspaceId = cs.WorkspaceId };
         }
 
         public static CauseParam AddId(this CauseParam cp)

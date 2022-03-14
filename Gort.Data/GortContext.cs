@@ -39,41 +39,46 @@ namespace Gort.Data
                     .HasConversion<int>();
 
 
+            modelBuilder.Entity<Sortable>()
+                    .Property(c => c.SortableFormat)
+                    .HasConversion<int>();
+
+
             modelBuilder.Entity<SortableSet>()
                     .Property(c => c.SortableSetRep)
                     .HasConversion<int>();
 
 
-            modelBuilder.Entity<SorterSet>()
-                    .Property(c => c.SorterSetRep)
+            modelBuilder.Entity<SortableSet>()
+                    .Property(c => c.SortableFormat)
                     .HasConversion<int>();
 
 
             modelBuilder.Entity<SorterPerf>()
-                    .Property(c => c.SorterPerfRep)
+                    .Property(c => c.NumberFormat)
                     .HasConversion<int>();
 
 
             modelBuilder.Entity<SorterSetPerf>()
-                    .Property(c => c.SorterSetPerfRep)
+                    .Property(c => c.NumberFormat)
                     .HasConversion<int>();
 
 
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Workspace> Workspaces { get; set; }
-        public DbSet<CauseTypeGroup> CauseTypeGroups { get; set; }
-        public DbSet<CauseType> CauseTypes { get; set; }
-        public DbSet<CauseTypeParam> CauseTypeParams { get; set; }
-        public DbSet<Cause> Causes { get; set; }
-        public DbSet<CauseParam> CauseParams { get; set; }
-        public DbSet<RandGen> RandGens { get; set; }
-        public DbSet<SortableSet> SortableSets { get; set; }
-        public DbSet<Sorter> Sorters { get; set; }
-        public DbSet<SorterSet> SorterSets { get; set; }
-        public DbSet<SorterPerf> SorterPerfs { get; set; }
-        public DbSet<SorterSetPerf> SorterSetPerfs { get; set; }
+        public DbSet<Workspace> Workspace { get; set; }
+        public DbSet<CauseTypeGroup> CauseTypeGroup { get; set; }
+        public DbSet<CauseType> CauseType { get; set; }
+        public DbSet<CauseTypeParam> CauseTypeParam { get; set; }
+        public DbSet<Cause> Cause { get; set; }
+        public DbSet<CauseParam> CauseParam { get; set; }
+        public DbSet<RandGen> RandGen { get; set; }
+        public DbSet<SortableSet> SortableSet { get; set; }
+        public DbSet<Sorter> Sorter { get; set; }
+        public DbSet<SorterSet> SorterSet { get; set; }
+        public DbSet<SorterPerf> SorterPerf { get; set; }
+        public DbSet<SorterSetPerf> SorterSetPerf { get; set; }
     }
 
 }

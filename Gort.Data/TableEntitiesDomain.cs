@@ -47,7 +47,7 @@ namespace Gort.Data
         public string Description { get; set; }
         public SortableSetRep SortableSetRep { get; set; }
         public int Order { get; set; }
-        public SortableFormat BinaryFormat { get; set; }
+        public SortableFormat SortableFormat { get; set; }
         public byte[] Data { get; set; }
     }
 
@@ -62,7 +62,6 @@ namespace Gort.Data
         public virtual Cause Cause { get; set; }
         public string Description { get; set; }
         public int Order { get; set; }
-        public SortableFormat BinaryFormat { get; set; }
         public byte[] Data { get; set; }
 
     }
@@ -80,8 +79,7 @@ namespace Gort.Data
         public virtual Sorter Sorter { get; set; }
         public Guid SortableSetId { get; set; }
         public virtual SortableSet SortableSet { get; set; }
-        public SorterPerfRep SorterPerfRep { get; set; }
-        public SortableFormat BinaryFormat { get; set; }
+        public NumberFormat NumberFormat { get; set; }
         public byte[] Data { get; set; }
     }
 
@@ -95,8 +93,8 @@ namespace Gort.Data
         public string CausePath { get; set; }
         public string Description { get; set; }
         public int Order { get; set; }
-        public SorterSetRep SorterSetRep { get; set; }
-        public SortableFormat BinaryFormat { get; set; }
+        public int SwitchLength { get; set; }
+        public bool IsGenerated { get; set; }
         public byte[] Data { get; set; }
     }
 
@@ -113,8 +111,8 @@ namespace Gort.Data
         public virtual SorterSet SorterSet { get; set; }
         public Guid SortableSetId { get; set; }
         public virtual SortableSet SortableSet { get; set; }
-        public SorterSetPerfRep SorterSetPerfRep { get; set; }
-        public byte[] SorterSetPerfData { get; set; }
+        public NumberFormat NumberFormat { get; set; }
+        public byte[] Data { get; set; }
     }
 
 

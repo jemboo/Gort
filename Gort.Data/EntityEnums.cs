@@ -50,20 +50,12 @@
         u16
     }
 
-    public enum SorterSetRep
+    public enum NumberFormat
     {
-        Explicit,
-        Generated
-    }
-
-    public enum SorterPerfRep
-    {
-        PerfBin
-    }
-
-    public enum SorterSetPerfRep
-    {
-        PerfBins
+        u8,
+        u16,
+        u32,
+        s32
     }
 
 }

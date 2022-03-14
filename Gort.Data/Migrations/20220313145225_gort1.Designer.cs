@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gort.Data.Migrations
 {
     [DbContext(typeof(GortContext))]
-    [Migration("20220312112724_gort")]
-    partial class gort
+    [Migration("20220313145225_gort1")]
+    partial class gort1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,7 +30,7 @@ namespace Gort.Data.Migrations
                     b.Property<int>("CauseStatus")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("CauseTypeId")
+                    b.Property<Guid>("CauseTypeID")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
@@ -45,11 +45,11 @@ namespace Gort.Data.Migrations
 
                     b.HasKey("CauseId");
 
-                    b.HasIndex("CauseTypeId");
+                    b.HasIndex("CauseTypeID");
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("Causes");
+                    b.ToTable("Cause");
                 });
 
             modelBuilder.Entity("Gort.Data.CauseParam", b =>
@@ -74,7 +74,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseTypeParamId");
 
-                    b.ToTable("CauseParams");
+                    b.ToTable("CauseParam");
                 });
 
             modelBuilder.Entity("Gort.Data.CauseType", b =>
@@ -94,7 +94,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseTypeGroupId");
 
-                    b.ToTable("CauseTypes");
+                    b.ToTable("CauseType");
                 });
 
             modelBuilder.Entity("Gort.Data.CauseTypeGroup", b =>
@@ -114,7 +114,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("CauseTypeGroups");
+                    b.ToTable("CauseTypeGroup");
                 });
 
             modelBuilder.Entity("Gort.Data.CauseTypeParam", b =>
@@ -137,7 +137,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseTypeId");
 
-                    b.ToTable("CauseTypeParams");
+                    b.ToTable("CauseTypeParam");
                 });
 
             modelBuilder.Entity("Gort.Data.RandGen", b =>
@@ -170,17 +170,14 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseId");
 
-                    b.ToTable("RandGens");
+                    b.ToTable("RandGen");
                 });
 
-            modelBuilder.Entity("Gort.Data.SortableSet", b =>
+            modelBuilder.Entity("Gort.Data.Sortable", b =>
                 {
-                    b.Property<Guid>("SortableSetId")
+                    b.Property<Guid>("SortableId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("BinaryFormat")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
@@ -200,6 +197,49 @@ namespace Gort.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<int>("SortableFormat")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("SortableSetId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("StructId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("SortableId");
+
+                    b.HasIndex("CauseId");
+
+                    b.ToTable("Sortable");
+                });
+
+            modelBuilder.Entity("Gort.Data.SortableSet", b =>
+                {
+                    b.Property<Guid>("SortableSetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CauseId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CausePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortableFormat")
+                        .HasColumnType("int");
+
                     b.Property<int>("SortableSetRep")
                         .HasColumnType("int");
 
@@ -210,7 +250,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseId");
 
-                    b.ToTable("SortableSets");
+                    b.ToTable("SortableSet");
                 });
 
             modelBuilder.Entity("Gort.Data.Sorter", b =>
@@ -218,9 +258,6 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("SorterId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("BinaryFormat")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
@@ -247,7 +284,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("CauseId");
 
-                    b.ToTable("Sorters");
+                    b.ToTable("Sorter");
                 });
 
             modelBuilder.Entity("Gort.Data.SorterPerf", b =>
@@ -255,9 +292,6 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("SorterPerfId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("BinaryFormat")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
@@ -274,14 +308,14 @@ namespace Gort.Data.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("NumberFormat")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("SortableSetId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("SorterId")
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("SorterPerfRep")
-                        .HasColumnType("int");
 
                     b.HasKey("SorterPerfId");
 
@@ -291,7 +325,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("SorterId");
 
-                    b.ToTable("SorterPerfs");
+                    b.ToTable("SorterPerf");
                 });
 
             modelBuilder.Entity("Gort.Data.SorterSet", b =>
@@ -299,9 +333,6 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("SorterSetId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("BinaryFormat")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
@@ -318,17 +349,20 @@ namespace Gort.Data.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsGenerated")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("SorterSetRep")
+                    b.Property<int>("SwitchLength")
                         .HasColumnType("int");
 
                     b.HasKey("SorterSetId");
 
                     b.HasIndex("CauseId");
 
-                    b.ToTable("SorterSets");
+                    b.ToTable("SorterSet");
                 });
 
             modelBuilder.Entity("Gort.Data.SorterSetPerf", b =>
@@ -344,22 +378,22 @@ namespace Gort.Data.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("NumberFormat")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("SortableSetId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("SorterSetId")
                         .HasColumnType("char(36)");
-
-                    b.Property<byte[]>("SorterSetPerfData")
-                        .IsRequired()
-                        .HasColumnType("longblob");
-
-                    b.Property<int>("SorterSetPerfRep")
-                        .HasColumnType("int");
 
                     b.HasKey("SorterSetPerfId");
 
@@ -369,7 +403,7 @@ namespace Gort.Data.Migrations
 
                     b.HasIndex("SorterSetId");
 
-                    b.ToTable("SorterSetPerfs");
+                    b.ToTable("SorterSetPerf");
                 });
 
             modelBuilder.Entity("Gort.Data.Workspace", b =>
@@ -384,14 +418,14 @@ namespace Gort.Data.Migrations
 
                     b.HasKey("WorkspaceId");
 
-                    b.ToTable("Workspaces");
+                    b.ToTable("Workspace");
                 });
 
             modelBuilder.Entity("Gort.Data.Cause", b =>
                 {
                     b.HasOne("Gort.Data.CauseType", "CauseType")
                         .WithMany()
-                        .HasForeignKey("CauseTypeId")
+                        .HasForeignKey("CauseTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -457,6 +491,17 @@ namespace Gort.Data.Migrations
                 });
 
             modelBuilder.Entity("Gort.Data.RandGen", b =>
+                {
+                    b.HasOne("Gort.Data.Cause", "Cause")
+                        .WithMany()
+                        .HasForeignKey("CauseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cause");
+                });
+
+            modelBuilder.Entity("Gort.Data.Sortable", b =>
                 {
                     b.HasOne("Gort.Data.Cause", "Cause")
                         .WithMany()
