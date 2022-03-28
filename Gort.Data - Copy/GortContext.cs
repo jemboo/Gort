@@ -29,7 +29,7 @@ namespace Gort.Data
                     .HasConversion<int>();
 
 
-            modelBuilder.Entity<ParamType>()
+            modelBuilder.Entity<CauseParamType>()
                     .Property(c => c.DataType)
                     .HasConversion<int>();
 
@@ -74,7 +74,7 @@ namespace Gort.Data
         public DbSet<Workspace> Workspace { get; set; }
         public DbSet<CauseTypeGroup> CauseTypeGroup { get; set; }
         public DbSet<CauseType> CauseType { get; set; }
-        public DbSet<ParamType> ParamType { get; set; }
+        public DbSet<CauseParamType> CauseParamType { get; set; }
         public DbSet<Cause> Cause { get; set; }
         public DbSet<CauseParam> CauseParam { get; set; }
         public DbSet<RandGen> RandGen { get; set; }

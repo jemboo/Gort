@@ -13,12 +13,11 @@ namespace Gort.Data.Seed
             //AddCauseRndGenSet(ctxt);
             //AddCauseSortableSetAllForOrderA(ctxt);
 
-            //GetWorkspace1(ctxt);
+            GetWorkspace1(ctxt);
             GetAllCauseDescr(ctxt);
             GetWorkspace1(ctxt);
-            AddCauseRndGen(ctxt);
-            //GetRndgen(ctxt);
-            //GetCauseSortableSetAllForOrderA(ctxt);
+            GetRndgen(ctxt);
+            GetCauseSortableSetAllForOrderA(ctxt);
 
 
             //context.Fabrics.Attach(product.Fabric);
@@ -30,14 +29,13 @@ namespace Gort.Data.Seed
         {
             AddCauseTypeGroups(ctxt);
             AddCauseTypes(ctxt);
-            AddParamTypes(ctxt);
-            AddParamTypesToCauseTypes(ctxt);
+            AddCauseParamTypes(ctxt);
         }
         public static void GetAllCauseDescr(GortContext ctxt)
         {
             GetCauseTypeGroups(ctxt);
             GetCauseTypes(ctxt);
-            GetParamTypes(ctxt);
+            GetCauseParamTypes(ctxt);
         }
 
         public static void AddWorkspace1(GortContext ctxt)

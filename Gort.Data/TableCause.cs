@@ -37,8 +37,8 @@ namespace Gort.Data
         public Guid CauseParamId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
-        public Guid CauseTypeParamId { get; set; }
-        public virtual CauseTypeParam CauseTypeParam { get; set; }
+        public Guid ParamTypeId { get; set; }
+        public virtual ParamType ParamType { get; set; }
         public byte[] Value { get; set; }
     }
 
@@ -49,6 +49,8 @@ namespace Gort.Data
         public Guid CauseTypeId { get; set; }
         public string Name { get; set; }
         public Guid CauseTypeGroupId { get; set; }
+        public ICollection<ParamType> ParamTypes { get; set; } =
+                new ObservableCollection<ParamType>();
         public virtual CauseTypeGroup CauseTypeGroup { get; set; }
     }
 
@@ -63,14 +65,14 @@ public class CauseTypeGroup
     }
 
 
-    public class CauseTypeParam
+    public class ParamType
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public Guid CauseTypeParamId { get; set; } 
-        public string Name { get; set; }         
-        public Guid CauseTypeId { get; set; }  
-        public virtual CauseType CauseType { get; set; }
+        public Guid ParamTypeId { get; set; } 
+        public string Name { get; set; } 
+        public ICollection<CauseType> CauseTypes { get; set; } =
+                new ObservableCollection<CauseType>();
         public DataType DataType { get; set; }
     }
 
