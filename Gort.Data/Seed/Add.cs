@@ -6,7 +6,7 @@ namespace Gort.Data.Seed
     internal static partial class CauseSeed
     {
 
-        public static void AddCauseTypeGroups(GortContext gortContext)
+        public static void AddCauseTypeGroups(IGortContext gortContext)
         {
             ctgRoot = new CauseTypeGroup() { Name = "root", Parent = null }.AddId();
             ctgRandGen = new CauseTypeGroup() { Name = "randGen", Parent = ctgRoot }.AddId();
@@ -30,7 +30,7 @@ namespace Gort.Data.Seed
         }
 
 
-        public static void AddCauseTypes(GortContext gortContext)
+        public static void AddCauseTypes(IGortContext gortContext)
         {
             ctRandGen = new CauseType() { Name = "randGen", CauseTypeGroup = ctgRandGen }.AddId();
             ctRandGenSet = new CauseType() { Name = "randGenSet", CauseTypeGroup = ctgRandGen }.AddId();
@@ -86,7 +86,7 @@ namespace Gort.Data.Seed
         }
 
 
-        public static void AddParamTypes(GortContext gortContext)
+        public static void AddParamTypes(IGortContext gortContext)
         {
             ptRndGen_Seed = new ParamType() { Name = "Seed", DataType = DataType.Int }.AddId();
             ptRndGen_Type = new ParamType() { Name = "Type", DataType = DataType.Int }.AddId();
@@ -140,7 +140,7 @@ namespace Gort.Data.Seed
             gortContext.ParamType.Add(cptSorterSetPerfBins_SorterSaveMode);
         }
 
-        public static void AddParamTypesToCauseTypes(GortContext gortContext)
+        public static void AddParamTypesToCauseTypes(IGortContext gortContext)
         {
             ctRandGen.ParamTypes.Add(ptRndGen_Seed);
             ctRandGen.ParamTypes.Add(ptRndGen_Type);
@@ -220,18 +220,20 @@ namespace Gort.Data.Seed
 
 
 
-        public static void AddCauseRndGen(GortContext gortContext)
+        public static Cause AddCauseRndGen(IGortContext gortContext, CauseType ctRG, int seed, RndGenType rndGenType)
         {
-            causeRndGenA = new Cause() { Description = "rndGen Lcg 123", CauseTypeID = ctRandGen.CauseTypeId, CauseStatus = CauseStatus.Pending, Index = 1, WorkspaceId = workspace1.WorkspaceId }.AddId();
+            var descr = $"{ctRG.Name}_{rndGenType}_{seed}";
+            causeRndGenA = new Cause() { Description = descr, CauseTypeID = ctRG.CauseTypeId, CauseStatus = CauseStatus.Pending, Index = 1, WorkspaceId = workspace1.WorkspaceId}.AddId();
             cpRndGen_Seed = new CauseParam() { CauseId = causeRndGenA.CauseId, ParamTypeId = ptRndGen_Seed.ParamTypeId, Value = BitConverter.GetBytes(123) }.AddId();
             cpRndGen_Type = new CauseParam() { CauseId = causeRndGenA.CauseId, ParamTypeId = ptRndGen_Type.ParamTypeId, Value = BitConverter.GetBytes((int)RndGenType.Lcg) }.AddId();
             causeRndGenA.CauseParams.Add(cpRndGen_Seed);
             causeRndGenA.CauseParams.Add(cpRndGen_Type);
             gortContext.Cause.Add(causeRndGenA);
+            return causeRndGenA;
         }
 
 
-        public static void AddCauseRndGenSet(GortContext gortContext)
+        public static void AddCauseRndGenSet(IGortContext gortContext)
         {
             causeRndGenSetA = new Cause() { Description = "rndGenSet 123 10", CauseTypeID = ctRandGenSet.CauseTypeId, CauseStatus = CauseStatus.Pending, Index = 2, Workspace = workspace1 };
             cpRndGenSet_Rng = new CauseParam() { Cause = causeRndGenSetA, ParamType = ptRndGen_Seed, Value = causeRndGenA.CauseId.ToByteArray()}.AddId();
@@ -241,7 +243,7 @@ namespace Gort.Data.Seed
             gortContext.Cause.Add(causeRndGenSetA);
         }
 
-        public static void AddCauseSortableSetAllForOrderA(GortContext gortContext)
+        public static void AddCauseSortableSetAllForOrderA(IGortContext gortContext)
         {
             causeSortableSetAllForOrderA = new Cause() { Description = "allSortables 16", CauseTypeID = ctRandGenSet.CauseTypeId, CauseStatus = CauseStatus.Pending, Index = 3, Workspace = workspace1 };
             cpSortableSetAllForOrder_Order = new CauseParam() { Cause = causeSortableSetAllForOrderA, ParamType = ptOrder, Value = BitConverter.GetBytes(16) }.AddId();

@@ -7,7 +7,7 @@ namespace Gort.Data.Seed
     {
 
 
-        public static void GetCauseTypeGroups(GortContext gortContext)
+        public static void GetCauseTypeGroups(IGortContext gortContext)
         {
             ctgRoot = gortContext.CauseTypeGroup.Where(g => g.Name == "root").First();
             ctgRandGen = gortContext.CauseTypeGroup.Where(g => g.Name == "randGen").First();
@@ -30,7 +30,7 @@ namespace Gort.Data.Seed
             //gortContext.CauseTypeGroup.Attach(ctgSorterGa);
         }
 
-        public static void GetCauseTypes(GortContext gortContext)
+        public static void GetCauseTypes(IGortContext gortContext)
         {
             ctRandGen = gortContext.CauseType.Where(g => g.Name == "randGen").First();
             ctRandGenSet = gortContext.CauseType.Where(g => g.Name == "randGenSet").First();
@@ -85,7 +85,7 @@ namespace Gort.Data.Seed
             gortContext.CauseType.Attach(ctSorterSetPerfBins);
         }
 
-        public static void GetParamTypes(GortContext gortContext)
+        public static void GetParamTypes(IGortContext gortContext)
         {
             ptRndGen_Seed = gortContext.ParamType.Where(g => (g.Name == "Seed")).First();
             ptRndGen_Type = gortContext.ParamType.Where(g => (g.Name == "Type")).First();
@@ -115,19 +115,19 @@ namespace Gort.Data.Seed
         }
 
 
-        public static void GetCauseRndGenSet(GortContext gortContext)
+        public static void GetCauseRndGenSet(IGortContext gortContext)
         {
             causeRndGenSetA = gortContext.Cause.Where(g => g.Description == "rndGenSet 123 10").FirstOrDefault();
             if (causeRndGenSetA is null) return;
-            gortContext.Entry(causeRndGenSetA).Collection(c => c.CauseParams).Load();
+            gortContext.Entry<Cause>(causeRndGenSetA).Collection(c => c.CauseParams).Load();
             var csPs = causeRndGenSetA.CauseParams.ToList();
         }
 
-        public static void GetCauseSortableSetAllForOrderA(GortContext gortContext)
+        public static void GetCauseSortableSetAllForOrderA(IGortContext gortContext)
         {
             causeSortableSetAllForOrderA = gortContext.Cause.Where(g => g.Description == "allSortables 16").FirstOrDefault();
             if (causeSortableSetAllForOrderA is null) return;
-            gortContext.Entry(causeSortableSetAllForOrderA).Collection(c => c.CauseParams).Load();
+            gortContext.Entry<Cause>(causeSortableSetAllForOrderA).Collection(c => c.CauseParams).Load();
             var csPs = causeSortableSetAllForOrderA.CauseParams.ToList();
         }
 

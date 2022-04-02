@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gort.Data
 {
-    public class GortContext : DbContext
+    public class GortContext : DbContext, IGortContext
     {
         public GortContext()
         {
@@ -69,6 +70,11 @@ namespace Gort.Data
 
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        public EntityEntry<T> Entry<T>(object entity) where T : class
+        {
+            return (EntityEntry<T>)this.Entry(entity);
         }
 
         public DbSet<Workspace> Workspace { get; set; }
