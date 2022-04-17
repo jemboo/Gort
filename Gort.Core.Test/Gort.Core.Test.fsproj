@@ -12,6 +12,7 @@
     <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CollectionPropsFixture.fs" />
     <Compile Include="CollectionOpsFixture.fs" />
+    <Compile Include="GuidUtilsFixture.fs" />
     <Compile Include="ByteUtilsFixture.fs" />
     <Compile Include="ByteArrayFixture.fs" />
     <Compile Include="RandoFixture.fs" />

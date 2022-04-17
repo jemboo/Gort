@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Gort.Data.Seed
 {
-    internal static partial class CauseSeed
+    public static partial class CauseSeed
     {
 
         /// **********************************************

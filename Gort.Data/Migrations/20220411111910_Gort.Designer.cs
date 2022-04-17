@@ -11,30 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gort.Data.Migrations
 {
     [DbContext(typeof(GortContext))]
-    [Migration("20220328015844_gort")]
-    partial class gort
+    [Migration("20220411111910_Gort")]
+    partial class Gort
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "6.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("CauseTypeParamType", b =>
-                {
-                    b.Property<Guid>("CauseTypesCauseTypeId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ParamTypesParamTypeId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("CauseTypesCauseTypeId", "ParamTypesParamTypeId");
-
-                    b.HasIndex("ParamTypesParamTypeId");
-
-                    b.ToTable("CauseTypeParamType");
-                });
 
             modelBuilder.Entity("Gort.Data.Cause", b =>
                 {
@@ -79,18 +64,19 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("CauseId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("ParamTypeId")
+                    b.Property<Guid>("CauseTypeParamId")
                         .HasColumnType("char(36)");
 
-                    b.Property<byte[]>("Value")
-                        .IsRequired()
-                        .HasColumnType("longblob");
+                    b.Property<Guid>("ParamId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("CauseParamId");
 
                     b.HasIndex("CauseId");
 
-                    b.HasIndex("ParamTypeId");
+                    b.HasIndex("CauseTypeParamId");
+
+                    b.HasIndex("ParamId");
 
                     b.ToTable("CauseParam");
                 });
@@ -104,9 +90,8 @@ namespace Gort.Data.Migrations
                     b.Property<Guid>("CauseTypeGroupId")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
 
                     b.HasKey("CauseTypeId");
 
@@ -121,9 +106,8 @@ namespace Gort.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("char(36)");
@@ -135,6 +119,48 @@ namespace Gort.Data.Migrations
                     b.ToTable("CauseTypeGroup");
                 });
 
+            modelBuilder.Entity("Gort.Data.CauseTypeParam", b =>
+                {
+                    b.Property<Guid>("CauseTypeParamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CauseTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ParamTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("CauseTypeParamId");
+
+                    b.HasIndex("CauseTypeId");
+
+                    b.ToTable("CauseTypeParam");
+                });
+
+            modelBuilder.Entity("Gort.Data.Param", b =>
+                {
+                    b.Property<Guid>("ParamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ParamTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<byte[]>("Value")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.HasKey("ParamId");
+
+                    b.HasIndex("ParamTypeId");
+
+                    b.ToTable("Param");
+                });
+
             modelBuilder.Entity("Gort.Data.ParamType", b =>
                 {
                     b.Property<Guid>("ParamTypeId")
@@ -144,9 +170,8 @@ namespace Gort.Data.Migrations
                     b.Property<int>("DataType")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
 
                     b.HasKey("ParamTypeId");
 
@@ -437,21 +462,6 @@ namespace Gort.Data.Migrations
                     b.ToTable("Workspace");
                 });
 
-            modelBuilder.Entity("CauseTypeParamType", b =>
-                {
-                    b.HasOne("Gort.Data.CauseType", null)
-                        .WithMany()
-                        .HasForeignKey("CauseTypesCauseTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Gort.Data.ParamType", null)
-                        .WithMany()
-                        .HasForeignKey("ParamTypesParamTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Gort.Data.Cause", b =>
                 {
                     b.HasOne("Gort.Data.CauseType", "CauseType")
@@ -479,15 +489,23 @@ namespace Gort.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Gort.Data.ParamType", "ParamType")
+                    b.HasOne("Gort.Data.CauseTypeParam", "CauseTypeParam")
                         .WithMany()
-                        .HasForeignKey("ParamTypeId")
+                        .HasForeignKey("CauseTypeParamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gort.Data.Param", "Param")
+                        .WithMany()
+                        .HasForeignKey("ParamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cause");
 
-                    b.Navigation("ParamType");
+                    b.Navigation("CauseTypeParam");
+
+                    b.Navigation("Param");
                 });
 
             modelBuilder.Entity("Gort.Data.CauseType", b =>
@@ -508,6 +526,24 @@ namespace Gort.Data.Migrations
                         .HasForeignKey("ParentId");
 
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("Gort.Data.CauseTypeParam", b =>
+                {
+                    b.HasOne("Gort.Data.CauseType", null)
+                        .WithMany("CauseTypeParams")
+                        .HasForeignKey("CauseTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Gort.Data.Param", b =>
+                {
+                    b.HasOne("Gort.Data.ParamType", null)
+                        .WithMany("Params")
+                        .HasForeignKey("ParamTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Gort.Data.RandGen", b =>
@@ -622,6 +658,16 @@ namespace Gort.Data.Migrations
             modelBuilder.Entity("Gort.Data.Cause", b =>
                 {
                     b.Navigation("CauseParams");
+                });
+
+            modelBuilder.Entity("Gort.Data.CauseType", b =>
+                {
+                    b.Navigation("CauseTypeParams");
+                });
+
+            modelBuilder.Entity("Gort.Data.ParamType", b =>
+                {
+                    b.Navigation("Params");
                 });
 
             modelBuilder.Entity("Gort.Data.Workspace", b =>

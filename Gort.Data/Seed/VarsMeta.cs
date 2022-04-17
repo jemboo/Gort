@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Gort.Data.Seed
 {
-    internal static partial class CauseSeed
+    public static partial class CauseSeed
     {
         /// *****************************************
         /// ************ CauseTypeGroups *****************
@@ -16,7 +16,7 @@ namespace Gort.Data.Seed
         public static CauseTypeGroup? ctgSorterSet;
         public static CauseTypeGroup? ctgSorterSetRand;
         public static CauseTypeGroup? ctgSorterPerf;
-        public static CauseTypeGroup? ctgSorterGa;
+        public static CauseTypeGroup? ctgSorterShc;
 
 
         /// *****************************************
@@ -73,7 +73,7 @@ namespace Gort.Data.Seed
         public static ParamType? ptSortableSetOrbit_Perm;
         public static ParamType? ptSortableSetOrbit_MaxCount;
 
-        public static ParamType? ptSortableSetStacked_Orders;
+        public static ParamType? ptSortableSetStacked_OrderStack;
 
         public static ParamType? ptSorterData;
 

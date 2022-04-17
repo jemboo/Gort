@@ -17,7 +17,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = (RollCount.create (1 <<< (Order.value ord)))
                 let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 2 -> 
@@ -31,7 +31,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = (RollCount.create (1 <<< (Order.value ord)))
                 let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 8 -> 
@@ -49,7 +49,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = (RollCount.create stripeAs.Length)
                 let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | _ -> "invalid format in makeAllBits" |> Error
@@ -68,7 +68,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = (RollCount.create orbit.Length)
                 let! rollout = norbi |> Rollout.init format rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes norbi)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 2 -> 
@@ -80,7 +80,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = (RollCount.create orbit.Length)
                 let! rollout = norbi |> Rollout.init format rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes norbi)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 8 -> 
@@ -96,7 +96,7 @@ module SortableSet =
                 let! rollLen = (RollLength.create (Order.value ord))
                 let! rollCt = orbit.Length |> CollectionProps.cratesFor 64 |> RollCount.create
                 let! rollout =  sortables |> Rollout.init format rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.guidFromBytes sortables)
+                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | _ -> "invalid format in makeAllBits" |> Error
@@ -116,7 +116,7 @@ module SortableSet =
                     let! rollLen = (RollLength.create (Order.value ord))
                     let! rollCt = RollCount.create stacked.Length
                     let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.guidFromBytes rBytes)
+                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                     return {sortableSet.id = ssId; rollout = rollout }
                 }
             | 2 -> 
@@ -127,7 +127,7 @@ module SortableSet =
                     let! rollLen = (RollLength.create (Order.value ord))
                     let! rollCt = RollCount.create stacked.Length
                     let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.guidFromBytes rBytes)
+                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                     return {sortableSet.id = ssId; rollout = rollout }
                 }
             | 8 -> 
@@ -140,7 +140,7 @@ module SortableSet =
                     let! rollLen = (RollLength.create (Order.value ord))
                     let! rollCt = stacked.Length |> CollectionProps.cratesFor 64 |> RollCount.create
                     let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.guidFromBytes rBytes)
+                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                     return {sortableSet.id = ssId; rollout = rollout }
                 }
             | _ -> "invalid format in makeAllBits" |> Error

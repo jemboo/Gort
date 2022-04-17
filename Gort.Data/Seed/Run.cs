@@ -3,8 +3,13 @@ using System.Text;
 
 namespace Gort.Data.Seed
 {
-    internal static partial class CauseSeed
+    public static partial class CauseSeed
     {
+        public static string GetThat()
+        {
+            return "yark! it's Batman";
+        }
+
         public static void RunIt()
         {
             var ctxt = new GortContext();
@@ -13,8 +18,8 @@ namespace Gort.Data.Seed
             //GetRndgen(ctxt);
             //AddCauseRndGenSet(ctxt);
 
-            AddAllCauseDescr(ctxt);
-            AddWorkspace1(ctxt);
+            //AddAllCauseDescr(ctxt);
+            //AddWorkspace1(ctxt);
             //AddCauseSortableSetAllForOrderA(ctxt);
 
             //GetWorkspace1(ctxt);
@@ -28,6 +33,13 @@ namespace Gort.Data.Seed
             //context.Fabrics.Attach(product.Fabric);
             //context.Products.Add(product);
             ctxt.SaveChanges();
+        }
+
+        public static void AddParamTables(IGortContext ctxt)
+        {
+            AddParamTypes(ctxt);
+            AddParams(ctxt);
+
         }
 
         public static void AddAllCauseDescr(IGortContext ctxt)

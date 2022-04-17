@@ -37,9 +37,9 @@ namespace Gort.Data
         public Guid CauseParamId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
-        public Guid ParamTypeId { get; set; }
-        public virtual ParamType ParamType { get; set; }
-        public byte[] Value { get; set; }
+        public Guid CauseTypeParamId { get; set; }
+        public virtual CauseParamType CauseTypeParam { get; set; }
+        public Param Param { get; set; }
     }
 
     public class CauseType
@@ -47,34 +47,57 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid CauseTypeId { get; set; }
-        public string Name { get; set; }
+        public CauseTypeName Name { get; set; }
         public Guid CauseTypeGroupId { get; set; }
-        public ICollection<ParamType> ParamTypes { get; set; } =
-                new ObservableCollection<ParamType>();
+        public ICollection<CauseParamType> CauseTypeParams { get; set; } =
+                new ObservableCollection<CauseParamType>();
         public virtual CauseTypeGroup CauseTypeGroup { get; set; }
     }
 
-public class CauseTypeGroup
+
+    public class CauseTypeGroup
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid CauseTypeGroupId { get; set; }
-        public string Name { get; set; }
+        public CauseTypeGroupName Name { get; set; }
         public Guid? ParentId { get; set; }
         public virtual CauseTypeGroup? Parent { get; set; }
     }
 
+
+    public class CauseParamType
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid CauseTypeParamId { get; set; }
+        public Guid CauseTypeId { get; set; }
+        public CauseParamTypeName Name { get; set; }
+        public Guid ParamTypeId { get; set; }
+    }
 
     public class ParamType
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid ParamTypeId { get; set; } 
-        public string Name { get; set; } 
-        public ICollection<CauseType> CauseTypes { get; set; } =
-                new ObservableCollection<CauseType>();
+        public ParamTypeName Name { get; set; } 
+        public ICollection<Param> Params { get; set; } =
+                new ObservableCollection<Param>();
+
         public DataType DataType { get; set; }
     }
+
+    public class Param
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid ParamId { get; set; }
+        public Guid ParamTypeId { get; set; }
+        public byte[] Value { get; set; }
+    }
+
+
 
     //public class RndGen
     //{

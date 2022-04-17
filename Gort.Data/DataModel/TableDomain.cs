@@ -66,6 +66,20 @@ namespace Gort.Data
 
     }
 
+    public class SwitchList
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid SwitchListId { get; set; }
+        public Guid StructId { get; set; }
+        public Guid CauseId { get; set; }
+        public string CausePath { get; set; }
+        public virtual Cause Cause { get; set; }
+        public string Description { get; set; }
+        public int Order { get; set; }
+        public byte[] Data { get; set; }
+    }
+
     public class SorterPerf
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -115,6 +129,14 @@ namespace Gort.Data
         public byte[] Data { get; set; }
     }
 
-
+    public class SorterMutation
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid SorterMutationId { get; set; }
+        public double MutationRate { get; set; }
+        public MutationType MutationType { get; set; }
+        public byte[] Data { get; set; }
+    }
 
 }

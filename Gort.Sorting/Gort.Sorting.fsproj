@@ -12,6 +12,7 @@
     <Compile Include="SwitchGen.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />
+    <Compile Include="SorterGen.fs" />
     <Compile Include="SortableSet.fs" />
     <Compile Include="SortersFromData.fs" />
   </ItemGroup>

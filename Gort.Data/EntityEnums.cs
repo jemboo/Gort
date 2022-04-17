@@ -11,10 +11,10 @@
 
     public enum DataType
     {
-        Int,
+        Int32,
         IntArray,
-        Float,
-        FloatArray,
+        Double,
+        DoubleArray,
         String,
         StringArray,
         Guid,
@@ -26,6 +26,16 @@
     {
         Lcg,
         Clr
+    }
+
+    public enum MutationType
+    {
+        Switch,
+        BoundedSwitch,
+        Stage,
+        BoundedStage,
+        StageRfl,
+        BoundedStageRfl
     }
 
     public enum SorterSaveMode
@@ -56,6 +66,112 @@
         u16,
         u32,
         s32
+    }
+
+    public enum CauseParamTypeName
+    {
+        WorkspaceId,
+        RngSeed,
+        RngType,
+        RndGenId,
+        RndGenCount,
+        Order,
+        SortableFormat,
+        TableName,
+        RecordId,
+        RecordPath,
+        SortableCount,
+        SortableSetOrbitPerm,
+        SortableSetOrbitMaxCount,
+        SortableSetStackedOrders,
+        SwitchCount,
+        SwitchSequenceStartPos,
+        SwitchSequenceLength,
+        StageCount,
+        SorterCount,
+        StageBuddyCount,
+        SorterId,
+        SortableSetId,
+        SorterSetName,
+        SorterSetId,
+        SorterSaveMode,
+        Generation,
+        MutationRangeStartPos,
+        MutationRangeLength
+    }
+
+    public enum ParamTypeName
+    {
+        WorkspaceId,
+        RngSeed,
+        RngType,
+        RndGenId,
+        RndGenCount,
+        Order,
+        OrderStack,
+        SortableFormat,
+        TableName,
+        RecordId,
+        RecordPath,
+        SortableCount,
+        SortableSetOrbitPerm,
+        SortableSetOrbitMaxCount,
+        SwitchOrStage,
+        SorterPosition,
+        SorterExtent,
+        StageCount,
+        SorterCount,
+        StageBuddyCount,
+        SorterId,
+        SortableSetId,
+        SorterSetName,
+        SorterSetId,
+        SorterSaveMode,
+        Generation,
+        SorterMutationId,
+        MutationRate,
+        Temperature
+    }
+
+    public enum CauseTypeGroupName
+    {
+        Root,
+        RandGen,
+        Sortable,
+        SortableSetDef,
+        SortableSetRnd,
+        Sorter,
+        SorterSetDef,
+        SorterSetRnd,
+        SwitchList,
+        SorterPerf,
+        SorterShc
+    }
+
+    public enum CauseTypeName
+    {
+        Rng,
+        RngSet,
+        SorterMutation,
+        SortableImport,
+        SortableSetImport,
+        SortableSetRand,
+        SortableSetAllForOrder,
+        SortableSetOrbit,
+        SortableSetStacked,
+        SorterImport,
+        SorterGroupName,
+        SorterSetImport,
+        SorterSetRandBySwitch,
+        SorterSetRandByStage,
+        SorterSetRandByRflStage,
+        SorterSetRandByRflStageBuddies,
+        SorterSetRandByMutation,
+        SwitchListImport,
+        SorterPerf,
+        SorterSetPerfBins,
+        SorterShcImport,
+        SorterShc
     }
 
 }

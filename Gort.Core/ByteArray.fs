@@ -7,7 +7,7 @@ open Microsoft.FSharp.Core
 module ByteArray =
 
     /// ***********************************************************
-    /// *************** int< ^a >[] <->  int< ^a >[]  *************************
+    /// *************** int< ^a >[] <->  int< ^a >[]  *************
     /// ***********************************************************
 
     let copyIntArray (src_offset:int) (src:int[]) (dest_offset:int) (dest:int[]) (src_Ct:int) =
@@ -274,7 +274,7 @@ module ByteArray =
 
 
 //*************************************************************
-//********  order dependent byte array conversions  *********
+//********  order dependent byte array conversions  ***********
 //*************************************************************
 
     let fromUint8<'T> (ord:order) 
@@ -372,17 +372,17 @@ module ByteArray =
 
 
 
-    /// ***********************************************************
+    /// ******************************************************
     /// ******** order list <-> byte arrays ******************
-    /// ***********************************************************
+    /// ******************************************************
 
-    let bytesToDegree (data:byte[]) =
+    let bytesToOrder (data:byte[]) =
         result {
             let! v = getUint16FromBytes 0 data
             return! v |> int |> Order.create
         }
 
-    let bytesToDegreeArray (data:byte[]) =
+    let bytesToOrderArray (data:byte[]) =
         result {
             if data.Length % 2 <> 0 then
                 return!   "incorrect byte format for orderArrayFromBytes" |> Error

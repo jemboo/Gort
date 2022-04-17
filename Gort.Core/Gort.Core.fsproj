@@ -13,8 +13,8 @@
     <Compile Include="CollectionProps.fs" />
     <Compile Include="CollectionOps.fs" />
     <Compile Include="ByteUtils.fs" />
-    <Compile Include="ByteArray.fs" />
     <Compile Include="GuidUtils.fs" />
+    <Compile Include="ByteArray.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="RndGen.fs" />
     <Compile Include="IntSet.fs" />

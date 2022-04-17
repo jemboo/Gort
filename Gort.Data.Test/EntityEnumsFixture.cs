@@ -17,7 +17,8 @@ namespace Gort.Data.Test
             //var dgs = new int[] { dgA, dgB, dgC };
             //var ssStack = SortableSetGen.makeStack(dgs);
 
-            var y = 6;
+            var y = ParamTypeName.Order.ToString();
+
         }
     }
 }

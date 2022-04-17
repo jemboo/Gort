@@ -8,8 +8,37 @@ namespace Gort.Data
 {
     public static class MetaDataUtils
     {
+        public static byte[] ToBytes(DataType dataType, object val)
+        {
+            switch (dataType)
+            {
+                case DataType.Int32:
+                    return BitConverter.GetBytes((int)val);
+                case DataType.IntArray:
+                    return BitConverter.GetBytes((int)val);
+                case DataType.Double:
+                    return BitConverter.GetBytes((float)val);
+                case DataType.DoubleArray:
+                    return BitConverter.GetBytes((int)val);
+                case DataType.String:
+                    return Encoding.ASCII.GetBytes((string)val);
+                case DataType.StringArray:
+                    var fs = String.Join(Environment.NewLine, (string[])val);
+                    return Encoding.ASCII.GetBytes(fs);
+                case DataType.Guid:
+                    return ((Guid)val).ToByteArray();
+                case DataType.GuidArray:
+                    var qua = ((Guid[])val).Select(gu => gu.ToByteArray());
+                    return BitConverter.GetBytes((int)val);
+                case DataType.ByteArray:
+                    return (byte[])val;
+                default:
+                    break;
+            }
+            return new byte[0];
+        }
 
-        public static IEnumerable<Cause> GetAllCausesForWorkspace(string workspaceName, GortContext? gortContext = null)
+        public static IEnumerable<Cause> GetAllCausesForWorkspace(string workspaceName, IGortContext? gortContext = null)
         {
             var ctxt = gortContext ?? new GortContext();
             var ws = ctxt.Workspace.Where(c => c.Name == workspaceName).FirstOrDefault();
@@ -20,7 +49,7 @@ namespace Gort.Data
             return ctxt.Cause.Where(c => c.Workspace == ws);
         }
 
-        public static Cause GetCauseById(Guid causeId, GortContext? gortContext = null)
+        public static Cause GetCauseById(Guid causeId, IGortContext? gortContext = null)
         {
             try
             {
@@ -33,7 +62,7 @@ namespace Gort.Data
             }
         }
 
-        public static CauseType GetCauseType(this Cause cause, GortContext? gortContext = null)
+        public static CauseType GetCauseType(this Cause cause, IGortContext? gortContext = null)
         {
             try
             {
@@ -46,7 +75,7 @@ namespace Gort.Data
             }
         }
 
-        public static CauseTypeGroup GetCauseTypeGroup(this CauseType ct, GortContext? gortContext = null)
+        public static CauseTypeGroup GetCauseTypeGroup(this CauseType ct, IGortContext? gortContext = null)
         {
             try
             {
@@ -59,12 +88,12 @@ namespace Gort.Data
             }
         }
 
-        public static CauseTypeGroup? GetCauseTypeGroupParent(this CauseTypeGroup ctGroup, GortContext? gortContext = null)
+        public static CauseTypeGroup GetCauseTypeGroupParent(this CauseTypeGroup ctGroup, IGortContext? gortContext = null)
         {
             try
             {
                 var ctxt = gortContext ?? new GortContext();
-                return ctxt.CauseTypeGroup.Where(ct => ct.CauseTypeGroupId == ctGroup.ParentId).FirstOrDefault();
+                return ctxt.CauseTypeGroup.Where(ct => ct.CauseTypeGroupId == ctGroup.ParentId).First();
             }
             catch (Exception ex)
             {
@@ -72,7 +101,20 @@ namespace Gort.Data
             }
         }
 
-        public static IEnumerable<CauseTypeGroup> GetCauseTypeGroupAncestors(this CauseType ct, GortContext? gortContext = null)
+        public static ParamType GetParamType(this ParamTypeName name, IGortContext? gortContext = null)
+        {
+            try
+            {
+                var ctxt = gortContext ?? new GortContext();
+                return ctxt.ParamType.Where(pt => pt.Name == name).First();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"ParamType with name {name} not found", ex);
+            }
+        }
+
+        public static IEnumerable<CauseTypeGroup> GetCauseTypeGroupAncestors(this CauseType ct, IGortContext? gortContext = null)
         {
             var ctxt = gortContext ?? new GortContext();
             Guid? ctgId = ct.CauseTypeGroupId;
@@ -84,7 +126,7 @@ namespace Gort.Data
             }
         }
 
-        public static Tuple<CauseType, CauseTypeGroup[]> GetBuildInfo(this Cause cause, GortContext? gortContext = null)
+        public static Tuple<CauseType, CauseTypeGroup[]> GetBuildInfo(this Cause cause, IGortContext? gortContext = null)
         {
             try
             {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Gort.Data.Migrations
 {
-    public partial class gort : Migration
+    public partial class Gort : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,8 +17,7 @@ namespace Gort.Data.Migrations
                 columns: table => new
                 {
                     CauseTypeGroupId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<int>(type: "int", nullable: false),
                     ParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
                 },
                 constraints: table =>
@@ -37,8 +36,7 @@ namespace Gort.Data.Migrations
                 columns: table => new
                 {
                     ParamTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<int>(type: "int", nullable: false),
                     DataType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -66,8 +64,7 @@ namespace Gort.Data.Migrations
                 columns: table => new
                 {
                     CauseTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<int>(type: "int", nullable: false),
                     CauseTypeGroupId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
@@ -78,6 +75,26 @@ namespace Gort.Data.Migrations
                         column: x => x.CauseTypeGroupId,
                         principalTable: "CauseTypeGroup",
                         principalColumn: "CauseTypeGroupId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Param",
+                columns: table => new
+                {
+                    ParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ParamTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Value = table.Column<byte[]>(type: "longblob", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Param", x => x.ParamId);
+                    table.ForeignKey(
+                        name: "FK_Param_ParamType_ParamTypeId",
+                        column: x => x.ParamTypeId,
+                        principalTable: "ParamType",
+                        principalColumn: "ParamTypeId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -113,53 +130,22 @@ namespace Gort.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CauseTypeParamType",
+                name: "CauseTypeParam",
                 columns: table => new
                 {
-                    CauseTypesCauseTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ParamTypesParamTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    CauseTypeParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CauseTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<int>(type: "int", nullable: false),
+                    ParamTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CauseTypeParamType", x => new { x.CauseTypesCauseTypeId, x.ParamTypesParamTypeId });
+                    table.PrimaryKey("PK_CauseTypeParam", x => x.CauseTypeParamId);
                     table.ForeignKey(
-                        name: "FK_CauseTypeParamType_CauseType_CauseTypesCauseTypeId",
-                        column: x => x.CauseTypesCauseTypeId,
+                        name: "FK_CauseTypeParam_CauseType_CauseTypeId",
+                        column: x => x.CauseTypeId,
                         principalTable: "CauseType",
                         principalColumn: "CauseTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CauseTypeParamType_ParamType_ParamTypesParamTypeId",
-                        column: x => x.ParamTypesParamTypeId,
-                        principalTable: "ParamType",
-                        principalColumn: "ParamTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CauseParam",
-                columns: table => new
-                {
-                    CauseParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ParamTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Value = table.Column<byte[]>(type: "longblob", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CauseParam", x => x.CauseParamId);
-                    table.ForeignKey(
-                        name: "FK_CauseParam_Cause_CauseId",
-                        column: x => x.CauseId,
-                        principalTable: "Cause",
-                        principalColumn: "CauseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CauseParam_ParamType_ParamTypeId",
-                        column: x => x.ParamTypeId,
-                        principalTable: "ParamType",
-                        principalColumn: "ParamTypeId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -300,6 +286,39 @@ namespace Gort.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "CauseParam",
+                columns: table => new
+                {
+                    CauseParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CauseId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CauseTypeParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ParamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CauseParam", x => x.CauseParamId);
+                    table.ForeignKey(
+                        name: "FK_CauseParam_Cause_CauseId",
+                        column: x => x.CauseId,
+                        principalTable: "Cause",
+                        principalColumn: "CauseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CauseParam_CauseTypeParam_CauseTypeParamId",
+                        column: x => x.CauseTypeParamId,
+                        principalTable: "CauseTypeParam",
+                        principalColumn: "CauseTypeParamId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CauseParam_Param_ParamId",
+                        column: x => x.ParamId,
+                        principalTable: "Param",
+                        principalColumn: "ParamId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "SorterPerf",
                 columns: table => new
                 {
@@ -399,9 +418,14 @@ namespace Gort.Data.Migrations
                 column: "CauseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseParam_ParamTypeId",
+                name: "IX_CauseParam_CauseTypeParamId",
                 table: "CauseParam",
-                column: "ParamTypeId");
+                column: "CauseTypeParamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CauseParam_ParamId",
+                table: "CauseParam",
+                column: "ParamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CauseType_CauseTypeGroupId",
@@ -414,9 +438,14 @@ namespace Gort.Data.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CauseTypeParamType_ParamTypesParamTypeId",
-                table: "CauseTypeParamType",
-                column: "ParamTypesParamTypeId");
+                name: "IX_CauseTypeParam_CauseTypeId",
+                table: "CauseTypeParam",
+                column: "CauseTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Param_ParamTypeId",
+                table: "Param",
+                column: "ParamTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RandGen_CauseId",
@@ -486,9 +515,6 @@ namespace Gort.Data.Migrations
                 name: "CauseParam");
 
             migrationBuilder.DropTable(
-                name: "CauseTypeParamType");
-
-            migrationBuilder.DropTable(
                 name: "RandGen");
 
             migrationBuilder.DropTable(
@@ -501,7 +527,10 @@ namespace Gort.Data.Migrations
                 name: "SorterSetPerf");
 
             migrationBuilder.DropTable(
-                name: "ParamType");
+                name: "CauseTypeParam");
+
+            migrationBuilder.DropTable(
+                name: "Param");
 
             migrationBuilder.DropTable(
                 name: "Sorter");
@@ -511,6 +540,9 @@ namespace Gort.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "SorterSet");
+
+            migrationBuilder.DropTable(
+                name: "ParamType");
 
             migrationBuilder.DropTable(
                 name: "Cause");
