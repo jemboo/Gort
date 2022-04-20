@@ -72,7 +72,7 @@ namespace Gort.Data
         [Key]
         public Guid CauseTypeParamId { get; set; }
         public Guid CauseTypeId { get; set; }
-        public CauseParamTypeName Name { get; set; }
+        public string Name { get; set; }
         public Guid ParamTypeId { get; set; }
     }
 

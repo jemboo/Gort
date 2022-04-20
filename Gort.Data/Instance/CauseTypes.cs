@@ -23,8 +23,7 @@
             SorterSetRandByMutation = MakeCauseType(CauseTypeName.SorterSetRandByMutation, CauseTypeGroups.SorterSetRnd);
             SwitchListImport = MakeCauseType(CauseTypeName.SwitchListImport, CauseTypeGroups.SwitchList);
             SorterPerf = MakeCauseType(CauseTypeName.SorterPerf, CauseTypeGroups.SorterPerf);
-            SorterSetPerfBins = MakeCauseType(CauseTypeName.SorterSetPerfBins, CauseTypeGroups.SorterPerf);
-            SorterShcImport = MakeCauseType(CauseTypeName.SorterShcImport, CauseTypeGroups.SorterShc);
+            SorterSetPerf = MakeCauseType(CauseTypeName.SorterSetPerf, CauseTypeGroups.SorterPerf);
             SorterShc = MakeCauseType(CauseTypeName.SorterShc, CauseTypeGroups.SorterShc);
         }
 
@@ -47,8 +46,7 @@
         public static CauseType SorterSetRandByMutation { get; private set; }
         public static CauseType SwitchListImport { get; private set; }
         public static CauseType SorterPerf { get; private set; }
-        public static CauseType SorterSetPerfBins { get; private set; }
-        public static CauseType SorterShcImport { get; private set; }
+        public static CauseType SorterSetPerf { get; private set; }
         public static CauseType SorterShc { get; private set; }
         static CauseType MakeCauseType(CauseTypeName ptn, CauseTypeGroup causeTypeGroup)
         {

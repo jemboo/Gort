@@ -44,10 +44,10 @@ namespace Gort.Data.Seed
             ctSortableSetOrbit = new CauseType() { Name = CauseTypeName.SortableSetOrbit, CauseTypeGroup = ctgSortableSet }.AddId();
             ctSortableSetStacked = new CauseType() { Name = CauseTypeName.SortableSetStacked, CauseTypeGroup = ctgSortableSet }.AddId();
 
-            ctSorter = new CauseType() { Name = CauseTypeName.Sorter, CauseTypeGroup = ctgSorter }.AddId();
+            //ctSorter = new CauseType() { Name = CauseTypeName.Sorter, CauseTypeGroup = ctgSorter }.AddId();
             ctSorterImport = new CauseType() { Name = CauseTypeName.SorterImport, CauseTypeGroup = ctgSorter }.AddId();
 
-            ctSorterSetRef = new CauseType() { Name = CauseTypeName.SorterSet, CauseTypeGroup = ctgSorterSet }.AddId();
+            //ctSorterSetRef = new CauseType() { Name = CauseTypeName.SorterSet, CauseTypeGroup = ctgSorterSet }.AddId();
             ctSorterSetImport = new CauseType() { Name = CauseTypeName.SorterSetImport, CauseTypeGroup = ctgSorterSet }.AddId();
 
             ctSorterSetRndBySwitch = new CauseType() { Name = CauseTypeName.SorterSetRandBySwitch, CauseTypeGroup = ctgSorterSetRand }.AddId();
@@ -95,8 +95,8 @@ namespace Gort.Data.Seed
         {
             AddParamType(gortContext, ParamTypeName.RngSeed, DataType.Int32);
             AddParamType(gortContext, ParamTypeName.RngType, DataType.Int32);
-            AddParamType(gortContext, ParamTypeName.RndGenId, DataType.Guid);
-            AddParamType(gortContext, ParamTypeName.RndGenCount, DataType.Int32);
+            AddParamType(gortContext, ParamTypeName.RngId, DataType.Guid);
+            AddParamType(gortContext, ParamTypeName.RngCount, DataType.Int32);
             AddParamType(gortContext, ParamTypeName.Order, DataType.Int32);
             AddParamType(gortContext, ParamTypeName.SortableFormat, DataType.Int32);
             //AddParamType(gortContext, ParamTypeName.SortableData, DataType.ByteArray);
@@ -107,7 +107,7 @@ namespace Gort.Data.Seed
             AddParamType(gortContext, ParamTypeName.SortableCount, DataType.Int32);
             AddParamType(gortContext, ParamTypeName.SortableSetOrbitPerm, DataType.IntArray);
             AddParamType(gortContext, ParamTypeName.SortableSetOrbitMaxCount, DataType.Int32);
-            AddParamType(gortContext, ParamTypeName.SortableSetStacked, DataType.IntArray);
+            AddParamType(gortContext, ParamTypeName.OrderStack, DataType.IntArray);
             //AddParamType(gortContext, ParamTypeName.SorterData, DataType.ByteArray);
             AddParamType(gortContext, ParamTypeName.SorterExtent, DataType.Int32);
             AddParamType(gortContext, ParamTypeName.StageCount, DataType.Int32);

@@ -87,8 +87,8 @@ namespace Gort.Data.Seed
         {
             ptRndGen_Seed = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RngSeed)).First();
             ptRndGen_Type = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RngType)).First();
-            ptRndGenId = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RndGenId)).First();
-            ptRndGenCount = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RndGenCount)).First();
+            ptRndGenId = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RngId)).First();
+            ptRndGenCount = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.RngCount)).First();
             ptOrder = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.Order)).First();
             ptSortableFormat = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.SortableFormat)).First();
             //ptSortableData = gortContext.ParamType.Where(g => (g.Name == ParamTypeName.SortableData)).First();
