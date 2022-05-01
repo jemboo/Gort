@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.FSharp.Core;
+using Gort.Data.DataModel;
 
 namespace Gort.Data.Test
 {

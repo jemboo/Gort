@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Gort.Data
+namespace Gort.Data.DataModel
 {
     public class GortContext : DbContext, IGortContext
     {
@@ -33,17 +28,17 @@ namespace Gort.Data
                     .Property(c => c.DataType)
                     .HasConversion<int>();
 
-            modelBuilder.Entity<CauseTypeGroup>()
-                    .Property(c => c.Name)
-                    .HasConversion<int>();
+            //modelBuilder.Entity<CauseTypeGroup>()
+            //        .Property(c => c.Name)
+            //        .HasConversion<int>();
 
-            modelBuilder.Entity<CauseType>()
-                    .Property(c => c.Name)
-                    .HasConversion<int>();
+            //modelBuilder.Entity<CauseType>()
+            //        .Property(c => c.Name)
+            //        .HasConversion<int>();
 
-            modelBuilder.Entity<ParamType>()
-                    .Property(c => c.Name)
-                    .HasConversion<int>();
+            //modelBuilder.Entity<ParamType>()
+            //        .Property(c => c.Name)
+            //        .HasConversion<int>();
 
             modelBuilder.Entity<RandGen>()
                     .Property(c => c.RndGenType)
@@ -87,6 +82,7 @@ namespace Gort.Data
         public DbSet<CauseType> CauseType { get; set; }
         public DbSet<Cause> Cause { get; set; }
         public DbSet<CauseParam> CauseParam { get; set; }
+        public DbSet<CauseParamType> CauseParamType { get; set; }
         public DbSet<Param> Param { get; set; }
         public DbSet<ParamType> ParamType { get; set; }
         public DbSet<RandGen> RandGen { get; set; }

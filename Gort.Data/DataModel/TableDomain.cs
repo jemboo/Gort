@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.FSharp.Core;
 
-namespace Gort.Data
+namespace Gort.Data.DataModel
 {
     public class RandGen
     {
@@ -14,7 +14,6 @@ namespace Gort.Data
         public string CausePath { get; set; }
         public Guid StructId { get; set; }
         public virtual Cause Cause { get; set; }
-        public string Description { get; set; }
         public int Seed { get; set; }
         public RndGenType RndGenType { get; set; }
     }

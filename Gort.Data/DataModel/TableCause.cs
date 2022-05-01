@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Gort.Data
+namespace Gort.Data.DataModel
 {
     public class Workspace
     {
@@ -37,9 +37,10 @@ namespace Gort.Data
         public Guid CauseParamId { get; set; }
         public Guid CauseId { get; set; }
         public virtual Cause Cause { get; set; }
-        public Guid CauseTypeParamId { get; set; }
-        public virtual CauseParamType CauseTypeParam { get; set; }
-        public Param Param { get; set; }
+        public Guid CauseParamTypeId { get; set; }
+        public virtual CauseParamType CauseParamType { get; set; }
+        public Guid ParamId { get; set; }
+        public virtual Param Param { get; set; }
     }
 
     public class CauseType
@@ -47,9 +48,9 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid CauseTypeId { get; set; }
-        public CauseTypeName Name { get; set; }
+        public string Name { get; set; }
         public Guid CauseTypeGroupId { get; set; }
-        public ICollection<CauseParamType> CauseTypeParams { get; set; } =
+        public ICollection<CauseParamType> CauseParamTypes { get; set; } =
                 new ObservableCollection<CauseParamType>();
         public virtual CauseTypeGroup CauseTypeGroup { get; set; }
     }
@@ -60,7 +61,7 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid CauseTypeGroupId { get; set; }
-        public CauseTypeGroupName Name { get; set; }
+        public string Name { get; set; }
         public Guid? ParentId { get; set; }
         public virtual CauseTypeGroup? Parent { get; set; }
     }
@@ -70,10 +71,11 @@ namespace Gort.Data
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public Guid CauseTypeParamId { get; set; }
+        public Guid CauseParamTypeId { get; set; }
         public Guid CauseTypeId { get; set; }
         public string Name { get; set; }
         public Guid ParamTypeId { get; set; }
+        public virtual ParamType ParamType { get; set; }
     }
 
     public class ParamType
@@ -81,10 +83,9 @@ namespace Gort.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid ParamTypeId { get; set; } 
-        public ParamTypeName Name { get; set; } 
+        public string Name { get; set; } 
         public ICollection<Param> Params { get; set; } =
                 new ObservableCollection<Param>();
-
         public DataType DataType { get; set; }
     }
 
@@ -94,6 +95,7 @@ namespace Gort.Data
         [Key]
         public Guid ParamId { get; set; }
         public Guid ParamTypeId { get; set; }
+        public virtual ParamType ParamType { get; set; }
         public byte[] Value { get; set; }
     }
 

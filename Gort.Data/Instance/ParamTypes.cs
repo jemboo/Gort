@@ -1,4 +1,7 @@
-﻿namespace Gort.Data.Instance
+﻿using Gort.Data.DataModel;
+using Gort.Data.Utils;
+
+namespace Gort.Data.Instance
 {
     public static class ParamTypes
     {
@@ -19,7 +22,6 @@
             SortableSetId = MakeParamType(ParamTypeName.SortableSetId, DataType.Guid);
             SortableSetOrbitMaxCount = MakeParamType(ParamTypeName.SortableSetOrbitMaxCount, DataType.Int32);
             SortableSetOrbitPerm = MakeParamType(ParamTypeName.SortableSetOrbitPerm, DataType.IntArray);
-            SwitchOrStage = MakeParamType(ParamTypeName.SwitchOrStage, DataType.String);
             SorterCount = MakeParamType(ParamTypeName.SorterCount, DataType.Int32);
             SorterExtent = MakeParamType(ParamTypeName.SorterExtent, DataType.Int32);
             SorterId = MakeParamType(ParamTypeName.SorterId, DataType.Guid);
@@ -31,7 +33,7 @@
             StageBuddyCount = MakeParamType(ParamTypeName.StageBuddyCount, DataType.Int32);
             StageCount = MakeParamType(ParamTypeName.StageCount, DataType.Int32);
             SwitchCount = MakeParamType(ParamTypeName.SwitchCount, DataType.Int32);
-            SwitchOrStage = MakeParamType(ParamTypeName.SwitchOrStage, DataType.Int32);
+            SwitchOrStage = MakeParamType(ParamTypeName.SwitchOrStage, DataType.String);
             TableName = MakeParamType(ParamTypeName.TableName, DataType.String);
             Temperature = MakeParamType(ParamTypeName.Temperature, DataType.Double);
             WorkspaceId = MakeParamType(ParamTypeName.WorkspaceId, DataType.Guid);
@@ -70,7 +72,15 @@
 
         static ParamType MakeParamType(ParamTypeName ptn, DataType dt)
         {
-            return new ParamType() { Name = ptn, DataType = dt }.AddId();
+            var pt = new ParamType() { Name = ptn.ToString(), DataType = dt }.AddId();
+            _members.Add(pt);
+            return pt;
+        }
+
+        private static readonly List<ParamType> _members = new List<ParamType>();
+        public static IEnumerable<ParamType> Members
+        {
+            get { return _members; }
         }
     }
 }

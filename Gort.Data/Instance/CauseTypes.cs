@@ -1,4 +1,7 @@
-﻿namespace Gort.Data.Instance
+﻿using Gort.Data.DataModel;
+using Gort.Data.Utils;
+
+namespace Gort.Data.Instance
 {
     public static class CauseTypes
     {
@@ -50,7 +53,15 @@
         public static CauseType SorterShc { get; private set; }
         static CauseType MakeCauseType(CauseTypeName ptn, CauseTypeGroup causeTypeGroup)
         {
-            return new CauseType() { Name = ptn, CauseTypeGroupId = causeTypeGroup.CauseTypeGroupId }.AddId();
+            var ct = new CauseType() { Name = ptn.ToString(), CauseTypeGroupId = causeTypeGroup.CauseTypeGroupId }.AddId();
+            _members.Add(ct);
+            return ct;
+        }
+
+        private static readonly List<CauseType> _members = new List<CauseType>();
+        public static IEnumerable<CauseType> Members
+        {
+            get { return _members; }
         }
     }
 }

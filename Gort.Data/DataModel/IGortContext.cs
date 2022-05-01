@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Gort.Data
+namespace Gort.Data.DataModel
 {
     public interface IGortContext
     {
         DbSet<Cause> Cause { get; set; }
         DbSet<CauseParam> CauseParam { get; set; }
+        DbSet<CauseParamType> CauseParamType { get; set; }
         DbSet<CauseType> CauseType { get; set; }
         DbSet<CauseTypeGroup> CauseTypeGroup { get; set; }
         DbSet<ParamType> ParamType { get; set; }

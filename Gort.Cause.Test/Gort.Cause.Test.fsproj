@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="gcOpsFixture.fs" />
+    <Compile Include="ctrRootFixture.fs" />
+    <Compile Include="CauseOpsFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -17,6 +19,13 @@
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
     <PackageReference Include="coverlet.collector" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gort.Cause\Gort.Cause.fsproj" />
+    <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
+    <ProjectReference Include="..\Gort.Data\Gort.Data.csproj" />
+    <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
   </ItemGroup>
 
 </Project>

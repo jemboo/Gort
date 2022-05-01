@@ -3,11 +3,22 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="cSortableSet.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="miscConv.fs" />
+    <Compile Include="gcOps.fs" />
+    <Compile Include="byteConv.fs" />
+    <Compile Include="ctrSortable.fs" />
+    <Compile Include="ctrSorter.fs" />
+    <Compile Include="ctrSwitchList.fs" />
+    <Compile Include="ctrSorterPerf.fs" />
+    <Compile Include="ctrSorterShc.fs" />
+    <Compile Include="ctrUtils.fs" />
+    <Compile Include="ctrRoot.fs" />
+    <Compile Include="CauseOps.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>

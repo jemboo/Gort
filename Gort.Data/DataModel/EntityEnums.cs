@@ -1,4 +1,4 @@
-﻿namespace Gort.Data
+﻿namespace Gort.Data.DataModel
 {
 
     public enum CauseStatus
@@ -139,7 +139,7 @@
     public enum CauseTypeGroupName
     {
         Root,
-        RandGen,
+        Utils,
         Sortable,
         SortableSetDef,
         SortableSetRnd,

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Gort.Data.DataModel;
+using Gort.Data.Utils;
 
 namespace Gort.Data.Instance
 {
@@ -11,10 +8,10 @@ namespace Gort.Data.Instance
         static CauseTypeGroups()
         {
             Root = MakeCauseTypeGroup(CauseTypeGroupName.Root, null);
-            Utils = MakeCauseTypeGroup(CauseTypeGroupName.RandGen, Root.CauseTypeGroupId);
+            Utils = MakeCauseTypeGroup(CauseTypeGroupName.Utils, Root.CauseTypeGroupId);
             Sortable = MakeCauseTypeGroup(CauseTypeGroupName.Sortable, Root.CauseTypeGroupId);
             SortableSetDef = MakeCauseTypeGroup(CauseTypeGroupName.SortableSetDef, Sortable.CauseTypeGroupId);
-            SortableSetRnd = MakeCauseTypeGroup(CauseTypeGroupName.SortableSetDef, Sortable.CauseTypeGroupId);
+            SortableSetRnd = MakeCauseTypeGroup(CauseTypeGroupName.SortableSetRnd, Sortable.CauseTypeGroupId);
             Sorter = MakeCauseTypeGroup(CauseTypeGroupName.Sorter, Root.CauseTypeGroupId);
             SorterSetDef = MakeCauseTypeGroup(CauseTypeGroupName.SorterSetDef, Sorter.CauseTypeGroupId);
             SorterSetRnd = MakeCauseTypeGroup(CauseTypeGroupName.SorterSetRnd, Sorter.CauseTypeGroupId);
@@ -37,7 +34,15 @@ namespace Gort.Data.Instance
 
         static CauseTypeGroup MakeCauseTypeGroup(CauseTypeGroupName ptn, Guid? parentId)
         {
-            return new CauseTypeGroup() { Name = ptn, ParentId = parentId }.AddId();
+            var ctg = new CauseTypeGroup() { Name = ptn.ToString(), ParentId = parentId }.AddId();
+            _members.Add(ctg);
+            return ctg;
+        }
+
+        private static readonly List<CauseTypeGroup> _members = new List<CauseTypeGroup>();
+        public static IEnumerable<CauseTypeGroup> Members
+        {
+            get { return _members; }
         }
     }
 }

@@ -1,9 +1,16 @@
-﻿using System.Text;
+﻿using Gort.Data.DataModel;
+using System.Text;
 
-namespace Gort.Data
+namespace Gort.Data.Utils
 {
-    public static class CtorUtils
+    public static class ParamU
     {
+        public static Param MakeParam(ParamType paramType, object pVal)
+        {
+            var dv = paramType.DataType.ToBytes(pVal);
+            return new Param() { ParamTypeId = paramType.ParamTypeId, Value = dv }.AddId();
+        }
+
         public static Param MakeIntParam(Guid paramTypeId, int value)
         {
             return new Param() { ParamTypeId = paramTypeId, Value = BitConverter.GetBytes(value) }.AddId();

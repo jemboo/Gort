@@ -2,16 +2,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.FSharp.Core;
 using System.Linq;
 using System;
+using Gort.Data.Utils;
 
 namespace Gort.Data.Test
 {
     [TestClass]
     public class DataRepoFixture
     {
+        Guid gu = Guid.Parse("fd100b52-f74e-8930-3cef-bc1f657a82a5");
+
         [TestMethod]
         public void GetCauseById()
         {
-            var gu = Guid.Parse("08da05ac-e312-4969-8f78-e9e18ae1c20c");
             var cas = MetaDataUtils.GetCauseById(gu);
             Assert.IsNotNull(cas);
         }
@@ -19,28 +21,22 @@ namespace Gort.Data.Test
         [TestMethod]
         public void GetAllCausesForWorkspace()
         {
-            var noWs = MetaDataUtils.GetAllCausesForWorkspace("notAWs").ToArray();
-            Assert.AreEqual (noWs.Length, 0);
-            var realWs = MetaDataUtils.GetAllCausesForWorkspace("workspace1").ToArray();
+            var realWs = MetaDataUtils.GetAllCausesForWorkspace("WorkspaceRand");
             Assert.IsTrue (realWs.Length > 0);
         }
 
         [TestMethod]
-        public void GetCauseTypeGroupAncestors()
+        public void GetCauseTypeGroupAncestry()
         {
-            var gu = Guid.Parse("08da05ac-e312-4969-8f78-e9e18ae1c20c");
-            var ct = MetaDataUtils.GetCauseById(gu).GetCauseType();
-            var realWs = MetaDataUtils.GetCauseTypeGroupAncestors(ct).ToArray();
-            Assert.IsTrue(true);
+            var cause = MetaDataUtils.GetCauseById(gu);
+            var realWs = MetaDataUtils.GetCauseTypeGroupAncestry(cause).ToArray();
+            Assert.IsTrue(realWs.Length > 0);
         }
 
-
         [TestMethod]
-        public void GetBuildInfo()
+        public void Tst()
         {
-            var gu = Guid.Parse("08da05ac-e312-4969-8f78-e9e18ae1c20c");
-            var cause = MetaDataUtils.GetCauseById(gu);
-            var realWs = MetaDataUtils.GetBuildInfo(cause);
+
             Assert.IsTrue(true);
         }
 

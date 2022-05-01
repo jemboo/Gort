@@ -1,4 +1,7 @@
-﻿namespace Gort.Data.Instance
+﻿using Gort.Data.DataModel;
+using Gort.Data.Utils;
+
+namespace Gort.Data.Instance
 {
     public static class CauseParamTypes
     {
@@ -201,7 +204,15 @@
 
         static CauseParamType MakeCauseTypeParam(CauseType causeType, CauseParamTypeName ptn, ParamType paramType)
         {
-            return new CauseParamType() { CauseTypeId = causeType.CauseTypeId, Name = ptn.ToString(), ParamTypeId = paramType.ParamTypeId }.AddId();
+            var ctp = new CauseParamType() { CauseTypeId = causeType.CauseTypeId, Name = ptn.ToString(), ParamTypeId = paramType.ParamTypeId }.AddId();
+            _members.Add(ctp);
+            return ctp;
+        }
+
+        private static readonly List<CauseParamType> _members = new List<CauseParamType>();   
+        public static IEnumerable<CauseParamType> Members
+        {
+            get { return _members; }
         }
     }
 }
