@@ -91,7 +91,7 @@ type TwoCycleFixture () =
             refSyms |> Array.map(fun p ->
                 let tcp = seq { 
                             while true do 
-                                yield RandGen.drawTwoWithoutRep ord iRando }
+                                yield RandVars.drawTwoWithoutRep ord iRando }
                 TwoCycle.mutateByReflPair tcp p)
 
         let mutReflBins = 

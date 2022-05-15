@@ -127,6 +127,26 @@ namespace Gort.Data.Utils
             }
         }
 
+        public static Cause? GetNextCauseForWorkspace(string workspaceName,
+            IGortContext? gortContext = null)
+        {
+            try
+            {
+                var ctxt = gortContext ?? new GortContext();
+                var ws = ctxt.Workspace.SingleOrDefault(c => c.Name == workspaceName);
+                if (ws is null)
+                {
+                    throw new Exception($"Workspace \"{workspaceName}\" not found");
+                }
+                return ctxt.Cause.Where(c => (c.Workspace == ws) && (c.CauseStatus != CauseStatus.Complete))
+                                 .OrderBy(c => c.Index).FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public static Cause GetCauseById(Guid causeId, IGortContext? gortContext = null)
         {
             try

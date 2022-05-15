@@ -11,10 +11,10 @@ type RndGenFixture () =
         let weightFunction (w:float) =
             1.0 / w
         let res0 = testArray 
-                    |> (RandGen.fromWeightedDistribution weightFunction rndy)
+                    |> (RandVars.fromWeightedDistribution weightFunction rndy)
                     |> Seq.take 1000 |> Seq.toArray
         let res = testArray 
-                    |> (RandGen.fromWeightedDistribution weightFunction rndy)
+                    |> (RandVars.fromWeightedDistribution weightFunction rndy)
                     |> Seq.take 1000 |> Seq.toArray
                     |> Array.groupBy(id)
                     |> Array.sortBy(fst)
@@ -28,10 +28,10 @@ type RndGenFixture () =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
         let arraySize = 16
         let cycleCount = 2
-        let block = RandGen.rndTwoCycle rndy arraySize cycleCount
+        let block = RandVars.rndTwoCycle rndy arraySize cycleCount
         Assert.IsTrue (CollectionProps.isTwoCycle block)
         let cycleCount = 8
-        let block2 = RandGen.rndTwoCycle rndy arraySize cycleCount
+        let block2 = RandVars.rndTwoCycle rndy arraySize cycleCount
         Assert.IsTrue (CollectionProps.isTwoCycle block2)
 
 
@@ -41,7 +41,7 @@ type RndGenFixture () =
         let m = 3
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
         let numDraws = 300
-        let res = RandGen.rndNchooseM n m rndy
+        let res = RandVars.rndNchooseM n m rndy
                   |> Seq.take numDraws
                   |> Seq.toArray
                   |> Array.groupBy(id)

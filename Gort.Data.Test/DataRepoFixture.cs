@@ -26,6 +26,13 @@ namespace Gort.Data.Test
         }
 
         [TestMethod]
+        public void GetNextCauseForWorkspace()
+        {
+            var realWs = MetaDataUtils.GetNextCauseForWorkspace("WorkspaceRand");
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod]
         public void GetCauseTypeGroupAncestry()
         {
             var cause = MetaDataUtils.GetCauseById(gu);

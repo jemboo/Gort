@@ -12,7 +12,7 @@ module ctrRoot =
 
     let RunRootChildren (cz:Cause) (pth:string list) (ctxt:Gort.Data.DataModel.IGortContext) =
         match pth with
-        | [] -> "No path in RunCause" |> Error
+        | [] -> "No path in RunRootChildren" |> Error
         | x::[] -> match x with  
             | "Sortable" -> ctrSorter.RunSortable cz ctxt
             | "Utils" -> ctrUtils.RunUtils cz ctxt
@@ -46,7 +46,7 @@ module ctrRoot =
                                | "Root" -> RunRootChildren cz xs ctxt
                                | _ -> "Bad path in RunCause" |> Error
 
-                if (res = 1) then
+                if (res > 0) then
                     cz.CauseStatus <- CauseStatus.Complete
                     ctxt.SaveChanges() |> ignore
                 return res

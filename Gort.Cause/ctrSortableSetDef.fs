@@ -2,16 +2,14 @@
 open System
 open Gort.Data.DataModel
 
-module ctrSortable =
+module ctrSortableSetDef =
 
-
-
-    let RunSortable (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
+    let RunSortableSetDef (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
         match cz.CauseType.Name with
         | "SortableImport" -> 5|>Ok
         | n -> (sprintf "%s not handled in RunSortable" n) |> Error
 
-    let RunSortableChildren (cz:Cause) (pth:string list) (ctxt:Gort.Data.DataModel.IGortContext) =
+    let RunSortableSetDefChildren (cz:Cause) (pth:string list) (ctxt:Gort.Data.DataModel.IGortContext) =
         match pth with
         | [] -> "No path in RunSortableChildren" |> Error
         | x::[] -> match x with  

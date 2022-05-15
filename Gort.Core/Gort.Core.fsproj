@@ -16,7 +16,7 @@
     <Compile Include="GuidUtils.fs" />
     <Compile Include="ByteArray.fs" />
     <Compile Include="Rando.fs" />
-    <Compile Include="RndGen.fs" />
+    <Compile Include="RndVars.fs" />
     <Compile Include="IntSet.fs" />
     <Compile Include="Rollout.fs" />
     <Compile Include="IntSeries.fs" />

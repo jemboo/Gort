@@ -66,7 +66,7 @@ type BitwiseFixture () =
 
         let deg2 = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let bpa2 = Array.init 100 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
+        let bpa2 = Array.init 100 (fun _ -> RandVars.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped deg2 |> Result.ExtractOrThrow
         let bpaBack2 = bsa2 |> ByteUtils.bitStripedToUint64array deg2 bpa2.Length |> Result.ExtractOrThrow
 
@@ -78,7 +78,7 @@ type BitwiseFixture () =
     member this.bitPackedtoBitStriped2D () =
         let deg2 = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let bpa2 = Array.init 1000 (fun _ -> RandGen.rndBitsUint64 deg2 randy)
+        let bpa2 = Array.init 1000 (fun _ -> RandVars.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped2D deg2 |> Result.ExtractOrThrow
         Assert.IsTrue(bsa2.Length > 1)
 

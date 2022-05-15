@@ -64,7 +64,7 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<100 do
-            let bloke = RandGen.randomPermutation randy order
+            let bloke = RandVars.randomPermutation randy order
             let inv = CollectionOps.invertArray bloke (Array.zeroCreate (Order.value order))
                         |> Result.ExtractOrThrow
             let prod = CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
@@ -79,9 +79,9 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RandGen.randomPermutation randy order
-            let core1 = RandGen.randomPermutation randy order
-            let core2 = RandGen.randomPermutation randy order
+            let conjer = RandVars.randomPermutation randy order
+            let core1 = RandVars.randomPermutation randy order
+            let core2 = RandVars.randomPermutation randy order
             let coreProd = CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 
@@ -106,9 +106,9 @@ type CollectionOpsFixture () =
         let randy = Rando.fromRngGen (RngGen.lcgFromNow())
         let mutable i = 0
         while i<10 do
-            let conjer = RandGen.randomPermutation randy order
-            let core1 = RandGen.randomPermutation randy order
-            let core2 = RandGen.randomPermutation randy order
+            let conjer = RandVars.randomPermutation randy order
+            let core1 = RandVars.randomPermutation randy order
+            let core2 = RandVars.randomPermutation randy order
             let coreProd = CollectionOps.arrayProductIntR core1 core2  (Array.zeroCreate core1.Length)
                             |> Result.ExtractOrThrow 
 

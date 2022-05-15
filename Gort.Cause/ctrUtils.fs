@@ -15,14 +15,24 @@ module ctrUtils =
             let! rtv = pramRngType.Param.Value |> byteConv.intFromBytes
             let! rngT = miscConv.RndGenTypeFromInt rtv
             let! rsv = pramSeed.Param.Value |> byteConv.intFromBytes
-            let! rr = gcOps.MakeRndGenRecordAndTable rngT rsv cz.CauseId "" ctxt
+            let! rr = gcOps.MakeRndGenRecordAndTable rngT rsv cz.CauseId "" ctxt true
             return 1
         }
 
     let runRngSet (cz:Cause) 
                   (ctxt:Gort.Data.DataModel.IGortContext) =
-
-        1 |> Ok
+        result {
+            let prams = cz.CauseParams |> Seq.toList
+            let pramRngID = prams |> List.find(fun p -> 
+                p.CauseParamType.Name = CauseParamTypeName.RngId.ToString())
+            let pramCount = prams |> List.find(fun p -> 
+                p.CauseParamType.Name = CauseParamTypeName.RngCount.ToString())
+            let! rngId = pramRngID.Param.Value |> byteConv.guidFromBytes
+            let! rngCt = pramCount.Param.Value |> byteConv.intFromBytes
+            let! rng =  gcOps.MakeRndGenFromRecord rngId ctxt
+            let randy = rng |> Rando.fromRngGen
+            return! gcOps.MakeRndGenSetRecordsAndTable randy rngCt cz.CauseId ctxt
+        }
 
 
     let RunUtils (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
@@ -36,10 +46,4 @@ module ctrUtils =
                          (ctxt:Gort.Data.DataModel.IGortContext) =
         let g::gs = pth
         match g with
-        | "Sortable" -> 5 |> Ok
-        | "Utils" -> 5 |> Ok
-        | "Sorter" -> 5 |> Ok
-        | "SwitchList" -> 5 |> Ok
-        | "SorterPerf" -> 5 |> Ok
-        | "SorterShc" -> 5 |> Ok
         | n -> (sprintf "%s not handled in RunUtilsChildren" n) |> Error

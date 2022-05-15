@@ -10,6 +10,7 @@
     <Compile Include="miscConv.fs" />
     <Compile Include="gcOps.fs" />
     <Compile Include="byteConv.fs" />
+    <Compile Include="ctrSortableSetDef.fs" />
     <Compile Include="ctrSortable.fs" />
     <Compile Include="ctrSorter.fs" />
     <Compile Include="ctrSwitchList.fs" />

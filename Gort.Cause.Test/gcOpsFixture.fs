@@ -17,9 +17,8 @@ type gcOpsFixture () =
         let seed = 123
         let causeId = causeId
         let causePath = "causePath"
-        let rr = gcOps.MakeRndGenRecordAndTable rngType seed causeId causePath texto
+        let rr = gcOps.MakeRndGenRecordAndTable rngType seed causeId causePath texto true
                           |> Result.ExtractOrThrow
-
         Assert.IsTrue(true);
 
 

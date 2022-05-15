@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-module RandGen =
+module RandVars =
     
     let rndBitsUint64 (order:order) (rnd:IRando) = 
         rnd.NextULong &&& (order |> Order.bitMaskUint64)

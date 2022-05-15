@@ -218,7 +218,7 @@ module TwoCycle =
 //*************************************************************
 
     let makeRndMonoCycle (order:order) (rnd:IRando) =
-        let tup = RandGen.drawTwoWithoutRep order rnd
+        let tup = RandVars.drawTwoWithoutRep order rnd
         makeMonoCycle order (fst tup) (snd tup)
 
 
@@ -235,11 +235,11 @@ module TwoCycle =
 
         let switchCount = _multiDraw rnd switchFreq 
                             (order |> Order.maxSwitchesPerStage)
-        { values = RandGen.rndTwoCycle rnd (Order.value order) switchCount }
+        { values = RandVars.rndTwoCycle rnd (Order.value order) switchCount }
 
 
     let rndFullTwoCycle (order:order) (rnd:IRando) =
-        { values = RandGen.rndFullTwoCycle rnd (Order.value order) }
+        { values = RandVars.rndFullTwoCycle rnd (Order.value order) }
 
 
     let rndSymmetric (ord:order) 

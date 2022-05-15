@@ -161,6 +161,6 @@ module Switch =
         let dd = (Order.value orderDest)
         if sd < dd then
             failwith "source order cannot be smaller than dest"
-        RandGen.rndNchooseM sd dd rnd
+        RandVars.rndNchooseM sd dd rnd
         |> Seq.map(rebufo orderSource swa)
 

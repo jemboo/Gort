@@ -89,7 +89,8 @@ namespace Gort.Data.Instance
     {
         public static void LoadInst(GortInstBase gib, IGortContext ctxt)
         {
-            ctxt.Workspace.Add(gib.Workspace);
+            //ctxt.Workspace.Add(gib.Workspace);
+
             foreach (var pt in gib.Params)
             {
                 ctxt.Param.Add(pt);

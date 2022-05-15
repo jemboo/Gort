@@ -114,7 +114,7 @@ module Permutation =
 
     let createRandom (order:order) (rnd:IRando) =
         let idArray = (identity order) |> getArray  
-        { values=(RandGen.fisherYatesShuffle rnd idArray |> Seq.toArray)}
+        { values=(RandVars.fisherYatesShuffle rnd idArray |> Seq.toArray)}
 
     let createRandoms (order:order) (rnd:IRando) =
         Seq.initInfinite(fun _ -> createRandom order rnd)
