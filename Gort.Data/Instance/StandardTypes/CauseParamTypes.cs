@@ -1,7 +1,7 @@
 ﻿using Gort.Data.DataModel;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance
+namespace Gort.Data.Instance.StandardTypes
 {
     public static class CauseParamTypes
     {
@@ -30,7 +30,7 @@ namespace Gort.Data.Instance
 
             SortableSetRand_Order = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.Order, ParamTypes.Order);
             SortableSetRand_RngId = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.RngId, ParamTypes.RngId);
-            SortableSetRand_SortableCount = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableCount, ParamTypes.RecordId);
+            SortableSetRand_SortableCount = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableCount, ParamTypes.SortableCount);
             SortableSetRand_SortableFormat = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableFormat, ParamTypes.SortableFormat);
 
             SortableSetAllForOrder_Order = MakeCauseTypeParam(CauseTypes.SortableSetAllForOrder, CauseParamTypeName.Order, ParamTypes.Order);
@@ -204,12 +204,17 @@ namespace Gort.Data.Instance
 
         static CauseParamType MakeCauseTypeParam(CauseType causeType, CauseParamTypeName ptn, ParamType paramType)
         {
-            var ctp = new CauseParamType() { CauseTypeId = causeType.CauseTypeId, Name = ptn.ToString(), ParamTypeId = paramType.ParamTypeId }.AddId();
+            var ctp = new CauseParamType() 
+                { 
+                    CauseTypeId = causeType.CauseTypeId, 
+                    Name = ptn.ToString(), 
+                    ParamTypeId = paramType.ParamTypeId 
+                }.AddId();
             _members.Add(ctp);
             return ctp;
         }
 
-        private static readonly List<CauseParamType> _members = new List<CauseParamType>();   
+        private static readonly List<CauseParamType> _members = new List<CauseParamType>();
         public static IEnumerable<CauseParamType> Members
         {
             get { return _members; }

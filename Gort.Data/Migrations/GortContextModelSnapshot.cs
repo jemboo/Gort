@@ -25,15 +25,14 @@ namespace Gort.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("CauseDescr")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("CauseStatus")
                         .HasColumnType("int");
 
                     b.Property<Guid>("CauseTypeID")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<int>("Index")
                         .HasColumnType("int");
@@ -86,7 +85,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<Guid>("ParamTypeId")
@@ -95,6 +93,8 @@ namespace Gort.Data.Migrations
                     b.HasKey("CauseParamTypeId");
 
                     b.HasIndex("CauseTypeId");
+
+                    b.HasIndex("ParamTypeId");
 
                     b.ToTable("CauseParamType");
                 });
@@ -109,7 +109,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("CauseTypeId");
@@ -126,7 +125,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<Guid?>("ParentId")
@@ -149,7 +147,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<byte[]>("Value")
-                        .IsRequired()
                         .HasColumnType("longblob");
 
                     b.HasKey("ParamId");
@@ -169,7 +166,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("ParamTypeId");
@@ -190,11 +186,7 @@ namespace Gort.Data.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("RndGenType")
+                    b.Property<int>("RandGenType")
                         .HasColumnType("int");
 
                     b.Property<int>("Seed")
@@ -471,7 +463,6 @@ namespace Gort.Data.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("WorkspaceId");
@@ -535,6 +526,14 @@ namespace Gort.Data.Migrations
                         .HasForeignKey("CauseTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Gort.Data.DataModel.ParamType", "ParamType")
+                        .WithMany()
+                        .HasForeignKey("ParamTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParamType");
                 });
 
             modelBuilder.Entity("Gort.Data.DataModel.CauseType", b =>
@@ -559,11 +558,13 @@ namespace Gort.Data.Migrations
 
             modelBuilder.Entity("Gort.Data.DataModel.Param", b =>
                 {
-                    b.HasOne("Gort.Data.DataModel.ParamType", null)
+                    b.HasOne("Gort.Data.DataModel.ParamType", "ParamType")
                         .WithMany("Params")
                         .HasForeignKey("ParamTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParamType");
                 });
 
             modelBuilder.Entity("Gort.Data.DataModel.RandGen", b =>

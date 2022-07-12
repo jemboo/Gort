@@ -14,17 +14,17 @@ module ctrRoot =
         match pth with
         | [] -> "No path in RunRootChildren" |> Error
         | x::[] -> match x with  
-            | "Sortable" -> ctrSorter.RunSortable cz ctxt
+            | "Sortable" -> ctrSortable.RunSortable cz ctxt
             | "Utils" -> ctrUtils.RunUtils cz ctxt
-            | "Sorter" -> ctrSortable.RunSorter cz ctxt
+            | "Sorter" -> ctrSorter.RunSorter cz ctxt
             | "SwitchList" -> ctrSwitchList.RunSwitchList cz ctxt
             | "SorterPerf" -> ctrSorterPerf.RunSorterPerf cz ctxt
             | "SorterShc" -> ctrSorterShc.RunSorterShc cz ctxt
             | _ -> "Bad path in RunRootChildren" |> Error
         | x::xs -> match x with  
-                   | "Sortable" -> ctrSorter.RunSortableChildren cz xs ctxt
+                   | "Sortable" -> ctrSortable.RunSortableChildren cz xs ctxt
                    | "Utils" -> ctrUtils.RunUtilsChildren cz xs ctxt
-                   | "Sorter" -> ctrSortable.RunSorterChildren cz xs ctxt
+                   | "Sorter" -> ctrSorter.RunSorterChildren cz xs ctxt
                    | "SwitchList" -> ctrSwitchList.RunSwitchListChildren cz xs ctxt
                    | "SorterPerf" -> ctrSorterPerf.RunSorterPerfChildren cz xs ctxt
                    | "SorterShc" -> ctrSorterShc.RunSorterShcChildren cz xs ctxt

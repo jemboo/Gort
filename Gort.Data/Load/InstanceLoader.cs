@@ -1,35 +1,33 @@
 ﻿using Gort.Data.DataModel;
 using Gort.Data.Instance;
+using Gort.Data.Instance.CauseBuilder;
+using Gort.Data.Instance.StandardTypes;
 
 namespace Gort.Data.Load
 {
     internal static class InstanceLoader
     {
-        public static void LoadStatics(IGortContext ctxt)
+
+        public static void LoadWorkSpaceRnd(IGortContext ctxt,
+            string workspaceName, int causeIndex, 
+            Param paramSeed, Param paramRndGenType)
         {
-            foreach (var pt in CauseTypeGroups.Members)
-            {
-                ctxt.CauseTypeGroup.Add(pt);
-            }
-            foreach (var pt in ParamTypes.Members)
-            {
-                ctxt.ParamType.Add(pt);
-            }
-            foreach (var pt in CauseTypes.Members)
-            {
-                ctxt.CauseType.Add(pt);
-            }
-            foreach (var pt in CauseParamTypes.Members)
-            {
-                ctxt.CauseParamType.Add(pt);
-            }
-            ctxt.SaveChanges();
+            string descr = $"RndGen_{causeIndex}";
+            WorkspaceLoad.LoadCauseBuilder(
+                new CbRand(workspaceName, causeIndex, descr,
+                paramRndGenType, paramSeed), ctxt);
         }
 
-        public static void LoadWorkSpace(IGortContext ctxt)
-        {
-            GortInstLoader.LoadInst(new WksRand(), ctxt);
-        }
-
+        //public static void LoadWorkSpaceRndSortableSet(IGortContext ctxt, int causeIndex, 
+        //    Param paramRndGenId, Param paramOrder, Param paramSortableCount, Param paramSortableFormat)
+        //{
+        //    string descr = $"RndSortableSet{causeIndex}";
+        //    int order = 16;
+        //    int sortableCount = 20;
+        //    SortableFormat sortableFormat = SortableFormat.b64;
+        //    WorkspaceLoad.LoadCauseBuilder(new CbRandSortableSet(
+        //        WorkspaceName, causeIndex, descr, paramOrder,
+        //        paramSortableCount, paramSortableFormat, paramRndGenId), ctxt);
+        //}
     }
 }

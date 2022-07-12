@@ -1,7 +1,7 @@
 ﻿using Gort.Data.DataModel;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance
+namespace Gort.Data.Instance.StandardTypes
 {
     public static class CauseTypeGroups
     {
@@ -34,12 +34,17 @@ namespace Gort.Data.Instance
 
         static CauseTypeGroup MakeCauseTypeGroup(CauseTypeGroupName ptn, Guid? parentId)
         {
-            var ctg = new CauseTypeGroup() { Name = ptn.ToString(), ParentId = parentId }.AddId();
+            var ctg = new CauseTypeGroup() 
+                { 
+                    Name = ptn.ToString(), 
+                    ParentId = parentId 
+                }.AddId();
             _members.Add(ctg);
             return ctg;
         }
 
-        private static readonly List<CauseTypeGroup> _members = new List<CauseTypeGroup>();
+        private static readonly List<CauseTypeGroup> _members 
+            = new List<CauseTypeGroup>();
         public static IEnumerable<CauseTypeGroup> Members
         {
             get { return _members; }

@@ -15,7 +15,7 @@ namespace Gort.Data.DataModel
         public Guid StructId { get; set; }
         public virtual Cause Cause { get; set; }
         public int Seed { get; set; }
-        public RndGenType RndGenType { get; set; }
+        public RandGenType RandGenType { get; set; }
     }
 
     public class Sortable

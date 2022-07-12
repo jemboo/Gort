@@ -3,6 +3,7 @@ using Microsoft.FSharp.Core;
 using System.Linq;
 using System;
 using Gort.Data.Utils;
+using System.Diagnostics.Metrics;
 
 namespace Gort.Data.Test
 {
@@ -14,29 +15,29 @@ namespace Gort.Data.Test
         [TestMethod]
         public void GetCauseById()
         {
-            var cas = MetaDataUtils.GetCauseById(gu);
+            var cas = CauseQuery.GetCauseById(gu);
             Assert.IsNotNull(cas);
         }
 
         [TestMethod]
         public void GetAllCausesForWorkspace()
         {
-            var realWs = MetaDataUtils.GetAllCausesForWorkspace("WorkspaceRand");
+            var realWs = CauseQuery.GetAllCausesForWorkspace("WorkspaceRand");
             Assert.IsTrue (realWs.Length > 0);
         }
 
         [TestMethod]
         public void GetNextCauseForWorkspace()
         {
-            var realWs = MetaDataUtils.GetNextCauseForWorkspace("WorkspaceRand");
+            var realWs = CauseQuery.GetPendingCauseForWorkspace("WorkspaceRand");
             Assert.IsTrue(true);
         }
 
         [TestMethod]
         public void GetCauseTypeGroupAncestry()
         {
-            var cause = MetaDataUtils.GetCauseById(gu);
-            var realWs = MetaDataUtils.GetCauseTypeGroupAncestry(cause).ToArray();
+            var cause = CauseQuery.GetCauseById(gu);
+            var realWs = CauseQuery.GetCauseTypeGroupAncestry(cause).ToArray();
             Assert.IsTrue(realWs.Length > 0);
         }
 

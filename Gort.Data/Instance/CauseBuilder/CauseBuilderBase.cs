@@ -1,16 +1,23 @@
 ﻿using Gort.Data.DataModel;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance
+namespace Gort.Data.Instance.CauseBuilder
 {
-    public class GortInstBase
+    public class CauseBuilderBase
     {
-        public GortInstBase(string workspaceName)
+        public CauseBuilderBase(string workspaceName, int causeIndex)
         {
+            WorkspaceName = workspaceName;
+            CauseIndex = causeIndex;
             Workspace = new Workspace() { Name = workspaceName }.AddId();
         }
-        public Workspace Workspace { get; private set; }
 
+        public string WorkspaceName { get; }
+        public int CauseIndex { get; }
+
+        public string? CauseDescription { get; protected set; }
+
+        public Workspace Workspace { get; private set; }
 
         #region Params
 
@@ -19,7 +26,11 @@ namespace Gort.Data.Instance
         {
             try
             {
-                var pram = new Param() { ParamTypeId = paramType.ParamTypeId, Value = paramType.DataType.ToBytes(v) }.AddId();
+                var pram = new Param()
+                    {
+                        ParamTypeId = paramType.ParamTypeId,
+                        Value = paramType.DataType.ToBytes(v)
+                    }.AddId();
                 _memberParams.Add(pram);
                 return pram;
             }
@@ -39,14 +50,14 @@ namespace Gort.Data.Instance
 
         private readonly List<Cause> _memberCauses = new List<Cause>();
 
-        protected Cause MakeCause(int index, string descr, CauseType causeType)
+        protected Cause MakeCause(CauseType causeType)
         {
             var cs = new Cause()
             {
-                Description = descr,
+                CauseDescr = CauseDescription,
                 CauseTypeID = causeType.CauseTypeId,
                 WorkspaceId = Workspace.WorkspaceId,
-                Index = index,
+                Index = CauseIndex,
                 CauseStatus = CauseStatus.Pending
             }.AddId();
 
@@ -83,29 +94,5 @@ namespace Gort.Data.Instance
 
         #endregion
 
-    }
-
-    public static class GortInstLoader
-    {
-        public static void LoadInst(GortInstBase gib, IGortContext ctxt)
-        {
-            //ctxt.Workspace.Add(gib.Workspace);
-
-            foreach (var pt in gib.Params)
-            {
-                ctxt.Param.Add(pt);
-            }
-
-            foreach (var pt in gib.Causes)
-            {
-                ctxt.Cause.Add(pt);
-            }
-
-            foreach (var pt in gib.CauseParams)
-            {
-                ctxt.CauseParam.Add(pt);
-            }
-            ctxt.SaveChanges();
-        }
     }
 }

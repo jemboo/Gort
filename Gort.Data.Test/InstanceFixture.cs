@@ -1,8 +1,5 @@
+using Gort.Data.Instance.StandardTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.FSharp.Core;
-using System;
-using Gort.Data.Utils;
-using Gort.Data.Instance;
 using System.Linq;
 
 namespace Gort.Data.Test

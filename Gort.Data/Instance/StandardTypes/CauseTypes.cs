@@ -1,7 +1,7 @@
 ﻿using Gort.Data.DataModel;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance
+namespace Gort.Data.Instance.StandardTypes
 {
     public static class CauseTypes
     {
@@ -53,7 +53,11 @@ namespace Gort.Data.Instance
         public static CauseType SorterShc { get; private set; }
         static CauseType MakeCauseType(CauseTypeName ptn, CauseTypeGroup causeTypeGroup)
         {
-            var ct = new CauseType() { Name = ptn.ToString(), CauseTypeGroupId = causeTypeGroup.CauseTypeGroupId }.AddId();
+            var ct = new CauseType() 
+                { 
+                    Name = ptn.ToString(), 
+                    CauseTypeGroupId = causeTypeGroup.CauseTypeGroupId 
+                }.AddId();
             _members.Add(ct);
             return ct;
         }

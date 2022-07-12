@@ -38,7 +38,7 @@ namespace Gort.Data.Utils
         public static Cause AddId(this Cause cs)
         {
             var id = GuidUtils.guidFromObjs(new object[2] { cs.Index, cs.WorkspaceId});
-            return new Cause() { CauseId = id, Description = cs.Description, CauseTypeID = cs.CauseTypeID, CauseParams = cs.CauseParams, Index=cs.Index, WorkspaceId = cs.WorkspaceId };
+            return new Cause() { CauseId = id, CauseDescr = cs.CauseDescr, CauseTypeID = cs.CauseTypeID, CauseParams = cs.CauseParams, Index=cs.Index, WorkspaceId = cs.WorkspaceId };
         }
         public static CauseParam AddId(this CauseParam cp)
         {
@@ -47,9 +47,9 @@ namespace Gort.Data.Utils
         }
         public static DataModel.RandGen AddStructId(this DataModel.RandGen rg)
         {
-            var ids = GuidUtils.guidFromObjs(new object[2] { rg.RndGenType, rg.Seed });
+            var ids = GuidUtils.guidFromObjs(new object[2] { rg.RandGenType, rg.Seed });
             var id = GuidUtils.guidFromObjs(new object[2] { rg.CauseId, rg.CausePath });
-            return new DataModel.RandGen() { RandGenId = id, StructId = ids, RndGenType = rg.RndGenType, Seed = rg.Seed, CauseId = rg.CauseId, CausePath = rg.CausePath };
+            return new DataModel.RandGen() { RandGenId = id, StructId = ids, RandGenType = rg.RandGenType, Seed = rg.Seed, CauseId = rg.CauseId, CausePath = rg.CausePath };
         }
         public static DataModel.Sorter AddStructId(this DataModel.Sorter sorter)
         {

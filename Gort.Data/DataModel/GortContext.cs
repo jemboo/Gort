@@ -41,7 +41,7 @@ namespace Gort.Data.DataModel
             //        .HasConversion<int>();
 
             modelBuilder.Entity<RandGen>()
-                    .Property(c => c.RndGenType)
+                    .Property(c => c.RandGenType)
                     .HasConversion<int>();
 
             modelBuilder.Entity<Sortable>()

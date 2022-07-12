@@ -4,8 +4,6 @@ open Gort.Data.DataModel
 
 module ctrSortable =
 
-
-
     let RunSortable (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
         match cz.CauseType.Name with
         | "SortableImport" -> 5|>Ok

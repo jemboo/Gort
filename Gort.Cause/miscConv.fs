@@ -8,17 +8,17 @@ module miscConv =
 
     let RndGenTypeFromInt (ival:int) =
         try
-            let rgt = MetaDataUtils.RndGenTypeFromInt ival
+            let rgt = DataTypeExt.RandGenTypeFromInt ival
             rgt |> Ok
         with
             | ex -> ("error in RndGenTypeFromInt: " + ex.Message ) |> Error 
 
 
-    let RndGenTypeToRngType (tVal:RndGenType) =
+    let RndGenTypeToRngType (tVal:RandGenType) =
         try
             match tVal with
-            | RndGenType.Lcg -> rngType.Lcg |> Ok
-            | RndGenType.Clr -> rngType.Net |> Ok
+            | RandGenType.Lcg -> rngType.Lcg |> Ok
+            | RandGenType.Clr -> rngType.Net |> Ok
             | _ -> "RndGenType not handled" |> Error
         with
             | ex -> ("error in RndGenTypeToRngType: " + ex.Message ) |> Error
@@ -27,8 +27,8 @@ module miscConv =
     let RngTypeToRandGenType (tVal:rngType) =
         try
             match tVal with
-            | rngType.Lcg -> RndGenType.Lcg |> Ok
-            | rngType.Net -> RndGenType.Clr |> Ok
+            | rngType.Lcg -> RandGenType.Lcg |> Ok
+            | rngType.Net -> RandGenType.Clr |> Ok
             | _ -> "rngType not handled" |> Error
         with
             | ex -> ("error in RngTypeToRandGenType: " + ex.Message ) |> Error 

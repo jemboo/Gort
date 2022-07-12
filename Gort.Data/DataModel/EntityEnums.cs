@@ -3,10 +3,10 @@
 
     public enum CauseStatus
     {
-        Pending,
-        InProgress,
-        Complete,
-        Error
+        Pending = 0,
+        InProgress = 1,
+        Complete = 2,
+        Error = 3
     }
 
     public enum DataType
@@ -22,7 +22,7 @@
         ByteArray
     }
 
-    public enum RndGenType
+    public enum RandGenType
     {
         Lcg,
         Clr
@@ -126,7 +126,7 @@
         SorterPosition,
         SorterSaveMode,
         SorterSetId,
-        SorterSetName,
+        SorterGroupName,
         StageBuddyCount,
         StageCount,
         SwitchCount,

@@ -13,7 +13,7 @@ type gcOpsFixture () =
 
     [<TestMethod>]
     member this.MakeRndAndTable () =
-        let rngType = RndGenType.Lcg
+        let rngType = RandGenType.Lcg
         let seed = 123
         let causeId = causeId
         let causePath = "causePath"
