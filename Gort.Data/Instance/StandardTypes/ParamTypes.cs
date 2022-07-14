@@ -14,9 +14,9 @@ namespace Gort.Data.Instance.StandardTypes
             RecordId = MakeParamType(ParamTypeName.RecordId);
             RecordPath = MakeParamType(ParamTypeName.RecordPath);
             RngCount = MakeParamType(ParamTypeName.RngCount);
-            RngId = MakeParamType(ParamTypeName.RngId);
-            RngSeed = MakeParamType(ParamTypeName.RngSeed);
-            RngType = MakeParamType(ParamTypeName.RngType);
+            RngId = MakeParamType(ParamTypeName.RandGenId);
+            RngSeed = MakeParamType(ParamTypeName.RandGenSeed);
+            RngType = MakeParamType(ParamTypeName.RandGenType);
             SortableCount = MakeParamType(ParamTypeName.SortableCount);
             SortableFormat = MakeParamType(ParamTypeName.SortableFormat);
             SortableSetId = MakeParamType(ParamTypeName.SortableSetId);
@@ -74,7 +74,7 @@ namespace Gort.Data.Instance.StandardTypes
         {
             var pt = new ParamType() { 
                 Name = ptn.ToString(), 
-                DataType = ptn.GetDataType() }.AddId();
+                ParamDataType = ptn.GetDataType() }.AddId();
             _members.Add(pt);
             return pt;
         }
@@ -103,11 +103,11 @@ namespace Gort.Data.Instance.StandardTypes
                     return RecordPath;
                 case ParamTypeName.RngCount:
                     return RngCount;
-                case ParamTypeName.RngId:
+                case ParamTypeName.RandGenId:
                     return RngId;
-                case ParamTypeName.RngSeed:
+                case ParamTypeName.RandGenSeed:
                     return RngSeed;
-                case ParamTypeName.RngType:
+                case ParamTypeName.RandGenType:
                     return RngType;
                 case ParamTypeName.SortableCount:
                     return SortableCount;

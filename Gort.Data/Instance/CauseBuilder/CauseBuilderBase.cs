@@ -29,7 +29,7 @@ namespace Gort.Data.Instance.CauseBuilder
                 var pram = new Param()
                     {
                         ParamTypeId = paramType.ParamTypeId,
-                        Value = paramType.DataType.ToBytes(v)
+                        Value = paramType.ParamDataType.ToBytes(v)
                     }.AddId();
                 _memberParams.Add(pram);
                 return pram;
@@ -38,6 +38,12 @@ namespace Gort.Data.Instance.CauseBuilder
             {
                 throw new Exception($"Error in MakeParam", ex);
             }
+        }
+
+        protected Param AddParam(Param pram)
+        {
+            _memberParams.Add(pram);
+            return pram;
         }
         public IEnumerable<Param> Params
         {

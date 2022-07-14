@@ -7,66 +7,9 @@ namespace Gort.Data.Utils
     {
         public static Param MakeParam(this ParamType paramType, object pVal)
         {
-            var dv = paramType.DataType.ToBytes(pVal);
+            var dv = paramType.ParamDataType.ToBytes(pVal);
             return new Param() { ParamTypeId = paramType.ParamTypeId, Value = dv }.AddId();
         }
-
-        //public static Param MakeIntParam(Guid paramTypeId, int value)
-        //{
-        //    return new Param() { ParamTypeId = paramTypeId, Value = BitConverter.GetBytes(value) }.AddId();
-        //}
-
-        //public static Param MakeIntArrayParam(Guid paramTypeId, int[] value)
-        //{
-        //    var blob = new byte[value.Length * 4];
-        //    Buffer.BlockCopy(value, 0, blob, 0, blob.Length);
-        //    return new Param() { ParamTypeId = paramTypeId, Value = blob }.AddId();
-        //}
-
-        //public static Param MakeDoubleParam(Guid paramTypeId, double value)
-        //{
-        //    return new Param() { ParamTypeId = paramTypeId, Value = BitConverter.GetBytes(value) }.AddId();
-        //}
-
-        //public static Param MakeDoubleArrayParam(Guid paramTypeId, double[] value)
-        //{
-        //    var blob = new byte[value.Length * 8];
-        //    Buffer.BlockCopy(value, 0, blob, 0, blob.Length);
-        //    return new Param() { ParamTypeId = paramTypeId, Value = blob }.AddId();
-        //}
-
-        //public static Param MakeStringParam(Guid paramTypeId, string value)
-        //{
-        //    return new Param() { ParamTypeId = paramTypeId, Value = Encoding.ASCII.GetBytes(value) }.AddId();
-        //}
-
-        //public static Param MakeStringArrayParam(Guid paramTypeId, string[] value)
-        //{
-        //    var fs = String.Join("\n", value);
-        //    return new Param() { ParamTypeId = paramTypeId, Value = Encoding.ASCII.GetBytes(fs) }.AddId();
-        //}
-
-        //public static Param MakeGuidParam(Guid paramTypeId, Guid value)
-        //{
-        //    return new Param() { ParamTypeId = paramTypeId, Value = value.ToByteArray() }.AddId();
-        //}
-
-        //public static Param MakeGuidArrayParam(Guid paramTypeId, Guid[] value)
-        //{
-        //    var blob = new byte[value.Length * 16];
-        //    for (var dex = 0; dex < value.Length; dex++)
-        //    {
-        //        var gbs = value[dex].ToByteArray();
-        //        Buffer.BlockCopy(gbs, 0, blob, dex * 16, gbs.Length);
-        //    }
-        //    return new Param() { ParamTypeId = paramTypeId, Value = blob }.AddId();
-        //}
-
-        //public static Param MakeByteArrayParam(Guid paramTypeId, byte[] value)
-        //{
-        //    return new Param() { ParamTypeId = paramTypeId, Value = value }.AddId();
-        //}
-
 
         public static int IntValue(this Param param)
         {

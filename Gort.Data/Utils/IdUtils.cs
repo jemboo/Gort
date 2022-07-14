@@ -23,7 +23,7 @@ namespace Gort.Data.Utils
         public static ParamType AddId(this ParamType ctp)
         {
             var id = GuidUtils.guidFromObjs(new object[1] { ctp.Name });
-            return new ParamType() { ParamTypeId = id, Name = ctp.Name, DataType = ctp.DataType };
+            return new ParamType() { ParamTypeId = id, Name = ctp.Name, ParamDataType = ctp.ParamDataType };
         }
         public static CauseParamType AddId(this CauseParamType ctp)
         {

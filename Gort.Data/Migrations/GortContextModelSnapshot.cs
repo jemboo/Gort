@@ -16,7 +16,7 @@ namespace Gort.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Gort.Data.DataModel.Cause", b =>
@@ -162,11 +162,11 @@ namespace Gort.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("DataType")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ParamDataType")
+                        .HasColumnType("int");
 
                     b.HasKey("ParamTypeId");
 

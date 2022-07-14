@@ -22,6 +22,4 @@ var cbRand = new CbRand(
     paramRngType: seedParams.RngType);
 WorkspaceLoad.LoadCauseBuilder(cbRand, ctx) ;
 
-//var pramRngId = cbRand.GetParamRngId(ctx);
-
 Console.WriteLine("Goodbye, World!");

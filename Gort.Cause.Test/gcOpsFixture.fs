@@ -17,14 +17,14 @@ type gcOpsFixture () =
         let seed = 123
         let causeId = causeId
         let causePath = "causePath"
-        let rr = gcOps.MakeRndGenRecordAndTable rngType seed causeId causePath texto true
+        let rr = gcOps.MakeRandGenRecordAndTable rngType seed causeId causePath texto
                           |> Result.ExtractOrThrow
         Assert.IsTrue(true);
 
 
     [<TestMethod>]
     member this.MakeRndGenFromTable () =
-        let rr = gcOps.MakeRndGenFromRecord rndGenId texto
+        let rr = gcOps.MakeRngGenFromRecord rndGenId texto
                           |> Result.ExtractOrThrow
 
         Assert.IsTrue(true);

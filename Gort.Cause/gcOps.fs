@@ -5,37 +5,27 @@ open Gort.Data.DataModel
 
 module gcOps =
 
-    let SaveChanges (ctxt:IGortContext) =
-        try
-            ctxt.SaveChanges() |> Ok
-        with
-            | ex -> ("error in MakeRndGenRecord: " + ex.Message ) |> Error 
-
-
-    let MakeRndGenRecordAndTable 
-                         (rgt:RandGenType) 
+    let MakeRandGenRecordAndTable 
+                         (randGenType:RandGenType) 
                          (seed:int) 
                          (causeId:Guid) 
                          (causePath:string) 
-                         (ctxt:IGortContext) 
-                         (saveChanges:bool) =
+                         (ctxt:IGortContext) =
         try
-            let mutable rr = new Gort.Data.DataModel.RandGen()
+            let mutable rr = new RandGen()
             rr.CauseId <- causeId;
             rr.CausePath <- causePath;
-            rr.RandGenType <- rgt;
+            rr.RandGenType <- randGenType;
             rr.Seed <- seed;
             rr <- IdUtils.AddStructId rr
             ctxt.RandGen.Add rr |> ignore
-            if saveChanges then
-                ctxt.SaveChanges() |> ignore
             rr |> Ok
         with
             | ex -> ("error in MakeRndGenRecord: " + ex.Message ) |> Error 
 
 
-    let MakeRndGenSetRecordsAndTable 
-                         (rg:IRando) 
+    let MakeRandGenSetRecordsAndTable 
+                         (randy:IRando) 
                          (rgCount:int)
                          (causeId:Guid)
                          (ctxt:IGortContext) =
@@ -43,14 +33,14 @@ module gcOps =
             (snd tup).Seed |> RandomSeed.value
         try
             result {
-                let! rgType = rg.rngType |> miscConv.RngTypeToRandGenType
+                let! randGenType = randy.rngType |> miscConv.RngTypeToRandGenType
                 let rgs = { 0 .. (rgCount - 1) }
-                            |> Seq.map(fun dex -> (dex.ToString(), Rando.nextRngGen rg))
+                            |> Seq.map(fun dex -> (dex.ToString(), Rando.nextRngGen randy))
                             |> Seq.toList
                 let! res = rgs |> List.map(fun tup -> 
-                    MakeRndGenRecordAndTable rgType (getSeed tup) causeId (fst tup) ctxt false)
+                    MakeRandGenRecordAndTable randGenType (getSeed tup) causeId (fst tup) ctxt)
                                |> Result.sequence
-                return! SaveChanges ctxt
+                return res.Length
             }
         with
             | ex -> ("error in MakeRndGenRecord: " + ex.Message ) |> Result.Error 
@@ -59,16 +49,16 @@ module gcOps =
 
     let MakeRandGenFromRecord (rndGenId:Guid) (ctxt:IGortContext) =
         try
-            DomainQuery.GetRndGen(rndGenId, ctxt) |> Ok
+            DomainQuery.GetRandGen(rndGenId, ctxt) |> Ok
         with
-            | ex -> ("error in GetRndGenRecord: " + ex.Message ) |> Result.Error
+            | ex -> ("error in GetRandGenRecord: " + ex.Message ) |> Result.Error
 
 
 
-    let MakeRndGenFromRecord (rndGenId:Guid) (ctxt:IGortContext) =
+    let MakeRngGenFromRecord (randGenId:Guid) (ctxt:IGortContext) =
         result {
-            let! r = MakeRandGenFromRecord rndGenId ctxt
-            let! rngt = r.RandGenType |> miscConv.RndGenTypeToRngType
+            let! r = MakeRandGenFromRecord randGenId ctxt
+            let! rngt = r.RandGenType |> miscConv.RandGenTypeToRngType
             let seed = r.Seed |> RandomSeed.create
             return {rngType=rngt; seed=seed}
         }

@@ -12,14 +12,16 @@ namespace Gort.Data.Instance.CauseBuilder
             string descr, Param paramSeed, Param paramRngType)
                 : base(workspaceName, causeIndex)
         {
+            RngSeed = AddParam(paramSeed);
+            RngTypeLcg = AddParam(paramRngType);
             Seed = paramSeed.IntValue();
             RandGenType = paramRngType.RandGenTypeValue();
-            CauseDescription = $"RndGen({descr},{Seed})";
+            CauseDescription = $"{descr}({RandGenType},{Seed})";
             CauseMakeRand = MakeCause(CauseTypes.Rng);
-            RngSeed = MakeParam(ParamTypes.RngSeed, 123);
-            RngTypeLcg = MakeParam(ParamTypes.RngType, RandGenType.Lcg);
-            CauseParamSeed = MakeCauseParam(CauseParamTypes.Rng_RngSeed, CauseMakeRand, RngSeed);
-            CauseParamRngType = MakeCauseParam(CauseParamTypes.Rng_RngType, CauseMakeRand, RngTypeLcg);
+            CauseParamSeed = MakeCauseParam(CauseParamTypes.Rng_RngSeed, 
+                CauseMakeRand, RngSeed);
+            CauseParamRngType = MakeCauseParam(CauseParamTypes.Rng_RngType, 
+                CauseMakeRand, RngTypeLcg);
         }
 
         public int Seed { get; }

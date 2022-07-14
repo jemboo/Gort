@@ -84,7 +84,6 @@ module SwitchCount =
                     | _ -> 0
         create ct
 
-
 module SwitchFrequency =
     let value (SwitchFrequency v) = v
     let create vv = SwitchFrequency vv

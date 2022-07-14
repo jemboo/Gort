@@ -25,7 +25,7 @@ namespace Gort.Data.DataModel
                     .HasConversion<int>();
 
             modelBuilder.Entity<ParamType>()
-                    .Property(c => c.DataType)
+                    .Property(c => c.ParamDataType)
                     .HasConversion<int>();
 
             //modelBuilder.Entity<CauseTypeGroup>()

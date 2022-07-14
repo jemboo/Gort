@@ -16,7 +16,7 @@ namespace Gort.Data.Instance.SeedParams
                 var pram = new Param()
                 {
                     ParamTypeId = paramType.ParamTypeId,
-                    Value = paramType.DataType.ToBytes(v)
+                    Value = paramType.ParamDataType.ToBytes(v)
                 }.AddId();
                 _members.Add(pram);
                 return pram;

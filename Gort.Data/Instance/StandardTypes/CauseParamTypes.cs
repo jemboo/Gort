@@ -7,16 +7,16 @@ namespace Gort.Data.Instance.StandardTypes
     {
         static CauseParamTypes()
         {
-            Rng_RngSeed = MakeCauseTypeParam(CauseTypes.Rng, CauseParamTypeName.RngSeed, ParamTypes.RngSeed);
-            Rng_RngType = MakeCauseTypeParam(CauseTypes.Rng, CauseParamTypeName.RngType, ParamTypes.RngType);
+            Rng_RngSeed = MakeCauseTypeParam(CauseTypes.Rng, CauseParamTypeName.RandGenSeed, ParamTypes.RngSeed);
+            Rng_RngType = MakeCauseTypeParam(CauseTypes.Rng, CauseParamTypeName.RandGenType, ParamTypes.RngType);
 
-            RngSet_RndGenId = MakeCauseTypeParam(CauseTypes.RngSet, CauseParamTypeName.RngId, ParamTypes.RngId);
-            RngSet_RndGenCount = MakeCauseTypeParam(CauseTypes.RngSet, CauseParamTypeName.RngCount, ParamTypes.RngCount);
+            RngSet_RndGenId = MakeCauseTypeParam(CauseTypes.RngSet, CauseParamTypeName.RandGenId, ParamTypes.RngId);
+            RngSet_RndGenCount = MakeCauseTypeParam(CauseTypes.RngSet, CauseParamTypeName.RandGenCount, ParamTypes.RngCount);
 
             SorterMutation_SorterId = MakeCauseTypeParam(CauseTypes.SorterMutation, CauseParamTypeName.SorterId, ParamTypes.SorterId);
             SorterMutation_SorterMutationId = MakeCauseTypeParam(CauseTypes.SorterMutation, CauseParamTypeName.SorterMutationId, ParamTypes.SorterMutationId);
             SorterMutation_SorterCount = MakeCauseTypeParam(CauseTypes.SorterMutation, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);
-            SorterMutation_RngId = MakeCauseTypeParam(CauseTypes.SorterMutation, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterMutation_RngId = MakeCauseTypeParam(CauseTypes.SorterMutation, CauseParamTypeName.RandGenId, ParamTypes.RngId);
 
             SortableImport_WorkspaceId = MakeCauseTypeParam(CauseTypes.SortableImport, CauseParamTypeName.WorkspaceId, ParamTypes.WorkspaceId);
             SortableImport_TableName = MakeCauseTypeParam(CauseTypes.SortableImport, CauseParamTypeName.TableName, ParamTypes.TableName);
@@ -29,7 +29,7 @@ namespace Gort.Data.Instance.StandardTypes
             SortableSetImport_RecordPath = MakeCauseTypeParam(CauseTypes.SortableSetImport, CauseParamTypeName.RecordPath, ParamTypes.RecordPath);
 
             SortableSetRand_Order = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.Order, ParamTypes.Order);
-            SortableSetRand_RngId = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SortableSetRand_RngId = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SortableSetRand_SortableCount = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableCount, ParamTypes.SortableCount);
             SortableSetRand_SortableFormat = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableFormat, ParamTypes.SortableFormat);
 
@@ -53,28 +53,28 @@ namespace Gort.Data.Instance.StandardTypes
             SorterSetImport_RecordId = MakeCauseTypeParam(CauseTypes.SorterSetImport, CauseParamTypeName.RecordId, ParamTypes.RecordId);
             SorterSetImport_RecordPath = MakeCauseTypeParam(CauseTypes.SorterSetImport, CauseParamTypeName.RecordPath, ParamTypes.RecordPath);
 
-            SorterSetRandBySwitch_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandBySwitch, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterSetRandBySwitch_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandBySwitch, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SorterSetRandBySwitch_Order = MakeCauseTypeParam(CauseTypes.SorterSetRandBySwitch, CauseParamTypeName.Order, ParamTypes.Order);
             SorterSetRandBySwitch_SwitchLength = MakeCauseTypeParam(CauseTypes.SorterSetRandBySwitch, CauseParamTypeName.SwitchCount, ParamTypes.SwitchCount);
             SorterSetRandBySwitch_SorterCount = MakeCauseTypeParam(CauseTypes.SorterSetRandBySwitch, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);
 
-            SorterSetRandByStage_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByStage, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterSetRandByStage_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByStage, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SorterSetRandByStage_Order = MakeCauseTypeParam(CauseTypes.SorterSetRandByStage, CauseParamTypeName.Order, ParamTypes.Order);
             SorterSetRandByStage_StageLength = MakeCauseTypeParam(CauseTypes.SorterSetRandByStage, CauseParamTypeName.StageCount, ParamTypes.StageCount);
             SorterSetRandByStage_SorterCount = MakeCauseTypeParam(CauseTypes.SorterSetRandByStage, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);
 
-            SorterSetRandByRflStage_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStage, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterSetRandByRflStage_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStage, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SorterSetRandByRflStage_Order = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStage, CauseParamTypeName.Order, ParamTypes.Order);
             SorterSetRandByRflStage_StageLength = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStage, CauseParamTypeName.StageCount, ParamTypes.StageCount);
             SorterSetRandByRflStage_SorterCount = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStage, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);
 
-            SorterSetRandByRflStageBuddies_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterSetRandByRflStageBuddies_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SorterSetRandByRflStageBuddies_Order = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.Order, ParamTypes.Order);
             SorterSetRandByRflStageBuddies_StageLength = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.StageCount, ParamTypes.StageCount);
             SorterSetRandByRflStageBuddies_StageBuddyCount = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.StageBuddyCount, ParamTypes.StageBuddyCount);
             SorterSetRandByRflStageBuddies_SorterCount = MakeCauseTypeParam(CauseTypes.SorterSetRandByRflStageBuddies, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);
 
-            SorterSetRandByMutation_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByMutation, CauseParamTypeName.RngId, ParamTypes.RngId);
+            SorterSetRandByMutation_RngId = MakeCauseTypeParam(CauseTypes.SorterSetRandByMutation, CauseParamTypeName.RandGenId, ParamTypes.RngId);
             SorterSetRandByMutation_SorterId = MakeCauseTypeParam(CauseTypes.SorterSetRandByMutation, CauseParamTypeName.SorterId, ParamTypes.SorterId);
             SorterSetRandByMutation_SorterMutationId = MakeCauseTypeParam(CauseTypes.SorterSetRandByMutation, CauseParamTypeName.SorterMutationId, ParamTypes.SorterMutationId);
             SorterSetRandByMutation_SorterCount = MakeCauseTypeParam(CauseTypes.SorterSetRandByMutation, CauseParamTypeName.SorterCount, ParamTypes.SorterCount);

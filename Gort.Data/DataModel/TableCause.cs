@@ -86,7 +86,7 @@ namespace Gort.Data.DataModel
         public string? Name { get; set; } 
         public ICollection<Param> Params { get; set; } =
                 new ObservableCollection<Param>();
-        public DataType DataType { get; set; }
+        public ParamDataType ParamDataType { get; set; }
     }
 
     public class Param

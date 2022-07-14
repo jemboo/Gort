@@ -7,9 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="miscConv.fs" />
-    <Compile Include="gcOps.fs" />
     <Compile Include="byteConv.fs" />
+    <Compile Include="enumConv.fs" />
+    <Compile Include="gcOps.fs" />
+    <Compile Include="paramConv.fs" />
     <Compile Include="ctrSortableSetDef.fs" />
     <Compile Include="ctrSortable.fs" />
     <Compile Include="ctrSorter.fs" />
@@ -20,6 +21,10 @@
     <Compile Include="ctrRoot.fs" />
     <Compile Include="CauseOps.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>
