@@ -2,20 +2,21 @@
 using Gort.Data.Instance.StandardTypes;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance.CauseBuilder
+namespace Gort.Data.Instance.CauseBuilder.SortableSet
 {
-
     public class CbRandSortableSet : CauseBuilderBase
     {
         public CbRandSortableSet(
-            string workspaceName, 
+            string workspaceName,
             int causeIndex,
             string descr,
-            Param paramOrder, 
+            Param paramOrder,
             Param paramSortableCount,
-            Param paramSortableFormat, 
+            Param paramSortableFormat,
             Param paramRngId) : base(workspaceName, causeIndex)
         {
+            Cause = MakeCause(CauseTypes.SortableSetRand);
+
             PramOrder = AddParam(paramOrder);
             PramRngId = AddParam(paramRngId);
             PramSortableCount = AddParam(paramSortableCount);
@@ -28,26 +29,25 @@ namespace Gort.Data.Instance.CauseBuilder
 
             CauseDescription = $"SortableSetRand({descr},{Order},{SortableCount})";
 
-            CauseMakeSortableSet = MakeCause(CauseTypes.SortableSetRand);
-            CauseParam_MakeSortableSet_RngId = 
+            CauseParam_RngId =
                 MakeCauseParam(
-                    CauseParamTypes.SortableSetRand_RngId, 
-                    CauseMakeSortableSet, 
+                    CauseParamTypes.SortableSetRand_RngId,
+                    Cause,
                     PramRngId);
-            CauseParam_MakeSortableSet_Order = 
+            CauseParam_Order =
                 MakeCauseParam(
-                    CauseParamTypes.SortableSetRand_Order, 
-                    CauseMakeSortableSet, 
+                    CauseParamTypes.SortableSetRand_Order,
+                    Cause,
                     PramOrder);
-            CauseParam_MakeSortableSet_SortableCount = 
+            CauseParam_SortableCount =
                 MakeCauseParam(
-                    CauseParamTypes.SortableSetRand_SortableCount, 
-                    CauseMakeSortableSet, 
+                    CauseParamTypes.SortableSetRand_SortableCount,
+                    Cause,
                     PramSortableCount);
-            CauseParam_MakeSortableSet_SortableFormat = 
+            CauseParam_SortableFormat =
                 MakeCauseParam(
-                    CauseParamTypes.SortableSetRand_SortableFormat, 
-                    CauseMakeSortableSet, 
+                    CauseParamTypes.SortableSetRand_SortableFormat,
+                    Cause,
                     PramSortableFormat);
         }
 
@@ -55,17 +55,14 @@ namespace Gort.Data.Instance.CauseBuilder
         public int SortableCount { get; }
         public Guid RngId { get; }
         public SortableFormat SortableFormat { get; }
-
-        public Cause CauseMakeSortableSet { get; private set; }
         public Param PramRngId { get; private set; }
         public Param PramOrder { get; private set; }
         public Param PramSortableCount { get; private set; }
         public Param PramSortableFormat { get; private set; }
-
-        public CauseParam CauseParam_MakeSortableSet_RngId { get; private set; }
-        public CauseParam CauseParam_MakeSortableSet_Order { get; private set; }
-        public CauseParam CauseParam_MakeSortableSet_SortableCount { get; private set; }
-        public CauseParam CauseParam_MakeSortableSet_SortableFormat { get; private set; }
+        public CauseParam CauseParam_RngId { get; private set; }
+        public CauseParam CauseParam_Order { get; private set; }
+        public CauseParam CauseParam_SortableCount { get; private set; }
+        public CauseParam CauseParam_SortableFormat { get; private set; }
 
     }
 }

@@ -34,12 +34,14 @@ namespace Gort.Data.Instance.StandardTypes
             SortableSetRand_SortableFormat = MakeCauseTypeParam(CauseTypes.SortableSetRand, CauseParamTypeName.SortableFormat, ParamTypes.SortableFormat);
 
             SortableSetAllForOrder_Order = MakeCauseTypeParam(CauseTypes.SortableSetAllForOrder, CauseParamTypeName.Order, ParamTypes.Order);
+            SortableSetAllForOrder_SortableFormat = MakeCauseTypeParam(CauseTypes.SortableSetAllForOrder, CauseParamTypeName.SortableFormat, ParamTypes.Order);
 
             SortableSetOrbit_Order = MakeCauseTypeParam(CauseTypes.SortableSetOrbit, CauseParamTypeName.Order, ParamTypes.Order);
             SortableSetOrbit_Perm = MakeCauseTypeParam(CauseTypes.SortableSetOrbit, CauseParamTypeName.SortableSetOrbitPerm, ParamTypes.SortableSetOrbitPerm);
             SortableSetOrbit_MaxCount = MakeCauseTypeParam(CauseTypes.SortableSetOrbit, CauseParamTypeName.SortableSetOrbitMaxCount, ParamTypes.SortableSetOrbitMaxCount);
 
             SortableSetStacked_Orders = MakeCauseTypeParam(CauseTypes.SortableSetStacked, CauseParamTypeName.OrderStack, ParamTypes.OrderStack);
+            SortableSetStacked_SortableFormat = MakeCauseTypeParam(CauseTypes.SortableSetStacked, CauseParamTypeName.SortableFormat, ParamTypes.SortableFormat);
 
             SorterGroupName_SorterGroupName = MakeCauseTypeParam(CauseTypes.SorterGroupName, CauseParamTypeName.SorterGroupName, ParamTypes.SorterGroupName);
 
@@ -134,12 +136,13 @@ namespace Gort.Data.Instance.StandardTypes
         public static CauseParamType SortableSetRand_SortableFormat { get; private set; }
 
         public static CauseParamType SortableSetAllForOrder_Order { get; private set; }
-
+        public static CauseParamType SortableSetAllForOrder_SortableFormat { get; private set; }
         public static CauseParamType SortableSetOrbit_Order { get; private set; }
         public static CauseParamType SortableSetOrbit_Perm { get; private set; }
         public static CauseParamType SortableSetOrbit_MaxCount { get; private set; }
 
         public static CauseParamType SortableSetStacked_Orders { get; private set; }
+        public static CauseParamType SortableSetStacked_SortableFormat { get; private set; }
 
         public static CauseParamType SorterGroupName_SorterGroupName { get; private set; }
 

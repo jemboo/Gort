@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Tests.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gort.Cause\Gort.Cause.fsproj" />
+    <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
+    <ProjectReference Include="..\Gort.DataConvert\Gort.DataConvert.fsproj" />
+    <ProjectReference Include="..\Gort.DataStore\Gort.DataStore.csproj" />
+    <ProjectReference Include="..\Gort.Ops\Gort.Ops.fsproj" />
+    <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
+  </ItemGroup>
+
+</Project>

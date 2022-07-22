@@ -6,6 +6,9 @@ module ctrSortable =
     let runSortableImport (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
         5 |> Ok
 
+    let runSortableSetImport (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
+        5 |> Ok
+
     let runSortableSetDef (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
         5 |> Ok
 
@@ -36,16 +39,20 @@ module ctrSortable =
     let RunSortable (cz:Cause) (ctxt:Gort.Data.DataModel.IGortContext) =
         match cz.CauseType.Name with
         | "SortableImport" -> runSortableImport cz ctxt
-        | n -> (sprintf "%s not handled in RunSortable" n) |> Error
+        | "SortableSetImport" -> runSortableSetImport cz ctxt
+        | n -> (sprintf "The Cause: %s not a child of Sortable" n) |> Error
 
     let RunSortableChildren (cz:Cause) (pth:string list) (ctxt:Gort.Data.DataModel.IGortContext) =
         match pth with
         | [] -> "No path in RunSortableChildren" |> Error
-        | x::[] -> match x with  
-            | "SortableSetDef" -> runSortableSetDef cz ctxt
-            | "SortableSetRnd" -> runSortableSetRnd cz ctxt
-            | _ -> "Bad path in RunSortableChildren" |> Error
+        | x::[] -> match x with
+            | "SortableSetDef" -> ctrSortableSetDef.RunSortableSetDef cz ctxt
+            | "SortableSetRnd" -> ctrSortableSetRnd.RunSortableSetRnd cz ctxt
+            | _ -> (sprintf "The CauseTypeGroup: %s is not a child of Sortable" x) |> Error
         | x::xs -> match x with  
-                   | "SortableSetDef" -> 5 |> Ok
-                   | "SortableSetRnd" -> 5 |> Ok
-                   | _ -> "Bad path in RunSortableChildren" |> Error
+                   | "SortableSetDef" -> (sprintf "CauseTypeGroup: %s is not a child of SortableSetDef" 
+                                            xs.[0]) |> Error
+                   | "SortableSetRnd" -> (sprintf "CauseTypeGroup: %s is not a child of SortableSetRnd" 
+                                            xs.[0]) |> Error
+                   | _ -> (sprintf "CauseTypeGroup: %s is not a child of Sortable" 
+                             x) |> Error

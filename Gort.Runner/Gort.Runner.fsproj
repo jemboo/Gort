@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="WorkspaceRunner.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="RunUtils.fs" />
+    <Compile Include="RunSortableSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

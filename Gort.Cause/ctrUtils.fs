@@ -39,10 +39,3 @@ module ctrUtils =
         | "Rng" -> runMakeRandGenRecord cz ctxt
         | "RngSet" -> runMakeSetOfRandGenRecords cz ctxt
         | n -> (sprintf "%s not handled in RunRoot" n) |> Error
-
-    let RunUtilsChildren (cz:Cause) 
-                         (pth:string list) 
-                         (ctxt:Gort.Data.DataModel.IGortContext) =
-        let g::gs = pth
-        match g with
-        | n -> (sprintf "%s not handled in RunUtilsChildren" n) |> Error

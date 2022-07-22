@@ -9,9 +9,9 @@ namespace Gort.Data.Instance.StandardTypes
         {
             Rng = MakeCauseType(CauseTypeName.Rng, CauseTypeGroups.Utils);
             RngSet = MakeCauseType(CauseTypeName.RngSet, CauseTypeGroups.Utils);
-            SorterMutation = MakeCauseType(CauseTypeName.SorterMutation, CauseTypeGroups.Utils);
+            SorterMutation = MakeCauseType(CauseTypeName.SorterMutation, CauseTypeGroups.Sorter);
             SortableImport = MakeCauseType(CauseTypeName.SortableImport, CauseTypeGroups.Sortable);
-            SortableSetImport = MakeCauseType(CauseTypeName.SortableSetImport, CauseTypeGroups.SortableSetDef);
+            SortableSetImport = MakeCauseType(CauseTypeName.SortableSetImport, CauseTypeGroups.Sortable);
             SortableSetRand = MakeCauseType(CauseTypeName.SortableSetRand, CauseTypeGroups.SortableSetRnd);
             SortableSetAllForOrder = MakeCauseType(CauseTypeName.SortableSetAllForOrder, CauseTypeGroups.SortableSetDef);
             SortableSetOrbit = MakeCauseType(CauseTypeName.SortableSetOrbit, CauseTypeGroups.SortableSetDef);

@@ -2,15 +2,15 @@
 using Gort.Data.Instance.StandardTypes;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance.CauseBuilder
+namespace Gort.Data.Instance.CauseBuilder.Utils
 {
 
     public class CbRandSet : CauseBuilderBase
     {
         public CbRandSet(
-                    string workspaceName, 
+                    string workspaceName,
                     int causeIndex,
-                    string descr, 
+                    string descr,
                     Param paramRngId,
                     Param paramRngCount
                     ) : base(workspaceName, causeIndex)
@@ -24,9 +24,9 @@ namespace Gort.Data.Instance.CauseBuilder
 
             CauseDescription = $"{descr}({RngId},{RngCount})";
             CauseMakeRandSet = MakeCause(CauseTypes.RngSet);
-            CauseParamRngId = MakeCauseParam(CauseParamTypes.RngSet_RndGenId, 
+            CauseParamRngId = MakeCauseParam(CauseParamTypes.RngSet_RndGenId,
                 CauseMakeRandSet, PramRngId);
-            CauseParamRngCount = MakeCauseParam(CauseParamTypes.RngSet_RndGenCount, 
+            CauseParamRngCount = MakeCauseParam(CauseParamTypes.RngSet_RndGenCount,
                 CauseMakeRandSet, PramRngCount);
         }
 

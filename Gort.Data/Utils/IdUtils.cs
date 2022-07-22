@@ -45,11 +45,11 @@ namespace Gort.Data.Utils
             var id = GuidUtils.guidFromObjs(new object[2] { cp.CauseId, cp.CauseParamTypeId });
             return new CauseParam() { CauseParamId = id, CauseId = cp.CauseId, CauseParamTypeId = cp.CauseParamTypeId, ParamId = cp.ParamId };
         }
-        public static DataModel.RandGen AddStructId(this DataModel.RandGen rg)
+        public static RandGen AddStructId(this DataModel.RandGen rg)
         {
             var ids = GuidUtils.guidFromObjs(new object[2] { rg.RandGenType, rg.Seed });
             var id = GuidUtils.guidFromObjs(new object[2] { rg.CauseId, rg.CausePath });
-            return new DataModel.RandGen() { RandGenId = id, StructId = ids, RandGenType = rg.RandGenType, Seed = rg.Seed, CauseId = rg.CauseId, CausePath = rg.CausePath };
+            return new RandGen() { RandGenId = id, StructId = ids, RandGenType = rg.RandGenType, Seed = rg.Seed, CauseId = rg.CauseId, CausePath = rg.CausePath };
         }
         public static DataModel.Sorter AddStructId(this DataModel.Sorter sorter)
         {

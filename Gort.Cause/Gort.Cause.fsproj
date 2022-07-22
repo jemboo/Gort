@@ -11,6 +11,7 @@
     <Compile Include="enumConv.fs" />
     <Compile Include="gcOps.fs" />
     <Compile Include="paramConv.fs" />
+    <Compile Include="ctrSortableSetRnd.fs" />
     <Compile Include="ctrSortableSetDef.fs" />
     <Compile Include="ctrSortable.fs" />
     <Compile Include="ctrSorter.fs" />
@@ -19,7 +20,11 @@
     <Compile Include="ctrSorterShc.fs" />
     <Compile Include="ctrUtils.fs" />
     <Compile Include="ctrRoot.fs" />
+    <Compile Include="Run.fs" />
     <Compile Include="CauseOps.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="RunUtils.fs" />
+    <Compile Include="RunSortableSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

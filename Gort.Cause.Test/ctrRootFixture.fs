@@ -16,7 +16,7 @@ type ctrRootFixture () =
     member this.RunCause () =
         let cz, cestry = CauseOps.GetCauseDispatcherInfo texto causeOneRngID 
                           |> Result.ExtractOrThrow
-        let res = ctrRoot.RunCause cz (cestry |> Array.toList) texto
+        let res = Run.RunCause cz (cestry |> Array.toList) texto
         Assert.IsTrue(true);
 
     [<TestMethod>]
@@ -26,7 +26,7 @@ type ctrRootFixture () =
             if nextCause <> null then
                 let cz, cestry = CauseOps.GetCauseDispatcherInfo texto nextCause.CauseId 
                                   |> Result.ExtractOrThrow
-                ctrRoot.RunCause cz (cestry |> Array.toList) texto
+                Run.RunCause cz (cestry |> Array.toList) texto
             else
                 1 |> Result.Ok
 

@@ -38,7 +38,7 @@ module gcOps =
                             |> Seq.map(fun dex -> (dex.ToString(), Rando.nextRngGen randy))
                             |> Seq.toList
                 let! res = rgs |> List.map(fun tup -> 
-                    MakeRandGenRecordAndTable randGenType (getSeed tup) causeId (fst tup) ctxt)
+                        MakeRandGenRecordAndTable randGenType (getSeed tup) causeId (fst tup) ctxt)
                                |> Result.sequence
                 return res.Length
             }
@@ -46,13 +46,11 @@ module gcOps =
             | ex -> ("error in MakeRndGenRecord: " + ex.Message ) |> Result.Error 
 
 
-
     let MakeRandGenFromRecord (rndGenId:Guid) (ctxt:IGortContext) =
         try
             DomainQuery.GetRandGen(rndGenId, ctxt) |> Ok
         with
             | ex -> ("error in GetRandGenRecord: " + ex.Message ) |> Result.Error
-
 
 
     let MakeRngGenFromRecord (randGenId:Guid) (ctxt:IGortContext) =

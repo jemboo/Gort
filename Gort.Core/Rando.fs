@@ -3,7 +3,7 @@ open System
 
 // Rando
 type randomSeed = private RandomSeed of int
-type rngType = | Lcg | Net
+type rngType = | Lcg = 1 | Net = 2
 type rngGen = {rngType:rngType; seed:randomSeed}
 
 type IRando =

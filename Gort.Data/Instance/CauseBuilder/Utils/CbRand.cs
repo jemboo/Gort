@@ -2,9 +2,8 @@
 using Gort.Data.Instance.StandardTypes;
 using Gort.Data.Utils;
 
-namespace Gort.Data.Instance.CauseBuilder
+namespace Gort.Data.Instance.CauseBuilder.Utils
 {
-
     public class CbRand : CauseBuilderBase
     {
         public CbRand(
@@ -18,9 +17,9 @@ namespace Gort.Data.Instance.CauseBuilder
             RandGenType = paramRngType.RandGenTypeValue();
             CauseDescription = $"{descr}({RandGenType},{Seed})";
             CauseMakeRand = MakeCause(CauseTypes.Rng);
-            CauseParamSeed = MakeCauseParam(CauseParamTypes.Rng_RngSeed, 
+            CauseParamSeed = MakeCauseParam(CauseParamTypes.Rng_RngSeed,
                 CauseMakeRand, RngSeed);
-            CauseParamRngType = MakeCauseParam(CauseParamTypes.Rng_RngType, 
+            CauseParamRngType = MakeCauseParam(CauseParamTypes.Rng_RngType,
                 CauseMakeRand, RngTypeLcg);
         }
 

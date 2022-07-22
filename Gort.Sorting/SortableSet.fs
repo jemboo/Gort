@@ -55,7 +55,6 @@ module SortableSet =
         | _ -> "invalid format in makeAllBits" |> Error
 
 
-
     let makeOrbits (ord:order) (format:byteWidth) (perm:permutation) = 
         let orbit = Permutation.powers perm |> Seq.toArray
         match (ByteWidth.value format) with

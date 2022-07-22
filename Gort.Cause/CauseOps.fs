@@ -57,6 +57,6 @@ module CauseOps =
         result {
             let! nextCause = GetPendingCauseForWorkspace ctxt wsName
             let! cz, cestry = GetCauseDispatcherInfo ctxt nextCause.CauseId 
-            let! dex = ctrRoot.RunCause cz (cestry |> Array.toList) ctxt
+            let! dex = Run.RunCause cz (cestry |> Array.toList) ctxt
             return dex
         }

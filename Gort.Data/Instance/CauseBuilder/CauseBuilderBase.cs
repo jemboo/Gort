@@ -12,6 +12,7 @@ namespace Gort.Data.Instance.CauseBuilder
             Workspace = new Workspace() { Name = workspaceName }.AddId();
         }
 
+        public Cause Cause { get; protected set; }
         public string WorkspaceName { get; }
         public int CauseIndex { get; }
 
