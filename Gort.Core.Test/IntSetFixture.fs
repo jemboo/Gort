@@ -18,7 +18,7 @@ type IntSetFixture () =
     member this.randomCycles () =
         let maxSz = 100000
         let _cycT (perm:permutation) =
-            perm |> Permutation.powers 
+            perm |> Permutation.powers None
                  |> CollectionOps.takeUpto maxSz
                  |> Seq.length
                     
@@ -34,7 +34,7 @@ type IntSetFixture () =
     member this.randomCycles2 () =
         let maxSz = 100
         let _cycT (perm:permutation) =
-            perm |> Permutation.powers 
+            perm |> Permutation.powers None
                  |> CollectionOps.takeUpto maxSz
                  |> Seq.map(fun p -> ByteUtils.allUint64s (Permutation.getArray p))
                  |> Seq.concat

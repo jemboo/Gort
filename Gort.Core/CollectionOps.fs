@@ -66,6 +66,19 @@ module CollectionOps =
                 yield a_cur
         }
 
+    let allPowersCapped (maxCount:int) (a_core:array<int>) =
+        seq {
+            let mutable _continue = true
+            let mutable dex = 0
+            let mutable a_cur = Array.copy a_core
+            while ( _continue && (dex < maxCount)) do
+                yield a_cur 
+                let a_next = Array.zeroCreate a_cur.Length
+                a_cur <- arrayProductInt a_core a_cur a_next
+                _continue <- not (CollectionProps.isIdentity a_next)
+                dex <- dex + 1
+        }
+
     let conjIntArraysNr (a_conj:array<int>) 
                         (a_core:array<int>)  
                         (a_out:array<int>) =

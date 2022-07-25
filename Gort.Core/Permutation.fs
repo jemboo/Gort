@@ -18,17 +18,20 @@ module Permutation =
 
     let getArray (perm:permutation) = perm.values
         
-    let getDegree (perm:permutation) =
+    let getOrder (perm:permutation) =
         Order.createNr perm.values.Length
 
     let rotate (order:order) (dir:int) = 
         let d = (Order.value order)
         { values=Array.init d (fun i-> (i + dir) % d)}
 
+    let powers (maxCount:int option) (perm:permutation) =
+        let permSeq = 
+            match maxCount with
+            | Some mc -> perm.values |> CollectionOps.allPowersCapped mc
+            | None -> perm.values |> CollectionOps.allPowers
 
-    let powers (perm:permutation)  =
-        perm.values |> CollectionOps.allPowers
-                    |> Seq.map(fun vs -> {permutation.values = vs})
+        permSeq |> Seq.map(fun vs -> {permutation.values = vs})
 
     let conjugate (conj:permutation)  (pA:permutation) =
         result {
@@ -40,7 +43,7 @@ module Permutation =
 
     let cyclicGroup (order:order) = 
         let r1 = rotate order 1
-        powers r1 |> Seq.toArray
+        powers None r1 |> Seq.toArray
 
     let identity (order:order) = 
         { values= CollectionProps.identity (Order.value order)}

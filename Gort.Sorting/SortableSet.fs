@@ -4,142 +4,184 @@ type sortableSet = {id:sortableSetId; rollout:rollout}
  
 module SortableSet =
 
-    let makeAllBits (ord:order) (format:byteWidth) = 
-        match (ByteWidth.value format) with
+    let toSortableIntArrays (sortableSet:sortableSet) =
+        //let byteW = sortableSet.rollout |> Rollout.byteLength |> Byt
+
+        None
+        
+    let makeAllBits (order:order) (byteWidth:byteWidth) = 
+        match (ByteWidth.value byteWidth) with
         | 1 -> 
             result {
-                let! sortables = IntSet8.allForAsSeq ord
+                let! byteArray = IntSet8.allForAsSeq order
                                 |> Seq.map(IntSet8.getValues)
                                 |> Seq.concat
                                 |> Seq.toArray
                                 |> ByteArray.convertUint8sToBytes
-                let! rollWdth = (ByteWidth.create 1)
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = (RollCount.create (1 <<< (Order.value ord)))
-                let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
+
+                let! chunkCt = (ChunkCount.create (1 <<< (Order.value order)))
+                let! rollout = byteArray |> Rollout.init byteWidth chunkCt order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 2 -> 
             result {
-                let! sortables = IntSet16.allForAsSeq ord
+                let! byteArray = IntSet16.allForAsSeq order
                                  |> Seq.map(IntSet16.getValues)
                                  |> Seq.concat
                                  |> Seq.toArray
                                  |> ByteArray.convertUint16sToBytes
-                let! rollWdth = (ByteWidth.create 2)
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = (RollCount.create (1 <<< (Order.value ord)))
-                let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
+
+                let! chunkCt = (ChunkCount.create (1 <<< (Order.value order)))
+                let! rollout = byteArray |> Rollout.init byteWidth chunkCt order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 8 -> 
             result {
-                let stripeAs = IntSet8.allForAsSeq ord
+                let stripeAs = IntSet8.allForAsSeq order
                                 |> Seq.map(IntSet8.getValues)
-                                |> ByteUtils.toStripeArrays 1uy ord
+                                |> ByteUtils.toStripeArrays 1uy order
                                 |> Seq.toArray
 
-                let! sortables = stripeAs
+                let! byteArray = stripeAs
                                 |> Array.concat
                                 |> ByteArray.convertUint64sToBytes
 
-                let! rollWdth = (ByteWidth.create 8)
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = (RollCount.create stripeAs.Length)
-                let! rollout = sortables |> Rollout.init rollWdth rollLen rollCt
-                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
+                let! rollLen = (ChunkCount.create stripeAs.Length)
+                let! rollout = byteArray |> Rollout.init byteWidth rollLen order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | _ -> "invalid format in makeAllBits" |> Error
 
 
-    let makeOrbits (ord:order) (format:byteWidth) (perm:permutation) = 
-        let orbit = Permutation.powers perm |> Seq.toArray
-        match (ByteWidth.value format) with
+    let makeOrbits (maxCount:sortableCount option) (byteWidth:byteWidth) 
+                   (perm:permutation)  = 
+        let intOpt = maxCount |> Option.map SortableCount.value
+        let permA = Permutation.powers intOpt perm |> Seq.toArray
+        let order = perm |> Permutation.getOrder
+        match (ByteWidth.value byteWidth) with
         | 1 -> 
             result {
-                let! norbi = orbit |> Array.map(Permutation.getArray)
+                let! norbi = permA |> Array.map(Permutation.getArray)
                                    |> Array.concat
                                    |> Array.map(uint8)
                                    |> ByteArray.convertUint8sToBytes
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = (RollCount.create orbit.Length)
-                let! rollout = norbi |> Rollout.init format rollLen rollCt
+                let! rollCt = (ChunkCount.create permA.Length)
+                let! rollout = norbi |> Rollout.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 2 -> 
             result {
-                let! norbi = orbit |> Array.map(Permutation.getArray)
+                let! norbi = permA |> Array.map(Permutation.getArray)
                                    |> Array.concat
                                    |> Array.map(uint16)
                                    |> ByteArray.convertUint16sToBytes
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = (RollCount.create orbit.Length)
-                let! rollout = norbi |> Rollout.init format rollLen rollCt
+                let! rollCt = (ChunkCount.create permA.Length)
+                let! rollout = norbi |> Rollout.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 8 -> 
             result {
-                let! norb = orbit |> Array.map(Permutation.getArray)
+                let! norb = permA |> Array.map(Permutation.getArray)
                                   |> ByteUtils.toDistinctUint64s
                                   |> Seq.toArray
-                                  |> ByteUtils.uint64ArraytoBitStriped ord
+                                  |> ByteUtils.uint64ArraytoBitStriped order
 
-                let! striped = norb |> ByteUtils.uint64ArraytoBitStriped ord
+                let! striped = norb |> ByteUtils.uint64ArraytoBitStriped order
                 let! sortables = striped |> ByteArray.convertUint64sToBytes
-
-                let! rollLen = (RollLength.create (Order.value ord))
-                let! rollCt = orbit.Length |> CollectionProps.cratesFor 64 |> RollCount.create
-                let! rollout =  sortables |> Rollout.init format rollLen rollCt
+                let! rollCt = permA.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
+                let! rollout =  sortables |> Rollout.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
-        | _ -> "invalid format in makeAllBits" |> Error
+        | _ -> "invalid format in makeOrbits" |> Error
 
 
-    let makeSortedStacks (ord:order) (format:byteWidth) (degStack:order[]) = 
-        let stackTot = Order.add degStack
-        if stackTot <> ord then
-            "order list is incorrect" |> Error
-        else
-            match (ByteWidth.value format) with
-            | 1 -> 
-                result {
-                    let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
-                                    |> Seq.toArray
-                    let! rBytes = stacked |> Array.concat |> ByteArray.convertUint8sToBytes
-                    let! rollLen = (RollLength.create (Order.value ord))
-                    let! rollCt = RollCount.create stacked.Length
-                    let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
-                    return {sortableSet.id = ssId; rollout = rollout }
-                }
-            | 2 -> 
-                result {
-                    let stacked = CollectionOps.stackSortedBlocks degStack 1us 0us
-                                    |> Seq.toArray
-                    let! rBytes = stacked |> Array.concat |> ByteArray.convertUint16sToBytes
-                    let! rollLen = (RollLength.create (Order.value ord))
-                    let! rollCt = RollCount.create stacked.Length
-                    let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
-                    return {sortableSet.id = ssId; rollout = rollout }
-                }
-            | 8 -> 
-                result {
-                    let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
-                                    |> Seq.toArray
-                    let stripedAs = stacked |> ByteUtils.toStripeArrays 1uy ord
-                                            |> Seq.toArray
-                    let! rBytes = stripedAs |> Array.concat |> ByteArray.convertUint64sToBytes
-                    let! rollLen = (RollLength.create (Order.value ord))
-                    let! rollCt = stacked.Length |> CollectionProps.cratesFor 64 |> RollCount.create
-                    let! rollout = rBytes |> Rollout.init format rollLen rollCt
-                    let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
-                    return {sortableSet.id = ssId; rollout = rollout }
-                }
-            | _ -> "invalid format in makeAllBits" |> Error
+    let makeSortedStacks (byteWidth:byteWidth) (degStack:order[]) = 
+        let order = Order.add degStack
+        match (ByteWidth.value byteWidth) with
+        | 1 -> 
+            result {
+                let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
+                                |> Seq.toArray
+                let! rBytes = stacked |> Array.concat |> ByteArray.convertUint8sToBytes
+                let! chunkCt = ChunkCount.create stacked.Length
+                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | 2 -> 
+            result {
+                let stacked = CollectionOps.stackSortedBlocks degStack 1us 0us
+                                |> Seq.toArray
+                let! rBytes = stacked |> Array.concat |> ByteArray.convertUint16sToBytes
+                let! chunkCt = ChunkCount.create stacked.Length
+                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | 8 -> 
+            result {
+                let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
+                                |> Seq.toArray
+                let stripedAs = stacked |> ByteUtils.toStripeArrays 1uy order
+                                        |> Seq.toArray
+                let! rBytes = stripedAs |> Array.concat |> ByteArray.convertUint64sToBytes
+                let! chunkCt = stacked.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
+                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | _ -> "invalid format in makeSortedStacks" |> Error
+
+
+    let makeRandom (order:order) 
+                   (byteWidth:byteWidth)
+                   (rando:IRando)
+                   (sortableCount:sortableCount) =
+
+        let randPerms = Permutation.createRandoms order rando
+                        |> Seq.map(Permutation.getArray)
+                        
+        let chunkyCt = sortableCount |> SortableCount.value
+        match (ByteWidth.value byteWidth) with
+        | 1 -> 
+            result {
+                let! rBytes = randPerms |> Seq.concat
+                                       |> Seq.map(uint8)
+                                       |> Seq.toArray
+                                       |> ByteArray.convertUint8sToBytes
+                let! chunkCount = ChunkCount.create chunkyCt
+                let! rollout = rBytes |> Rollout.init byteWidth chunkCount order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | 2 -> 
+            result {
+                let! rBytes = randPerms |> Seq.concat
+                                       |> Seq.map(uint16)
+                                       |> Seq.toArray
+                                       |> ByteArray.convertUint16sToBytes
+                let! chunkCount = ChunkCount.create chunkyCt
+                let! rollout = rBytes |> Rollout.init byteWidth chunkCount order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | 8 -> 
+            result {
+                let! rBytes = randPerms |> ByteUtils.toDistinctUint64s
+                                      |> Seq.toArray
+                                      |> ByteUtils.uint64ArraytoBitStriped order
+
+                let! striped = rBytes |> ByteUtils.uint64ArraytoBitStriped order
+                let! sortables = striped |> ByteArray.convertUint64sToBytes
+                let! chunkCount = rBytes.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
+                let! rollout =  sortables |> Rollout.init byteWidth chunkCount order
+                let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
+                return {sortableSet.id = ssId; rollout = rollout }
+            }
+        | _ -> "invalid format in makeOrbits" |> Error

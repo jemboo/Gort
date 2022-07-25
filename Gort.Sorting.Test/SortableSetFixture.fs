@@ -16,9 +16,9 @@ type SortableSetFixture () =
         let rs16 = SortableSet.makeAllBits ord byteWidth16 |> Result.ExtractOrThrow
         let rs64 = SortableSet.makeAllBits ord byteWidth64 |> Result.ExtractOrThrow
 
-        Assert.IsTrue(res8.rollout |> Rollout.getRollWidth |> ByteWidth.value = 1);
-        Assert.IsTrue(rs16.rollout |> Rollout.getRollWidth |> ByteWidth.value = 2);
-        Assert.IsTrue(rs64.rollout |> Rollout.getRollWidth |> ByteWidth.value = 8);
+        Assert.IsTrue(res8.rollout |> Rollout.getByteWidth |> ByteWidth.value = 1);
+        Assert.IsTrue(rs16.rollout |> Rollout.getByteWidth |> ByteWidth.value = 2);
+        Assert.IsTrue(rs64.rollout |> Rollout.getByteWidth |> ByteWidth.value = 8);
 
 
     [<TestMethod>]
@@ -31,13 +31,13 @@ type SortableSetFixture () =
         let byteWidth8 = ByteWidth.create 1 |> Result.ExtractOrThrow
         let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
         let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
-        let res8 = SortableSet.makeOrbits ord byteWidth8 perm |> Result.ExtractOrThrow
-        let rs16 = SortableSet.makeOrbits ord byteWidth16 perm |> Result.ExtractOrThrow
-        let rs64 = SortableSet.makeOrbits ord byteWidth64 perm |> Result.ExtractOrThrow
+        let res8 = SortableSet.makeOrbits None byteWidth8 perm  |> Result.ExtractOrThrow
+        let rs16 = SortableSet.makeOrbits None byteWidth16 perm |> Result.ExtractOrThrow
+        let rs64 = SortableSet.makeOrbits None byteWidth64 perm |> Result.ExtractOrThrow
         
-        Assert.AreEqual(res8.rollout |> Rollout.getRollCount |> RollCount.value, 12);
-        Assert.AreEqual(rs16.rollout |> Rollout.getRollCount |> RollCount.value, 12);
-        Assert.AreEqual(rs64.rollout |> Rollout.getRollCount |> RollCount.value, 1);
+        Assert.AreEqual(res8.rollout |> Rollout.getOrder |> Order.value, 12);
+        Assert.AreEqual(rs16.rollout |> Rollout.getOrder |> Order.value, 12);
+        Assert.AreEqual(rs64.rollout |> Rollout.getOrder |> Order.value, 1);
 
 
     [<TestMethod>]
@@ -51,13 +51,22 @@ type SortableSetFixture () =
         let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
         let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
 
-        let res8 = SortableSet.makeSortedStacks order byteWidth8 degGrp
+        let res8 = SortableSet.makeSortedStacks byteWidth8 degGrp
                      |> Result.ExtractOrThrow
-        let res16 = SortableSet.makeSortedStacks order byteWidth16 degGrp
+        let res16 = SortableSet.makeSortedStacks byteWidth16 degGrp
                      |> Result.ExtractOrThrow
-        let res64 = SortableSet.makeSortedStacks order byteWidth64 degGrp
+        let res64 = SortableSet.makeSortedStacks byteWidth64 degGrp
                      |> Result.ExtractOrThrow
 
-        Assert.AreEqual(res8.rollout |> Rollout.getRollCount |> RollCount.value, 405);
-        Assert.AreEqual(res16.rollout |> Rollout.getRollCount |> RollCount.value, 405);
-        Assert.AreEqual(res64.rollout |> Rollout.getRollCount |> RollCount.value, 7);
+        Assert.AreEqual(res8.rollout |> Rollout.getOrder |> Order.value, 405);
+        Assert.AreEqual(res16.rollout |> Rollout.getOrder |> Order.value, 405);
+        Assert.AreEqual(res64.rollout |> Rollout.getOrder |> Order.value, 7);
+
+
+
+    [<TestMethod>]
+    member this.makeRandom() =
+
+
+        
+            Assert.IsTrue(true)

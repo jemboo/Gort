@@ -135,6 +135,14 @@ type CollectionOpsFixture () =
 
 
     [<TestMethod>]
+    member this.allPowersCapped () =
+        let maxCount = 5
+        let tc =  [|1;2;3;4;5;6;0|]
+        let orbit = CollectionOps.allPowersCapped maxCount tc |> Seq.toArray
+        Assert.AreEqual(orbit.Length, maxCount);
+
+
+    [<TestMethod>]
     member this.stackSortedBlocks () =
         let dgs = [4;2;2] |> List.map(Order.createNr)
         let blocks = CollectionOps.stackSortedBlocks dgs 0 1

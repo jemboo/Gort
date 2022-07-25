@@ -20,7 +20,7 @@ type PermutationFixture () =
     member this.Permutation_powers() =
         let ord = Order.createNr 16
         let perm = Permutation.rotate ord 1
-        let arA = perm |> Permutation.powers
+        let arA = perm |> Permutation.powers None
                        |> Seq.toArray
         Assert.AreEqual (arA.Length, 16)
 
@@ -33,7 +33,7 @@ type PermutationFixture () =
         let permCount = 1000
         let randPerms = Permutation.createRandoms ord iRando
                         |> CollectionOps.takeUpto permCount
-                        |> Seq.map((Permutation.powers) >> Seq.toArray)
+                        |> Seq.map((Permutation.powers None) >> Seq.toArray)
                         |> Seq.toArray
 
         let yabs = randPerms |> Array.countBy(fun po->po.Length)

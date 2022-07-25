@@ -55,7 +55,6 @@ module ByteUtils =
         let oneThresholds = seq { 0 .. (intVers.Length - 1) }
         oneThresholds |> Seq.map(arrayToUint64 intVers)
         
-
     let toDistinctUint64s (intVersions:int[] seq) =
         intVersions |> Seq.map(allUint64s) 
                     |> Seq.concat

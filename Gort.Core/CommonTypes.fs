@@ -78,7 +78,7 @@ module ByteWidth =
     let value (ByteWidth v) = v
     let create (value:int) =
         if (value = 1) || (value = 2) || (value = 4) || (value = 8) then value |> ByteWidth |> Ok
-        else "RollWidth must be 1, 2, 4 or 8" |> Error
+        else "byteWidth must be 1, 2, 4 or 8" |> Error
 
 
 type mutationRate = private MutationRate of float
