@@ -177,8 +177,9 @@ module Stage =
                      (stage:stage) = 
         match rnd.NextFloat with
             | k when k < (MutationRate.value mutationRate) -> 
+                        let sc = stage.order |> Order.value |> SymbolSetSize.createNr
                         let tcp = RandVars.drawTwoWithoutRep 
-                                                    stage.order 
+                                                    sc
                                                     rnd
                         mutateStageByPair stage tcp
             | _ -> stage
@@ -189,12 +190,10 @@ module Stage =
                          (stage:stage) = 
         match rnd.NextFloat with
             | k when k < (MutationRate.value mutationRate) -> 
+                        let sc = stage.order |> Order.value |> SymbolSetSize.createNr
                         let tcp = seq { 
                                 while true do 
-                                yield 
-                                    RandVars.drawTwoWithoutRep 
-                                                    stage.order 
-                                                    rnd }
+                                yield RandVars.drawTwoWithoutRep sc rnd }
                         mutateStageReflByPair stage tcp 
             | _ -> stage
 

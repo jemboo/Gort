@@ -1,6 +1,6 @@
 ﻿namespace global
 
-type sortableSet = {id:sortableSetId; rollout:rollout}
+type sortableSet = {id:sortableSetId; rollout:rolloutO}
  
 module SortableSet =
 
@@ -19,8 +19,8 @@ module SortableSet =
                                 |> Seq.toArray
                                 |> ByteArray.convertUint8sToBytes
 
-                let! chunkCt = (ChunkCount.create (1 <<< (Order.value order)))
-                let! rollout = byteArray |> Rollout.init byteWidth chunkCt order
+                let! chunkCt = (SymbolCount.create (1 <<< (Order.value order)))
+                let! rollout = byteArray |> RolloutO.init byteWidth chunkCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -32,8 +32,8 @@ module SortableSet =
                                  |> Seq.toArray
                                  |> ByteArray.convertUint16sToBytes
 
-                let! chunkCt = (ChunkCount.create (1 <<< (Order.value order)))
-                let! rollout = byteArray |> Rollout.init byteWidth chunkCt order
+                let! chunkCt = (SymbolCount.create (1 <<< (Order.value order)))
+                let! rollout = byteArray |> RolloutO.init byteWidth chunkCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -48,8 +48,8 @@ module SortableSet =
                                 |> Array.concat
                                 |> ByteArray.convertUint64sToBytes
 
-                let! rollLen = (ChunkCount.create stripeAs.Length)
-                let! rollout = byteArray |> Rollout.init byteWidth rollLen order
+                let! rollLen = (SymbolCount.create stripeAs.Length)
+                let! rollout = byteArray |> RolloutO.init byteWidth rollLen order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes byteArray)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -68,8 +68,8 @@ module SortableSet =
                                    |> Array.concat
                                    |> Array.map(uint8)
                                    |> ByteArray.convertUint8sToBytes
-                let! rollCt = (ChunkCount.create permA.Length)
-                let! rollout = norbi |> Rollout.init byteWidth rollCt order
+                let! rollCt = (SymbolCount.create permA.Length)
+                let! rollout = norbi |> RolloutO.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -79,8 +79,8 @@ module SortableSet =
                                    |> Array.concat
                                    |> Array.map(uint16)
                                    |> ByteArray.convertUint16sToBytes
-                let! rollCt = (ChunkCount.create permA.Length)
-                let! rollout = norbi |> Rollout.init byteWidth rollCt order
+                let! rollCt = (SymbolCount.create permA.Length)
+                let! rollout = norbi |> RolloutO.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes norbi)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -93,8 +93,8 @@ module SortableSet =
 
                 let! striped = norb |> ByteUtils.uint64ArraytoBitStriped order
                 let! sortables = striped |> ByteArray.convertUint64sToBytes
-                let! rollCt = permA.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
-                let! rollout =  sortables |> Rollout.init byteWidth rollCt order
+                let! rollCt = permA.Length |> CollectionProps.cratesFor 64 |> SymbolCount.create
+                let! rollout =  sortables |> RolloutO.init byteWidth rollCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -109,8 +109,8 @@ module SortableSet =
                 let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
                                 |> Seq.toArray
                 let! rBytes = stacked |> Array.concat |> ByteArray.convertUint8sToBytes
-                let! chunkCt = ChunkCount.create stacked.Length
-                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let! chunkCt = SymbolCount.create stacked.Length
+                let! rollout = rBytes |> RolloutO.init byteWidth chunkCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -119,8 +119,8 @@ module SortableSet =
                 let stacked = CollectionOps.stackSortedBlocks degStack 1us 0us
                                 |> Seq.toArray
                 let! rBytes = stacked |> Array.concat |> ByteArray.convertUint16sToBytes
-                let! chunkCt = ChunkCount.create stacked.Length
-                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let! chunkCt = SymbolCount.create stacked.Length
+                let! rollout = rBytes |> RolloutO.init byteWidth chunkCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -131,8 +131,8 @@ module SortableSet =
                 let stripedAs = stacked |> ByteUtils.toStripeArrays 1uy order
                                         |> Seq.toArray
                 let! rBytes = stripedAs |> Array.concat |> ByteArray.convertUint64sToBytes
-                let! chunkCt = stacked.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
-                let! rollout = rBytes |> Rollout.init byteWidth chunkCt order
+                let! chunkCt = stacked.Length |> CollectionProps.cratesFor 64 |> SymbolCount.create
+                let! rollout = rBytes |> RolloutO.init byteWidth chunkCt order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
@@ -143,44 +143,45 @@ module SortableSet =
                    (byteWidth:byteWidth)
                    (rando:IRando)
                    (sortableCount:sortableCount) =
-
+        
+        let sortableCt = sortableCount |> SortableCount.value
         let randPerms = Permutation.createRandoms order rando
+                        |> Seq.take sortableCt
                         |> Seq.map(Permutation.getArray)
                         
-        let chunkyCt = sortableCount |> SortableCount.value
         match (ByteWidth.value byteWidth) with
         | 1 -> 
             result {
                 let! rBytes = randPerms |> Seq.concat
-                                       |> Seq.map(uint8)
-                                       |> Seq.toArray
-                                       |> ByteArray.convertUint8sToBytes
-                let! chunkCount = ChunkCount.create chunkyCt
-                let! rollout = rBytes |> Rollout.init byteWidth chunkCount order
+                                        |> Seq.map(uint8)
+                                        |> Seq.toArray
+                                        |> ByteArray.convertUint8sToBytes
+                let! chunkCount = SymbolCount.create sortableCt
+                let! rollout = rBytes |> RolloutO.init byteWidth chunkCount order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 2 -> 
             result {
                 let! rBytes = randPerms |> Seq.concat
-                                       |> Seq.map(uint16)
-                                       |> Seq.toArray
-                                       |> ByteArray.convertUint16sToBytes
-                let! chunkCount = ChunkCount.create chunkyCt
-                let! rollout = rBytes |> Rollout.init byteWidth chunkCount order
+                                        |> Seq.map(uint16)
+                                        |> Seq.toArray
+                                        |> ByteArray.convertUint16sToBytes
+                let! chunkCount = SymbolCount.create sortableCt
+                let! rollout = rBytes |> RolloutO.init byteWidth chunkCount order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes rBytes)
                 return {sortableSet.id = ssId; rollout = rollout }
             }
         | 8 -> 
             result {
                 let! rBytes = randPerms |> ByteUtils.toDistinctUint64s
-                                      |> Seq.toArray
-                                      |> ByteUtils.uint64ArraytoBitStriped order
+                                        |> Seq.toArray
+                                        |> ByteUtils.uint64ArraytoBitStriped order
 
                 let! striped = rBytes |> ByteUtils.uint64ArraytoBitStriped order
                 let! sortables = striped |> ByteArray.convertUint64sToBytes
-                let! chunkCount = rBytes.Length |> CollectionProps.cratesFor 64 |> ChunkCount.create
-                let! rollout =  sortables |> Rollout.init byteWidth chunkCount order
+                let! chunkCount = rBytes.Length |> CollectionProps.cratesFor 64 |> SymbolCount.create
+                let! rollout =  sortables |> RolloutO.init byteWidth chunkCount order
                 let ssId = SortableSetId.create (GuidUtils.hashBytes sortables)
                 return {sortableSet.id = ssId; rollout = rollout }
             }

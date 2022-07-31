@@ -13,6 +13,7 @@ type CommonTypesFixture () =
         let cc = Order.maxSwitchesPerStage order
         Assert.AreEqual(msw, cc)
     
+
     [<TestMethod>]
     member this.Degree_reflect() =
         let order7 = Order.createNr 7
@@ -28,7 +29,6 @@ type CommonTypesFixture () =
         Assert.AreEqual(d6r2, 3)
 
 
-
     [<TestMethod>]
     member this.TestMethodPassing () =
         let ord = Order.createNr 8
@@ -37,3 +37,12 @@ type CommonTypesFixture () =
                     |> Seq.toArray
         Assert.AreEqual(sA.Length, (Order.value ord));
         Assert.AreEqual(sAs.Length, (Order.value ord) + 1);
+
+
+    [<TestMethod>]
+    member this.SymbolCountToByteWidth () =
+        let sc = 9 |> SymbolSetSize.createNr
+        let bw = sc |> BitWidth.fromSymbolSetSize
+                    |> Result.ExtractOrThrow
+                    |> BitWidth.value
+        Assert.AreEqual(bw, 3);

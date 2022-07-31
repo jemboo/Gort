@@ -45,3 +45,10 @@ type SysExtFixture () =
         let uint64_25 = 1 |> ByteUtils.arrayToUint64 bs25
         let onesCt = uint64_25.count
         Assert.AreEqual(onesCt, 25)
+
+    [<TestMethod>]
+    member this.chunky64b  () =
+        let bs25 = [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let yy = 196uy
+        let len = bs25 |> Seq.chunkBySize(3) |> Seq.toList
+        Assert.AreEqual(1, 1)

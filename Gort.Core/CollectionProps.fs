@@ -1,8 +1,32 @@
 ﻿namespace global
 open System
+open System.Collections
+open System.Runtime.CompilerServices
 
 
 module CollectionProps =
+
+    let rec compareAny (o1:obj) (o2:obj) = 
+        match (o1, o2) with
+        | (:? IComparable as o1), (:? IComparable as o2) 
+             -> Some(compare o1 o2)
+        | (:? IEnumerable as arr1), (:? IEnumerable as arr2) ->      
+            Seq.zip (arr1 |> Seq.cast) (arr2 |> Seq.cast)
+            |> Seq.choose(fun (a, b) -> compareAny a b)
+            |> Seq.skipWhile ((=) 0)
+            |> Seq.tryHead
+            |> Option.defaultValue 0
+            |> Some
+        | (:? ITuple as tup1), (:? ITuple as tup2) ->
+            let tupleToSeq (tuple: ITuple) = 
+                seq { for i in 0..tuple.Length do yield tuple.[i] }
+            compareAny (tupleToSeq tup1) (tupleToSeq tup2)
+        | _ -> None
+
+    let areEqual (o1:obj) (o2:obj) = 
+        match compareAny o1 o2 with
+        | Some v -> v = 0
+        | None -> false
 
     let arrayEquals<'a when 'a:equality> (lhs:'a[]) (rhs:'a[]) =
         (lhs.Length = rhs.Length) &&
@@ -28,6 +52,19 @@ module CollectionProps =
         let fullCrates = items / itemsPerCrate
         let leftOvers = items % itemsPerCrate
         if (leftOvers = 0) then fullCrates else fullCrates + 1
+
+    let check2dArraySize (arrayLength:arrayLength) (arrayCount:arrayCount)  
+                         (data:'T[]) = 
+        let expectedLen = (arrayLength |> ArrayLength.value) * 
+                          (arrayCount |> ArrayCount.value)
+        if (data.Length = expectedLen) then
+            () |> Ok
+        else    
+            sprintf "arrayLength:%d, arrayCount: %d data length: %d" 
+                    (arrayLength |> ArrayLength.value)
+                    (arrayCount |> ArrayCount.value)
+                    data.Length
+                    |> Error
 
 
     let distanceSquared (a:'a[]) 

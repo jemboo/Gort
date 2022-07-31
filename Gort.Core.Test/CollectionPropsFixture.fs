@@ -8,6 +8,16 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type CollectionPropsFixture () =
 
     [<TestMethod>]
+    member this.areEqual () =
+        let a1 = [| [|1;2;3;|]; [|1;2;3;|]; [|1;2;3;|] |]
+        let a2 = [| [|1;2;3;|]; [|1;2;3;|]; [|1;2;3;|] |]
+        let a3 = [| [|1;2;3;|]; [|1;2;2;|]; [|1;2;3;|] |]
+        let c1 = CollectionProps.areEqual a1 a2 
+        let c2 = CollectionProps.areEqual a1 a3 
+        Assert.IsTrue(c1)
+        Assert.IsFalse(c2)
+
+    [<TestMethod>]
     member this.arrayEquals () =
         let a1 = [|1;2;3;|]
         let a2 = [|1;2;3;|]

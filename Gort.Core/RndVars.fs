@@ -30,12 +30,18 @@ module RandVars =
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
 
 
-    let drawTwoWithoutRep (order:order) 
+    let randSymbols (symbolCount:symbolSetSize) (rnd:IRando) (len:int) =
+        let sc = SymbolSetSize.value(symbolCount)
+        Seq.init len (fun _ -> (rnd.NextPositiveInt % sc))
+
+
+    let drawTwoWithoutRep (symbolCount:symbolSetSize)
                           (rnd:IRando) =
-        let aBit = rnd.NextPositiveInt % Order.value(order)
-        let mutable bBit = rnd.NextPositiveInt % Order.value(order)
+        let sc = SymbolSetSize.value(symbolCount)
+        let aBit = rnd.NextPositiveInt % sc
+        let mutable bBit = rnd.NextPositiveInt % sc
         while aBit = bBit do
-            bBit <- rnd.NextPositiveInt % Order.value(order)
+            bBit <- rnd.NextPositiveInt % sc
         if aBit < bBit then aBit, bBit
         else bBit, aBit
 
@@ -73,7 +79,8 @@ module RandVars =
 
 
     let randomPermutation (rnd:IRando) (order:order)  =
-         (fisherYatesShuffle rnd)  [|0 .. (Order.value(order) - 1)|] |> Seq.toArray
+         (fisherYatesShuffle rnd)  [|0 .. (Order.value(order) - 1)|] 
+            |> Seq.toArray
 
 
     let randomPermutations (rnd:IRando) (order:order) =

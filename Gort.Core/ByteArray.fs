@@ -10,7 +10,8 @@ module ByteArray =
     /// *************** int< ^a >[] <->  int< ^a >[]  *************
     /// ***********************************************************
 
-    let copyIntArray (src_offset:int) (src:int[]) (dest_offset:int) (dest:int[]) (src_Ct:int) =
+    let copyIntArray (src_offset:int) (src:int[]) (dest_offset:int) 
+                     (dest:int[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
 
     let getIntArray(src_offset:int) (src_Ct:int) (src:int[]) =
@@ -18,7 +19,8 @@ module ByteArray =
         copyIntArray src_offset src 0 aout src_Ct
         aout
 
-    let copyUint8Array (src_offset:int) (src:uint8[]) (dest_offset:int) (dest:uint8[]) (src_Ct:int) =
+    let copyUint8Array (src_offset:int) (src:uint8[]) (dest_offset:int) 
+                       (dest:uint8[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset, dest, dest_offset, src_Ct)
 
     let getUintArray(src_offset:int) (src_Ct:int) (src:uint8[]) =
@@ -26,7 +28,8 @@ module ByteArray =
         copyUint8Array src_offset src 0 aout src_Ct
         aout
 
-    let copyUint16Array (src_offset:int) (src:uint16[]) (dest_offset:int) (dest:uint16[]) (src_Ct:int) =
+    let copyUint16Array (src_offset:int) (src:uint16[]) (dest_offset:int) 
+                        (dest:uint16[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 2, dest, dest_offset * 2, src_Ct * 2)
 
     let getUint16Array(src_offset:int) (src_Ct:int) (src:uint16[]) =
@@ -34,7 +37,8 @@ module ByteArray =
         copyUint16Array src_offset src 0 aout src_Ct
         aout
 
-    let copyUint32Array (src_offset:int) (src:uint32[]) (dest_offset:int) (dest:uint32[]) (src_Ct:int) =
+    let copyUint32Array (src_offset:int) (src:uint32[]) (dest_offset:int) 
+                        (dest:uint32[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
 
     let getUint32Array(src_offset:int) (src_Ct:int) (src:uint32[]) =
@@ -42,7 +46,8 @@ module ByteArray =
         copyUint32Array src_offset src 0 aout src_Ct
         aout
 
-    let copyUint64Array (src_offset:int) (src:uint64[]) (dest_offset:int) (dest:uint64[]) (src_Ct:int) =
+    let copyUint64Array (src_offset:int) (src:uint64[]) (dest_offset:int) 
+                        (dest:uint64[]) (src_Ct:int) =
             Buffer.BlockCopy(src, src_offset * 8, dest, dest_offset * 8, src_Ct * 8)
 
     let getUint64Array(src_offset:int) (src_Ct:int) (src:uint64[]) =
@@ -79,7 +84,8 @@ module ByteArray =
             | ex -> ("error in convertBytesToInts: " + ex.Message ) |> Result.Error
 
 
-    let mapIntsToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) (blob_offset:int) (uintA:int[]) =
+    let mapIntsToBytes (uintA_offset:int) (uint_ct:int) (blob:byte[]) 
+                       (blob_offset:int) (uintA:int[]) =
         try
             Buffer.BlockCopy(uintA, uintA_offset*8, blob, blob_offset, uint_ct * 4) 
             blob |> Ok

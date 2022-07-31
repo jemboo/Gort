@@ -23,6 +23,136 @@ module ByteUtils =
         md5.ComputeHash(stream.ToArray())
 
 
+    //let inline yabba< ^a when ^a : (static member (<<<) : ^a * int -> ^a)> (qua:^a) i =
+    //    qua &&& (1 <<< i) <> 0
+
+    //let inline yab< ^a > (qua:^a) i =
+    //    qua &&& (1 <<< i) <> 0
+
+
+    //let inline yabba (qua: ^a when ^a : (static member isset : int -> bool)) =
+    //            qua.isset 
+
+    let inline descendants name (xml:^x) =
+            (^x : (member Descendants : int -> seq<int>) (xml,name))
+
+    let inline descendants2 name (xml:^x) =
+            (^x : (member isset : int -> bool) (xml,name))
+
+    let inline descendants3 (xml:^x) name  =
+            (^x : (member isset : int -> bool) (xml,name))
+
+    let inline descendants4 (ibts:^x when ^x : (member isset : int -> bool)) dex =
+            (^x : (member isset : int -> bool) (ibts, dex))
+
+    let inline walk_the_creature_2 (creature:^a when ^a:(member Walk : unit -> unit)) =
+                (^a : (member Walk : unit -> unit) creature)
+
+    let inline walk_the_creature (creature:^a when ^a:(member Walk2 : int->int)) =
+                creature
+                //(^a : (member Walk2 : int->int) creature 5)
+
+    let inline yabb3 (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a)) =
+        qua <<< 3
+
+
+    let inline dabba (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a) and ^a : (static member (>>>) : ^a * int -> ^a)) =
+        qua <<< 3
+
+
+    let inline dodo (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a) and ^a : (static member (&&&) : ^a * ^a -> ^a)) =
+        qua <<< 3
+
+
+
+    let byteToBits (bitWidth:bitWidth) (v:byte) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in 0 .. (bw - 1) -> v.isset i }
+
+
+    let byteSeqToBits (bitWidth:bitWidth) (v:seq<byte>) =
+        seq { for i in v do yield! byteToBits bitWidth i }
+
+
+    let bitSeqToBytes (bitWidth:bitWidth) (bitsy:seq<bool>) =
+        let bw = bitWidth |> BitWidth.value
+        let _yab (_bs:seq<bool>) = 
+            let mutable bRet = new byte()
+            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            bRet
+        bitsy |> Seq.chunkBySize(bw)
+              |> Seq.where(fun chunk -> chunk.Length = bw)
+              |> Seq.map(_yab)
+
+
+
+    let uint16ToBits (bitWidth:bitWidth) (v:uint16) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in 0 .. (bw - 1) -> v.isset i }
+
+
+    let uint16SeqToBits (bitWidth:bitWidth) (v:seq<uint16>) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in v do yield! uint16ToBits bitWidth i }
+
+
+    let bitSeqToUint16 (bitWidth:bitWidth) (bitsy:seq<bool>) =
+        let bw = bitWidth |> BitWidth.value
+        let _yab (_bs:seq<bool>) =
+            let mutable bRet = new uint16()
+            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            bRet
+        bitsy |> Seq.chunkBySize(bw)
+              |> Seq.where(fun chunk -> chunk.Length = bw)
+              |> Seq.map(_yab)
+
+
+
+
+    let intToBits (bitWidth:bitWidth) (v:int) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in 0 .. (bw - 1) -> v.isset i }
+
+
+    let intSeqToBits (bitWidth:bitWidth) (v:seq<int>) =
+        seq { for i in v do yield! intToBits bitWidth i }
+
+
+    let bitSeqToInts (bitWidth:bitWidth) (bitsy:seq<bool>) =
+        let bw = bitWidth |> BitWidth.value
+        let _yab (_bs:seq<bool>) = 
+            let mutable bRet = new int()
+            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            bRet
+        bitsy |> Seq.chunkBySize(bw)
+              |> Seq.where(fun chunk -> chunk.Length = bw)
+              |> Seq.map(_yab)
+
+
+
+
+    let uint64ToBits (bitWidth:bitWidth) (v:uint64) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in 0 .. (bw - 1) -> v.isset i }
+
+
+    let uint64SeqToBits (bitWidth:bitWidth) (v:seq<uint64>) =
+        let bw = bitWidth |> BitWidth.value
+        seq { for i in v do yield! uint64ToBits bitWidth i }
+
+
+    let bitSeqToUint64 (bitWidth:bitWidth) (bitsy:seq<bool>) =
+        let bw = bitWidth |> BitWidth.value
+        let _yab (_bs:seq<bool>) =
+            let mutable bRet = new uint64()
+            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            bRet
+        bitsy |> Seq.chunkBySize(bw)
+              |> Seq.where(fun chunk -> chunk.Length = bw)
+              |> Seq.map(_yab)
+
+
+
     let IdMap_ints = 
         [|for deg=0 to 64 do 
                 yield if deg = 0 then [||] else [| 0 .. deg - 1 |] |]

@@ -85,13 +85,14 @@ type TwoCycleFixture () =
         let seed = RandomSeed.fromNow()
         let iRando = Rando.fromRngGen (RngGen.createNet seed)
         let ord = Order.createNr 16
+        let sc = ord |> Order.value |> SymbolSetSize.createNr
         let refSyms = Array.init 1000 (fun _ -> TwoCycle.rndSymmetric ord  iRando)
 
         let refMuts = 
             refSyms |> Array.map(fun p ->
                 let tcp = seq { 
                             while true do 
-                                yield RandVars.drawTwoWithoutRep ord iRando }
+                                yield RandVars.drawTwoWithoutRep sc iRando }
                 TwoCycle.mutateByReflPair tcp p)
 
         let mutReflBins = 

@@ -1,10 +1,12 @@
 namespace Gort.Core.Test
 
 open System
+open SysExt
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open ByteUtils
 
 [<TestClass>]
-type BitwiseFixture () =
+type ByteUtilsFixture () =
 
     [<TestMethod>]
     member this.allSorted_uL () =
@@ -122,4 +124,41 @@ type BitwiseFixture () =
                                   |> Result.sequence
                                   |> Result.ExtractOrThrow
     
-        Assert.AreEqual(intSetIn |> Array.toList, intSetBack);
+        Assert.AreEqual(intSetIn |> Array.toList, intSetBack)
+
+
+    [<TestMethod>]
+    member this.intPack () =
+        let max64 = 32 |> BitWidth.create |> Result.ExtractOrThrow
+        let v = 5uL
+        let va = [23454234uL; 23423uL]
+        let qa =  uint64ToBits max64 v |> Seq.toArray
+        let qaA =  uint64SeqToBits max64 va |> Seq.toArray
+        
+        let max8 = 8 |> BitWidth.create |> Result.ExtractOrThrow
+        let u = 5uy
+        let ua = [234uy; 42uy]
+        let pa =  byteToBits max8 u |> Seq.toArray
+        let paA =  byteSeqToBits max8 ua |> Seq.toArray
+
+        Assert.AreEqual(1, 1);
+
+
+    [<TestMethod>]
+    member this.intUnPack () =
+        let max64 = 32 |> BitWidth.create |> Result.ExtractOrThrow
+        let v = 5uL
+        let va = [23454234uL; 23423uL]
+        let qa =  uint64ToBits max64 v |> Seq.toArray
+        let qaA =  uint64SeqToBits max64 va |> Seq.toArray
+        let qaB =  bitSeqToUint64 max64 qaA |> Seq.toArray
+
+
+        let max8 = 8 |> BitWidth.create |> Result.ExtractOrThrow
+        let u = 5uy
+        let ua = [234uy; 42uy]
+        let pa =  byteToBits max8 u |> Seq.toArray
+        let paA =  byteSeqToBits max8 ua |> Seq.toArray
+        let akB = bitSeqToBytes max8 paA |> Seq.toArray
+
+        Assert.AreEqual(1, 1);

@@ -94,6 +94,14 @@ type System.Int32 with                        // x=this
     member x.abs = (x ^^^ (x >>> 31)) - (x >>> 31) //3000% faster than standard math.abs
 
 
+type System.UInt16 with                        // x=this
+    (* bit manipulation methods *)
+    member x.isset i = x &&& (1us <<< i) <> 0us     // test if bit set at a specified position 
+    member x.get i = x &&& (1us <<< i) <> 0us
+    member x.set i = x ||| (1us <<< i)            // set bit to 1 
+    member x.unset i = x &&& ~~~(1us <<< i)       // set bit from 0 
+    member x.flip i = (x ^^^ (1us <<< i))       // change bit  
+
 
 type System.UInt64 with                        // x=this
     (* bit manipulation methods *)
@@ -158,7 +166,7 @@ type System.UInt64 with                        // x=this
    // member x.toBits = System.Convert.ToString(x, 2).PadLeft(32, '0') // to binary   
     member x.toResizeArray =                    // to Resizable array of positions set to 1
       let array = ResizeArray()
-      for i=0 to 31 do
+      for i=0 to 63 do
         if x.isset i then array.Add(i)
       array        
     member x.toArray =                          // to array of positions set to 1
@@ -178,3 +186,12 @@ type System.UInt64 with                        // x=this
 
     (* misc methods *)
     member x.abs = (x ^^^ (x >>> 31)) - (x >>> 31) //3000% faster than standard math.abs
+
+
+type System.Byte with                        // x=this
+    (* bit manipulation methods *)
+    member x.isset i = x &&& (1uy <<< i) <> 0uy     // test if bit set at a specified position 
+    member x.get i = x &&& (1uy <<< i) <> 0uy
+    member x.set i = x ||| (1uy <<< i)            // set bit to 1 
+    member x.unset i = x &&& ~~~(1uy <<< i)       // set bit from 0 
+    member x.flip i = (x ^^^ (1uy <<< i))       // change bit  

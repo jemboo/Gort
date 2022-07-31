@@ -72,12 +72,33 @@ module Order =
                     |> Result.Error
 
 
+type bitWidth = private BitWidth of int
+type symbolSetSize = private SymbolSetSize of int
+
+module SymbolSetSize =
+    let value (SymbolSetSize v) = v
+    let create (value:int) =
+        if (value > 0) then value |> SymbolSetSize |> Ok
+        else "symbolSetSize must be gt 0" |> Error
+    let createNr (value:int) =
+        value |> SymbolSetSize
+
+module BitWidth = 
+    let value (BitWidth v) = v
+    let create (value:int) =
+        if (value > 0) then value |> BitWidth |> Ok
+        else "bitWidth must be gt 0" |> Error
+    let fromSymbolSetSize (symbolCount:symbolSetSize) =
+        let sc = symbolCount |> SymbolSetSize.value
+        Math.Log2(sc) |> int |> create
+
 
 type byteWidth = private ByteWidth of int
 module ByteWidth = 
     let value (ByteWidth v) = v
     let create (value:int) =
-        if (value = 1) || (value = 2) || (value = 4) || (value = 8) then value |> ByteWidth |> Ok
+        if (value = 1) || (value = 2) || (value = 4) || (value = 8) then 
+                value |> ByteWidth |> Ok
         else "byteWidth must be 1, 2, 4 or 8" |> Error
 
 
@@ -87,3 +108,26 @@ module MutationRate =
     let create (v:float) =
         MutationRate v
 
+
+type symbolCount = private SymbolCount of int
+module SymbolCount = 
+    let value (SymbolCount v) = v
+    let create (value:int) =
+        if (value > 0) then value |> SymbolCount |> Ok
+        else "symbolCount must be greater than 0" |> Error
+
+
+type arrayCount = private ArrayCount of int
+module ArrayCount = 
+    let value (ArrayCount v) = v
+    let create (value:int) =
+        if (value > 0) then value |> ArrayCount |> Ok
+        else "arrayCount must be greater than 0" |> Error
+
+
+type arrayLength = private ArrayLength of int
+module ArrayLength = 
+    let value (ArrayLength v) = v
+    let create (value:int) =
+        if (value > 0) then value |> ArrayLength |> Ok
+        else "arrayLength must be greater than 0" |> Error
