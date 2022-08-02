@@ -1,6 +1,6 @@
 namespace Gort.Core.Test
 
-open System
+open SysExt
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -40,9 +40,25 @@ type CommonTypesFixture () =
 
 
     [<TestMethod>]
-    member this.SymbolCountToByteWidth () =
-        let sc = 9 |> SymbolSetSize.createNr
+    member this.SymbolCount0ToByteWidth () =
+        let sc = 9uL |> SymbolSetSize.createNr
         let bw = sc |> BitWidth.fromSymbolSetSize
                     |> Result.ExtractOrThrow
                     |> BitWidth.value
         Assert.AreEqual(bw, 3);
+
+    [<TestMethod>]
+    member this.leftmost_index () =
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let mutable i = 0
+        while i < 100 do
+            let nuRnd = randy.NextULong
+            let leftDex = nuRnd.leftmost_index
+            let bv = nuRnd.get (leftDex + 0)
+            let bvS = nuRnd.get (leftDex + 1)
+            Assert.IsTrue(bv)
+            if (leftDex < 63) then
+                Assert.IsFalse(bvS)
+            i <- i + 1
+
+        Assert.AreEqual(3, 3);

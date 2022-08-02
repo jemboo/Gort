@@ -30,14 +30,15 @@ module RandVars =
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
 
 
-    let randSymbols (symbolCount:symbolSetSize) (rnd:IRando) (len:int) =
-        let sc = SymbolSetSize.value(symbolCount)
+    let randSymbols (symbolCount:symbolSetSize) 
+                    (rnd:IRando) (len:int) =
+        let sc = symbolCount |> SymbolSetSize.value |> int
         Seq.init len (fun _ -> (rnd.NextPositiveInt % sc))
 
 
     let drawTwoWithoutRep (symbolCount:symbolSetSize)
                           (rnd:IRando) =
-        let sc = SymbolSetSize.value(symbolCount)
+        let sc = symbolCount |> SymbolSetSize.value |> int
         let aBit = rnd.NextPositiveInt % sc
         let mutable bBit = rnd.NextPositiveInt % sc
         while aBit = bBit do

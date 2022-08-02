@@ -175,8 +175,8 @@ module Uint8Roll =
     let getArrayCount (uInt8Roll:uInt8Roll) =
         uInt8Roll.arrayCount
 
-    let getOrder (bitPack:bitPack) =
-        bitPack.symbolCount
+    let getArrayLength (uInt8Roll:uInt8Roll) =
+        uInt8Roll.arrayLength
 
     let getData (uInt8Roll:uInt8Roll) =
         uInt8Roll.data
@@ -232,8 +232,8 @@ module Uint16Roll =
     let getArrayCount (uInt16Roll:uInt16Roll) =
         uInt16Roll.arrayCount
 
-    let getOrder (bitPack:bitPack) =
-        bitPack.symbolCount
+    let getArrayLength (uInt16Roll:uInt16Roll) =
+        uInt16Roll.arrayLength
 
     let getData (uInt16Roll:uInt16Roll) =
         uInt16Roll.data
@@ -281,14 +281,15 @@ module Uint16Roll =
                          |> Seq.chunkBySize(uInt16Roll.arrayLength |> ArrayLength.value)
 
 
+
 type intRoll = private { arrayCount:arrayCount; arrayLength:arrayLength; data:int[] }
 module IntRoll =
 
     let getArrayCount (uInt8Roll:intRoll) =
         uInt8Roll.arrayCount
 
-    let getOrder (bitPack:bitPack) =
-        bitPack.symbolCount
+    let getArrayLength (intRoll:intRoll) =
+        intRoll.arrayLength
 
     let getData (uInt8Roll:intRoll) =
         uInt8Roll.data
@@ -341,8 +342,8 @@ module Uint64Roll =
     let getArrayCount (uint64Roll:uint64Roll) =
         uint64Roll.arrayCount
 
-    let getOrder (bitPack:bitPack) =
-        bitPack.symbolCount
+    let getArrayLength (uint64Roll:uint64Roll) =
+        uint64Roll.arrayLength
 
     let getData (uint64Roll:uint64Roll) =
         uint64Roll.data
@@ -391,8 +392,60 @@ module Uint64Roll =
                         |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
+    let fromUint64ArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
+                           (aas:seq<uint64[]>) =
+        result {
+            let uint64s = aas |> Seq.concat
+                              |> Seq.toArray
+            let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint64s
+            return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
+        }
+
+    let toUint64ArraySeq (uint64Roll:uint64Roll) =
+        uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
+
+
+    let fromIntArraySeqAsBitStriped (arrayLength:arrayLength) 
+                                    (arrayCount:arrayCount) 
+                                    (aas:seq<int[]>) =
+        let oo = arrayLength |> ArrayLength.value |> Order.createNr
+        let wab = aas |> Seq.toArray
+
+        let yab = ByteUtils.toStripeArrays 1 oo aas |> Seq.toArray
+        result {
+            let order = arrayLength |> ArrayLength.value |> Order.createNr
+            let data = ByteUtils.toStripeArrays 1 order aas
+                                |> Seq.concat
+                                |> Seq.toArray
+            return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
+        }
+
+
+    let asBitStripedToIntArraySeq (uint64Roll:uint64Roll) =
+         let order = uint64Roll.arrayLength |> ArrayLength.value |> Order.createNr
+         ByteUtils.fromStripeArrays 0 1 order uint64Roll.data
+
+
+
+
+
+
+
+
+
+
+
+
 
 type rolloutFormat = | RfU8 | RfU16 | RfI32 | RfU64
+
+module RolloutFormat =
+    let fromBitWidth (bitWidth:bitWidth) =
+        match (bitWidth |> BitWidth.value) with
+        | bw when bw < 9 -> rolloutFormat.RfU8
+        | bw when bw < 17 -> rolloutFormat.RfU16
+        | bw when bw < 32 -> rolloutFormat.RfI32
+        | _ -> rolloutFormat.RfU64
 
 type rollout = 
     | U8 of uInt8Roll
@@ -402,8 +455,25 @@ type rollout =
 
 
 module Rollout =
-    let fromIntArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                        (rolloutFormat:rolloutFormat)  (aas:seq<int[]>) =
+
+    let getArrayLength (rollout:rollout) =
+        match rollout with
+        | U8 _uInt8Roll -> _uInt8Roll.arrayLength
+        | U16 _uInt16Roll -> _uInt16Roll.arrayLength
+        | I32 _intRoll -> _intRoll.arrayLength
+        | U64 _uInt64Roll -> _uInt64Roll.arrayLength
+
+
+    let getArrayCount (rollout:rollout) =
+        match rollout with
+        | U8 _uInt8Roll -> _uInt8Roll.arrayCount
+        | U16 _uInt16Roll -> _uInt16Roll.arrayCount
+        | I32 _intRoll -> _intRoll.arrayCount
+        | U64 _uInt64Roll -> _uInt64Roll.arrayCount
+
+
+    let fromIntArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
+                        (arrayCount:arrayCount) (aas:seq<int[]>) =
 
         match rolloutFormat with
         | RfU8 -> result {
@@ -422,3 +492,68 @@ module Rollout =
                         let! roll = Uint64Roll.fromIntArraySeq arrayLength arrayCount aas
                         return roll |> rollout.U64
                     }
+
+    let toIntArraySeq (rollout:rollout) =
+        match rollout with
+        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toIntArraySeq
+        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toIntArraySeq
+        | I32 _intRoll -> _intRoll |> IntRoll.toIntArraySeq
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toIntArraySeq
+
+
+    let fromUInt64ArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
+                           (arrayCount:arrayCount) (aas:seq<uint64[]>) =
+
+        let intSeq = aas |> Seq.concat |> Seq.map(int) 
+                         |> Seq.chunkBySize(arrayLength |> ArrayLength.value)
+        match rolloutFormat with
+        | RfU8 -> result {
+                        let! roll = Uint8Roll.fromIntArraySeq arrayLength arrayCount intSeq
+                        return roll |> rollout.U8
+                    }
+        | RfU16 -> result {
+                        let! roll = Uint16Roll.fromIntArraySeq arrayLength arrayCount intSeq
+                        return roll |> rollout.U16
+                    }
+        | RfI32 -> result {
+                        let! roll = IntRoll.fromIntArraySeq arrayLength arrayCount intSeq
+                        return roll |> rollout.I32
+                    }
+        | RfU64 -> result {
+                        let! roll = Uint64Roll.fromUint64ArraySeq arrayLength arrayCount aas
+                        return roll |> rollout.U64
+                    }
+
+
+    let fromBitPackRf (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
+                      (bitPack:bitPack) =
+        match rolloutFormat with
+        | RfU8 -> result {
+                        let! roll = Uint8Roll.fromBitPack arrayLength bitPack
+                        return roll |> rollout.U8
+                    }
+        | RfU16 -> result {
+                        let! roll = Uint16Roll.fromBitPack arrayLength bitPack
+                        return roll |> rollout.U16
+                    }
+        | RfI32 -> result {
+                        let! roll = IntRoll.fromBitPack arrayLength bitPack
+                        return roll |> rollout.I32
+                    }
+        | RfU64 -> result {
+                        let! roll = Uint64Roll.fromBitPack arrayLength bitPack
+                        return roll |> rollout.U64
+                    }
+
+
+    let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
+        let rolloutFormat = bitPack.bitWidth |> RolloutFormat.fromBitWidth
+        fromBitPackRf rolloutFormat arrayLength bitPack
+
+
+    let toBitPack (symbolSetSize:symbolSetSize) (rollout:rollout) =
+        match rollout with
+        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toBitPack symbolSetSize
+        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toBitPack symbolSetSize
+        | I32 _intRoll -> _intRoll |> IntRoll.toBitPack symbolSetSize
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toBitPack symbolSetSize

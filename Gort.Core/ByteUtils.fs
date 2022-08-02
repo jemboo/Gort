@@ -205,10 +205,10 @@ module ByteUtils =
 /// ***********************************************************
 
     let uint64toBitStripe (ord:order) 
-                           (stripeArray:uint64[]) 
-                           (stripedOffset:int) 
-                           (bitPos:int) 
-                           (packedBits:uint64) =
+                          (stripeArray:uint64[]) 
+                          (stripedOffset:int) 
+                          (bitPos:int) 
+                          (packedBits:uint64) =
         for i = 0 to (Order.value ord) - 1 do
             if packedBits.isset i then
                 stripeArray.[stripedOffset + i] <- 
@@ -289,7 +289,7 @@ module ByteUtils =
                                     (stripePos:int)
                                     (stripedArray:uint64[]) =
         for i = 0 to values.Length - 1 do
-            if values.[i] < oneThresh then
+            if values.[i] >= oneThresh then
                 stripedArray.[i] <- 
                         stripedArray.[i].set stripePos
             
@@ -308,6 +308,7 @@ module ByteUtils =
                                     (oneThresh:^a)  
                                     (ord:order) 
                                     (aSeq:^a[] seq) =
+         let sq = aSeq |> Seq.toArray
          aSeq |> Seq.chunkBySize 64
               |> Seq.map(writeStripeArray oneThresh ord)
 
@@ -317,7 +318,7 @@ module ByteUtils =
                 for i = 0 to 63 do
                     yield Array.init 
                             striped.Length 
-                            (fun dex -> if striped.[dex].get i then zero_v else one_v)
+                            (fun dex -> if striped.[dex].get i then one_v else zero_v)
             }
 
     let fromStripeArrays (zero_v:'a)

@@ -218,7 +218,7 @@ module TwoCycle =
 //*************************************************************
 
     let makeRndMonoCycle (order:order) (rnd:IRando) =
-        let sc = order |> Order.value |> SymbolSetSize.createNr
+        let sc = order |> Order.value |> uint64 |> SymbolSetSize.createNr
         let tup = RandVars.drawTwoWithoutRep sc rnd
         makeMonoCycle order (fst tup) (snd tup)
 

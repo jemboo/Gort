@@ -85,7 +85,7 @@ type TwoCycleFixture () =
         let seed = RandomSeed.fromNow()
         let iRando = Rando.fromRngGen (RngGen.createNet seed)
         let ord = Order.createNr 16
-        let sc = ord |> Order.value |> SymbolSetSize.createNr
+        let sc = ord |> Order.value |> uint64 |> SymbolSetSize.createNr
         let refSyms = Array.init 1000 (fun _ -> TwoCycle.rndSymmetric ord  iRando)
 
         let refMuts = 

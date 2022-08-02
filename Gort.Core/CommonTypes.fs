@@ -1,5 +1,6 @@
 ﻿namespace global
 open System
+open SysExt
 
 type order = private Order of int
 
@@ -73,15 +74,17 @@ module Order =
 
 
 type bitWidth = private BitWidth of int
-type symbolSetSize = private SymbolSetSize of int
+type symbolSetSize = private SymbolSetSize of uint64
 
 module SymbolSetSize =
     let value (SymbolSetSize v) = v
-    let create (value:int) =
-        if (value > 0) then value |> SymbolSetSize |> Ok
+    let create (value:uint64) =
+        if (value > 0uL) then value |> SymbolSetSize |> Ok
         else "symbolSetSize must be gt 0" |> Error
-    let createNr (value:int) =
+    let createNr (value:uint64) =
         value |> SymbolSetSize
+
+
 
 module BitWidth = 
     let value (BitWidth v) = v
@@ -90,7 +93,7 @@ module BitWidth =
         else "bitWidth must be gt 0" |> Error
     let fromSymbolSetSize (symbolCount:symbolSetSize) =
         let sc = symbolCount |> SymbolSetSize.value
-        Math.Log2(sc) |> int |> create
+        (sc.leftmost_index + 1) |> create
 
 
 type byteWidth = private ByteWidth of int
@@ -115,7 +118,8 @@ module SymbolCount =
     let create (value:int) =
         if (value > 0) then value |> SymbolCount |> Ok
         else "symbolCount must be greater than 0" |> Error
-
+    let createNr (value:int) =
+        value |> SymbolCount
 
 type arrayCount = private ArrayCount of int
 module ArrayCount = 

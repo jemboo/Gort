@@ -109,22 +109,38 @@ type ByteUtilsFixture () =
 
 
     [<TestMethod>]
-    member this.stripeRnW () =
-        let ord = Order.createNr 8
-        let intSetIn = IntSet8.allForAsSeq ord |> Seq.toArray
-        let stripeAs = intSetIn
-                        |> Seq.map(IntSet8.getValues)
+    member this.stripeRnWInt32 () =
+        let ord = Order.createNr 3
+        let arOfIntAr = [|[|1; 0; 1|]; [|0; 1; 1|]; [|0; 0; 0|]; [|1; 1; 1 |];|]
+        let stripeAs = arOfIntAr
+                        |> ByteUtils.toStripeArrays 1 ord
+                        |> Seq.toArray
+                        |> Array.concat
+
+        let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays 0 1 ord
+                                     |> Seq.take(arOfIntAr.Length)
+                                     |> Seq.toList
+    
+        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
+
+
+
+    [<TestMethod>]
+    member this.stripeRnWuint8 () =
+        let ord = Order.createNr 3
+        let arOfIntAr = [|[|1uy; 0uy; 1uy|]; [|0uy; 1uy; 1uy|]; [|0uy; 0uy; 0uy|]; [|1uy; 1uy; 1uy |];|]
+        let stripeAs = arOfIntAr
                         |> ByteUtils.toStripeArrays 1uy ord
                         |> Seq.toArray
                         |> Array.concat
 
-        let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
-                                  |> Seq.map(IntSet8.fromBytes ord)
-                                  |> Seq.toList
-                                  |> Result.sequence
-                                  |> Result.ExtractOrThrow
+        let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
+                                     |> Seq.take(arOfIntAr.Length)
+                                     |> Seq.toList
     
-        Assert.AreEqual(intSetIn |> Array.toList, intSetBack)
+        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
+
+
 
 
     [<TestMethod>]
