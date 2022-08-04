@@ -1,6 +1,6 @@
 ﻿namespace global
 
-    type sortableInts = {values:int[]; symbolSetSize:symbolSetSize}
+    type sortableInts = private {values:int[]; symbolSetSize:symbolSetSize}
     module SortableInts =
     
         let Identity (order: order) (symbolCount:symbolSetSize) =
@@ -18,20 +18,60 @@
         let getOrder (sia:sortableInts) =
             sia.values.Length |> Order.createNr
     
-        let makeRandom (randy:IRando) 
-                       (order:order) 
-                       (symbolCount:symbolSetSize) =
+        let make (symbolSetSize:symbolSetSize) (vals:int[]) =
+            {sortableInts.values = vals; symbolSetSize=symbolSetSize}
 
-            let ord = (order |> Order.value)
-            let orduL = ord |> uint64
-            let sc = (symbolCount |> SymbolSetSize.value)
-            match sc with
-            | 1uL -> { sortableInts.values = RandVars.randOneOrZero 0.5 randy ord
-                                                |> Seq.toArray;
-                            symbolSetSize = symbolCount }
-            | i when i = orduL -> 
-                   { sortableInts.values = RandVars.randSymbols symbolCount randy ord
-                                                            |> Seq.toArray;
-                                   symbolSetSize = symbolCount }
-            | _ -> { sortableInts.values = RandVars.randomPermutation randy order; 
-                            symbolSetSize = symbolCount }
+        let makeAllBits (order:order) =
+            let symbolSetSize = 2uL |> SymbolSetSize.createNr
+            let bitShift = order |> Order.value
+            { 0uL .. (1uL <<< bitShift) - 1uL }
+                |> Seq.map(ByteUtils.uint64To2ValArray order 0 1)
+                |> Seq.map(fun arr ->
+                { sortableInts.values = arr; symbolSetSize = symbolSetSize })
+
+
+        let makeOrbits (maxCount:sortableCount option) 
+                       (perm:permutation) =
+            let symbolSetSize = perm |> Permutation.getOrder
+                                     |> Order.value
+                                     |> uint64
+                                     |> SymbolSetSize.createNr
+            let intOpt = maxCount |> Option.map SortableCount.value
+            Permutation.powers intOpt perm
+            |> Seq.map(Permutation.getArray)
+            |> Seq.map(fun arr ->
+                { sortableInts.values = arr; symbolSetSize = symbolSetSize })
+
+
+        let makeSortedStacks (degStack:order[]) =
+            let symbolSetSize = 2uL |> SymbolSetSize.createNr
+            let stackedOrder = Order.add degStack
+            CollectionOps.stackSortedBlocks degStack 1 0
+            |> Seq.map(fun arr ->
+                { sortableInts.values = arr; symbolSetSize = symbolSetSize })
+
+
+        let makeRandomPermutation (randy:IRando) 
+                                  (order:order) =
+            let symbolSetSize = order |> Order.value |> uint64 |> SymbolSetSize.createNr
+            { sortableInts.values = RandVars.randomPermutation randy order; 
+              symbolSetSize = symbolSetSize }
+
+
+        let makeRandomBits (order:order) 
+                           (pctOnes:float) (randy:IRando) =
+            let symbolSetSize = 2uL |> SymbolSetSize.createNr
+            let arrayLength = order |> Order.value
+            { sortableInts.values = RandVars.randOneOrZero pctOnes randy arrayLength
+                                    |> Seq.toArray;
+              symbolSetSize = symbolSetSize }
+
+
+        let makeRandomSymbols (order:order) 
+                              (symbolSetSize:symbolSetSize) (randy:IRando) =
+            let symbolSetSize = 2uL |> SymbolSetSize.createNr
+            let arrayLength = order |> Order.value
+            { sortableInts.values = RandVars.randSymbols symbolSetSize randy arrayLength
+                                    |> Seq.toArray;
+              symbolSetSize = symbolSetSize }
+

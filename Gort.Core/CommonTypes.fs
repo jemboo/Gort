@@ -121,12 +121,15 @@ module SymbolCount =
     let createNr (value:int) =
         value |> SymbolCount
 
+
 type arrayCount = private ArrayCount of int
 module ArrayCount = 
     let value (ArrayCount v) = v
     let create (value:int) =
         if (value > 0) then value |> ArrayCount |> Ok
         else "arrayCount must be greater than 0" |> Error
+    let createNr (value:int) =
+        value |> ArrayCount
 
 
 type arrayLength = private ArrayLength of int
@@ -135,3 +138,5 @@ module ArrayLength =
     let create (value:int) =
         if (value > 0) then value |> ArrayLength |> Ok
         else "arrayLength must be greater than 0" |> Error
+    let createNr (value:int) =
+        value |> ArrayLength

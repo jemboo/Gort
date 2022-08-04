@@ -84,5 +84,20 @@ type SortableSetFixture () =
         Assert.AreEqual(res16.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 129);
         Assert.AreEqual(res64.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 7);
 
-        
-        Assert.IsTrue(true)
+
+    [<TestMethod>]
+    member this.fromSortableInts() =
+        let order = Order.create 3 |> Result.ExtractOrThrow
+        let arOfIntAr = [| [|1111;11112;11113|]; [|2211;12;13|]; [|2221;22;23|]; [|5555531;32;33|]; |]
+        let sortableCount = arOfIntAr.Length |> SortableCount.create
+        let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
+        let siInt = arOfIntAr |> Array.map(SortableInts.make symbolSetSize)
+        let ssfU8 = rolloutFormat.RfI32 |> sortableSetFormat.SsfArrayRoll
+        let sortableSet = SortableSet.fromSortableIntsArrays ssfU8 order symbolSetSize sortableCount siInt
+                           |> Result.ExtractOrThrow
+        let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
+                                        |> Seq.map(SortableInts.value)
+                                        |> Seq.toArray
+
+
+        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack);

@@ -40,11 +40,11 @@ module IntSet =
     let toUint64 (intSt:intSet) (oneThresh:int) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (ord:order) =
+    let allBitsAsSeq (ord:order) =
         { 0 .. (1 <<< (Order.value ord)) - 1 }
         |> Seq.map (fun i -> fromInteger ord i)
 
-    let allForAsArray (ord:order) =
+    let allBitsAsArray (ord:order) =
         Array.init (1 <<< (Order.value ord)) (fromInteger ord)
 
 
@@ -135,11 +135,11 @@ module IntSet16 =
     let toUint64 (intSt:intSet16) (oneThresh:uint16) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (order:order) =
+    let allBitsAsSeq (order:order) =
         let dv = Order.value order 
         {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger order)
 
-    let allForAsArray (ord:order) =
+    let allBitsAsArray (ord:order) =
         Array.init (1 <<< (Order.value ord)) (fromInteger ord)
 
 
@@ -233,11 +233,11 @@ module IntSet8 =
     let toUint64 (intSt:intSet8) (oneThresh:uint8) = 
         ByteUtils.arrayToUint64 intSt.values oneThresh
 
-    let allForAsSeq (order:order) =
+    let allBitsAsSeq (order:order) =
         let dv = Order.value order 
         {0 .. (1 <<< dv) - 1} |> Seq.map (fromInteger order)
 
-    let allForAsArray (ord:order) =
+    let allBitsAsArray (ord:order) =
         Array.init (1 <<<  (Order.value ord)) (fromInteger ord)
 
 

@@ -405,18 +405,12 @@ module Uint64Roll =
         uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
-    let fromIntArraySeqAsBitStriped (arrayLength:arrayLength) 
-                                    (arrayCount:arrayCount) 
-                                    (aas:seq<int[]>) =
-        let oo = arrayLength |> ArrayLength.value |> Order.createNr
-        let wab = aas |> Seq.toArray
-
-        let yab = ByteUtils.toStripeArrays 1 oo aas |> Seq.toArray
+    let saveIntArraysAsBitStriped (arrayLength:arrayLength) 
+                                  (arrayCount:arrayCount) 
+                                  (aas:seq<int[]>) =
         result {
             let order = arrayLength |> ArrayLength.value |> Order.createNr
-            let data = ByteUtils.toStripeArrays 1 order aas
-                                |> Seq.concat
-                                |> Seq.toArray
+            let! data = ByteUtils.createStripedArrayFromInts order aas
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
 
@@ -424,15 +418,6 @@ module Uint64Roll =
     let asBitStripedToIntArraySeq (uint64Roll:uint64Roll) =
          let order = uint64Roll.arrayLength |> ArrayLength.value |> Order.createNr
          ByteUtils.fromStripeArrays 0 1 order uint64Roll.data
-
-
-
-
-
-
-
-
-
 
 
 
@@ -474,7 +459,6 @@ module Rollout =
 
     let fromIntArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
                         (arrayCount:arrayCount) (aas:seq<int[]>) =
-
         match rolloutFormat with
         | RfU8 -> result {
                         let! roll = Uint8Roll.fromIntArraySeq arrayLength arrayCount aas
@@ -492,6 +476,7 @@ module Rollout =
                         let! roll = Uint64Roll.fromIntArraySeq arrayLength arrayCount aas
                         return roll |> rollout.U64
                     }
+
 
     let toIntArraySeq (rollout:rollout) =
         match rollout with

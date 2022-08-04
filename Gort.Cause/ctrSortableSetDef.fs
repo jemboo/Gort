@@ -13,11 +13,11 @@ module ctrSortableSetDef =
         match pth with
         | [] -> "No path in RunSortableChildren" |> Error
         | x::[] -> match x with  
-            | "SortableSetImport" -> 5 |> Ok
-            | "SortableSetAllForOrder" -> 5 |> Ok
-            | "SortableSetOrbit" -> 5 |> Ok
-            | "SortableSetStacked" -> 5 |> Ok
-            | _ -> "Bad path in RunSortableChildren" |> Error
+                   | "SortableSetImport" -> 5 |> Ok
+                   | "SortableSetAllForOrder" -> 5 |> Ok
+                   | "SortableSetOrbit" -> 5 |> Ok
+                   | "SortableSetStacked" -> 5 |> Ok
+                   | _ -> "Bad path in RunSortableChildren" |> Error
         | x::xs -> match x with  
                    | "SortableSetDef" -> 5 |> Ok
                    | "SortableSetRnd" -> 5 |> Ok

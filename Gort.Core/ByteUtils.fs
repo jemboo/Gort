@@ -313,6 +313,16 @@ module ByteUtils =
               |> Seq.map(writeStripeArray oneThresh ord)
 
 
+    let createStripedArrayFromInts (ord:order) 
+                                   (intSeq:int[] seq) =
+        try
+            intSeq |> toStripeArrays 1 ord 
+                   |> Seq.concat
+                   |> Seq.toArray |> Ok
+        with
+            | ex -> ("error in createStripedArray: " + ex.Message ) |> Result.Error
+
+
     let fromStripeArray (zero_v:'a) (one_v:'a) (striped:uint64[])  =
         seq {
                 for i = 0 to 63 do

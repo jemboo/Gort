@@ -13,7 +13,7 @@ module SortableSetO =
         match (ByteWidth.value byteWidth) with
         | 1 -> 
             result {
-                let! byteArray = IntSet8.allForAsSeq order
+                let! byteArray = IntSet8.allBitsAsSeq order
                                 |> Seq.map(IntSet8.getValues)
                                 |> Seq.concat
                                 |> Seq.toArray
@@ -26,7 +26,7 @@ module SortableSetO =
             }
         | 2 -> 
             result {
-                let! byteArray = IntSet16.allForAsSeq order
+                let! byteArray = IntSet16.allBitsAsSeq order
                                  |> Seq.map(IntSet16.getValues)
                                  |> Seq.concat
                                  |> Seq.toArray
@@ -39,7 +39,7 @@ module SortableSetO =
             }
         | 8 -> 
             result {
-                let stripeAs = IntSet8.allForAsSeq order
+                let stripeAs = IntSet8.allBitsAsSeq order
                                 |> Seq.map(IntSet8.getValues)
                                 |> ByteUtils.toStripeArrays 1uy order
                                 |> Seq.toArray
@@ -191,17 +191,25 @@ type sortableSetFormat =
      | SsfArrayRoll of rolloutFormat
      | SsfBitStriped
 
+module SortableSetFormat =
+    let makeBitStriped () =
+        sortableSetFormat.SsfBitStriped
+
+    let makeRollout (rolloutFormat:rolloutFormat) =
+        sortableSetFormat.SsfArrayRoll rolloutFormat
+
+
 type sortableSet = 
-    | ArrayRoll of rollout * symbolCount
+    | ArrayRoll of rollout * symbolSetSize
     | BitStriped of uint64Roll * sortableCount
 
  
 module SortableSet =
 
-    let getSymbolCount (sortableSet:sortableSet) = 
+    let getSymbolSetSize (sortableSet:sortableSet) = 
         match sortableSet with
         | ArrayRoll (_, c) -> c
-        | BitStriped (_, _)  -> 2 |> SymbolCount.createNr
+        | BitStriped (_, _)  -> 2uL |> SymbolSetSize.createNr
 
 
     let getSortableCount (sortableSet:sortableSet) = 
@@ -221,22 +229,65 @@ module SortableSet =
                                        |> ArrayLength.value
                                        |> Order.create
 
-    let toSortableIntArrays (sortableSet:sortableSet) =
-        //let byteW = sortableSet.rollout |> Rollout.byteLength |> Byt
-        None
+    let makeArrayRoll (symbolSetSize: symbolSetSize) (rollout:rollout) =
+        (rollout, symbolSetSize) |> sortableSet.ArrayRoll
         
+    let makeBitStriped (sortableCount: sortableCount) (uint64Roll:uint64Roll) =
+        (uint64Roll, sortableCount) |> sortableSet.BitStriped
+
+    let toSortableIntsArrays (sortableSet:sortableSet) =
+        let symbolSetSize = getSymbolSetSize sortableSet
+        match sortableSet with
+        | ArrayRoll (r, c) -> r |> Rollout.toIntArraySeq
+                                |> Seq.map(fun ia -> SortableInts.make symbolSetSize ia)
+        | BitStriped (r64, sc) -> r64 |> Uint64Roll.asBitStripedToIntArraySeq
+                                      |> Seq.map(fun ia -> SortableInts.make symbolSetSize ia)
+
+
+    let fromSortableIntsArrays (sortableSetFormat:sortableSetFormat)
+                               (order:order)
+                               (symbolSetSize:symbolSetSize)
+                               (sortableCount:sortableCount)
+                               (sortableIntsSeq:seq<sortableInts>) =
+        let arrayLength = order |> Order.value |> ArrayLength.createNr
+        let arrayCount = sortableCount |> SortableCount.value |> ArrayCount.createNr
+        let intAseq = sortableIntsSeq |> Seq.map(fun sints -> sints.values)
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt ->  
+            intAseq |> Rollout.fromIntArraySeq rollfmt arrayLength arrayCount
+                    |> Result.map(makeArrayRoll symbolSetSize)
+
+        | SsfBitStriped -> 
+            intAseq |> Uint64Roll.saveIntArraysAsBitStriped arrayLength arrayCount
+                    |> Result.map(makeBitStriped sortableCount)
+
+
     let makeAllBits (sortableSetFormat:sortableSetFormat)
                     (order:order) = 
-        None
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt  -> 
+                match rollfmt with
+                | RfU8 -> None
+                | RfU16 -> None
+                | RfI32 -> None
+                | RfU64 -> None
+        | SsfBitStriped -> None
 
 
     let makeOrbits (sortableSetFormat:sortableSetFormat)
                    (maxCount:sortableCount option) 
-                   (perm:permutation)  = 
+                   (perm:permutation) = 
         let intOpt = maxCount |> Option.map SortableCount.value
         let permA = Permutation.powers intOpt perm |> Seq.toArray
         let order = perm |> Permutation.getOrder
-        None
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt  -> 
+                match rollfmt with
+                | RfU8 -> None
+                | RfU16 -> None
+                | RfI32 -> None
+                | RfU64 -> None
+        | SsfBitStriped -> None
 
 
     let makeSortedStacks (sortableSetFormat:sortableSetFormat)
@@ -244,10 +295,18 @@ module SortableSet =
         let order = Order.add degStack
         let stacked = CollectionOps.stackSortedBlocks degStack 1uy 0uy
                        |> Seq.toArray
-        None
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt  -> 
+                match rollfmt with
+                | RfU8 -> None
+                | RfU16 -> None
+                | RfI32 -> None
+                | RfU64 -> None
+        | SsfBitStriped -> None
 
 
-    let makeRandom (order:order)
+    let makeRandom (sortableSetFormat:sortableSetFormat)
+                   (order:order)
                    (rando:IRando)
                    (sortableCount:sortableCount) =
         
@@ -256,4 +315,11 @@ module SortableSet =
                         |> Seq.take sortableCt
                         |> Seq.map(Permutation.getArray)
                         
-        None
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt  -> 
+                match rollfmt with
+                | RfU8 -> None
+                | RfU16 -> None
+                | RfI32 -> None
+                | RfU64 -> None
+        | SsfBitStriped -> None

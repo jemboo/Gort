@@ -204,7 +204,7 @@ type GuidUtilsFixture () =
     [<TestMethod>]
     member this.stripeRnW () =
         let ord = Order.createNr 8
-        let intSetIn = IntSet8.allForAsSeq ord |> Seq.toArray
+        let intSetIn = IntSet8.allBitsAsSeq ord |> Seq.toArray
         let stripeAs = intSetIn
                         |> Seq.map(IntSet8.getValues)
                         |> ByteUtils.toStripeArrays 1uy ord

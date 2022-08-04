@@ -128,7 +128,7 @@ type RolloutFixture () =
 
     [<TestMethod>]
     member this.uint64Roll () =
-        let arOfIntAr = [|[|1111;11112;11113|]; [|2211;12;13|]; [|2221;22;23|]; [|5555531;32;33|]; |]
+        let arOfIntAr = [|[|1111;11112;11113|]; [|2211;12;13|]; [|2221;22;23|]; [|5555531;32;33|];|]
         let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
@@ -172,7 +172,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.fromIntArraySeqAsBitStriped arrayLen arrayCt arOfIntAr
+        let roll64 = Uint64Roll.saveIntArraysAsBitStriped arrayLen arrayCt arOfIntAr
                       |> Result.ExtractOrThrow
         let arOfIntArBack = Uint64Roll.asBitStripedToIntArraySeq roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
