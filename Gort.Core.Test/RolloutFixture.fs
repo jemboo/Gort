@@ -73,7 +73,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 64uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let br = Uint8Roll.fromIntArraySeq arrayLen arrayCt arOfIntAr
+        let br = Uint8Roll.fromIntArraySeq arrayLen arOfIntAr
                     |> Result.ExtractOrThrow
         let arOfIntArBack = Uint8Roll.toIntArraySeq br |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
@@ -93,7 +93,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 4000uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let br = Uint16Roll.fromIntArraySeq arrayLen arrayCt arOfIntAr
+        let br = Uint16Roll.fromIntArraySeq arrayLen arOfIntAr
                     |> Result.ExtractOrThrow
         let arOfIntArBack = Uint16Roll.toIntArraySeq br |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
@@ -114,7 +114,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let br = IntRoll.fromIntArraySeq arrayLen arrayCt arOfIntAr
+        let br = IntRoll.fromIntArraySeq arrayLen arOfIntAr
                     |> Result.ExtractOrThrow
         let arOfIntArBack = IntRoll.toIntArraySeq br |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
@@ -133,7 +133,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.fromIntArraySeq arrayLen arrayCt arOfIntAr
+        let roll64 = Uint64Roll.fromIntArraySeq arrayLen arOfIntAr
                     |> Result.ExtractOrThrow
         let arOfIntArBack = Uint64Roll.toIntArraySeq roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
@@ -152,7 +152,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = (UInt64.MaxValue - 1uL) |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.fromUint64ArraySeq arrayLen arrayCt arOfIntAr
+        let roll64 = Uint64Roll.fromUint64ArraySeq arrayLen arOfIntAr
                       |> Result.ExtractOrThrow
         let arOfIntArBack = Uint64Roll.toUint64ArraySeq roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
@@ -172,7 +172,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.saveIntArraysAsBitStriped arrayLen arrayCt arOfIntAr
+        let roll64 = Uint64Roll.saveIntArraysAsBitStriped arrayLen arOfIntAr
                       |> Result.ExtractOrThrow
         let arOfIntArBack = Uint64Roll.asBitStripedToIntArraySeq roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)

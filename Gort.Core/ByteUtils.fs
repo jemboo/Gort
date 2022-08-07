@@ -85,7 +85,6 @@ module ByteUtils =
               |> Seq.map(_yab)
 
 
-
     let uint16ToBits (bitWidth:bitWidth) (v:uint16) =
         let bw = bitWidth |> BitWidth.value
         seq { for i in 0 .. (bw - 1) -> v.isset i }
@@ -105,8 +104,6 @@ module ByteUtils =
         bitsy |> Seq.chunkBySize(bw)
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
-
-
 
 
     let intToBits (bitWidth:bitWidth) (v:int) =
@@ -129,8 +126,6 @@ module ByteUtils =
               |> Seq.map(_yab)
 
 
-
-
     let uint64ToBits (bitWidth:bitWidth) (v:uint64) =
         let bw = bitWidth |> BitWidth.value
         seq { for i in 0 .. (bw - 1) -> v.isset i }
@@ -150,7 +145,6 @@ module ByteUtils =
         bitsy |> Seq.chunkBySize(bw)
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
-
 
 
     let IdMap_ints = 
@@ -181,12 +175,19 @@ module ByteUtils =
         array |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
-    let allUint64s  (intVers:int[]) =
-        let oneThresholds = seq { 0 .. (intVers.Length - 1) }
+
+
+    let uint64ToIntArray (order:order) (uint64:uint64) =
+        Array.init (Order.value order) 
+                   (fun dex -> if (uint64.isset dex) then 1 else 0)
+
+    let allUint64s (symbolMod:int) (intVers:int[]) =
+        let oneThresholds = seq { 0 .. (symbolMod - 1) }
         oneThresholds |> Seq.map(arrayToUint64 intVers)
         
-    let toDistinctUint64s (intVersions:int[] seq) =
-        intVersions |> Seq.map(allUint64s) 
+
+    let toDistinctUint64s (symbolMod:int) (intVersions:int[] seq) =
+        intVersions |> Seq.map(allUint64s symbolMod) 
                     |> Seq.concat
                     |> Seq.distinct
 
@@ -323,13 +324,18 @@ module ByteUtils =
             | ex -> ("error in createStripedArray: " + ex.Message ) |> Result.Error
 
 
-    let fromStripeArray (zero_v:'a) (one_v:'a) (striped:uint64[])  =
+    let fromStripeArray<'a when 'a : equality> (zero_v:'a) 
+                 (one_v:'a) (striped:uint64[]) =
+        let order = striped.Length
         seq {
-                for i = 0 to 63 do
+                for bit_pos = 0 to 63 do
                     yield Array.init 
-                            striped.Length 
-                            (fun dex -> if striped.[dex].get i then one_v else zero_v)
+                            order 
+                            (fun stripe_dex -> 
+                                if striped.[stripe_dex].get bit_pos 
+                                    then one_v else zero_v)
             }
+
 
     let fromStripeArrays (zero_v:'a)
                          (one_v:'a)
@@ -338,3 +344,23 @@ module ByteUtils =
          strSeq |> Seq.chunkBySize (Order.value ord)
                 |> Seq.map(fromStripeArray zero_v one_v)
                 |> Seq.concat
+
+
+    let usedStripeCount<'a when 'a : equality> (zero_v:'a ) (one_v:'a) (striped:uint64[]) =
+        let _arrayIsZero (arr:'a[]) = 
+            arr |> Array.forall(fun dexV -> dexV = zero_v)
+
+        let _findFirstElement (cond:'a[]->bool) (arr:'a[][]) =
+            let mutable carryOn = true
+            let mutable dex = 0
+            while (dex < (arr.Length - 1)) && carryOn do
+                if cond arr.[dex] then
+                    carryOn <- false
+                else
+                    dex <- dex + 1
+            dex
+
+        let stripeArrays = fromStripeArray zero_v one_v striped
+                           |> Seq.toArray
+
+        _findFirstElement _arrayIsZero stripeArrays

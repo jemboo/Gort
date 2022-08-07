@@ -71,9 +71,7 @@ type ByteUtilsFixture () =
         let bpa2 = Array.init 100 (fun _ -> RandVars.rndBitsUint64 deg2 randy)
         let bsa2 = bpa2 |> ByteUtils.uint64ArraytoBitStriped deg2 |> Result.ExtractOrThrow
         let bpaBack2 = bsa2 |> ByteUtils.bitStripedToUint64array deg2 bpa2.Length |> Result.ExtractOrThrow
-
         Assert.AreEqual(bpa2 |> Array.toList, bpaBack2 |> Array.toList)
-
 
 
     [<TestMethod>]
@@ -116,13 +114,33 @@ type ByteUtilsFixture () =
                         |> ByteUtils.toStripeArrays 1 ord
                         |> Seq.toArray
                         |> Array.concat
-
-        let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays 0 1 ord
+        let zero_val = 0
+        let one_val = 1
+        let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays zero_val one_val ord
                                      |> Seq.take(arOfIntAr.Length)
                                      |> Seq.toList
     
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
+
+
+    [<TestMethod>]
+    member this.stripeRnW () =
+        let ord = Order.createNr 8
+        let intSetIn = IntSet8.allBitsAsSeq ord |> Seq.toArray
+        let stripeAs = intSetIn
+                        |> Seq.map(IntSet8.getValues)
+                        |> ByteUtils.toStripeArrays 1uy ord
+                        |> Seq.toArray
+                        |> Array.concat
+
+        let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
+                                  |> Seq.map(IntSet8.fromBytes ord)
+                                  |> Seq.toList
+                                  |> Result.sequence
+                                  |> Result.ExtractOrThrow
+    
+        Assert.AreEqual(intSetIn |> Array.toList, intSetBack);
 
 
     [<TestMethod>]
@@ -139,8 +157,6 @@ type ByteUtilsFixture () =
                                      |> Seq.toList
     
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-
-
 
 
     [<TestMethod>]
@@ -178,3 +194,29 @@ type ByteUtilsFixture () =
         let akB = bitSeqToBytes max8 paA |> Seq.toArray
 
         Assert.AreEqual(1, 1);
+
+
+    [<TestMethod>]
+    member this.usedStripeCount () =
+        let order = 4 |> Order.createNr
+        let arraysToStoreFull = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|]|]
+        let usedStripeCtFull = arraysToStoreFull.Length
+        let stripedArray = ByteUtils.toStripeArrays 1 order arraysToStoreFull
+                           |> Seq.head
+        let actualUsedStripes = ByteUtils.usedStripeCount 0 1 stripedArray
+        Assert.AreEqual(usedStripeCtFull, actualUsedStripes);
+        let arraysToStore3 = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|];[|0;0;0;0|]|]
+        let usedStripeCt3 = 3
+        let stripedArray = ByteUtils.toStripeArrays 1 order arraysToStore3
+                           |> Seq.head
+        let actualUsedStripes = ByteUtils.usedStripeCount 0 1 stripedArray
+        Assert.AreEqual(usedStripeCt3, actualUsedStripes);
+
+
+    [<TestMethod>]
+    member this.uint64ToIntArray () =
+        let order = 44 |> Order.createNr
+        let uint64In = 125436312321uL
+        let arrayRep = ByteUtils.uint64ToIntArray order uint64In
+        let uint64Back = ByteUtils.arrayToUint64 arrayRep 1
+        Assert.AreEqual(uint64In, uint64Back);

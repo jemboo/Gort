@@ -210,12 +210,13 @@ module Uint8Roll =
         
         }
 
-    let fromIntArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                        (aas:seq<int[]>) =
+    let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint8s = aas |> Seq.concat
                              |> Seq.map(uint8)
                              |> Seq.toArray
+            let arrayCount = (uint8s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
             let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint8s
             let! bigA = uint8s |> ByteArray.convertUint8sToBytes
             return { uInt8Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = bigA }
@@ -266,12 +267,14 @@ module Uint16Roll =
           return { bitPack.bitWidth = bitWidth; symbolCount = symbolCount; data = data }
         }
 
-    let fromIntArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                        (aas:seq<int[]>) =
+    let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint16s = aas |> Seq.concat
                              |> Seq.map(uint16)
                              |> Seq.toArray
+
+            let arrayCount = (uint16s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
             let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint16s
             return { uInt16Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint16s }
         }
@@ -323,11 +326,12 @@ module IntRoll =
         
         }
 
-    let fromIntArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                        (aas:seq<int[]>) =
+    let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let intA = aas |> Seq.concat
                            |> Seq.toArray
+            let arrayCount = (intA.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
             let! res = CollectionProps.check2dArraySize arrayLength arrayCount intA
             return { intRoll.arrayCount = arrayCount; arrayLength = arrayLength; data = intA }
         }
@@ -347,6 +351,15 @@ module Uint64Roll =
 
     let getData (uint64Roll:uint64Roll) =
         uint64Roll.data
+
+    let getUsedStripes (uint64Roll:uint64Roll) =
+        let len = uint64Roll.data.Length
+        let arrayLen = uint64Roll.arrayLength |> ArrayLength.value
+        let q = uint64Roll.data.[len - arrayLen .. len - 1]
+        let lastStripes = q |> ByteUtils.usedStripeCount 0 1
+        let ww = (len - arrayLen) / arrayLen
+        (ww * 64) + lastStripes
+
 
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
@@ -377,12 +390,13 @@ module Uint64Roll =
         
         }
 
-    let fromIntArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                        (aas:seq<int[]>) =
+    let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint64s = aas |> Seq.concat
                               |> Seq.map(uint64)
                               |> Seq.toArray
+            let arrayCount = (uint64s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
             let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint64s
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
@@ -392,11 +406,12 @@ module Uint64Roll =
                         |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
-    let fromUint64ArraySeq (arrayLength:arrayLength) (arrayCount:arrayCount) 
-                           (aas:seq<uint64[]>) =
+    let fromUint64ArraySeq (arrayLength:arrayLength) (aas:seq<uint64[]>) =
         result {
             let uint64s = aas |> Seq.concat
                               |> Seq.toArray
+            let arrayCount = (uint64s.Length / (ArrayLength.value arrayLength)) 
+                                |> ArrayCount.createNr
             let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint64s
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
@@ -405,12 +420,12 @@ module Uint64Roll =
         uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
-    let saveIntArraysAsBitStriped (arrayLength:arrayLength) 
-                                  (arrayCount:arrayCount) 
+    let saveIntArraysAsBitStriped (arrayLength:arrayLength)
                                   (aas:seq<int[]>) =
         result {
             let order = arrayLength |> ArrayLength.value |> Order.createNr
             let! data = ByteUtils.createStripedArrayFromInts order aas
+            let! arrayCount = data.Length |> ArrayCount.create
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
 
@@ -458,22 +473,22 @@ module Rollout =
 
 
     let fromIntArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
-                        (arrayCount:arrayCount) (aas:seq<int[]>) =
+                        (aas:seq<int[]>) =
         match rolloutFormat with
         | RfU8 -> result {
-                        let! roll = Uint8Roll.fromIntArraySeq arrayLength arrayCount aas
+                        let! roll = Uint8Roll.fromIntArraySeq arrayLength aas
                         return roll |> rollout.U8
                     }
         | RfU16 -> result {
-                        let! roll = Uint16Roll.fromIntArraySeq arrayLength arrayCount aas
+                        let! roll = Uint16Roll.fromIntArraySeq arrayLength aas
                         return roll |> rollout.U16
                     }
         | RfI32 -> result {
-                        let! roll = IntRoll.fromIntArraySeq arrayLength arrayCount aas
+                        let! roll = IntRoll.fromIntArraySeq arrayLength aas
                         return roll |> rollout.I32
                     }
         | RfU64 -> result {
-                        let! roll = Uint64Roll.fromIntArraySeq arrayLength arrayCount aas
+                        let! roll = Uint64Roll.fromIntArraySeq arrayLength aas
                         return roll |> rollout.U64
                     }
 
@@ -493,19 +508,19 @@ module Rollout =
                          |> Seq.chunkBySize(arrayLength |> ArrayLength.value)
         match rolloutFormat with
         | RfU8 -> result {
-                        let! roll = Uint8Roll.fromIntArraySeq arrayLength arrayCount intSeq
+                        let! roll = Uint8Roll.fromIntArraySeq arrayLength intSeq
                         return roll |> rollout.U8
                     }
         | RfU16 -> result {
-                        let! roll = Uint16Roll.fromIntArraySeq arrayLength arrayCount intSeq
+                        let! roll = Uint16Roll.fromIntArraySeq arrayLength intSeq
                         return roll |> rollout.U16
                     }
         | RfI32 -> result {
-                        let! roll = IntRoll.fromIntArraySeq arrayLength arrayCount intSeq
+                        let! roll = IntRoll.fromIntArraySeq arrayLength intSeq
                         return roll |> rollout.I32
                     }
         | RfU64 -> result {
-                        let! roll = Uint64Roll.fromUint64ArraySeq arrayLength arrayCount aas
+                        let! roll = Uint64Roll.fromUint64ArraySeq arrayLength aas
                         return roll |> rollout.U64
                     }
 

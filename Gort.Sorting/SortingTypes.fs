@@ -2,6 +2,7 @@
 open System
 
 // Sorter
+type expandBitSets = private ExpandBitSets of bool
 type sorterId = private SorterId of Guid
 type sortableCount = private SortableCount of int
 type sortableSetId = private SortableSetId of Guid
@@ -14,13 +15,18 @@ type switchFrequency = private SwitchFrequency of float
 type switchUses = {weights:int[]}
 
 
+module ExpandBitSets =
+    let value (ExpandBitSets v) = v
+    let create v = ExpandBitSets v
+
 module SortableCount =
     let value (SortableCount v) = v
     let create v = SortableCount v
     let repStr v = match v with
                           | Some r -> sprintf "%d" (value r)
                           | None -> ""
-
+    let makeSeq sc =
+            seq { 0 .. (value sc - 1)}
 
 module SorterId =
     let value (SorterId v) = v

@@ -18,7 +18,7 @@ module GuidUtils =
         new System.Guid(woof)
 
 
-    let from16bytes (ba:byte[]) =
+    let guidFromBytes (ba:byte[]) =
         new Guid(ba)
 
 
@@ -69,30 +69,24 @@ module GuidUtils =
 
     let getGuidFromBytes (offset:int) (blob:byte[]) =
         try
-            from16bytes blob.[offset .. offset + 15] |> Ok
+            guidFromBytes blob.[offset .. offset + 15] |> Ok
         with
             | ex -> ("error in getGuidFromBytes: " + ex.Message ) |> Result.Error
 
 
-    let mapBytesToGuids (blob_offset:int) (guidA:Guid[]) (guidA_offset:int) (guid_ct:int) (blob:byte[]) =
+    let mapBytesToGuids (blob_offset:int) (guidA:Guid[]) 
+                        (guidA_offset:int) (guid_ct:int) (blob:byte[]) =
         try
             for i = guidA_offset to (guidA_offset + guid_ct - 1) do
-                let gu = from16bytes blob.[ (i * 16 + blob_offset) .. (i * 16 + 15 + blob_offset)]
+                let gu = guidFromBytes blob.[ (i * 16 + blob_offset) .. (i * 16 + 15 + blob_offset)]
                 guidA.[i] <- gu
             guidA |> Ok
         with
             | ex -> ("error in mapBytesToGuids: " + ex.Message ) |> Result.Error
-
-
-    let convertBytesToGuids (blob:byte[]) =
-        try
-            let guidA = Array.zeroCreate<Guid> (blob.Length / 16)
-            blob |> mapBytesToGuids 0 guidA 0 (blob.Length / 16)
-        with
-            | ex -> ("error in convertBytesToGuids: " + ex.Message ) |> Result.Error
-
     
-    let mapGuidsToBytes (guidA_offset:int) (guid_ct:int) (blob:byte[]) (blob_offset:int) (guidA:Guid[]) =
+
+    let mapGuidsToBytes (guidA_offset:int) (guid_ct:int) 
+                        (blob:byte[]) (blob_offset:int) (guidA:Guid[]) =
         try
             for i = guidA_offset to (guidA_offset + guid_ct - 1) do
                 let gByts = guidA.[i].ToByteArray();
@@ -101,6 +95,15 @@ module GuidUtils =
             blob |> Ok
         with
             | ex -> ("error in mapGuidsToBytes: " + ex.Message ) |> Result.Error
+
+
+
+    let convertBytesToGuids (blob:byte[]) =
+        try
+            let guidA = Array.zeroCreate<Guid> (blob.Length / 16)
+            blob |> mapBytesToGuids 0 guidA 0 (blob.Length / 16)
+        with
+            | ex -> ("error in convertBytesToGuids: " + ex.Message ) |> Result.Error
 
 
     let convertGuidsToBytes (guidA:Guid[]) =

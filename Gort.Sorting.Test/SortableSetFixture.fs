@@ -8,96 +8,122 @@ type SortableSetFixture () =
 
     [<TestMethod>]
     member this.makeAllBits () =
-        let ord = Order.create 16 |> Result.ExtractOrThrow
-        let byteWidth8 = ByteWidth.create 1 |> Result.ExtractOrThrow
-        let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
-        let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
-        let res8 = SortableSetO.makeAllBits ord byteWidth8 |> Result.ExtractOrThrow
-        let rs16 = SortableSetO.makeAllBits ord byteWidth16 |> Result.ExtractOrThrow
-        let rs64 = SortableSetO.makeAllBits ord byteWidth64 |> Result.ExtractOrThrow
+        let order = Order.createNr 10
 
-        Assert.IsTrue(res8.rollout |> RolloutO.getByteWidth |> ByteWidth.value = 1);
-        Assert.IsTrue(rs16.rollout |> RolloutO.getByteWidth |> ByteWidth.value = 2);
-        Assert.IsTrue(rs64.rollout |> RolloutO.getByteWidth |> ByteWidth.value = 8);
+        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
+        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
+        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
+        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
+        let ssFmtBs = SortableSetFormat.makeBitStriped(false |> ExpandBitSets.create)
+
+        let ssRu8 = SortableSet.makeAllBits ssFmtRu8 order |> Result.ExtractOrThrow
+        let ssRu16 = SortableSet.makeAllBits ssFmtRu16 order |> Result.ExtractOrThrow
+        let ssRI32 = SortableSet.makeAllBits ssFmtRI32 order |> Result.ExtractOrThrow
+        let ssRu64 = SortableSet.makeAllBits ssFmtRu64 order |> Result.ExtractOrThrow
+        let ssBs = SortableSet.makeAllBits ssFmtBs order |> Result.ExtractOrThrow
+
+        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsBs);
 
 
     [<TestMethod>]
     member this.makeOrbit () =
-        let ord = Order.create 16 |> Result.ExtractOrThrow
+        let order = Order.createNr 10
         let seed = RandomSeed.create 1123
         let randy = Rando.create rngType.Lcg (seed)
-        let perm = Permutation.createRandom ord randy
+        let perm = Permutation.createRandom order randy
+        let maxCount = Some (SortableCount.create 12)
 
-        let byteWidth8 = ByteWidth.create 1 |> Result.ExtractOrThrow
-        let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
-        let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
-        let res8 = SortableSetO.makeOrbits None byteWidth8 perm  |> Result.ExtractOrThrow
-        let rs16 = SortableSetO.makeOrbits None byteWidth16 perm |> Result.ExtractOrThrow
-        let rs64 = SortableSetO.makeOrbits None byteWidth64 perm |> Result.ExtractOrThrow
-        
-        Assert.AreEqual(res8.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 12);
-        Assert.AreEqual(rs16.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 12);
-        Assert.AreEqual(rs64.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 1);
+        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
+        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
+        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
+        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
+        let ssFmtBs = SortableSetFormat.makeBitStriped(true |> ExpandBitSets.create)
 
+        let ssRu8 = SortableSet.makeOrbits ssFmtRu8 maxCount perm |> Result.ExtractOrThrow
+        let ssRu16 = SortableSet.makeOrbits ssFmtRu16 maxCount perm |> Result.ExtractOrThrow
+        let ssRI32 = SortableSet.makeOrbits ssFmtRI32 maxCount perm |> Result.ExtractOrThrow
+        let ssRu64 = SortableSet.makeOrbits ssFmtRu64 maxCount perm |> Result.ExtractOrThrow
+        let ssBs = SortableSet.makeOrbits ssFmtBs maxCount perm |> Result.ExtractOrThrow
+
+        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
+        Assert.IsTrue(srtIntsBs.Length > srtIntsRu8.Length);
 
     [<TestMethod>]
     member this.makeSortedStacks() =
-        let order = Order.create 16 |> Result.ExtractOrThrow
-        let degGrp = [Order.create 8; Order.create 4; Order.create 2; Order.create 2]
-                      |> Result.sequence
-                      |> Result.ExtractOrThrow
-                      |> List.toArray
-        let byteWidth8 = ByteWidth.create 1 |> Result.ExtractOrThrow
-        let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
-        let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
+        let ord = Order.createNr 16
+        let orderStack = [Order.create 8; Order.create 4; Order.create 2; Order.create 2]
+                          |> Result.sequence
+                          |> Result.ExtractOrThrow
+                          |> List.toArray
 
-        let res8 = SortableSetO.makeSortedStacks byteWidth8 degGrp
-                     |> Result.ExtractOrThrow
-        let res16 = SortableSetO.makeSortedStacks byteWidth16 degGrp
-                     |> Result.ExtractOrThrow
-        let res64 = SortableSetO.makeSortedStacks byteWidth64 degGrp
-                     |> Result.ExtractOrThrow
+        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
+        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
+        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
+        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
+        let ssFmtBs = SortableSetFormat.makeBitStriped(false |> ExpandBitSets.create)
 
-        Assert.AreEqual(res8.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 405);
-        Assert.AreEqual(res16.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 405);
-        Assert.AreEqual(res64.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 7);
+        let ssRu8 = SortableSet.makeSortedStacks ssFmtRu8 orderStack |> Result.ExtractOrThrow
+        let ssRu16 = SortableSet.makeSortedStacks ssFmtRu16 orderStack |> Result.ExtractOrThrow
+        let ssRI32 = SortableSet.makeSortedStacks ssFmtRI32 orderStack |> Result.ExtractOrThrow
+        let ssRu64 = SortableSet.makeSortedStacks ssFmtRu64 orderStack |> Result.ExtractOrThrow
+        let ssBs = SortableSet.makeSortedStacks ssFmtBs orderStack |> Result.ExtractOrThrow
 
+        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsBs);
 
 
     [<TestMethod>]
     member this.makeRandom() =
-        let order = Order.create 16 |> Result.ExtractOrThrow
-        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
-        let sortableCt = 129 |> SortableCount.create
-        let byteWidth8 = ByteWidth.create 1 |> Result.ExtractOrThrow
-        let byteWidth16 = ByteWidth.create 2 |> Result.ExtractOrThrow
-        let byteWidth64 = ByteWidth.create 8 |> Result.ExtractOrThrow
-
-        let res8 = SortableSetO.makeRandom order byteWidth8 randy sortableCt
-                    |> Result.ExtractOrThrow
-        let res16 = SortableSetO.makeRandom order byteWidth16 randy sortableCt
-                    |> Result.ExtractOrThrow
-        let res64 = SortableSetO.makeRandom order byteWidth64 randy sortableCt
-                    |> Result.ExtractOrThrow
-
-        Assert.AreEqual(res8.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 129);
-        Assert.AreEqual(res16.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 129);
-        Assert.AreEqual(res64.rollout |> RolloutO.getChunkCount |> SymbolCount.value, 7);
+        let order = Order.createNr 16
+        let sortableCount = SortableCount.create 10
+        let _randy () =
+            Rando.create rngType.Lcg (123 |> RandomSeed.create)
 
 
-    [<TestMethod>]
-    member this.fromSortableInts() =
-        let order = Order.create 3 |> Result.ExtractOrThrow
-        let arOfIntAr = [| [|1111;11112;11113|]; [|2211;12;13|]; [|2221;22;23|]; [|5555531;32;33|]; |]
-        let sortableCount = arOfIntAr.Length |> SortableCount.create
-        let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
-        let siInt = arOfIntAr |> Array.map(SortableInts.make symbolSetSize)
-        let ssfU8 = rolloutFormat.RfI32 |> sortableSetFormat.SsfArrayRoll
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfU8 order symbolSetSize sortableCount siInt
-                           |> Result.ExtractOrThrow
-        let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
-                                        |> Seq.map(SortableInts.value)
-                                        |> Seq.toArray
+        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
+        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
+        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
+        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
+        let ssFmtBs = SortableSetFormat.makeBitStriped(true |> ExpandBitSets.create)
 
+        let ssRu8 = SortableSet.makeRandomPermutation ssFmtRu8 order sortableCount (_randy()) |> Result.ExtractOrThrow
+        let ssRu16 = SortableSet.makeRandomPermutation ssFmtRu16 order sortableCount (_randy())|> Result.ExtractOrThrow
+        let ssRI32 = SortableSet.makeRandomPermutation ssFmtRI32 order sortableCount (_randy()) |> Result.ExtractOrThrow
+        let ssRu64 = SortableSet.makeRandomPermutation ssFmtRu64 order sortableCount (_randy()) |> Result.ExtractOrThrow
+        let ssBs = SortableSet.makeRandomPermutation ssFmtBs order sortableCount (_randy()) |> Result.ExtractOrThrow
 
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack);
+        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
+        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
+        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
+        Assert.IsTrue(srtIntsBs.Length > srtIntsRu8.Length);

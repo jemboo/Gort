@@ -34,11 +34,13 @@ type IntSetFixture () =
     member this.randomCycles2 () =
         let maxSz = 100
         let _cycT (perm:permutation) =
+            let symbolMod = perm |> Permutation.getOrder |> Order.value
             perm |> Permutation.powers None
                  |> CollectionOps.takeUpto maxSz
-                 |> Seq.map(fun p -> ByteUtils.allUint64s (Permutation.getArray p))
+                 |> Seq.map(fun p -> ByteUtils.allUint64s symbolMod (Permutation.getArray p))
                  |> Seq.concat
                  |> Seq.toArray
+
         let _ctups (perm:permutation) =
             let pps = _cycT perm
             let cds = pps |> Array.distinct
