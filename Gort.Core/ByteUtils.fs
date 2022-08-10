@@ -63,19 +63,25 @@ module ByteUtils =
     let inline dodo (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a) and ^a : (static member (&&&) : ^a * ^a -> ^a)) =
         qua <<< 3
 
+    
+    // creates a bit stream from a byte stream by selecting the first bitsPerSymbol bits.
+    let bitsFromSpBytePositions (bitsPerSymbol:bitsPerSymbol) (byteSeq:seq<byte>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
+        let _byteToBits (v:byte) =
+            seq { for i in 0 .. (bw - 1) -> v.isset i }
+        seq { for bite in byteSeq do yield! _byteToBits bite }
+    
+    // Creates a bit stream from each bit in a byte stream
+    let getAllBitsFromByteSeq (byteSeq:seq<byte>) =
+        let _byteBits (v:byte) =
+            seq { for i in 0 .. 7 -> v.isset i }
+        seq { for bite in byteSeq do yield! _byteBits bite }
 
-
-    let byteToBits (bitWidth:bitWidth) (v:byte) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in 0 .. (bw - 1) -> v.isset i }
-
-
-    let byteSeqToBits (bitWidth:bitWidth) (v:seq<byte>) =
-        seq { for i in v do yield! byteToBits bitWidth i }
-
-
-    let bitSeqToBytes (bitWidth:bitWidth) (bitsy:seq<bool>) =
-        let bw = bitWidth |> BitWidth.value
+    // maps a bit stream to the first bitsPerSymbol in a generated stream of byte
+    // The way this is used, the last chunk may padding - in this case it is smaller 
+    // than bitsPerSymbol, and it is ignored
+    let bitsToSpBytePositions (bitsPerSymbol:bitsPerSymbol) (bitsy:seq<bool>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _yab (_bs:seq<bool>) = 
             let mutable bRet = new byte()
             _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
@@ -84,19 +90,29 @@ module ByteUtils =
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
 
+    // Creates a byte stream from a bit stream by filling each byte
+    let storeBitSeqInBytes (bitsy:seq<bool>) =
+        let _yab (_bs:seq<bool>) = 
+            let mutable bRet = new byte()
+            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            bRet
+        bitsy |> Seq.chunkBySize(8)
+              |> Seq.map(_yab)
 
-    let uint16ToBits (bitWidth:bitWidth) (v:uint16) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in 0 .. (bw - 1) -> v.isset i }
 
+    // creates a bit stream from a uint16 stream by selecting the first bitsPerSymbol bits.
+    let bitsFromSpUint16Positions (bitsPerSymbol:bitsPerSymbol) (v:seq<uint16>) =
 
-    let uint16SeqToBits (bitWidth:bitWidth) (v:seq<uint16>) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in v do yield! uint16ToBits bitWidth i }
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
+        let _uint16ToBits (bitsPerSymbol:bitsPerSymbol) (v:uint16) =
+            seq { for i in 0 .. (bw - 1) -> v.isset i }
+        seq { for i in v do yield! _uint16ToBits bitsPerSymbol i }
 
-
-    let bitSeqToUint16 (bitWidth:bitWidth) (bitsy:seq<bool>) =
-        let bw = bitWidth |> BitWidth.value
+    // maps a bit stream to the first bitsPerSymbol in a generated stream of uint16
+    // The way this is used, the last chunk may padding - in this case it is smaller 
+    // than bitsPerSymbol, and it is ignored
+    let bitsToSpUint16Positions (bitsPerSymbol:bitsPerSymbol) (bitsy:seq<bool>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _yab (_bs:seq<bool>) =
             let mutable bRet = new uint16()
             _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
@@ -105,18 +121,19 @@ module ByteUtils =
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
 
-
-    let intToBits (bitWidth:bitWidth) (v:int) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in 0 .. (bw - 1) -> v.isset i }
-
-
-    let intSeqToBits (bitWidth:bitWidth) (v:seq<int>) =
-        seq { for i in v do yield! intToBits bitWidth i }
+    // creates a bit stream from a int stream by selecting the first bitsPerSymbol bits.
+    let bitsFromSpIntPositions (bitsPerSymbol:bitsPerSymbol) (v:seq<int>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
+        let _intToBits (v:int) =
+            seq { for i in 0 .. (bw - 1) -> v.isset i }
+        seq { for i in v do yield! _intToBits i }
 
 
-    let bitSeqToInts (bitWidth:bitWidth) (bitsy:seq<bool>) =
-        let bw = bitWidth |> BitWidth.value
+    // maps a bit stream to the first bitsPerSymbol in a generated stream of int
+    // The way this is used, the last chunk may padding - in this case it is smaller 
+    // than bitsPerSymbol, and it is ignored
+    let bitsToSpIntPositions (bitsPerSymbol:bitsPerSymbol) (bitsy:seq<bool>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _yab (_bs:seq<bool>) = 
             let mutable bRet = new int()
             _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
@@ -125,19 +142,21 @@ module ByteUtils =
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
 
-
-    let uint64ToBits (bitWidth:bitWidth) (v:uint64) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in 0 .. (bw - 1) -> v.isset i }
-
-
-    let uint64SeqToBits (bitWidth:bitWidth) (v:seq<uint64>) =
-        let bw = bitWidth |> BitWidth.value
-        seq { for i in v do yield! uint64ToBits bitWidth i }
+    
+    // creates a bit stream from a uint64 stream by selecting the first bitsPerSymbol bits.
+    let bitsFromSpUint64Positions (bitsPerSymbol:bitsPerSymbol) (v:seq<uint64>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
+        let _uint64ToBits (v:uint64) =
+            seq { for i in 0 .. (bw - 1) -> v.isset i }
+        seq { for i in v do yield! _uint64ToBits i }
 
 
-    let bitSeqToUint64 (bitWidth:bitWidth) (bitsy:seq<bool>) =
-        let bw = bitWidth |> BitWidth.value
+    // maps a bit stream to the first bitsPerSymbol in a generated stream of uint64
+    // The way this is used, the last chunk may padding - in this case it is smaller 
+    // than bitsPerSymbol, and it is ignored
+    let bitsToSpUint64Positions (bitsPerSymbol:bitsPerSymbol) 
+                                       (bitsy:seq<bool>) =
+        let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _yab (_bs:seq<bool>) =
             let mutable bRet = new uint64()
             _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
@@ -154,7 +173,7 @@ module ByteUtils =
     let allSorted_uL =
         [for deg = 0 to 63 do yield (1uL <<< deg) - 1uL]
 
-    let isSorted (bitRep:uint64) = 
+    let isUint64Sorted (bitRep:uint64) = 
         allSorted_uL |> List.contains bitRep
 
 
@@ -165,16 +184,15 @@ module ByteUtils =
                    (fun dex -> if (d64.get dex) then truVal else falseVal)
 
 
-    let intArrayToInt (data:int[]) (oneThresh:int) = 
+    let inline thresholdArrayToInt< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
         let mutable rv = 0
-        data |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
-        rv
-
-    let inline arrayToUint64< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
-        let mutable rv = 0uL
         array |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
         rv
 
+    let inline thresholdArrayToUint64< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
+        let mutable rv = 0uL
+        array |> Array.iteri(fun dex v -> if (v >= oneThresh) then rv <- rv.set dex)
+        rv
 
 
     let uint64ToIntArray (order:order) (uint64:uint64) =
@@ -183,7 +201,7 @@ module ByteUtils =
 
     let allUint64s (symbolMod:int) (intVers:int[]) =
         let oneThresholds = seq { 0 .. (symbolMod - 1) }
-        oneThresholds |> Seq.map(arrayToUint64 intVers)
+        oneThresholds |> Seq.map(thresholdArrayToUint64 intVers)
         
 
     let toDistinctUint64s (symbolMod:int) (intVersions:int[] seq) =

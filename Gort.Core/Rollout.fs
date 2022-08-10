@@ -1,165 +1,11 @@
 ﻿namespace global
 open System
 
-
-
-type rolloutO = private { byteWidth:byteWidth; chunkCount:symbolCount; order:order; data:byte[] }
-module RolloutO =
-
-    let indexLength (rollout:rolloutO) =
-        (ByteWidth.value rollout.byteWidth) * (Order.value rollout.order)
-
-    let getByteWidth (rollout:rolloutO) =
-        rollout.byteWidth
-
-    let getChunkCount (rollout:rolloutO) =
-        rollout.chunkCount
-
-    let getOrder (rollout:rolloutO) =
-        rollout.order
-
-    let getData (rollout:rolloutO) =
-        rollout.data
-
-    let create (byteWidth:byteWidth) (chunkCount:symbolCount) (order:order) =
-        {
-            rolloutO.byteWidth = byteWidth; chunkCount = chunkCount; order=order;
-            data = Array.zeroCreate<byte> ((ByteWidth.value byteWidth) * 
-                                           (SymbolCount.value chunkCount) * 
-                                           (Order.value order))
-        }
-
-    let init (byteWidth:byteWidth) 
-             (chunkCount:symbolCount) 
-             (order:order) 
-             (data:byte[]) =
-        let bytesNeeded = (ByteWidth.value byteWidth) * (SymbolCount.value chunkCount) * (Order.value order)
-        if (bytesNeeded <> data.Length) then
-            "data size is incorrect" |> Error
-        else
-            {
-                rolloutO.byteWidth = byteWidth; chunkCount = chunkCount; order=order;
-                data = data
-            } |> Ok
-
-
-    let getUint8s (rollIndex:int) (dataOut:uint8[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            Buffer.BlockCopy(rollout.data, internalOffset, dataOut, 0, (indexLength rollout))
-        | x when (x = 2)  -> 
-            "invalid byteWidth for getUint8s" |> failwith
-        | x when (x = 4)  ->
-            "invalid byteWidth for getUint8s" |> failwith
-        | x when (x = 8)  -> 
-            "invalid byteWidth for getUint8s" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let setUint8s (rollIndex:int) (dataIn:uint8[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            Buffer.BlockCopy(dataIn, 0, rollout.data, internalOffset, (indexLength rollout))
-        | x when (x = 2)  -> 
-            "invalid byteWidth for setUint8s" |> failwith
-        | x when (x = 4)  ->
-            "invalid byteWidth for setUint8s" |> failwith
-        | x when (x = 8)  -> 
-            "invalid byteWidth for setUint8s" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let getUint16s (rollIndex:int) (dataOut:uint16[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for getUint16s" |> failwith
-        | x when (x = 2)  -> 
-             Buffer.BlockCopy(rollout.data, internalOffset, dataOut, 0, (indexLength rollout))
-        | x when (x = 4)  ->
-            "invalid byteWidth for getUint16s" |> failwith
-        | x when (x = 8)  -> 
-            "invalid byteWidth for getUint16s" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let setUint16s (rollIndex:int) (dataIn:uint16[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for setUint16s" |> failwith
-        | x when (x = 2)  -> 
-            Buffer.BlockCopy(dataIn, 0, rollout.data, internalOffset, (indexLength rollout))
-        | x when (x = 4)  ->
-            "invalid byteWidth for setUint16s" |> failwith
-        | x when (x = 8)  -> 
-            "invalid byteWidth for setUint16s" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let getUint32s (rollIndex:int) (dataOut:uint32[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for Uint32" |> failwith
-        | x when (x = 2)  -> 
-            "invalid byteWidth for Uint32" |> failwith
-        | x when (x = 4)  ->
-            Buffer.BlockCopy(rollout.data, internalOffset, dataOut, 0, (indexLength rollout))
-        | x when (x = 8)  -> 
-            "invalid byteWidth for Uint32" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let setUint32s (rollIndex:int) (dataIn:uint32[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for setUint32s" |> failwith
-        | x when (x = 2)  -> 
-            "invalid byteWidth for setUint32s" |> failwith
-        | x when (x = 4)  ->
-            Buffer.BlockCopy(dataIn, 0, rollout.data, internalOffset, (indexLength rollout))
-        | x when (x = 8)  -> 
-            "invalid byteWidth for setUint32s" |> failwith
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let getUint64s (rollIndex:int) (dataOut:uint64[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for Uint64" |> failwith
-        | x when (x = 2)  -> 
-            "invalid byteWidth for Uint64" |> failwith
-        | x when (x = 4)  ->
-            "invalid byteWidth for Uint64" |> failwith
-        | x when (x = 8)  -> 
-            Buffer.BlockCopy(rollout.data, internalOffset, dataOut, 0, (indexLength rollout))
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-    let setUint64s (rollIndex:int) (dataIn:uint64[]) (rollout:rolloutO) =
-        let internalOffset = (indexLength rollout) * rollIndex
-        match (ByteWidth.value rollout.byteWidth) with
-        | x when (x = 1)  ->
-            "invalid byteWidth for setUint64s" |> failwith
-        | x when (x = 2)  -> 
-            "invalid byteWidth for setUint64s" |> failwith
-        | x when (x = 4)  ->
-            "invalid byteWidth for setUint64s" |> failwith
-        | x when (x = 8)  -> 
-            Buffer.BlockCopy(dataIn, 0, rollout.data, internalOffset, (indexLength rollout))
-        | _ ->  "invalid byteWidth" |> failwith
-
-
-type bitPack = private { bitWidth:bitWidth; symbolCount:symbolCount; data:byte[] }
+type bitPack = private { bitsPerSymbol:bitsPerSymbol; symbolCount:symbolCount; data:byte[] }
 module BitPack =
 
     let getBitWidth (bitPack:bitPack) =
-        bitPack.bitWidth
+        bitPack.bitsPerSymbol
 
     let getSymbolCount (bitPack:bitPack) =
         bitPack.symbolCount
@@ -167,6 +13,8 @@ module BitPack =
     let getData (bitPack:bitPack) =
         bitPack.data
 
+    let create (bitsPerSymbol:bitsPerSymbol) (symbolCount:symbolCount) (data:byte[]) =
+        { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
 
 
 type uInt8Roll = private { arrayCount:arrayCount; arrayLength:arrayLength; data:uint8[] }
@@ -186,11 +34,10 @@ module Uint8Roll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitWidth = bitPack |> BitPack.getBitWidth
-            let! byteWidth = 8 |> BitWidth.create
+            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
             let data = bitPack |> BitPack.getData 
-                               |> ByteUtils.byteSeqToBits byteWidth
-                               |> ByteUtils.bitSeqToBytes bitWidth
+                               |> ByteUtils.getAllBitsFromByteSeq
+                               |> ByteUtils.bitsToSpBytePositions bitsPerSymbol
                                |> Seq.toArray
 
             return { uInt8Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
@@ -198,15 +45,14 @@ module Uint8Roll =
 
     let toBitPack (symbolSetSize:symbolSetSize) (uInt8Roll:uInt8Roll) =
         result {
-          let! bitWidth = symbolSetSize |> BitWidth.fromSymbolSetSize
-          let! byteWidth = 8 |> BitWidth.create
+          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
           let! symbolCount = ((uInt8Roll.arrayCount |> ArrayCount.value) * 
                              (uInt8Roll.arrayLength |> ArrayLength.value))
                              |> SymbolCount.create
-          let data = uInt8Roll.data |> ByteUtils.byteSeqToBits bitWidth
-                                   |> ByteUtils.bitSeqToBytes byteWidth
-                                   |> Seq.toArray
-          return { bitPack.bitWidth = bitWidth; symbolCount = symbolCount; data = data }
+          let data = uInt8Roll.data |> ByteUtils.bitsFromSpBytePositions bitsPerSymbol
+                                    |> ByteUtils.storeBitSeqInBytes
+                                    |> Seq.toArray
+          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
         
         }
 
@@ -244,11 +90,10 @@ module Uint16Roll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitWidth = bitPack |> BitPack.getBitWidth
-            let! byteWidth = 8 |> BitWidth.create
+            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
             let data = bitPack |> BitPack.getData 
-                               |> ByteUtils.byteSeqToBits byteWidth
-                               |> ByteUtils.bitSeqToUint16 bitWidth
+                               |> ByteUtils.getAllBitsFromByteSeq
+                               |> ByteUtils.bitsToSpUint16Positions bitsPerSymbol
                                |> Seq.toArray
 
             return { uInt16Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
@@ -256,15 +101,14 @@ module Uint16Roll =
 
     let toBitPack (symbolSetSize:symbolSetSize) (uInt16Roll:uInt16Roll) =
         result {
-          let! bitWidth = symbolSetSize |> BitWidth.fromSymbolSetSize
-          let! byteWidth = 8 |> BitWidth.create
+          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
           let! symbolCount = ((uInt16Roll.arrayCount |> ArrayCount.value) * 
                              (uInt16Roll.arrayLength |> ArrayLength.value))
                              |> SymbolCount.create
-          let data = uInt16Roll.data |> ByteUtils.uint16SeqToBits bitWidth
-                                     |> ByteUtils.bitSeqToBytes byteWidth
+          let data = uInt16Roll.data |> ByteUtils.bitsFromSpUint16Positions bitsPerSymbol
+                                     |> ByteUtils.storeBitSeqInBytes
                                      |> Seq.toArray
-          return { bitPack.bitWidth = bitWidth; symbolCount = symbolCount; data = data }
+          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
         }
 
     let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
@@ -284,7 +128,6 @@ module Uint16Roll =
                          |> Seq.chunkBySize(uInt16Roll.arrayLength |> ArrayLength.value)
 
 
-
 type intRoll = private { arrayCount:arrayCount; arrayLength:arrayLength; data:int[] }
 module IntRoll =
 
@@ -302,11 +145,10 @@ module IntRoll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitWidth = bitPack |> BitPack.getBitWidth
-            let! byteWidth = 8 |> BitWidth.create
+            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
             let data = bitPack |> BitPack.getData 
-                               |> ByteUtils.byteSeqToBits byteWidth
-                               |> ByteUtils.bitSeqToInts bitWidth
+                               |> ByteUtils.getAllBitsFromByteSeq
+                               |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
                                |> Seq.toArray
 
             return { intRoll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
@@ -314,15 +156,14 @@ module IntRoll =
 
     let toBitPack (symbolSetSize:symbolSetSize) (intRoll:intRoll) =
         result {
-          let! bitWidth = symbolSetSize |> BitWidth.fromSymbolSetSize
-          let! byteWidth = 8 |> BitWidth.create
+          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
           let! symbolCount = ((intRoll.arrayCount |> ArrayCount.value) * 
                              (intRoll.arrayLength |> ArrayLength.value))
                              |> SymbolCount.create
-          let data = intRoll.data |> ByteUtils.intSeqToBits bitWidth
-                                  |> ByteUtils.bitSeqToBytes byteWidth
+          let data = intRoll.data |> ByteUtils.bitsFromSpIntPositions bitsPerSymbol
+                                  |> ByteUtils.storeBitSeqInBytes
                                   |> Seq.toArray
-          return { bitPack.bitWidth = bitWidth; symbolCount = symbolCount; data = data }
+          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
         
         }
 
@@ -366,11 +207,10 @@ module Uint64Roll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitWidth = bitPack |> BitPack.getBitWidth
-            let! byteWidth = 8 |> BitWidth.create
+            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
             let data = bitPack |> BitPack.getData 
-                               |> ByteUtils.byteSeqToBits byteWidth
-                               |> ByteUtils.bitSeqToUint64 bitWidth
+                               |> ByteUtils.getAllBitsFromByteSeq
+                               |> ByteUtils.bitsToSpUint64Positions bitsPerSymbol
                                |> Seq.toArray
 
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
@@ -378,15 +218,14 @@ module Uint64Roll =
 
     let toBitPack (symbolSetSize:symbolSetSize) (uint64Roll:uint64Roll) =
         result {
-          let! bitWidth = symbolSetSize |> BitWidth.fromSymbolSetSize
-          let! byteWidth = 8 |> BitWidth.create
+          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
           let! symbolCount = ((uint64Roll.arrayCount |> ArrayCount.value) * 
                              (uint64Roll.arrayLength |> ArrayLength.value))
                              |> SymbolCount.create
-          let data = uint64Roll.data |> ByteUtils.uint64SeqToBits bitWidth
-                                     |> ByteUtils.bitSeqToBytes byteWidth
+          let data = uint64Roll.data |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbol
+                                     |> ByteUtils.storeBitSeqInBytes
                                      |> Seq.toArray
-          return { bitPack.bitWidth = bitWidth; symbolCount = symbolCount; data = data }
+          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
         
         }
 
@@ -440,8 +279,8 @@ module Uint64Roll =
 type rolloutFormat = | RfU8 | RfU16 | RfI32 | RfU64
 
 module RolloutFormat =
-    let fromBitWidth (bitWidth:bitWidth) =
-        match (bitWidth |> BitWidth.value) with
+    let fromBitWidth (bitsPerSymbol:bitsPerSymbol) =
+        match (bitsPerSymbol |> BitsPerSymbol.value) with
         | bw when bw < 9 -> rolloutFormat.RfU8
         | bw when bw < 17 -> rolloutFormat.RfU16
         | bw when bw < 32 -> rolloutFormat.RfI32
@@ -547,7 +386,7 @@ module Rollout =
 
 
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
-        let rolloutFormat = bitPack.bitWidth |> RolloutFormat.fromBitWidth
+        let rolloutFormat = bitPack.bitsPerSymbol |> RolloutFormat.fromBitWidth
         fromBitPackRf rolloutFormat arrayLength bitPack
 
 

@@ -32,13 +32,13 @@ module IntSet =
         { intSet.values = (intVers |> uint64) |> ByteUtils.uint64To2ValArray ord 0 1 }
 
     let toInteger (arrayVers:intSet) (oneThresh:int) =
-        ByteUtils.intArrayToInt arrayVers.values oneThresh
+        ByteUtils.thresholdArrayToInt arrayVers.values oneThresh
                 
     let fromUint64 (ord:order) (intVers:uint64) =
         { intSet.values = intVers |> ByteUtils.uint64To2ValArray ord 0 1 }
                 
     let toUint64 (intSt:intSet) (oneThresh:int) = 
-        ByteUtils.arrayToUint64 intSt.values oneThresh
+        ByteUtils.thresholdArrayToUint64 intSt.values oneThresh
 
     let allBitsAsSeq (ord:order) =
         { 0 .. (1 <<< (Order.value ord)) - 1 }
@@ -130,10 +130,10 @@ module IntSet16 =
         { intSet16.values = intVers |> ByteUtils.uint64To2ValArray ord 0us 1us }
     
     let toInteger (arrayVers:intSet16) (oneThresh:int) =
-        ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
+        ByteUtils.thresholdArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
             
     let toUint64 (intSt:intSet16) (oneThresh:uint16) = 
-        ByteUtils.arrayToUint64 intSt.values oneThresh
+        ByteUtils.thresholdArrayToUint64 intSt.values oneThresh
 
     let allBitsAsSeq (order:order) =
         let dv = Order.value order 
@@ -228,10 +228,10 @@ module IntSet8 =
         { intSet8.values = intVers |> ByteUtils.uint64To2ValArray ord 0uy 1uy }
         
     let toInteger (arrayVers:intSet8) (oneThresh:int) =
-        ByteUtils.intArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
+        ByteUtils.thresholdArrayToInt (arrayVers.values |> Array.map(int)) oneThresh
             
     let toUint64 (intSt:intSet8) (oneThresh:uint8) = 
-        ByteUtils.arrayToUint64 intSt.values oneThresh
+        ByteUtils.thresholdArrayToUint64 intSt.values oneThresh
 
     let allBitsAsSeq (order:order) =
         let dv = Order.value order 

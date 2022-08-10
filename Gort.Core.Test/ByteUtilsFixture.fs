@@ -24,15 +24,15 @@ type ByteUtilsFixture () =
     member this.isSorted () =
         let uLun = 12412uL;
         let uLsrted = 2047uL;
-        Assert.IsFalse(ByteUtils.isSorted uLun);
-        Assert.IsTrue(ByteUtils.isSorted uLsrted);
+        Assert.IsFalse(ByteUtils.isUint64Sorted uLun);
+        Assert.IsTrue(ByteUtils.isUint64Sorted uLsrted);
 
 
     [<TestMethod>]
     member this.toIntArray () =
         let uLun = [|0; 0; 1; 0; 1; 1; 0|]
         let ord = Order.createNr uLun.Length
-        let uLRep = ByteUtils.arrayToUint64 uLun 1
+        let uLRep = ByteUtils.thresholdArrayToUint64 uLun 1
         let aBack = uLRep |> ByteUtils.uint64To2ValArray ord 1 0
         Assert.AreEqual(uLun |> Array.toList, aBack |> Array.toList)
         Assert.IsTrue(true);
@@ -89,7 +89,7 @@ type ByteUtilsFixture () =
         let bpa = Order.allSortableAsUint64 deg |> Result.ExtractOrThrow
         let bsa = bpa |> ByteUtils.uint64ArraytoBitStriped deg |> Result.ExtractOrThrow
         let bpaBack = bsa |> ByteUtils.bitStripedToUint64array deg bpa.Length |> Result.ExtractOrThrow
-        let srtedBack = bpaBack |> Array.filter(fun srtbl -> srtbl |> ByteUtils.isSorted |> not)
+        let srtedBack = bpaBack |> Array.filter(fun srtbl -> srtbl |> ByteUtils.isUint64Sorted |> not)
         Assert.AreEqual(1, 1);
 
 
@@ -161,37 +161,30 @@ type ByteUtilsFixture () =
 
     [<TestMethod>]
     member this.intPack () =
-        let max64 = 32 |> BitWidth.create |> Result.ExtractOrThrow
+        let bitsPerSymbol = 32 |> BitsPerSymbol.create |> Result.ExtractOrThrow
         let v = 5uL
         let va = [23454234uL; 23423uL]
-        let qa =  uint64ToBits max64 v |> Seq.toArray
-        let qaA =  uint64SeqToBits max64 va |> Seq.toArray
+        let qaA =  bitsFromSpUint64Positions bitsPerSymbol va |> Seq.toArray
         
-        let max8 = 8 |> BitWidth.create |> Result.ExtractOrThrow
-        let u = 5uy
+        let max8 = 8 |> BitsPerSymbol.create |> Result.ExtractOrThrow
         let ua = [234uy; 42uy]
-        let pa =  byteToBits max8 u |> Seq.toArray
-        let paA =  byteSeqToBits max8 ua |> Seq.toArray
+        let paA =  bitsFromSpBytePositions max8 ua |> Seq.toArray
 
         Assert.AreEqual(1, 1);
 
 
     [<TestMethod>]
     member this.intUnPack () =
-        let max64 = 32 |> BitWidth.create |> Result.ExtractOrThrow
-        let v = 5uL
+        let bitsPerSymbol = 32 |> BitsPerSymbol.create |> Result.ExtractOrThrow
         let va = [23454234uL; 23423uL]
-        let qa =  uint64ToBits max64 v |> Seq.toArray
-        let qaA =  uint64SeqToBits max64 va |> Seq.toArray
-        let qaB =  bitSeqToUint64 max64 qaA |> Seq.toArray
+        let qaA =  bitsFromSpUint64Positions bitsPerSymbol va |> Seq.toArray
+        let qaB =  bitsToSpUint64Positions bitsPerSymbol qaA |> Seq.toArray
 
 
-        let max8 = 8 |> BitWidth.create |> Result.ExtractOrThrow
-        let u = 5uy
+        let max8 = 8 |> BitsPerSymbol.create |> Result.ExtractOrThrow
         let ua = [234uy; 42uy]
-        let pa =  byteToBits max8 u |> Seq.toArray
-        let paA =  byteSeqToBits max8 ua |> Seq.toArray
-        let akB = bitSeqToBytes max8 paA |> Seq.toArray
+        let paA =  bitsFromSpBytePositions max8 ua |> Seq.toArray
+        let akB = bitsToSpBytePositions max8 paA |> Seq.toArray
 
         Assert.AreEqual(1, 1);
 
@@ -218,5 +211,5 @@ type ByteUtilsFixture () =
         let order = 44 |> Order.createNr
         let uint64In = 125436312321uL
         let arrayRep = ByteUtils.uint64ToIntArray order uint64In
-        let uint64Back = ByteUtils.arrayToUint64 arrayRep 1
+        let uint64Back = ByteUtils.thresholdArrayToUint64 arrayRep 1
         Assert.AreEqual(uint64In, uint64Back);

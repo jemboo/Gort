@@ -73,7 +73,7 @@ module Order =
                     |> Result.Error
 
 
-type bitWidth = private BitWidth of int
+type bitsPerSymbol = private BitsPerSymbol of int
 type symbolSetSize = private SymbolSetSize of uint64
 
 module SymbolSetSize =
@@ -84,13 +84,13 @@ module SymbolSetSize =
     let createNr (value:uint64) =
         value |> SymbolSetSize
 
-
-
-module BitWidth = 
-    let value (BitWidth v) = v
+module BitsPerSymbol = 
+    let value (BitsPerSymbol v) = v
+    let createNr (value:int) =
+        value |> BitsPerSymbol
     let create (value:int) =
-        if (value > 0) then value |> BitWidth |> Ok
-        else "bitWidth must be gt 0" |> Error
+        if (value > 0) then value |> BitsPerSymbol |> Ok
+        else "bitsPerSymbol must be gt 0" |> Error
     let fromSymbolSetSize (symbolCount:symbolSetSize) =
         let sc = symbolCount |> SymbolSetSize.value
         (sc.leftmost_index + 1) |> create

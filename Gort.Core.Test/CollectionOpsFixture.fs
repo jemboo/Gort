@@ -147,7 +147,7 @@ type CollectionOpsFixture () =
         let dgs = [4;2;2] |> List.map(Order.createNr)
         let blocks = CollectionOps.stackSortedBlocks dgs 0 1
                      |> Seq.toArray
-        Assert.AreEqual(dgs.Length, 45);
+        Assert.AreEqual(45, blocks.Length);
 
 
 

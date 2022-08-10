@@ -42,10 +42,10 @@ type CommonTypesFixture () =
     [<TestMethod>]
     member this.SymbolCount0ToByteWidth () =
         let sc = 9uL |> SymbolSetSize.createNr
-        let bw = sc |> BitWidth.fromSymbolSetSize
+        let bw = sc |> BitsPerSymbol.fromSymbolSetSize
                     |> Result.ExtractOrThrow
-                    |> BitWidth.value
-        Assert.AreEqual(bw, 3);
+                    |> BitsPerSymbol.value
+        Assert.AreEqual(4, bw);
 
     [<TestMethod>]
     member this.leftmost_index () =

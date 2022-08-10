@@ -31,3 +31,23 @@ module DomainTables =
                 let! rg = ( dto |> RngGenDto.fromDto)
                 return rg
         }
+
+    let bitPackToBitPackRecord (bitPack:bitPack) =
+        let bitPackRecord = new BitPackRecord();
+        let dd = bitPack |> BitPack.getData
+        bitPackRecord.BitsPerSymbol <- bitPack |> BitPack.getBitWidth 
+                                               |> BitsPerSymbol.value
+        bitPackRecord.SymbolCount <- bitPack |> BitPack.getSymbolCount 
+                                             |> SymbolCount.value
+        bitPackRecord.Data <- bitPack |> BitPack.getData
+        bitPackRecord
+
+
+    let bitPackRecordToBitPack (bitPackR:BitPackRecord) =
+        result {
+            let! bitsPerSymbol = bitPackR.BitsPerSymbol |> BitsPerSymbol.create
+            let! symbolCount = bitPackR.SymbolCount |> SymbolCount.create
+            let data = bitPackR.Data
+            let bitPack = BitPack.create bitsPerSymbol symbolCount data
+            return bitPack
+        }

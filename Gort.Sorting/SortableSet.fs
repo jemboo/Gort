@@ -45,11 +45,13 @@ module SortableSet =
 
     let makeArrayRoll (symbolSetSize: symbolSetSize) (rollout:rollout) =
         (rollout, symbolSetSize) |> sortableSet.ArrayRoll
-        
+
+
     let makeBitStriped (uint64Roll:uint64Roll) =
         let sortableCount = uint64Roll |> Uint64Roll.getUsedStripes
                                        |> SortableCount.create
         (uint64Roll, sortableCount) |> sortableSet.BitStriped
+
 
     let toSortableIntsArrays (sortableSet:sortableSet) =
         let order = sortableSet |> getOrder
@@ -84,6 +86,7 @@ module SortableSet =
             (_expando expandBitsets) 
                     |> Uint64Roll.saveIntArraysAsBitStriped arrayLength
                     |> Result.map(makeBitStriped)
+
 
 
     let makeAllBits (sortableSetFormat:sortableSetFormat)

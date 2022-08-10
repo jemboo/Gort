@@ -42,9 +42,9 @@ type SysExtFixture () =
     [<TestMethod>]
     member this.count64b  () =
         let bs25 = [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
-        let uint64_25 = 1 |> ByteUtils.arrayToUint64 bs25
+        let uint64_25 = 1 |> ByteUtils.thresholdArrayToUint64 bs25
         let onesCt = uint64_25.count
-        Assert.AreEqual(onesCt, 25)
+        Assert.AreEqual(onesCt, 25uL)
 
     [<TestMethod>]
     member this.chunky64b  () =

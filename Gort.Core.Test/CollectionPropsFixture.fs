@@ -144,3 +144,60 @@ type CollectionPropsFixture () =
     //        Assert.IsTrue(isTc)
     //        i <- i+1
 
+
+
+
+    [<TestMethod>]
+    member this.fibDivisibleByTwoAndYouWillBeHired () =
+
+        let fibSeq = Seq.unfold (fun (a,b) ->
+             if (a + b < 4000000) then Some( a+b, (b, a+b) ) else None ) (0,1)
+
+        let terms = fibSeq |> Seq.where(fun v -> (v % 2) = 0)
+                           |> Seq.toArray
+        let theSum = terms |> Array.sum
+        let ans = sprintf "here are the fibonacci numbers that are divisible by two and
+                           less than four million
+                           %d terms meet the conditions, and their sum is %d."
+                           terms.Length theSum
+
+        Assert.AreEqual(theSum, 4613732);
+
+
+
+
+    [<TestMethod>]
+    member this.fibEvenly16TimesAndYouWillGetHired () =
+
+        let fibSeq = Seq.unfold (fun (a,b) -> 
+            if (a + b < 4000000) then Some( a+b, (b, a+b) ) else None ) (0,1)
+
+        let terms = fibSeq |> Seq.chunkBySize 2
+                           |> Seq.map(fun pr -> pr.[1])
+                           |> Seq.toArray
+        let theSum = terms |> Array.sum
+        let ans = sprintf "here we are assuming that the terms in parenthesis are the even terms:
+                           1, (2), 3, (5), 8 ...
+                           %d terms meet the conditions, and their sum is %d."
+                           terms.Length theSum
+
+        Assert.AreEqual(theSum, 5702886)
+
+
+
+
+        
+
+
+    [<TestMethod>]
+    member this.TestProblem () =
+        
+        let arrayOfNums = [|2;3;7;10;25;50|]
+
+        let arrayOfOps = [|"+";"-";"*";"/";|]
+ 
+        let target = 633
+
+
+        
+        Assert.AreEqual(1, 1)

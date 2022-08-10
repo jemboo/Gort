@@ -1,13 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.FSharp.Core;
-
-namespace Gort.DataStore.DataModel
+﻿namespace Gort.DataStore.DataModel
 {
     public static class Versions
     {
         public const string RandGen_rndGen = "rndGen";
+    }
+    public class BitPackRecord
+    {
+        public int BitPackRecordId { get; set; }
+        public int BitsPerSymbol { get; set; }
+        public int SymbolCount { get; set; }
+        public byte[] Data { get; set; }
     }
 
     public class RandGen
@@ -38,7 +40,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SortableGen
@@ -49,7 +52,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class Sorter
@@ -60,7 +64,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SorterSet
@@ -71,7 +76,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SorterGen
@@ -82,7 +88,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SorterMutator
@@ -93,7 +100,8 @@ namespace Gort.DataStore.DataModel
         public string CausePath { get; set; }
         public string Version { get; set; }
         public string Cereal { get; set; }
-        public byte[] Data { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SorterPerf
@@ -102,11 +110,12 @@ namespace Gort.DataStore.DataModel
         public int CauseId { get; set; }
         public virtual Cause Cause { get; set; }
         public string CausePath { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public byte[] Data { get; set; }
         public int SorterSetId { get; set; }
         public virtual SorterSet SorterSet { get; set; }
+        public string Version { get; set; }
+        public string Cereal { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 
     public class SorterSetPerf
@@ -115,10 +124,11 @@ namespace Gort.DataStore.DataModel
         public int CauseId { get; set; }
         public virtual Cause Cause { get; set; }
         public string CausePath { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public byte[] Data { get; set; }
         public int SorterSetId { get; set; }
         public virtual SorterSet SorterSet { get; set; }
+        public string Version { get; set; }
+        public string Cereal { get; set; }
+        public int BitPackId { get; set; }
+        public virtual BitPackRecord BitPack { get; set; }
     }
 }
