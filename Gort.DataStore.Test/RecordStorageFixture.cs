@@ -34,11 +34,11 @@ namespace Gort.DataStore.Test
         {
             var ctx = new GortContext2();
             var ws = ctx.Workspace.GetOrMake(workSpaceSelector, makeWorkspace);
-            var cz = new Cause();
+            var cz = new CauseR();
             cz.Genus = "Genus";
             cz.Species = "Species";
             cz.Comments = "Comments";
-            ctx.Cause.Add(cz);
+            ctx.CauseR.Add(cz);
             ctx.SaveChanges();
         }
 
@@ -68,26 +68,26 @@ namespace Gort.DataStore.Test
         {
             var ctx = new GortContext2();
             var ws = ctx.Workspace.GetOrMake(workSpaceSelector, makeWorkspace);
-            var cc = new Cause();
+            var cc = new CauseR();
             cc.CauseStatus = CauseStatus.Error;
             cc.Genus = "Genus8";
             cc.Species = "Species8";
             cc.Index = 888;
             cc.Workspace = ws;
 
-            var cp = new CauseParam();
+            var cp = new CauseParamR();
             var pp = new Param();
             pp.ParamDataType = ParamDataType.String;
             pp.Name = "ParamName";
 
-            cp.Cause = cc;
+            cp.CauseR = cc;
             cp.Name = "CauseParamName";
             cp.Param = pp;
            
 
             //ctx.Workspace.Add(ws);
-            ctx.Cause.Add(cc);
-            ctx.CauseParam.Add(cp);
+            ctx.CauseR.Add(cc);
+            ctx.CauseParamR.Add(cp);
             ctx.Param.Add(pp);
 
 

@@ -2,32 +2,17 @@
 open Microsoft.FSharp.Core
 open System.IO
 open Newtonsoft.Json
-
-
-module Json =
-
-    type Marker = interface end
-        
-    let serialize obj = JsonConvert.SerializeObject obj
-        
-    let deserialize<'a> str :Result<'a, string> =
-        try
-            JsonConvert.DeserializeObject<'a> str |> Ok
-        with
-        | ex -> Result.Error ex.Message
-        
-    let deserializeOption<'a> str =
-        match str with
-        | Some s -> (deserialize<'a> s)
-        | None -> Result.Error  "option was none"
+open System
 
 
 module RngType =
 
     let toDto (rngt: rngType) =
         match rngt with
-        | Lcg -> nameof rngType.Lcg
-        | Net -> nameof rngType.Net
+        | rngType.Lcg -> nameof rngType.Lcg
+        | rngType.Net -> nameof rngType.Net
+        | _ -> failwith (sprintf "no match for RngType: %A" rngt)
+
     let create str =
         match str with
         | nameof rngType.Lcg -> rngType.Lcg |> Ok
@@ -36,6 +21,7 @@ module RngType =
 
 
 type rngGenDto = {rngType:string; seed:int}
+
 module RngGenDto =
 
     let fromDto (dto:rngGenDto) =
@@ -52,9 +38,8 @@ module RngGenDto =
         }
 
     let toDto (rngGen:rngGen) =
-        {rngType=(RngType.toDto rngGen.rngType); 
-         seed=RandomSeed.value rngGen.seed}
+        { rngType=(RngType.toDto rngGen.rngType); 
+          seed=RandomSeed.value rngGen.seed }
 
     let toJson (rngGen:rngGen) =
         rngGen |> toDto |> Json.serialize
-

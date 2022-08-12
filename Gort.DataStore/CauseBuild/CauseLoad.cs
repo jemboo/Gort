@@ -21,18 +21,18 @@ namespace Gort.DataStore.CauseBuild
                 }
             }
 
-            var resC = ctxt.Cause.Find(czBuilder.Cause.CauseId);
+            var resC = ctxt.CauseR.Find(czBuilder.CauseR.CauseRId);
             if (resC == null)
             {
-                ctxt.Cause.Add(czBuilder.Cause);
+                ctxt.CauseR.Add(czBuilder.CauseR);
             }
 
-            foreach (var czP in czBuilder.CauseParams)
+            foreach (var czP in czBuilder.CauseParamRs)
             {
-                var res = ctxt.CauseParam.Find(czP.CauseParamId);
+                var res = ctxt.CauseParamR.Find(czP.CauseParamRId);
                 if (res == null)
                 {
-                    ctxt.CauseParam.Add(czP);
+                    ctxt.CauseParamR.Add(czP);
                 }
             }
 

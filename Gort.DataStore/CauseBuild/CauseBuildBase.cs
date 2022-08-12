@@ -16,14 +16,14 @@ namespace Gort.DataStore.CauseBuild
             CauseComments = String.Empty;
         }
 
-        Cause _cause;
-        public Cause Cause 
+        CauseR _causeR;
+        public CauseR CauseR
         { 
             get
             {
-                if(_cause == null)
+                if(_causeR == null)
                 {
-                    _cause = new Cause()
+                    _causeR = new CauseR()
                     {
                         Genus = CauseGenus,
                         Species = CauseSpecies,
@@ -34,7 +34,7 @@ namespace Gort.DataStore.CauseBuild
                     };
                 }
 
-                return _cause;
+                return _causeR;
             }
         }
         public Workspace Workspace { get; }
@@ -63,14 +63,14 @@ namespace Gort.DataStore.CauseBuild
 
         #region CauseParams
 
-        private readonly List<CauseParam> _memberCauseParams 
-            = new List<CauseParam>();
+        private readonly List<CauseParamR> _memberCauseParams 
+            = new List<CauseParamR>();
 
-        protected CauseParam MakeCauseParam(Param pram, string causeParamName)
+        protected CauseParamR MakeCauseParam(Param pram, string causeParamName)
         {
-            var cs = new CauseParam()
+            var cs = new CauseParamR()
             {
-                Cause = Cause,
+                CauseR = CauseR,
                 Param = pram,
                 Name = causeParamName
             };
@@ -78,7 +78,7 @@ namespace Gort.DataStore.CauseBuild
             _memberCauseParams.Add(cs);
             return cs;
         }
-        public IEnumerable<CauseParam> CauseParams
+        public IEnumerable<CauseParamR> CauseParamRs
         {
             get { return _memberCauseParams; }
         }

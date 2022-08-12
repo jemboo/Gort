@@ -4,12 +4,14 @@ type sortableSetFormat =
      | SsfArrayRoll of rolloutFormat
      | SsfBitStriped of expandBitSets
 
+
 module SortableSetFormat =
     let makeBitStriped expandBitSets =
         sortableSetFormat.SsfBitStriped expandBitSets
 
     let makeRollout (rolloutFormat:rolloutFormat) =
         sortableSetFormat.SsfArrayRoll rolloutFormat
+
 
 
 type sortableSet = 

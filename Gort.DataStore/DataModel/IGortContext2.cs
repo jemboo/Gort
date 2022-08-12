@@ -5,17 +5,14 @@ namespace Gort.DataStore.DataModel
 {
     public interface IGortContext2
     {
-        DbSet<Cause> Cause { get; set; }
-        DbSet<CauseParam> CauseParam { get; set; }
-        DbSet<SorterGen> SorterGen { get; set; }
-        DbSet<SorterMutator> SorterMutator { get; set; }
+        DbSet<CauseR> CauseR { get; set; }
+        DbSet<CauseParamR> CauseParamR { get; set; }
         DbSet<Param> Param { get; set; }
-        DbSet<RandGen> RandGen { get; set; }
-        DbSet<SortableSet> SortableSet { get; set; }
-        DbSet<Sorter> Sorter { get; set; }
-        DbSet<SorterPerf> SorterPerf { get; set; }
-        DbSet<SorterSet> SorterSet { get; set; }
-        DbSet<SorterSetPerf> SorterSetPerf { get; set; }
+        DbSet<RandGenR> RandGenR { get; set; }
+        DbSet<SortableSetR> SortableSetR { get; set; }
+        DbSet<SorterR> SorterR { get; set; }
+        DbSet<SorterSetR> SorterSetR { get; set; }
+        DbSet<SorterSetPerfR> SorterSetPerfR { get; set; }
         DbSet<Workspace> Workspace { get; set; }
         EntityEntry<T> Entry<T>(object entity) where T : class;
         int SaveChanges();

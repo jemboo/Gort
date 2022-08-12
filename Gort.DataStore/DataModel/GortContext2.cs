@@ -20,24 +20,19 @@ namespace Gort.DataStore.DataModel
         }
 
         public DbSet<Workspace> Workspace { get; set; }
-        public DbSet<Cause> Cause { get; set; }
-        public DbSet<CauseParam> CauseParam { get; set; }
+        public DbSet<CauseR> CauseR { get; set; }
+        public DbSet<CauseParamR> CauseParamR { get; set; }
         public EntityEntry<T> Entry<T>(object entity) where T : class
         {
             return (EntityEntry<T>)this.Entry(entity);
         }
 
         public DbSet<Param> Param { get; set; }
-        public DbSet<RandGen> RandGen { get; set; }
-        public DbSet<Sortable> Sortable { get; set; }
-        public DbSet<SortableSet> SortableSet { get; set; }
-        public DbSet<SortableGen> SortableGen { get; set; }
-        public DbSet<Sorter> Sorter { get; set; }
-        public DbSet<SorterSet> SorterSet { get; set; }
-        public DbSet<SorterGen> SorterGen { get; set; }
-        public DbSet<SorterMutator> SorterMutator { get; set; }
-        public DbSet<SorterPerf> SorterPerf { get; set; }
-        public DbSet<SorterSetPerf> SorterSetPerf { get; set; }
+        public DbSet<RandGenR> RandGenR { get; set; }
+        public DbSet<SortableSetR> SortableSetR { get; set; }
+        public DbSet<SorterR> SorterR { get; set; }
+        public DbSet<SorterSetR> SorterSetR { get; set; }
+        public DbSet<SorterSetPerfR> SorterSetPerfR { get; set; }
 
     }
 }

@@ -12,31 +12,31 @@ namespace Gort.DataStore.DataModel
         [Key]
         public Guid WorkspaceId { get; set; }
         public string? Name { get; set; }
-        public ICollection<Cause> Causes { get; set; } =
-                new ObservableCollection<Cause>();
+        public ICollection<CauseR> Causes { get; set; } =
+                new ObservableCollection<CauseR>();
     }
 
     [Index(nameof(WorkspaceId), nameof(Index), IsUnique = true)]
-    public class Cause
+    public class CauseR
     {
-        public int CauseId { get; set; }
+        public int CauseRId { get; set; }
         public string Genus { get; set; }
         public string Species { get; set; }
         public string? Comments { get; set; }
         public CauseStatus CauseStatus { get; set; }
-        public ICollection<CauseParam> CauseParams { get; set; } =
-            new ObservableCollection<CauseParam>();
+        public ICollection<CauseParamR> CauseParamRs { get; set; } =
+            new ObservableCollection<CauseParamR>();
 
         public int Index { get; set; }
         public Guid WorkspaceId { get; set; }
         public virtual Workspace Workspace { get; set; }
     }
 
-    public class CauseParam
+    public class CauseParamR
     {
-        public int CauseParamId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public int CauseParamRId { get; set; }
+        public int CauseRId { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string Name { get; set; }
         public int ParamId { get; set; }
         public virtual Param Param { get; set; }

@@ -17,20 +17,20 @@ module Load =
             if (prami = null) then
                 ctxt.Param.Add(pram) |> ignore
 
-        let _addCause (cz:Cause) =
-            let czi = ctxt.Cause.Find(cz.CauseId);
+        let _addCause (cz:CauseR) =
+            let czi = ctxt.CauseR.Find(cz.CauseRId);
             if (czi = null) then
-                ctxt.Cause.Add(cz) |> ignore
+                ctxt.CauseR.Add(cz) |> ignore
 
-        let _addCauseParam (czP:CauseParam) =
-            let czPi = ctxt.CauseParam.Find(czP.ParamId);
+        let _addCauseParam (czP:CauseParamR) =
+            let czPi = ctxt.CauseParamR.Find(czP.ParamId);
             if (czPi = null) then
-                ctxt.CauseParam.Add(czP) |> ignore
+                ctxt.CauseParamR.Add(czP) |> ignore
         try
             _addWorkspace czBuilder.Workspace
-            _addCause czBuilder.Cause
+            _addCause czBuilder.CauseR
             czBuilder.Params |> Seq.iter(_addParam)
-            czBuilder.CauseParams |> Seq.iter(_addCauseParam)
+            czBuilder.CauseParamRs |> Seq.iter(_addCauseParam)
             ctxt.SaveChanges() |> Ok
         with
             | ex -> ("error in bytesFromIntArray: " + ex.Message ) |> Result.Error 

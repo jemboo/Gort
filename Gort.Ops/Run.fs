@@ -3,7 +3,7 @@ open Gort.DataStore.DataModel
 
 module Run =
 
-    let RunCause (cz:Cause) 
+    let RunCause (cz:CauseR) 
                  (pth:string list) 
                  (ctxt:IGortContext2) =
         if cz.CauseStatus = CauseStatus.Pending then

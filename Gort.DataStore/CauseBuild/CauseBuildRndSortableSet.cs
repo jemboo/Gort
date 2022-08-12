@@ -22,8 +22,8 @@ namespace Gort.DataStore.CauseBuild
 
         public Param RngSeed { get; private set; }
         public Param RngType { get; private set; }
-        public CauseParam CauseParamSeed { get; private set; }
-        public CauseParam CauseParamRngType { get; private set; }
+        public CauseParamR CauseParamSeed { get; private set; }
+        public CauseParamR CauseParamRngType { get; private set; }
 
     }
 }

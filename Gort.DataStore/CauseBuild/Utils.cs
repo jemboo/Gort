@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gort.DataStore.DataModel;
+﻿using Gort.DataStore.DataModel;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Gort.DataStore.CauseBuild
 {
     public static class Utils
     {
-        public static Cause GetCauseById(int causeId, IGortContext2? gortContext = null)
+        public static CauseR GetCauseById(int causeId, IGortContext2? gortContext = null)
         {
             try
             {
                 var ctxt = gortContext ?? new GortContext2();
-                var qua = ctxt.Cause.Where(c => c.CauseId == causeId)
-                                    .Include(s => s.CauseParams).SingleOrDefault();
+                var qua = ctxt.CauseR.Where(c => c.CauseRId == causeId)
+                                    .Include(s => s.CauseParamRs).SingleOrDefault();
                 if (qua is null)
                 {
                     throw new Exception($"cause {causeId} not found");
                 }
-                foreach (var cp in qua.CauseParams)
+                foreach (var cp in qua.CauseParamRs)
                 {
                     ctxt.Param.Where(p => p.ParamId == cp.ParamId).Load();
                 }
@@ -33,8 +29,21 @@ namespace Gort.DataStore.CauseBuild
             }
         }
 
+        public static RandGenR? GetRandGenRById(int rndGenId, 
+                        IGortContext2? gortContext = null)
+        {
+            try
+            {
+                var ctxt = gortContext ?? new GortContext2();
+                return ctxt.RandGenR.SingleOrDefault(c => c.RandGenRId == rndGenId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        public static Cause? GetPendingCauseForWorkspace(string workspaceName,
+        public static CauseR? GetPendingCauseForWorkspace(string workspaceName,
             IGortContext2? gortContext = null)
         {
             try
@@ -45,12 +54,12 @@ namespace Gort.DataStore.CauseBuild
                 {
                     throw new Exception($"Workspace \"{workspaceName}\" not found");
                 }
-                var plainCause = ctxt.Cause.Where(c => c.Workspace == ws &&
+                var plainCause = ctxt.CauseR.Where(c => c.Workspace == ws &&
                                                  c.CauseStatus != CauseStatus.Complete)
                                            .OrderBy(c => c.Index).FirstOrDefault();
 
                 if (plainCause == null) return null;
-                return GetCauseById(plainCause.CauseId);
+                return GetCauseById(plainCause.CauseRId);
 
             }
             catch (Exception)

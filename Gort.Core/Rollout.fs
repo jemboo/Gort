@@ -255,6 +255,7 @@ module Uint64Roll =
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
 
+
     let toUint64ArraySeq (uint64Roll:uint64Roll) =
         uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
@@ -262,7 +263,7 @@ module Uint64Roll =
     let saveIntArraysAsBitStriped (arrayLength:arrayLength)
                                   (aas:seq<int[]>) =
         result {
-            let order = arrayLength |> ArrayLength.value |> Order.createNr
+            let! order = arrayLength |> ArrayLength.value |> Order.create
             let! data = ByteUtils.createStripedArrayFromInts order aas
             let! arrayCount = data.Length |> ArrayCount.create
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
@@ -279,12 +280,30 @@ module Uint64Roll =
 type rolloutFormat = | RfU8 | RfU16 | RfI32 | RfU64
 
 module RolloutFormat =
+
     let fromBitWidth (bitsPerSymbol:bitsPerSymbol) =
         match (bitsPerSymbol |> BitsPerSymbol.value) with
         | bw when bw < 9 -> rolloutFormat.RfU8
         | bw when bw < 17 -> rolloutFormat.RfU16
         | bw when bw < 32 -> rolloutFormat.RfI32
         | _ -> rolloutFormat.RfU64
+
+    let toDto (rf: rolloutFormat) =
+        match rf with
+        | rolloutFormat.RfU8 -> nameof rolloutFormat.RfU8
+        | rolloutFormat.RfU16 -> nameof rolloutFormat.RfU16
+        | rolloutFormat.RfI32 -> nameof rolloutFormat.RfI32
+        | rolloutFormat.RfU64 -> nameof rolloutFormat.RfU64
+
+    let create str =
+        match str with
+        | nameof rolloutFormat.RfU8 -> rolloutFormat.RfU8 |> Ok
+        | nameof rolloutFormat.RfU16 -> rolloutFormat.RfU16 |> Ok
+        | nameof rolloutFormat.RfI32 -> rolloutFormat.RfI32 |> Ok
+        | nameof rolloutFormat.RfU64 -> rolloutFormat.RfU64 |> Ok
+        | _ -> Error (sprintf "no match for RngType: %s" str)
+
+
 
 type rollout = 
     | U8 of uInt8Roll

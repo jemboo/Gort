@@ -4,131 +4,71 @@
     {
         public const string RandGen_rndGen = "rndGen";
     }
-    public class BitPackRecord
+    public class BitPackR
     {
-        public int BitPackRecordId { get; set; }
+        public int BitPackRId { get; set; }
         public int BitsPerSymbol { get; set; }
         public int SymbolCount { get; set; }
         public byte[] Data { get; set; }
     }
 
-    public class RandGen
+    public class RandGenR
     {
-        public int RandGenId { get; set; }
+        public int RandGenRId { get; set; }
         public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
         public string Version { get; set; }
-        public string Cereal { get; set; }
+        public string Json { get; set; }
     }
 
-    public class Sortable
+    public class SortableSetR
     {
-        public int SortableId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public int SortableSetRId { get; set; }
+        public int CauseRId { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
         public string Version { get; set; }
-        public string Cereal { get; set; }
+        public string Json { get; set; }
+        public int? BitPackRId { get; set; }
+        public virtual BitPackR BitPackR { get; set; }
     }
 
-    public class SortableSet
+    public class SorterR
     {
-        public int SortableSetId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public int SorterRId { get; set; }
+        public int CauseRId { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
         public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
+        public string Json { get; set; }
+        public int? BitPackRId { get; set; }
+        public virtual BitPackR BitPackR { get; set; }
     }
 
-    public class SortableGen
+    public class SorterSetR
     {
-        public int SortableGenId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public int SorterSetRId { get; set; }
+        public int CauseRId { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
         public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
+        public string Json { get; set; }
+        public int? BitPackRId { get; set; }
+        public virtual BitPackR BitPackR { get; set; }
     }
 
-    public class Sorter
+    public class SorterSetPerfR
     {
-        public int SorterId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
+        public int SorterSetPerfRId { get; set; }
+        public int CauseRId { get; set; }
+        public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
+        public int SorterSetRId { get; set; }
+        public virtual SorterSetR SorterSetR { get; set; }
         public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
-    }
-
-    public class SorterSet
-    {
-        public int SorterSetId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
-        public string CausePath { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
-    }
-
-    public class SorterGen
-    {
-        public int SorterGenId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
-        public string CausePath { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
-    }
-
-    public class SorterMutator
-    {
-        public int SorterMutatorId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
-        public string CausePath { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
-    }
-
-    public class SorterPerf
-    {
-        public int SorterPerfId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
-        public string CausePath { get; set; }
-        public int SorterSetId { get; set; }
-        public virtual SorterSet SorterSet { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
-    }
-
-    public class SorterSetPerf
-    {
-        public int SorterSetPerfId { get; set; }
-        public int CauseId { get; set; }
-        public virtual Cause Cause { get; set; }
-        public string CausePath { get; set; }
-        public int SorterSetId { get; set; }
-        public virtual SorterSet SorterSet { get; set; }
-        public string Version { get; set; }
-        public string Cereal { get; set; }
-        public int BitPackId { get; set; }
-        public virtual BitPackRecord BitPack { get; set; }
+        public string Json { get; set; }
+        public int? BitPackRId { get; set; }
+        public virtual BitPackR BitPackR { get; set; }
     }
 }
