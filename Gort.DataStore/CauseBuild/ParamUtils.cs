@@ -4,71 +4,8 @@ using System.Text;
 
 namespace Gort.DataStore.CauseBuild
 {
-    public static class Utils
+    public static class ParamUtils
     {
-        public static CauseR GetCauseById(int causeId, IGortContext2? gortContext = null)
-        {
-            try
-            {
-                var ctxt = gortContext ?? new GortContext2();
-                var qua = ctxt.CauseR.Where(c => c.CauseRId == causeId)
-                                    .Include(s => s.CauseParamRs).SingleOrDefault();
-                if (qua is null)
-                {
-                    throw new Exception($"cause {causeId} not found");
-                }
-                foreach (var cp in qua.CauseParamRs)
-                {
-                    ctxt.Param.Where(p => p.ParamId == cp.ParamId).Load();
-                }
-                return qua;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public static RandGenR? GetRandGenRById(int rndGenId, 
-                        IGortContext2? gortContext = null)
-        {
-            try
-            {
-                var ctxt = gortContext ?? new GortContext2();
-                return ctxt.RandGenR.SingleOrDefault(c => c.RandGenRId == rndGenId);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public static CauseR? GetPendingCauseForWorkspace(string workspaceName,
-            IGortContext2? gortContext = null)
-        {
-            try
-            {
-                var ctxt = gortContext ?? new GortContext2();
-                var ws = ctxt.Workspace.SingleOrDefault(c => c.Name == workspaceName);
-                if (ws is null)
-                {
-                    throw new Exception($"Workspace \"{workspaceName}\" not found");
-                }
-                var plainCause = ctxt.CauseR.Where(c => c.Workspace == ws &&
-                                                 c.CauseStatus != CauseStatus.Complete)
-                                           .OrderBy(c => c.Index).FirstOrDefault();
-
-                if (plainCause == null) return null;
-                return GetCauseById(plainCause.CauseRId);
-
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
         public static byte[] ToBytes(this ParamDataType dataType, object val)
         {
             try
@@ -162,7 +99,6 @@ namespace Gort.DataStore.CauseBuild
             }
         }
 
-
         public static Param MakeParam(string name, ParamDataType paramDataType, object value)
         {
             return new Param()
@@ -172,7 +108,6 @@ namespace Gort.DataStore.CauseBuild
                 Value = paramDataType.ToBytes(value)
             };
         }
-
 
     }
 }

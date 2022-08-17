@@ -5,10 +5,11 @@ namespace Gort.DataStore.DataModel
 {
     public interface IGortContext2
     {
+        DbSet<BitPackR> BitPackR { get; set; }
         DbSet<CauseR> CauseR { get; set; }
         DbSet<CauseParamR> CauseParamR { get; set; }
         DbSet<Param> Param { get; set; }
-        DbSet<RandGenR> RandGenR { get; set; }
+        DbSet<ComponentR> RandGenR { get; set; }
         DbSet<SortableSetR> SortableSetR { get; set; }
         DbSet<SorterR> SorterR { get; set; }
         DbSet<SorterSetR> SorterSetR { get; set; }

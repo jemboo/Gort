@@ -172,3 +172,19 @@ module CollectionOps =
              Order.allTwoSymbolOrderedArrays deg hival lowval
         blockSizes |> Seq.map(_allSorted >> Seq.toArray)
                    |> comboStack
+
+
+
+//*************************************************************
+//***********    Split Sequence   ****************************
+//*************************************************************
+
+    let chunkByDelimiter<'a> (strm:seq<'a>) (delim:'a -> bool) =
+        let swEnumer = strm.GetEnumerator();
+        let mutable rz = ResizeArray()
+
+        seq {while swEnumer.MoveNext() do
+                rz.Add swEnumer.Current
+                if delim swEnumer.Current then
+                    yield rz.ToArray()
+                    rz <- ResizeArray() }

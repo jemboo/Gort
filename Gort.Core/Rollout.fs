@@ -16,6 +16,16 @@ module BitPack =
     let create (bitsPerSymbol:bitsPerSymbol) (symbolCount:symbolCount) (data:byte[]) =
         { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
 
+    let toIntArrays (arrayLength:arrayLength) (bitPack:bitPack) =
+        result {
+            let bitsPerSymbol = bitPack |> getBitWidth
+            let allInts = bitPack |> getData
+                                  |> ByteUtils.getAllBitsFromByteSeq
+                                  |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
+                                  |> Seq.toArray
+            return allInts |> Array.chunkBySize (arrayLength |> ArrayLength.value)
+        }
+
 
 type uInt8Roll = private { arrayCount:arrayCount; arrayLength:arrayLength; data:uint8[] }
 module Uint8Roll =
@@ -255,7 +265,6 @@ module Uint64Roll =
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
 
-
     let toUint64ArraySeq (uint64Roll:uint64Roll) =
         uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
@@ -268,7 +277,6 @@ module Uint64Roll =
             let! arrayCount = data.Length |> ArrayCount.create
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
-
 
     let asBitStripedToIntArraySeq (uint64Roll:uint64Roll) =
          let order = uint64Roll.arrayLength |> ArrayLength.value |> Order.createNr

@@ -5,9 +5,9 @@ open System
 type expandBitSets = private ExpandBitSets of bool
 type sorterId = private SorterId of Guid
 type sortableCount = private SortableCount of int
-type sortableSetId = private SortableSetId of Guid
+type sortableSetId = private SortableSetId of int
 type sorterCount = private SorterCount of int
-type sorterSetId = private SorterSetId of Guid
+type sorterSetId = private SorterSetId of int
 type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
 type switchCount = private SwitchCount of int
@@ -45,7 +45,6 @@ module SorterCount =
 module SortableSetId =
     let value (SortableSetId v) = v
     let create id = (SortableSetId id)
-    let fromGuid (id:Guid) = create id
 
 module SwitchCount =
     let value (SwitchCount v) = v
@@ -156,6 +155,4 @@ module StageWindowSize =
     let ToSwitchCount (ord:order) (tWz:stageWindowSize) =
         SwitchCount.create ((Order.value ord) * (value tWz) / 2)
     let fromInt v = create v
-
-
 

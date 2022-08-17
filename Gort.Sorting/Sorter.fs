@@ -72,3 +72,87 @@ module Sorter =
                         |> Seq.take(StageCount.value stageCount)
                         |> Seq.map(fun t -> t.switches)
                         |> Seq.concat
+
+
+type sorterUniformMutatorType = |Switch |Stage |StageRfl
+type sorterUniformMutator = private {sumType:sorterUniformMutatorType;
+                                     mutationRate:mutationRate;
+                                     mFunc: sorter -> IRando -> Result<sorter, string> }
+
+module SorterUniformMutator =
+
+    let create t r f  = 
+        {
+            sorterUniformMutator.sumType = t; 
+            mutationRate =r; 
+            mFunc = f
+        }
+
+    let getSorterUniformMutatorType (sum:sorterUniformMutator) =
+        sum.sumType
+
+    let getMutationRateVal (sum:sorterUniformMutator) =
+        sum.mutationRate |> MutationRate.getRateValue
+
+    let mutateBySwitch (swMr:switchMutationRate) =
+
+        (fun (sorter:sorter) (randy:IRando) ->
+            result {
+                let newSwitches = Switch.mutateSwitches sorter.order 
+                                                        swMr
+                                                        randy
+                                                        sorter.switches
+                                   |> Seq.toArray
+                let newSwitchCount = newSwitches.Length |> SwitchCount.create
+                return {
+                           sorter.order = sorter.order;
+                           sorter.switchCount = newSwitchCount;
+                           sorter.switches =  newSwitches
+                        }
+            }) |> create sorterUniformMutatorType.Switch (swMr |> mutationRate.Switch)
+
+
+    let mutateByStage (stMr:stageMutationRate) =
+
+        (fun (sorter:sorter) (randy:IRando) ->
+            result {
+                let mutantStages = 
+                          sorter.switches
+                             |> Stage.fromSwitches sorter.order
+                             |> Seq.toArray
+                             |> Array.map(Stage.randomMutate randy stMr)
+
+                let newSwitches = [| for stage in mutantStages do yield! stage.switches |]
+                                   |> Seq.toArray
+                let newSwitchCount = newSwitches.Length |> SwitchCount.create
+                return {
+                        sorter.order = sorter.order;
+                        sorter.switchCount = newSwitchCount;
+                        sorter.switches =  newSwitches
+                        }
+            }) |> create sorterUniformMutatorType.Stage (stMr |> mutationRate.Stage)
+
+
+    let mutateByStageRfl (stMr:stageMutationRate) =
+
+        (fun (sorter:sorter) (randy:IRando) ->
+            result {
+                let mutantStages = 
+                          sorter.switches
+                             |> Stage.fromSwitches sorter.order
+                             |> Seq.toArray
+                             |> Array.map(Stage.randomReflMutate randy stMr)
+
+                let newSwitches = [| for stage in mutantStages do yield! stage.switches |]
+                let newSwitchCount = newSwitches.Length |> SwitchCount.create
+
+                return {
+                        sorter.order = sorter.order;
+                        sorter.switchCount = newSwitchCount;
+                        sorter.switches =  newSwitches
+                        }
+            }) |> create sorterUniformMutatorType.StageRfl (stMr |> mutationRate.Stage)
+
+
+type sorterMutator =
+     | Uniform of sorterUniformMutator

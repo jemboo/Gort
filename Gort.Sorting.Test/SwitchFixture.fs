@@ -29,7 +29,7 @@ type SwitchFixture () =
         for i=0 to switches.Length - 1 do
             let sw = switches.[i]
             let lowFriends = Switch.lowOverlapping degSrc sw.low
-                             |> Switch.fromIndexes
+                             |> Switch.fromSwitchIndexes
                              |> Seq.toArray
             for j=0 to lowFriends.Length - 1 do
                 let fr = lowFriends.[j]
@@ -46,7 +46,7 @@ type SwitchFixture () =
         for i=0 to switches.Length - 1 do
             let sw = switches.[i]
             let hiFriends = Switch.hiOverlapping degSrc sw.hi
-                             |> Switch.fromIndexes
+                             |> Switch.fromSwitchIndexes
                              |> Seq.toArray
             for j=0 to hiFriends.Length - 1 do
                 let fr = hiFriends.[j]

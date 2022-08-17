@@ -7,8 +7,9 @@
 
   <ItemGroup>
     <Compile Include="Utils.fs" />
-    <Compile Include="SimpleDto.fs" />
+    <Compile Include="componentDto.fs" />
     <Compile Include="SortableSetDto.fs" />
+    <Compile Include="SorterSetDto.fs" />
     <Compile Include="RecordVersions.fs" />
     <Compile Include="DomainTables.fs" />
     <Compile Include="Program.fs" />

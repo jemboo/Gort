@@ -14,7 +14,10 @@ type SortableIntsFixture () =
         let symbolSetSize = 255 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map(SortableInts.make order symbolSetSize)
         let ssfU8 = rolloutFormat.RfU16 |> sortableSetFormat.SsfArrayRoll
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfU8 order symbolSetSize siInt
+        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSet = SortableSet.fromSortableIntsArrays 
+                                sortableSetId ssfU8 
+                                order symbolSetSize siInt
                            |> Result.ExtractOrThrow
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
@@ -31,8 +34,11 @@ type SortableIntsFixture () =
         let symbolSetSize = 5553 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map(SortableInts.make order symbolSetSize)
         let ssfU16 = rolloutFormat.RfU16 |> sortableSetFormat.SsfArrayRoll
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfU16 order symbolSetSize siInt
-                           |> Result.ExtractOrThrow
+        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSet = SortableSet.fromSortableIntsArrays 
+                                sortableSetId ssfU16 
+                                order symbolSetSize siInt
+                                |> Result.ExtractOrThrow
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
                                         |> Seq.toArray
@@ -48,7 +54,9 @@ type SortableIntsFixture () =
         let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map(SortableInts.make order symbolSetSize)
         let ssfI32 = rolloutFormat.RfI32 |> sortableSetFormat.SsfArrayRoll
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfI32 order symbolSetSize siInt
+        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSet = SortableSet.fromSortableIntsArrays sortableSetId
+                                ssfI32 order symbolSetSize siInt
                            |> Result.ExtractOrThrow
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
@@ -65,8 +73,11 @@ type SortableIntsFixture () =
         let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map(SortableInts.make order symbolSetSize)
         let ssfU64 = rolloutFormat.RfU64 |> sortableSetFormat.SsfArrayRoll
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfU64 order symbolSetSize siInt
-                           |> Result.ExtractOrThrow
+        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSet = SortableSet.fromSortableIntsArrays 
+                                    sortableSetId
+                                    ssfU64 order symbolSetSize siInt
+                                    |> Result.ExtractOrThrow
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
                                         |> Seq.toArray
@@ -81,8 +92,11 @@ type SortableIntsFixture () =
         let symbolSetSize = 2 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map(SortableInts.make order symbolSetSize)
         let ssfStriped = sortableSetFormat.SsfBitStriped (false |> ExpandBitSets.create)
-        let sortableSet = SortableSet.fromSortableIntsArrays ssfStriped order symbolSetSize siInt
-                           |> Result.ExtractOrThrow
+        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSet = SortableSet.fromSortableIntsArrays 
+                                    sortableSetId
+                                    ssfStriped order symbolSetSize siInt
+                                    |> Result.ExtractOrThrow
         let scFromSs  = sortableSet |> SortableSet.getSortableCount |> SortableCount.value
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
@@ -101,7 +115,9 @@ type SortableIntsFixture () =
                          |> Seq.map(SortableInts.getValues)
                          |> Seq.toArray
         let ssfStriped = sortableSetFormat.SsfBitStriped (false |> ExpandBitSets.create)
+        let sortableSetId = 123 |> SortableSetId.create
         let sortableSet = SortableSet.fromSortableIntsArrays 
+                                sortableSetId
                                 ssfStriped 
                                 order 
                                 symbolSetSize

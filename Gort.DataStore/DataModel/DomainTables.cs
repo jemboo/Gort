@@ -2,7 +2,14 @@
 {
     public static class Versions
     {
-        public const string RandGen_rndGen = "rndGen";
+        public static class RandGen
+        {
+            public const string rndGen = "rndGen";
+        }
+        public static class SorterMutator
+        {
+            public const string uniform = "uniform";
+        }
     }
     public class BitPackR
     {
@@ -12,12 +19,13 @@
         public byte[] Data { get; set; }
     }
 
-    public class RandGenR
+    public class ComponentR
     {
-        public int RandGenRId { get; set; }
+        public int ComponentRId { get; set; }
         public int CauseId { get; set; }
         public virtual CauseR CauseR { get; set; }
         public string CausePath { get; set; }
+        public string Category { get; set; }
         public string Version { get; set; }
         public string Json { get; set; }
     }

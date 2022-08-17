@@ -3,7 +3,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open DomainTables
 
 [<TestClass>]
-type dtoFixture () =
+type rngGenDtoFixture () =
 
     [<TestMethod>]
     member this.RngGenDto() =

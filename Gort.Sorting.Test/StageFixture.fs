@@ -15,12 +15,12 @@ type StageFixture () =
     member this.addStageIndexes () =
         let deg = Order.createNr 32
         let l = [1 .. 200]
-        let newRes = l |> Switch.fromIndexesNonDeg 
+        let newRes = l |> Switch.removeDegenerateIndexes 
                   |> StageCover.addStageIndexes
                   |> Seq.groupBy(snd)
                   |> Seq.toArray
 
-        let oldRes = l |> Switch.fromIndexesNonDeg 
+        let oldRes = l |> Switch.removeDegenerateIndexes 
                    |> Stage.fromSwitches deg
                    |> Seq.toArray
 

@@ -27,15 +27,28 @@ module Json =
 
 module DbLookup = 
 
-    let GetCauseById (causeId:int) (gortCtxt:IGortContext2) = 
+    let GetBitPackRById (gortCtxt:IGortContext2) (bitPackRId:int)  = 
         try
-            Utils.GetCauseById(causeId, gortCtxt) |> Ok
+            DbQueryUtils.GetBitPackRById(bitPackRId, gortCtxt) |> Ok
+        with
+            | ex -> ("error in GetBitPackById: " + ex.Message ) |> Result.Error
+
+
+    let GetCauseById (gortCtxt:IGortContext2) (causeId:int) = 
+        try
+            DbQueryUtils.GetCauseById(causeId, gortCtxt) |> Ok
         with
             | ex -> ("error in GetCauseById: " + ex.Message ) |> Result.Error
 
 
-    let GetRandGenRById (gortCtxt:IGortContext2) (rndGenId:int)  = 
+    let GetRandGenRById (gortCtxt:IGortContext2) (rndGenId:int) = 
         try
-            Utils.GetRandGenRById(rndGenId, gortCtxt) |> Ok
+            DbQueryUtils.GetRandGenRById(rndGenId, gortCtxt) |> Ok
+        with
+            | ex -> ("error in GetRandGenRById: " + ex.Message ) |> Result.Error
+
+    let GetSortableSetRById (gortCtxt:IGortContext2) (sortableSetRId:int) = 
+        try
+            DbQueryUtils.GetSortableSetRById(sortableSetRId, gortCtxt) |> Ok
         with
             | ex -> ("error in GetRandGenRById: " + ex.Message ) |> Result.Error 

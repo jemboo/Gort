@@ -9,7 +9,7 @@ module Run =
         if cz.CauseStatus = CauseStatus.Pending then
             result {
                 let! res = 
-                    match cz.Genus with
+                    match cz.Category with
                     | _ -> "No path in RunCause" |> Error
 
                 if (res > 0) then

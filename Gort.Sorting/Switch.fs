@@ -17,14 +17,14 @@ module Switch =
 
     let mapIndexUb = switchMap.Length
     
-    let maxMapIndexForDegree (ord:order)  =
+    let maxSwitchIndexForOrder (ord:order)  =
         uint32 ((Order.value ord)*(Order.value ord + 1) / 2)
     
-    let fromIndexes (dexes:int seq) = 
+    let fromSwitchIndexes (dexes:int seq) = 
         dexes |> Seq.map(fun dex -> switchMap.[dex])
 
-    let fromIndexesNonDeg (dexes:int seq) = 
-        dexes |> fromIndexes |> Seq.filter(fun sw -> sw.low <> sw.hi)
+    let removeDegenerateIndexes (dexes:int seq) = 
+        dexes |> fromSwitchIndexes |> Seq.filter(fun sw -> sw.low <> sw.hi)
 
     let getIndex (switch:switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
@@ -70,7 +70,7 @@ module Switch =
     // IRando dependent
     let rndNonDegenSwitchesOfDegree (order:order) 
                                     (rnd:IRando) =
-        let maxDex = maxMapIndexForDegree order
+        let maxDex = maxSwitchIndexForOrder order
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
                     let sw = switchMap.[p] 
@@ -79,7 +79,7 @@ module Switch =
 
     let rndSwitchesOfDegree (order:order) 
                             (rnd:IRando) =
-        let maxDex = maxMapIndexForDegree order
+        let maxDex = maxSwitchIndexForOrder order
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
                     yield switchMap.[p] }
@@ -93,13 +93,13 @@ module Switch =
 
 
     let mutateSwitches (order:order) 
-                       (mutationRate:mutationRate) 
+                       (mutationRate:switchMutationRate) 
                        (rnd:IRando) 
                        (switches:seq<switch>) =
         let mDex = uint32 ((Order.value order)*(Order.value order + 1) / 2) 
         let mutateSwitch (switch:switch) =
             match rnd.NextFloat with
-            | k when k < (MutationRate.value mutationRate) -> 
+            | k when k < (SwitchMutationRate.value mutationRate) -> 
                         switchMap.[(int (rnd.NextUInt % mDex))] 
             | _ -> switch
         switches |> Seq.map(fun sw-> mutateSwitch sw)

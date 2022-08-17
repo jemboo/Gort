@@ -24,8 +24,8 @@ type TestClass () =
         
         let ctx = new GortContext2()
         let ws = ctx.Workspace.GetOrMake(selectWorkSpace, makeWorkspace)
-        let paramSeed = Utils.MakeParam("Seed", ParamDataType.Int32, 123)
-        let paramRngType = Utils.MakeParam("RngType", ParamDataType.Int32, 123)
+        let paramSeed = ParamUtils.MakeParam("Seed", ParamDataType.Int32, 123)
+        let paramRngType = ParamUtils.MakeParam("RngType", ParamDataType.Int32, 123)
         let cbRndGen = new CauseBuildRndGen(paramSeed, paramRngType,ws, 1)
         let yow = Load.LoadCauseBuilder cbRndGen ctx
         Assert.IsTrue(true);

@@ -25,8 +25,8 @@ namespace Gort.DataStore.CauseBuild
                 {
                     _causeR = new CauseR()
                     {
-                        Genus = CauseGenus,
-                        Species = CauseSpecies,
+                        Category = CauseGenus,
+                        Version = CauseSpecies,
                         Comments = CauseComments,
                         Workspace = Workspace,
                         Index = CauseIndex,

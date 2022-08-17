@@ -20,8 +20,8 @@ namespace Gort.DataStore.DataModel
     public class CauseR
     {
         public int CauseRId { get; set; }
-        public string Genus { get; set; }
-        public string Species { get; set; }
+        public string Category { get; set; }
+        public string Version { get; set; }
         public string? Comments { get; set; }
         public CauseStatus CauseStatus { get; set; }
         public ICollection<CauseParamR> CauseParamRs { get; set; } =

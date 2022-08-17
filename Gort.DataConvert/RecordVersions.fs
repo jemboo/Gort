@@ -4,7 +4,8 @@ open Gort.DataStore.DataModel
 
  
 type sortableSetVersion = | AllBitsForOrder | Orbit | SortedStack 
-                            | RandomPermutation | RandomBits | RandomSymbols
+                          | RandomPermutation | RandomBits | RandomSymbols
+                          | Explicit | SwitchReduced
 
 module SortableSetVersion =
     let parse (strRep:string) =
@@ -21,6 +22,10 @@ module SortableSetVersion =
             sortableSetVersion.RandomBits |> Ok
         | nameof sortableSetVersion.RandomSymbols -> 
             sortableSetVersion.RandomSymbols |> Ok
+        | nameof sortableSetVersion.Explicit -> 
+            sortableSetVersion.Explicit |> Ok
+        | nameof sortableSetVersion.SwitchReduced -> 
+            sortableSetVersion.SwitchReduced |> Ok
         | _ -> sprintf "%s not handled" strRep |> Error
 
     let makeGeneratedSortableSetR 

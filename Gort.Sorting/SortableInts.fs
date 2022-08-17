@@ -24,7 +24,9 @@
         let getOrder (sia:sortableInts) = sia.values.Length |> Order.createNr
         let getSymbolSetSize (sia:sortableInts) = sia.symbolSetSize
     
-        let make (order: order) (symbolSetSize:symbolSetSize) (vals:int[]) =
+        let make (order:order) 
+                 (symbolSetSize:symbolSetSize) 
+                 (vals:int[]) =
             { sortableInts.values = vals;
               order = order;
               symbolSetSize=symbolSetSize}

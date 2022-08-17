@@ -35,8 +35,8 @@ namespace Gort.DataStore.Test
             var ctx = new GortContext2();
             var ws = ctx.Workspace.GetOrMake(workSpaceSelector, makeWorkspace);
             var cz = new CauseR();
-            cz.Genus = "Genus";
-            cz.Species = "Species";
+            cz.Category = "Category";
+            cz.Version = "Version";
             cz.Comments = "Comments";
             ctx.CauseR.Add(cz);
             ctx.SaveChanges();
@@ -70,8 +70,8 @@ namespace Gort.DataStore.Test
             var ws = ctx.Workspace.GetOrMake(workSpaceSelector, makeWorkspace);
             var cc = new CauseR();
             cc.CauseStatus = CauseStatus.Error;
-            cc.Genus = "Genus8";
-            cc.Species = "Species8";
+            cc.Category = "Category8";
+            cc.Version = "Version8";
             cc.Index = 888;
             cc.Workspace = ws;
 
@@ -101,8 +101,8 @@ namespace Gort.DataStore.Test
             var ctx = new GortContext2();
             var ws = ctx.Workspace.GetOrMake(workSpaceSelector, makeWorkspace);
 
-            var paramSeed = Utils.MakeParam("Seed", ParamDataType.Int32, (int)rngType.Lcg);
-            var paramRngType = Utils.MakeParam("RngType", ParamDataType.Int32, 123);
+            var paramSeed = ParamUtils.MakeParam("Seed", ParamDataType.Int32, (int)rngType.Lcg);
+            var paramRngType = ParamUtils.MakeParam("RngType", ParamDataType.Int32, 123);
 
             var cbRndGen = new CauseBuildRndGen(paramSeed, paramRngType, ws, 1);
             CauseLoad.LoadCauseBuilder(cbRndGen, ctx);

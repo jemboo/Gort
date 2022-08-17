@@ -150,4 +150,11 @@ type CollectionOpsFixture () =
         Assert.AreEqual(45, blocks.Length);
 
 
+    [<TestMethod>]
+    member this.chunkByDelimiter () =
+        let dtp = [|1;0;11;22;0;0;1;2;3;0;4|]
+        let chunks = CollectionOps.chunkByDelimiter dtp (fun v -> v=0)
+                     |> Seq.toArray
+        Assert.AreEqual(chunks.Length, 4);
+
 

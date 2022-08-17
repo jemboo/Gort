@@ -105,11 +105,30 @@ module ByteWidth =
         else "byteWidth must be 1, 2, 4 or 8" |> Error
 
 
-type mutationRate = private MutationRate of float
-module MutationRate =
-    let value (MutationRate v) = v
+type switchMutationRate = private SwitchMutationRate of float
+module SwitchMutationRate =
+    let value (SwitchMutationRate v) = v
     let create (v:float) =
-        MutationRate v
+        SwitchMutationRate v
+
+
+type stageMutationRate = private StageMutationRate of float
+module StageMutationRate =
+    let value (StageMutationRate v) = v
+    let create (v:float) =
+        StageMutationRate v
+
+type mutationRate =
+    | Switch of switchMutationRate
+    | Stage of stageMutationRate
+
+module MutationRate =
+
+    let getRateValue mr =
+        match mr with
+        | Switch swMr -> swMr |> SwitchMutationRate.value
+        | Stage stMr -> stMr |> StageMutationRate.value
+
 
 
 type symbolCount = private SymbolCount of int

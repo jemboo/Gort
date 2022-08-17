@@ -20,6 +20,7 @@ namespace Gort.DataStore.DataModel
         }
 
         public DbSet<Workspace> Workspace { get; set; }
+        public DbSet<BitPackR> BitPackR { get; set; }
         public DbSet<CauseR> CauseR { get; set; }
         public DbSet<CauseParamR> CauseParamR { get; set; }
         public EntityEntry<T> Entry<T>(object entity) where T : class
@@ -28,7 +29,7 @@ namespace Gort.DataStore.DataModel
         }
 
         public DbSet<Param> Param { get; set; }
-        public DbSet<RandGenR> RandGenR { get; set; }
+        public DbSet<ComponentR> RandGenR { get; set; }
         public DbSet<SortableSetR> SortableSetR { get; set; }
         public DbSet<SorterR> SorterR { get; set; }
         public DbSet<SorterSetR> SorterSetR { get; set; }
