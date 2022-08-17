@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Utils.fs" />
+    <Compile Include="JsonUtils.fs" />
+    <Compile Include="DbLookup.fs" />
     <Compile Include="componentDto.fs" />
     <Compile Include="SortableSetDto.fs" />
     <Compile Include="SorterSetDto.fs" />

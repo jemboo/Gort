@@ -1,9 +1,10 @@
 ﻿namespace global
 open Microsoft.FSharp.Core
 
-type sortableSetFormatDto = {key:string; value:string}
+type sortableSetFormatDto = { key:string; value:string }
 
 module SortableSetFormat =
+
     let makeBitStriped expandBitSets =
         sortableSetFormat.SsfBitStriped expandBitSets
 
@@ -25,7 +26,7 @@ module SortableSetFormat =
     let fromDto (dto:sortableSetFormatDto) =
         result {
             if (dto.key = nameof sortableSetFormat.SsfArrayRoll) then
-                let! rof = dto.value |> RolloutFormat.create
+                let! rof = dto.value |> RolloutFormat.fromString
                 return rof |> sortableSetFormat.SsfArrayRoll
             else
                 let expB = dto.value |> bool.Parse |> ExpandBitSets.create
@@ -39,14 +40,17 @@ module SortableSetFormat =
         }
 
 
-type sortableSetAllBitsDto = { sortableSetId:int; order:int; fmt:string }
+
+type sortableSetAllBitsDto = { 
+        sortableSetRId:int; order:int; fmt:string }
+
 module SortableSetAllBitsDto =
 
     let fromDto (dto:sortableSetAllBitsDto) =
         result {
             let! order = dto.order |> Order.create
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
-            return! SortableSet.makeAllBits (dto.sortableSetId |> SortableSetId.create)
+            return! SortableSet.makeAllBits (dto.sortableSetRId |> SortableSetId.create)
                         ssFormat order
         }
 
@@ -57,7 +61,7 @@ module SortableSetAllBitsDto =
         }
 
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) (ord:order) =
-         { sortableSetAllBitsDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetAllBitsDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            order =  (ord |> Order.value);
            fmt = ssfmt |> SortableSetFormat.toJson }
 
@@ -65,7 +69,10 @@ module SortableSetAllBitsDto =
         ord |> toDto sortableSetId ssfmt |> Json.serialize
 
 
-type sortableSetOrbitDto = { sortableSetId:int; maxCount:int; permutation:int[]; fmt:string }
+
+type sortableSetOrbitDto = { 
+        sortableSetRId:int; maxCount:int; permutation:int[]; fmt:string }
+
 module SortableSetOrbitDto =
 
     let fromDto (dto:sortableSetOrbitDto) =
@@ -76,7 +83,7 @@ module SortableSetOrbitDto =
                 | _ -> None
             let! perm = dto.permutation |> Permutation.create
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
-            return! SortableSet.makeOrbits (dto.sortableSetId |> SortableSetId.create) 
+            return! SortableSet.makeOrbits (dto.sortableSetRId |> SortableSetId.create) 
                         ssFormat maxCt perm
         }
 
@@ -88,7 +95,7 @@ module SortableSetOrbitDto =
 
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 
               (maxCount:int) (perm:permutation) =
-         { sortableSetOrbitDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetOrbitDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            maxCount = maxCount;
            sortableSetOrbitDto.permutation = perm |> Permutation.getArray
            fmt = ssfmt |> SortableSetFormat.toJson }
@@ -98,7 +105,10 @@ module SortableSetOrbitDto =
         perm |> toDto sortableSetId ssfmt maxCount |> Json.serialize
 
 
-type sortableSetSortedStacksDto = { sortableSetId:int; orderStack:int[]; fmt:string }
+
+type sortableSetSortedStacksDto = { 
+        sortableSetRId:int; orderStack:int[]; fmt:string }
+
 module SortableSetSortedStacksDto =
 
     let fromDto (dto:sortableSetSortedStacksDto) =
@@ -107,7 +117,7 @@ module SortableSetSortedStacksDto =
                                              |> Array.toList
                                              |> Result.sequence
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
-            return! SortableSet.makeSortedStacks (dto.sortableSetId |> SortableSetId.create)
+            return! SortableSet.makeSortedStacks (dto.sortableSetRId |> SortableSetId.create)
                             ssFormat (orderStack |> List.toArray)
         }
 
@@ -119,7 +129,7 @@ module SortableSetSortedStacksDto =
 
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 
               (orderStack:order[]) =
-         { sortableSetSortedStacksDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetSortedStacksDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            orderStack = orderStack |> Array.map(Order.value);
            fmt = ssfmt |> SortableSetFormat.toJson }
 
@@ -128,9 +138,10 @@ module SortableSetSortedStacksDto =
         orderStack |> toDto sortableSetId ssfmt |> Json.serialize
 
 
-type sortableSetRandomPermutationDto = 
-                { sortableSetId:int; order:int;
-                  sortableCount:int; rngGenId:int; fmt:string }
+
+type sortableSetRandomPermutationDto = {
+        sortableSetRId:int; order:int; sortableCount:int; rngGenId:int; fmt:string }
+
 module SortableSetRandomPermutationDto =
 
     let fromDto (dto:sortableSetRandomPermutationDto) (rnGenLookup: int -> Result<rngGen, string>) =
@@ -141,7 +152,7 @@ module SortableSetRandomPermutationDto =
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
             let sortableCt = dto.sortableCount |> SortableCount.create
             return! SortableSet.makeRandomPermutation 
-                    (dto.sortableSetId |> SortableSetId.create)
+                    (dto.sortableSetRId |> SortableSetId.create)
                     ssFormat order sortableCt randy
         }
 
@@ -154,7 +165,7 @@ module SortableSetRandomPermutationDto =
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 
               (ord:order) (sortableCt:sortableCount) 
               (rngId:int) =
-         { sortableSetRandomPermutationDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetRandomPermutationDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            sortableSetRandomPermutationDto.order = ord |> Order.value;
            sortableSetRandomPermutationDto.rngGenId = rngId;
            sortableSetRandomPermutationDto.sortableCount = (sortableCt |> SortableCount.value)
@@ -168,9 +179,8 @@ module SortableSetRandomPermutationDto =
 
 
 type sortableSetRandomBitsDto = {
-                  sortableSetId:int;
-                  order:int;  pctOnes:float;
-                  sortableCount:int; rngGenId:int; fmt:string }
+        sortableSetRId:int;  order:int;  pctOnes:float;
+        sortableCount:int; rngGenId:int; fmt:string }
 
 module SortableSetRandomBitsDto =
 
@@ -183,7 +193,7 @@ module SortableSetRandomBitsDto =
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
             let sortableCt = dto.sortableCount |> SortableCount.create
             return! SortableSet.makeRandomBits 
-                       (dto.sortableSetId |> SortableSetId.create)
+                       (dto.sortableSetRId |> SortableSetId.create)
                        ssFormat 
                        order dto.pctOnes sortableCt randy
         }
@@ -197,7 +207,7 @@ module SortableSetRandomBitsDto =
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 
               (ord:order) (pctOnes:float) 
               (sortableCt:sortableCount) (rngGenId:int) =
-         { sortableSetRandomBitsDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetRandomBitsDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            order = ord |> Order.value;
            pctOnes = pctOnes;
            sortableCount = sortableCt |> SortableCount.value;
@@ -210,10 +220,11 @@ module SortableSetRandomBitsDto =
         rngGenId |> toDto sortableSetId ssfmt ord pctOnes sortableCt |> Json.serialize
 
 
-type sortableSetRandomSymbolsDto = 
-                { sortableSetId:int;
-                  order:int; symbolSetSize:int; 
-                  sortableCount:int; rngGenId:int; fmt:string }
+
+type sortableSetRandomSymbolsDto = { 
+         sortableSetRId:int; order:int; symbolSetSize:int; 
+         sortableCount:int; rngGenId:int; fmt:string }
+
 module SortableSetRandomSymbolsDto =
 
     let fromDto (dto:sortableSetRandomSymbolsDto) 
@@ -226,7 +237,7 @@ module SortableSetRandomSymbolsDto =
             let! symbolSetSize = dto.symbolSetSize |> uint64 |> SymbolSetSize.create
             let sortableCt = dto.sortableCount |> SortableCount.create
             return! SortableSet.makeRandomSymbols 
-                        (dto.sortableSetId |> SortableSetId.create) ssFormat 
+                        (dto.sortableSetRId |> SortableSetId.create) ssFormat 
                         order symbolSetSize sortableCt randy
         }
 
@@ -239,7 +250,7 @@ module SortableSetRandomSymbolsDto =
     let toDto (sortableSetId:sortableSetId)
               (ssfmt:sortableSetFormat) (order:order) (symbolSetSz:symbolSetSize) 
               (sortableCt:sortableCount) (rngGenId:int) =
-         { sortableSetRandomSymbolsDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetRandomSymbolsDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            order = order |> Order.value;
            symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int;
            sortableCount = sortableCt |> SortableCount.value;
@@ -251,10 +262,11 @@ module SortableSetRandomSymbolsDto =
                (sortableCt:sortableCount) (rngGenId:int) =
         rngGenId |> toDto sortableSetId ssfmt order symbolSetSz sortableCt|> Json.serialize
 
-type sortableSetExplicitDto = 
-                { sortableSetId:int;
-                  order:int; symbolSetSize:int; 
-                  bitPackRId:int; fmt:string }
+
+
+type sortableSetExplicitDto = { 
+        sortableSetRId:int; order:int; symbolSetSize:int; 
+        bitPackRId:int; fmt:string }
 
 module SortableSetExplicitDto =
 
@@ -265,7 +277,8 @@ module SortableSetExplicitDto =
             let! order = dto.order |> Order.create
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
             let! symbolSetSize = dto.symbolSetSize |> uint64 |> SymbolSetSize.create
-            return! SortableSet.fromBitPack dto.sortableSetId ssFormat order symbolSetSize bitPack
+            let sortableSetId = dto.sortableSetRId |> SortableSetId.create
+            return! SortableSet.fromBitPack sortableSetId ssFormat order symbolSetSize bitPack
         }
 
     let fromJson (jstr:string) (bitPackLookup: int -> Result<bitPack, string>) =
@@ -277,7 +290,7 @@ module SortableSetExplicitDto =
     let toDto (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 
               (order:order) (symbolSetSz:symbolSetSize) 
               (sortableCt:sortableCount) (bitPackRId:int) =
-         { sortableSetExplicitDto.sortableSetId = sortableSetId |> SortableSetId.value;
+         { sortableSetExplicitDto.sortableSetRId = sortableSetId |> SortableSetId.value;
            order = order |> Order.value;
            symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int;
            bitPackRId = bitPackRId;
@@ -290,9 +303,8 @@ module SortableSetExplicitDto =
 
 
 
-type sortableSetSwitchReducedDto = 
-                { sortableSetId:int; sorterId:int; 
-                  sortableSetSourceId:int; fmt:string }
+type sortableSetSwitchReducedDto = { 
+        sortableSetRId:int; sorterId:int; sortableSetSourceId:int; fmt:string }
 
 module SortableSetSwitchReducedDto =
 
@@ -303,7 +315,7 @@ module SortableSetSwitchReducedDto =
             let! sortableSet = sortableSetLookup dto.sortableSetSourceId
             let! sorter = sorterLookup dto.sorterId
             let! ssFormat = dto.fmt |> SortableSetFormat.fromJson
-            return! SortableSet.switchReduce (dto.sortableSetId |> SortableSetId.create) 
+            return! SortableSet.switchReduce (dto.sortableSetRId |> SortableSetId.create) 
                         ssFormat sortableSet sorter 
         }
 
@@ -318,7 +330,7 @@ module SortableSetSwitchReducedDto =
               (sorterId:int) (sortableSetSourceId:int) =
          { sortableSetSwitchReducedDto.sorterId = sorterId;
            fmt = ssfmt |> SortableSetFormat.toJson;
-           sortableSetId = sortableSetId |> SortableSetId.value;
+           sortableSetRId = sortableSetId |> SortableSetId.value;
            sortableSetSourceId=sortableSetSourceId}
 
     let toJson (sortableSetId:sortableSetId) (ssfmt:sortableSetFormat) 

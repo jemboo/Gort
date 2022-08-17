@@ -1,8 +1,6 @@
-﻿using Gort.DataStore.DataModel;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
+﻿using System.Text;
 
-namespace Gort.DataStore.CauseBuild
+namespace Gort.DataStore.DataModel
 {
     public static class ParamUtils
     {
@@ -29,7 +27,7 @@ namespace Gort.DataStore.CauseBuild
                     case ParamDataType.String:
                         return Encoding.ASCII.GetBytes((string)val);
                     case ParamDataType.StringArray:
-                        var fs = String.Join("\n", (string[])val);
+                        var fs = string.Join("\n", (string[])val);
                         return Encoding.ASCII.GetBytes(fs);
                     case ParamDataType.Guid:
                         return ((Guid)val).ToByteArray();

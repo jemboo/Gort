@@ -303,7 +303,7 @@ module RolloutFormat =
         | rolloutFormat.RfI32 -> nameof rolloutFormat.RfI32
         | rolloutFormat.RfU64 -> nameof rolloutFormat.RfU64
 
-    let create str =
+    let fromString str =
         match str with
         | nameof rolloutFormat.RfU8 -> rolloutFormat.RfU8 |> Ok
         | nameof rolloutFormat.RfU16 -> rolloutFormat.RfU16 |> Ok

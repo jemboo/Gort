@@ -16,8 +16,10 @@ module Sorter =
 
 
     let fromSwitches (order:order) 
+                     (switchCtTarget:switchCount)
                      (switches:seq<switch>) =
-        let switchArray = switches |> Seq.toArray
+        let switchArray = switches |> Seq.take (switchCtTarget |> SwitchCount.value)
+                                   |> Seq.toArray
         let switchCount = SwitchCount.create switchArray.Length
         {
             sorter.order=order;
@@ -25,23 +27,29 @@ module Sorter =
             switches = switchArray
         }
 
+    let fromSwitchesWithPrefix (order:order)
+                               (switchCtTarget:switchCount)
+                               (switchesPfx:seq<switch>)
+                               (switches:seq<switch>) =
+        let combinedSwitches = switchesPfx |> Seq.append switches
+        fromSwitches order switchCtTarget combinedSwitches
 
-    let fromStages (order:order) 
-                   (stages:seq<stage>) =
-        let switchArray = stages |> Seq.map(fun st->st.switches)
-                                    |> Seq.concat
-                                    |> Seq.toArray
-        let switchCount = SwitchCount.create switchArray.Length
-        {
-            sorter.order=order;
-            switchCount=switchCount;
-            switches = switchArray
-        }
+
+    let fromStagesWithPrefix (order:order)
+                             (switchCtTarget:switchCount)
+                             (switchesPfx:seq<switch>)
+                             (stages:seq<stage>) =
+        let switches = stages |> Seq.map(fun st->st.switches)
+                              |> Seq.concat
+        fromSwitchesWithPrefix order switchCtTarget switchesPfx switches
    
 
-    let appendSwitches (switches:seq<switch>) 
+    // creates a longer sorter with the switches added to the end.
+    let appendSwitches (switchesToAppend:seq<switch>) 
                        (sorter:sorter) =
-        let newSwitches = (switches |> Seq.toArray) |> Array.append sorter.switches
+        let newSwitches = switchesToAppend 
+                          |> Seq.append sorter.switches
+                          |> Seq.toArray
         let newSwitchCount = SwitchCount.create newSwitches.Length
         {
             sorter.order = sorter.order;
@@ -50,28 +58,85 @@ module Sorter =
         }
 
 
-    let trimLength (trimEnd:bool) (newLength:switchCount) (sorter:sorter) =
-        if (SwitchCount.value sorter.switchCount) < (SwitchCount.value newLength) then
-            "New length is longer than sorter" |> Error
-        else
-        let newSwitches =  match trimEnd with 
-                           | true -> sorter.switches 
-                                      |> Array.take (SwitchCount.value newLength)
-                           | _ -> sorter.switches 
-                                      |> Array.skip((sorter.switches.Length) - (SwitchCount.value newLength))
+    let prependSwitches (newSwitches:seq<switch>) 
+                        (sorter:sorter) =
+        let newSwitches = sorter.switches 
+                          |> Seq.append newSwitches
+                          |> Seq.toArray
+        let newSwitchCount = SwitchCount.create newSwitches.Length
         {
             sorter.order = sorter.order;
-            switchCount = newLength;
+            switchCount=newSwitchCount;
             switches = newSwitches
-        } |> Ok
+        }
 
 
-    let getSwitchPrefix (stageCount:stageCount) 
-                        (sorter:sorter) =
+    let removeSwitchesFromTheStart (newLength:switchCount) (sorter:sorter) =
+        let numSwitchesToRemove = (SwitchCount.value sorter.switchCount) -
+                                  (SwitchCount.value newLength)
+        if numSwitchesToRemove < 0 then
+            "New length is longer than sorter" |> Error
+        else
+            let trimmedSwitches =  sorter.switches 
+                                   |> Seq.skip(numSwitchesToRemove)
+            fromSwitches sorter.order newLength trimmedSwitches |> Ok
+
+
+    let removeSwitchesFromTheEnd (newLength:switchCount) (sorter:sorter) =
+        let numSwitchesToRemove = (SwitchCount.value sorter.switchCount) -
+                                  (SwitchCount.value newLength)
+        if numSwitchesToRemove < 0 then
+            "New length is longer than sorter" |> Error
+        else
+            fromSwitches sorter.order newLength sorter.switches |> Ok
+
+
+    let getSwitchesFromFirstStages
+                    (stageCount:stageCount) 
+                    (sorter:sorter) =
         sorter.switches |> Stage.fromSwitches sorter.order
                         |> Seq.take(StageCount.value stageCount)
                         |> Seq.map(fun t -> t.switches)
                         |> Seq.concat
+
+
+    let fromTwoCycles
+                (order:order)
+                (switchCtTarget:switchCount)
+                (wPfx: switch seq) 
+                (tc:twoCycle seq) =
+        let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
+                          |> Seq.concat
+        fromSwitchesWithPrefix order switchCtTarget wPfx switches
+
+    
+    let makeAltEvenOdd (order:order) 
+                       (wPfx: switch seq)
+                       (switchCount:switchCount) =
+
+        let switches = TwoCycle.makeAltEvenOdd order 
+                                    (Permutation.identity order)
+                        |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
+                        |> Seq.concat
+
+        fromSwitchesWithPrefix order switchCount wPfx switches
+
+
+    //***********  IRando dependent  *********************************
+
+    let randomStages (order:order) 
+                     (wPfx: switch seq) 
+                     (switchFreq:switchFrequency) 
+                     (switchCount:switchCount) 
+                     (rando:IRando) =
+        let switches = (Stage.rndSeq order switchFreq rando)
+                        //|> Seq.take (StageCount.value stageCount)
+                        //|> Seq.map (fun st -> st.switches)
+                        //|> Seq.concat
+        //fromSwitchesAndPrefix degree wPfx switches
+        None
+
+
 
 
 type sorterUniformMutatorType = |Switch |Stage |StageRfl

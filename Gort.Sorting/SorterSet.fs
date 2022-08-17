@@ -1,7 +1,8 @@
 ﻿namespace global
 open System
 
-type sorterSet = private {id:sorterSetId; order:order; sorterMap:Map<sorterId, sorter>}
+type sorterSet = private { 
+        id:sorterSetId; order:order; sorterMap:Map<sorterId, sorter>}
 
 module SorterSet =
 

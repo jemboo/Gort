@@ -51,11 +51,11 @@ module SortableSet =
         (sortableSetRId, rollout, symbolSetSize) |> sortableSet.ArrayRoll
 
 
-    let makeBitStriped  (sortableSetRId:sortableSetId)
+    let makeBitStriped  (sortableSetId:sortableSetId)
                         (uint64Roll:uint64Roll) =
         let sortableCount = uint64Roll |> Uint64Roll.getUsedStripes
                                        |> SortableCount.create
-        (sortableSetRId, 
+        (sortableSetId, 
           uint64Roll, sortableCount) |> sortableSet.BitStriped
 
 
@@ -69,7 +69,7 @@ module SortableSet =
                                       |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
 
 
-    let fromSortableIntsArrays (sortableSetRId:sortableSetId)
+    let fromSortableIntsArrays (sortableSetId:sortableSetId)
                                (sortableSetFormat:sortableSetFormat)
                                (order:order)
                                (symbolSetSize:symbolSetSize)
@@ -87,15 +87,15 @@ module SortableSet =
         | SsfArrayRoll rollfmt ->  
             (_expando (false |> ExpandBitSets.create)) 
                     |> Rollout.fromIntArraySeq rollfmt arrayLength
-                    |> Result.map(makeArrayRoll sortableSetRId symbolSetSize)
+                    |> Result.map(makeArrayRoll sortableSetId symbolSetSize)
 
         | SsfBitStriped expandBitsets -> 
             (_expando expandBitsets) 
                     |> Uint64Roll.saveIntArraysAsBitStriped arrayLength
-                    |> Result.map(makeBitStriped sortableSetRId)
+                    |> Result.map(makeBitStriped sortableSetId)
 
 
-    let fromBitPack (sortableSetRId:int)
+    let fromBitPack (sortableSetId:sortableSetId)
                     (sortableSetFormat:sortableSetFormat)
                     (order:order)
                     (symbolSetSize:symbolSetSize)
@@ -115,13 +115,13 @@ module SortableSet =
                         sortableInts |> Seq.map(fun sints -> sints.values)
 
                 let! bitStriped = adjustedInts |> Uint64Roll.saveIntArraysAsBitStriped arrayLen
-                return bitStriped |> makeBitStriped (sortableSetRId |> SortableSetId.create)
+                return bitStriped |> makeBitStriped sortableSetId
             }
 
         match sortableSetFormat with
         | SsfArrayRoll rollfmt -> bitPk |> Rollout.fromBitPack arrayLen
-                                        |> Result.map(makeArrayRoll 
-                                           (sortableSetRId |> SortableSetId.create) symbolSetSize)
+                                        |> Result.map(makeArrayRoll
+                                           sortableSetId symbolSetSize)
         | SsfBitStriped expandBitsets -> expandBitsets |> _expando
 
 
