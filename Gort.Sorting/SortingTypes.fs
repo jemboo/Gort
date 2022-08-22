@@ -12,7 +12,7 @@ type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
 type switchCount = private SwitchCount of int
 type switchFrequency = private SwitchFrequency of float
-type switchUses = {weights:int[]}
+type switchUses = private { useCounts:int[] }
 
 
 module ExpandBitSets =
@@ -95,7 +95,6 @@ module SwitchFrequency =
     let create vv = SwitchFrequency vv
     let max = create 1.0
 
-
 module StageCount =
     let value (StageCount v) = v
     let create id = StageCount id
@@ -148,11 +147,18 @@ module StageCount =
                     | _ -> 0
         create ct
 
-
 module StageWindowSize =
     let value (StageWindowSize v) = v
     let create v = StageWindowSize v
     let ToSwitchCount (ord:order) (tWz:stageWindowSize) =
         SwitchCount.create ((Order.value ord) * (value tWz) / 2)
     let fromInt v = create v
+
+module SwitchUses =
+    let make (useCounts:int[]) =
+        { switchUses.useCounts = useCounts}
+
+    let getUseCounts (switchUses:switchUses) =
+        switchUses.useCounts
+
 

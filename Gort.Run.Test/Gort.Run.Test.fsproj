@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,15 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="LoadFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
@@ -25,7 +25,8 @@
     <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
     <ProjectReference Include="..\Gort.DataConvert\Gort.DataConvert.fsproj" />
     <ProjectReference Include="..\Gort.DataStore\Gort.DataStore.csproj" />
-    <ProjectReference Include="..\Gort.Ops\Gort.Ops.fsproj" />
+    <ProjectReference Include="..\Gort.Run\Gort.Run.fsproj" />
+    <ProjectReference Include="..\Gort.SortingOps\Gort.SortingOps.fsproj" />
     <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
   </ItemGroup>
 

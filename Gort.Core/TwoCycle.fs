@@ -94,7 +94,7 @@ module TwoCycle =
 
         let _refl = Array.init (tcp.values.Length)
                                (fun dex -> tcp.values.[_refV dex] |> _refV)
-        { values = _refl }
+        { twoCycle.values = _refl }
 
 
     let mutateByPair (pair:int*int) 
@@ -119,7 +119,7 @@ module TwoCycle =
             tcpA.[c] <- d
             tcpA.[b] <- a
             tcpA.[d] <- c
-        { tcp with values=tcpA}
+        { twoCycle.values = tcpA}
 
     
     let mutateByReflPair (pairs: seq<(int*int)>) 
@@ -150,7 +150,7 @@ module TwoCycle =
             tca.[rA] <- rtB
             tca.[rtB] <- rA
 
-            { tcp with values=tca}
+            { twoCycle.values = tca}
 
         //let muts =
         pairs |> Seq.map(fun pr -> _mutato pr)
@@ -160,31 +160,6 @@ module TwoCycle =
         //    muts.[0]
         //else
         //    { tcp with values = tcp |> arrayValues |> Array.copy}
-
-
-
-
-
-//*************************************************************
-//***************  byte conversions  **************************
-//*************************************************************
-
-    //let makeFromBytes (ord:order) (data:byte[]) = 
-    //    ByteArray.makeFromBytes ord create8 create16 data
-
-
-    //let makeArrayFromBytes (ord:order) (data:byte[]) = 
-    //    ByteArray.makeArrayFromBytes ord create8 create16 data
-
-
-    //let toBytes (perm:intSet) =
-    //    ByteArray.toBytes (perm.values)
-
-
-    //let arrayToBytes (perms:intSet[]) =
-    //    ByteArray.arrayToBytes (perms |> Array.map(fun p -> p.values))
-
-
 
 
 
@@ -209,7 +184,7 @@ module TwoCycle =
                 curPa.[fst(tup)] <- snd(tup)
                 curPa.[snd(tup)] <- fst(tup)
         tupes |> Seq.iter(_opPa)
-        { values=curPa }
+        { twoCycle.values = curPa }
 
 
 
@@ -234,9 +209,9 @@ module TwoCycle =
                     i <- i + 1
             successCount
 
-        let switchCount = _multiDraw rnd switchFreq 
+        let cycleCount = _multiDraw rnd switchFreq 
                             (order |> Order.maxSwitchesPerStage)
-        { values = RandVars.rndTwoCycle rnd (Order.value order) switchCount }
+        { twoCycle.values = RandVars.rndTwoCycle rnd (Order.value order) cycleCount }
 
 
     let rndFullTwoCycle (order:order) (rnd:IRando) =
@@ -265,7 +240,7 @@ module TwoCycle =
 
         SwitchRfl.rndReflectivePairs ord rnd |> Seq.iter(chunkRi)
 
-        { values=aRet }
+        { twoCycle.values = aRet }
 
 
     let evenMode (order:order) =
@@ -275,7 +250,7 @@ module TwoCycle =
             if p = dm then p
             else if (p%2 = 0) then p + 1
             else p - 1
-        { values=Array.init d (yak) }
+        { twoCycle.values = Array.init d (yak) }
 
 
     let oddMode (order:order) =
@@ -286,7 +261,7 @@ module TwoCycle =
             else if p = 0 then 0
             else if (p%2 = 0) then p - 1
             else p + 1
-        { values=Array.init d (yak) }
+        { twoCycle.values = Array.init d (yak) }
 
 
     let oddModeFromEvenDegreeWithCap (order:order) =
@@ -296,7 +271,7 @@ module TwoCycle =
             else if p = d-1 then 0
             else if (p%2 = 0) then p - 1
             else p + 1
-        { values=Array.init d (yak) }
+        { twoCycle.values = Array.init d (yak) }
 
 
     let oddModeWithCap (order:order) =
@@ -312,11 +287,11 @@ module TwoCycle =
 
 
     let makeCoConjugateEvenOdd (conj:permutation list) =
-        let ord = Order.createNr conj.[0].values.Length
+        let order = Order.createNr conj.[0].values.Length
         let coes (conj:permutation) =
             result {
-                    let eve =  conjugate (evenMode ord) conj
-                    let odd =  conjugate (oddModeWithCap ord) conj
+                    let eve =  conjugate (evenMode order) conj
+                    let odd =  conjugate (oddModeWithCap order) conj
                     return seq { yield eve; yield odd; }
                    }
         result {

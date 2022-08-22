@@ -15,6 +15,7 @@
     <Compile Include="SorterSet.fs" />
     <Compile Include="SortableInts.fs" />
     <Compile Include="SortableSet.fs" />
+    <Compile Include="SortingResults.fs" />
     <Compile Include="SortersFromData.fs" />
   </ItemGroup>
 

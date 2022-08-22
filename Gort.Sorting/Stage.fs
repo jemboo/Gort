@@ -142,7 +142,7 @@ module Stage =
                (switchFreq:switchFrequency) 
                (rnd:IRando) =
 
-        let aa (rnd:IRando)  = 
+        let _aa (rnd:IRando)  = 
             {
                 switches = TwoCycle.rndTwoCycle 
                                     order
@@ -150,15 +150,13 @@ module Stage =
                                     rnd
                                |> Switch.fromTwoCycle
                                |> Seq.toList;
-                order=order
+                order = order
             }
-        seq { while true do yield (aa rnd) }
+        seq { while true do yield (_aa rnd) }
 
 
-    let rndSymmetric 
-                (order:order) 
-                (rnd:IRando) =
-        let aa (rnd:IRando)  = 
+    let rndSymmetric (order:order) (rnd:IRando) =
+        let _aa (rnd:IRando)  = 
             { 
                 stage.switches = 
                     TwoCycle.rndSymmetric 
@@ -169,7 +167,7 @@ module Stage =
                 order = order
             }
 
-        seq { while true do yield (aa rnd) }
+        seq { while true do yield (_aa rnd) }
 
 
     let randomMutate (rnd:IRando) 
@@ -177,10 +175,8 @@ module Stage =
                      (stage:stage) = 
         match rnd.NextFloat with
             | k when k < (StageMutationRate.value mutationRate) -> 
-                        let sc = stage.order |> Order.value |> uint64 |> SymbolSetSize.createNr
-                        let tcp = RandVars.drawTwoWithoutRep 
-                                                    sc
-                                                    rnd
+                        let symbolSetSize = stage.order |> Order.value |> uint64 |> SymbolSetSize.createNr
+                        let tcp = RandVars.drawTwoWithoutRep symbolSetSize rnd
                         mutateStageByPair stage tcp
             | _ -> stage
 
@@ -236,13 +232,13 @@ module Stage =
              }
 
 
-    let rndBuddyStages (stageWindowSize:stageCount)
+    let rndBuddyStages (stageWindowSz:stageWindowSize)
                         (switchFreq:switchFrequency) 
                         (order:order) 
                         (rnd:IRando) 
                         (stagesPfx:stage list)  =
         let stageSeq = rndSeq order switchFreq rnd
-        let maxWindow = (StageCount.value stageWindowSize)
+        let maxWindow = (StageWindowSize.value stageWindowSz)
         let mutable window = stagesPfx |> CollectionProps.last maxWindow
         let trim() =
             if window.Length = maxWindow then

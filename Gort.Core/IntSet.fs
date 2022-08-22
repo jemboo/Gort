@@ -16,6 +16,9 @@ module IntSet =
     let zeroCreate (count:int) = 
         { intSet.values = Array.zeroCreate count }
 
+    let getValues (intSet:intSet) = 
+        intSet.values
+
     let copy (intSet:intSet) = 
         {intSet.values = Array.copy (intSet.values) }
     

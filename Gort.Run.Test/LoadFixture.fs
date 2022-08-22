@@ -1,12 +1,10 @@
-namespace Gort.Ops.Test
-
-open System
+namespace Gort.Run.Test
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open Gort.DataStore.DataModel
 open Gort.DataStore.CauseBuild
 
 [<TestClass>]
-type TestClass () =
+type LoadFixture () =
 
     let WorkspaceName = "Ralph4";
 
@@ -20,7 +18,7 @@ type TestClass () =
         ws.Name = WorkspaceName
 
     [<TestMethod>]
-    member this.LoadCauseBuilder () =
+    member this.LoadCauseBuilder() =
         
         let ctx = new GortContext2()
         let ws = ctx.Workspace.GetOrMake(selectWorkSpace, makeWorkspace)

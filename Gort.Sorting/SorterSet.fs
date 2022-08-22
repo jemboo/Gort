@@ -22,3 +22,61 @@ module SorterSet =
             order=order; 
             sorterMap = sorterMap
         }
+
+
+    let createRandom (order:order)
+                     (wPfx: switch seq)
+                     (switchCount:switchCount)
+                     (sorterRndGen: order->switch seq->switchCount->IRando->sorter) 
+                     (sorterCt:sorterCount) 
+                     (rnGen:rngGen) 
+                     (id:sorterSetId) =
+        let randy = rnGen |> Rando.fromRngGen
+        seq { 1 .. ( sorterCt |> SorterCount.value) }
+        |> Seq.map( fun _ -> sorterRndGen order wPfx switchCount randy )
+        |> fromSorters id order
+
+
+    let createRandomSwitches
+                     (order:order)
+                     (wPfx: switch seq)
+                     (switchCount:switchCount)
+                     (sorterCt:sorterCount) 
+                     (rnGen:rngGen) 
+                     (id:sorterSetId) =
+        createRandom order wPfx switchCount Sorter.randomSwitches sorterCt rnGen id
+
+
+    let createRandomStages
+                     (switchFreq:switchFrequency) 
+                     (order:order)
+                     (wPfx: switch seq)
+                     (switchCount:switchCount)
+                     (sorterCt:sorterCount)
+                     (rnGen:rngGen) 
+                     (id:sorterSetId) =
+        createRandom order wPfx switchCount (Sorter.randomStages switchFreq) 
+                     sorterCt rnGen id
+
+
+    let createRandomSymmetric
+                     (order:order)
+                     (wPfx: switch seq)
+                     (switchCount:switchCount)
+                     (sorterCt:sorterCount)
+                     (rnGen:rngGen) 
+                     (id:sorterSetId) =
+        createRandom order wPfx switchCount Sorter.randomSymmetric
+                     sorterCt rnGen id
+
+
+    let createRandomBuddies
+                     (stageWindowSz:stageWindowSize) 
+                     (order:order)
+                     (wPfx: switch seq)
+                     (switchCount:switchCount)
+                     (sorterCt:sorterCount)
+                     (rnGen:rngGen) 
+                     (id:sorterSetId) =
+        createRandom order wPfx switchCount (Sorter.randomBuddies stageWindowSz) 
+                     sorterCt rnGen id

@@ -39,6 +39,13 @@ module Uint8Roll =
     let getData (uInt8Roll:uInt8Roll) =
         uInt8Roll.data
 
+    let copy (uInt8Roll:uInt8Roll) = 
+        {
+            arrayCount = uInt8Roll.arrayCount;
+            arrayLength = uInt8Roll.arrayLength;
+            data = uInt8Roll.data |> Array.copy
+        }
+
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
@@ -95,6 +102,14 @@ module Uint16Roll =
     let getData (uInt16Roll:uInt16Roll) =
         uInt16Roll.data
 
+    let copy (uInt16Roll:uInt16Roll) = 
+        {
+            arrayCount = uInt16Roll.arrayCount;
+            arrayLength = uInt16Roll.arrayLength;
+            data = uInt16Roll.data |> Array.copy
+        }
+
+
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
@@ -141,11 +156,25 @@ module Uint16Roll =
 type intRoll = private { arrayCount:arrayCount; arrayLength:arrayLength; data:int[] }
 module IntRoll =
 
+    let copy (intRoll:intRoll) = 
+        {
+            arrayCount = intRoll.arrayCount;
+            arrayLength = intRoll.arrayLength;
+            data = intRoll.data |> Array.copy
+        }
+
+    let updateData (data:int[]) (intRoll:intRoll)  =
+        {intRoll with data=data}
+
     let getArrayCount (uInt8Roll:intRoll) =
         uInt8Roll.arrayCount
 
     let getArrayLength (intRoll:intRoll) =
         intRoll.arrayLength
+
+    let getRolloutLength (intRoll:intRoll) =
+        (intRoll.arrayCount |> ArrayCount.value) * 
+        (intRoll.arrayLength |> ArrayLength.value)
 
     let getData (uInt8Roll:intRoll) =
         uInt8Roll.data
@@ -202,6 +231,13 @@ module Uint64Roll =
 
     let getData (uint64Roll:uint64Roll) =
         uint64Roll.data
+
+    let copy (uint64Roll:uint64Roll) = 
+        {
+            arrayCount = uint64Roll.arrayCount;
+            arrayLength = uint64Roll.arrayLength;
+            data = uint64Roll.data |> Array.copy
+        }
 
     let getUsedStripes (uint64Roll:uint64Roll) =
         let len = uint64Roll.data.Length
@@ -336,6 +372,19 @@ module Rollout =
         | U16 _uInt16Roll -> _uInt16Roll.arrayCount
         | I32 _intRoll -> _intRoll.arrayCount
         | U64 _uInt64Roll -> _uInt64Roll.arrayCount
+
+
+    let copy (rollout:rollout) =
+        match rollout with
+        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.copy |> U8
+        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.copy |> U16
+        | I32 _intRoll -> _intRoll |> IntRoll.copy |> I32
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.copy |> U64
+         
+
+    let getRolloutLength (rollout:rollout) =
+        (rollout |> getArrayCount |> ArrayCount.value) * 
+        (rollout |> getArrayLength |> ArrayLength.value)
 
 
     let fromIntArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
