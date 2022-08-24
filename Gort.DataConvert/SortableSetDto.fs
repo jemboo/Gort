@@ -5,8 +5,8 @@ type sortableSetFormatDto = { key:string; value:string }
 
 module SortableSetFormat =
 
-    let makeBitStriped expandBitSets =
-        sortableSetFormat.SsfBitStriped expandBitSets
+    let makeBitStriped =
+        sortableSetFormat.SsfBitStriped
 
     let makeRollout (rolloutFormat:rolloutFormat) =
         sortableSetFormat.SsfArrayRoll rolloutFormat
@@ -16,9 +16,9 @@ module SortableSetFormat =
         | sortableSetFormat.SsfArrayRoll rollfmt -> 
                         {sortableSetFormatDto.key = nameof sortableSetFormat.SsfArrayRoll;
                          value = (rollfmt |> RolloutFormat.toDto)}
-        | sortableSetFormat.SsfBitStriped expBs ->
+        | sortableSetFormat.SsfBitStriped  ->
                         { sortableSetFormatDto.key = nameof sortableSetFormat.SsfBitStriped;
-                          value = (expBs |> ExpandBitSets.value |> string)}
+                          value = ""}
 
     let toJson (ssf:sortableSetFormat) =
         ssf |> toDto |> Json.serialize
@@ -29,8 +29,7 @@ module SortableSetFormat =
                 let! rof = dto.value |> RolloutFormat.fromString
                 return rof |> sortableSetFormat.SsfArrayRoll
             else
-                let expB = dto.value |> bool.Parse |> ExpandBitSets.create
-                return expB |> sortableSetFormat.SsfBitStriped
+                return sortableSetFormat.SsfBitStriped
         }
 
     let fromJson (jstr:string) =

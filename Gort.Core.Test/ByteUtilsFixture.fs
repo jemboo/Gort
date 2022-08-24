@@ -111,7 +111,7 @@ type ByteUtilsFixture () =
         let ord = Order.createNr 3
         let arOfIntAr = [|[|1; 0; 1|]; [|0; 1; 1|]; [|0; 0; 0|]; [|1; 1; 1 |];|]
         let stripeAs = arOfIntAr
-                        |> ByteUtils.toStripeArrays 1 ord
+                        |> ByteUtils.toStripeArraysO 1 ord
                         |> Seq.toArray
                         |> Array.concat
         let zero_val = 0
@@ -130,7 +130,7 @@ type ByteUtilsFixture () =
         let intSetIn = IntSet8.allBitsAsSeq ord |> Seq.toArray
         let stripeAs = intSetIn
                         |> Seq.map(IntSet8.getValues)
-                        |> ByteUtils.toStripeArrays 1uy ord
+                        |> ByteUtils.toStripeArraysO 1uy ord
                         |> Seq.toArray
                         |> Array.concat
 
@@ -148,7 +148,7 @@ type ByteUtilsFixture () =
         let ord = Order.createNr 3
         let arOfIntAr = [|[|1uy; 0uy; 1uy|]; [|0uy; 1uy; 1uy|]; [|0uy; 0uy; 0uy|]; [|1uy; 1uy; 1uy |];|]
         let stripeAs = arOfIntAr
-                        |> ByteUtils.toStripeArrays 1uy ord
+                        |> ByteUtils.toStripeArraysO 1uy ord
                         |> Seq.toArray
                         |> Array.concat
 
@@ -194,15 +194,15 @@ type ByteUtilsFixture () =
         let order = 4 |> Order.createNr
         let arraysToStoreFull = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|]|]
         let usedStripeCtFull = arraysToStoreFull.Length
-        let stripedArray = ByteUtils.toStripeArrays 1 order arraysToStoreFull
+        let stripedArray = ByteUtils.toStripeArraysO 1 order arraysToStoreFull
                            |> Seq.head
-        let actualUsedStripes = ByteUtils.usedStripeCount 0 1 stripedArray
+        let actualUsedStripes = ByteUtils.usedStripeCount stripedArray
         Assert.AreEqual(usedStripeCtFull, actualUsedStripes);
         let arraysToStore3 = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|];[|0;0;0;0|]|]
         let usedStripeCt3 = 3
-        let stripedArray = ByteUtils.toStripeArrays 1 order arraysToStore3
+        let stripedArray = ByteUtils.toStripeArraysO 1 order arraysToStore3
                            |> Seq.head
-        let actualUsedStripes = ByteUtils.usedStripeCount 0 1 stripedArray
+        let actualUsedStripes = ByteUtils.usedStripeCount stripedArray
         Assert.AreEqual(usedStripeCt3, actualUsedStripes);
 
 

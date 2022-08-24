@@ -167,16 +167,23 @@ module CollectionOps =
         _cart (subSeqs |> Seq.toList) |> Seq.map(stack)
 
 
-    let stackSortedBlocks (blockSizes:order seq) (hival:'a) (lowval:'a) =
+    let stackSortedBlocksOfTwoSymbols (blockSizes:order seq) (hival:'a) (lowval:'a) =
         let _allSorted (deg:order) = 
              Order.allTwoSymbolOrderedArrays deg hival lowval
         blockSizes |> Seq.map(_allSorted >> Seq.toArray)
                    |> comboStack
 
 
+    let stackSortedBlocks (blockSizes:order seq) =
+        let _allSorted (deg:order) = 
+             Order.allTwoSymbolOrderedArrays deg true false
+        blockSizes |> Seq.map(_allSorted >> Seq.toArray)
+                   |> comboStack
+
+
 
 //*************************************************************
-//***********    Split Sequence   ****************************
+//************    Split Sequence   ****************************
 //*************************************************************
 
     let chunkByDelimiter<'a> (strm:seq<'a>) (delim:'a -> bool) =
@@ -188,3 +195,14 @@ module CollectionOps =
                 if delim swEnumer.Current then
                     yield rz.ToArray()
                     rz <- ResizeArray() }
+
+
+    // returns an array of length chunkSz, which is made by converting vals to a
+    // 2d array with chunkSz columns, and then summing over each column. 
+    let wrapAndSumCols (chunkSz:int) (vals:seq<int>) =
+        let addArrays (a:int[]) (b:int[]) =
+            Array.init a.Length (fun dex -> a.[dex] + b.[dex])
+
+        vals |> Seq.chunkBySize chunkSz
+             |> Seq.toArray
+             |> Array.reduce addArrays

@@ -183,6 +183,12 @@ module ByteUtils =
         Array.init (Order.value ord) 
                    (fun dex -> if (d64.get dex) then truVal else falseVal)
 
+                   
+    let inline uint64ToBoolArray (ord:order)
+                                 (d64:uint64) = 
+        Array.init (Order.value ord) 
+                   (fun dex -> if (d64.get dex) then true else false)
+
 
     let inline thresholdArrayToInt< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
         let mutable rv = 0
@@ -302,7 +308,49 @@ module ByteUtils =
 /// ***************  bitstriped <-> 'a[]  *********************
 /// ***********************************************************
 
-    let inline writeStripe< ^a when ^a: comparison> 
+    // stripePos <=64
+    // if values.Length = stripedArray.Length
+    let writeStripeFromBitArray
+                                (values:bool[]) 
+                                (stripePos:int)
+                                (stripedArray:uint64[]) =
+        for i = 0 to values.Length - 1 do
+            if values.[i] then
+                stripedArray.[i] <- 
+                        stripedArray.[i].set stripePos
+
+
+    // for 2d arrays bool[a][b] where a <= 64 and b = order
+    // returns uint64[b]
+    let makeStripedArrayFrom2dBoolArray
+                                    (ord:order) 
+                                    (twoDvals:bool[][]) =
+        let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
+        for i = 0 to twoDvals.Length - 1 do
+            writeStripeFromBitArray twoDvals.[i] i stripedArray
+        stripedArray
+
+
+    // for 2d arrays bool[a][b] where a <= 64 and b = order
+    // returns uint64[c] where c <= (a / 64)
+    let makeStripedArrayFromBoolArrays
+                       (ord:order) 
+                       (boolSeq:bool[] seq) =
+
+         let _makeStripedArrayFromBoolArray
+                                        (ord:order) 
+                                        (twoDvals:bool[][]) =
+            let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
+            for i = 0 to twoDvals.Length - 1 do
+                writeStripeFromBitArray twoDvals.[i] i stripedArray
+            stripedArray
+
+         boolSeq |> Seq.chunkBySize 64
+              |> Seq.map(_makeStripedArrayFromBoolArray ord)
+
+
+
+    let inline writeStripeO< ^a when ^a: comparison> 
                                     (oneThresh:^a)  
                                     (values:^a[]) 
                                     (stripePos:int)
@@ -313,29 +361,29 @@ module ByteUtils =
                         stripedArray.[i].set stripePos
             
             
-    let inline writeStripeArray< ^a when ^a: comparison> 
+    let inline writeStripeArrayO< ^a when ^a: comparison> 
                                     (oneThresh:^a)  
                                     (ord:order) 
                                     (aValues:^a[][]) =
         let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
         for i = 0 to aValues.Length - 1 do
-            writeStripe oneThresh aValues.[i] i stripedArray
+            writeStripeO oneThresh aValues.[i] i stripedArray
         stripedArray
 
 
-    let inline toStripeArrays< ^a when ^a: comparison> 
+    let inline toStripeArraysO< ^a when ^a: comparison> 
                                     (oneThresh:^a)  
                                     (ord:order) 
                                     (aSeq:^a[] seq) =
-         let sq = aSeq |> Seq.toArray
          aSeq |> Seq.chunkBySize 64
-              |> Seq.map(writeStripeArray oneThresh ord)
+              |> Seq.map(writeStripeArrayO oneThresh ord)
 
 
-    let createStripedArrayFromInts (ord:order) 
+    let createStripedArrayFromIntArrays 
+                                   (ord:order) 
                                    (intSeq:int[] seq) =
         try
-            intSeq |> toStripeArrays 1 ord 
+            intSeq |> toStripeArraysO 1 ord 
                    |> Seq.concat
                    |> Seq.toArray |> Ok
         with
@@ -364,21 +412,11 @@ module ByteUtils =
                 |> Seq.concat
 
 
-    let usedStripeCount<'a when 'a : equality> (zero_v:'a ) (one_v:'a) (striped:uint64[]) =
-        let _arrayIsZero (arr:'a[]) = 
-            arr |> Array.forall(fun dexV -> dexV = zero_v)
+    let usedStripeCount  (striped:uint64[]) =
+        let _arrayIsNotZero (arr:bool[]) = 
+            not (arr |> Array.forall(fun dexV -> dexV = false))
 
-        let _findFirstElement (cond:'a[]->bool) (arr:'a[][]) =
-            let mutable carryOn = true
-            let mutable dex = 0
-            while (dex < (arr.Length - 1)) && carryOn do
-                if cond arr.[dex] then
-                    carryOn <- false
-                else
-                    dex <- dex + 1
-            dex
-
-        let stripeArrays = fromStripeArray zero_v one_v striped
+        let stripeArrays = fromStripeArray false true striped
                            |> Seq.toArray
 
-        _findFirstElement _arrayIsZero stripeArrays
+        stripeArrays |> Seq.filter(_arrayIsNotZero) |> Seq.length

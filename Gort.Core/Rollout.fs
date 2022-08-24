@@ -4,7 +4,7 @@ open System
 type bitPack = private { bitsPerSymbol:bitsPerSymbol; symbolCount:symbolCount; data:byte[] }
 module BitPack =
 
-    let getBitWidth (bitPack:bitPack) =
+    let getBitsPerSymbol (bitPack:bitPack) =
         bitPack.bitsPerSymbol
 
     let getSymbolCount (bitPack:bitPack) =
@@ -18,7 +18,7 @@ module BitPack =
 
     let toIntArrays (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
-            let bitsPerSymbol = bitPack |> getBitWidth
+            let bitsPerSymbol = bitPack |> getBitsPerSymbol
             let allInts = bitPack |> getData
                                   |> ByteUtils.getAllBitsFromByteSeq
                                   |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
@@ -51,7 +51,7 @@ module Uint8Roll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
+            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
             let data = bitPack |> BitPack.getData 
                                |> ByteUtils.getAllBitsFromByteSeq
                                |> ByteUtils.bitsToSpBytePositions bitsPerSymbol
@@ -115,7 +115,7 @@ module Uint16Roll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
+            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
             let data = bitPack |> BitPack.getData 
                                |> ByteUtils.getAllBitsFromByteSeq
                                |> ByteUtils.bitsToSpUint16Positions bitsPerSymbol
@@ -184,7 +184,7 @@ module IntRoll =
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
+            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
             let data = bitPack |> BitPack.getData 
                                |> ByteUtils.getAllBitsFromByteSeq
                                |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
@@ -231,6 +231,17 @@ module Uint64Roll =
 
     let getData (uint64Roll:uint64Roll) =
         uint64Roll.data
+    
+    let stripeBlocksNeededForArrayCount (arrayCount:arrayCount) = 
+        ( (ArrayCount.value arrayCount) + 63) / 64
+
+    let createEmptyStripedSet (arrayLength:arrayLength) 
+                              (arrayCount:arrayCount) =
+        let blocksNeeded = stripeBlocksNeededForArrayCount arrayCount
+        let dataLength = (ArrayLength.value arrayLength) * blocksNeeded
+        let data = Array.zeroCreate<uint64> dataLength
+        { arrayCount=arrayCount; arrayLength=arrayLength; data=data }
+
 
     let copy (uint64Roll:uint64Roll) = 
         {
@@ -239,21 +250,14 @@ module Uint64Roll =
             data = uint64Roll.data |> Array.copy
         }
 
-    let getUsedStripes (uint64Roll:uint64Roll) =
-        let len = uint64Roll.data.Length
-        let arrayLen = uint64Roll.arrayLength |> ArrayLength.value
-        let q = uint64Roll.data.[len - arrayLen .. len - 1]
-        let lastStripes = q |> ByteUtils.usedStripeCount 0 1
-        let ww = (len - arrayLen) / arrayLen
-        (ww * 64) + lastStripes
-
-
+    // *************** not bit striped **********************
+    
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
                                (arrayLength |> ArrayLength.value))
                                 |> ArrayCount.create
-            let bitsPerSymbol = bitPack |> BitPack.getBitWidth
+            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
             let data = bitPack |> BitPack.getData 
                                |> ByteUtils.getAllBitsFromByteSeq
                                |> ByteUtils.bitsToSpUint64Positions bitsPerSymbol
@@ -262,20 +266,8 @@ module Uint64Roll =
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
 
-    let toBitPack (symbolSetSize:symbolSetSize) (uint64Roll:uint64Roll) =
-        result {
-          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-          let! symbolCount = ((uint64Roll.arrayCount |> ArrayCount.value) * 
-                             (uint64Roll.arrayLength |> ArrayLength.value))
-                             |> SymbolCount.create
-          let data = uint64Roll.data |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbol
-                                     |> ByteUtils.storeBitSeqInBytes
-                                     |> Seq.toArray
-          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
-        
-        }
 
-    let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
+    let fromIntArrays (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint64s = aas |> Seq.concat
                               |> Seq.map(uint64)
@@ -286,12 +278,8 @@ module Uint64Roll =
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
 
-    let toIntArraySeq (uint64Roll:uint64Roll) =
-        uint64Roll.data |> Seq.map(int)
-                        |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
-
-    let fromUint64ArraySeq (arrayLength:arrayLength) (aas:seq<uint64[]>) =
+    let fromUint64Arrays (arrayLength:arrayLength) (aas:seq<uint64[]>) =
         result {
             let uint64s = aas |> Seq.concat
                               |> Seq.toArray
@@ -301,20 +289,67 @@ module Uint64Roll =
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint64s }
         }
 
-    let toUint64ArraySeq (uint64Roll:uint64Roll) =
+
+    let toBitPack (symbolSetSize:symbolSetSize) (uint64Roll:uint64Roll) =
+        result {
+          let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+          let! symbolCount = ((uint64Roll.arrayCount |> ArrayCount.value) * 
+                              (uint64Roll.arrayLength |> ArrayLength.value))
+                             |> SymbolCount.create
+          let data = uint64Roll.data |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbol
+                                     |> ByteUtils.storeBitSeqInBytes
+                                     |> Seq.toArray
+          return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
+        }
+
+
+    let toIntArrays (uint64Roll:uint64Roll) =
+        uint64Roll.data |> Seq.map(int)
+                        |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
+
+
+    let toUint64Arrays (uint64Roll:uint64Roll) =
         uint64Roll.data |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
-    let saveIntArraysAsBitStriped (arrayLength:arrayLength)
+    
+    // ****************   bit striped  **********************
+
+    let getUsedStripes (uint64Roll:uint64Roll) =
+        let len = uint64Roll.data.Length
+        let arrayLen = uint64Roll.arrayLength |> ArrayLength.value
+        let q = uint64Roll.data.[len - arrayLen .. len - 1]
+        let lastStripes = q |> ByteUtils.usedStripeCount
+        let ww = (len - arrayLen) / arrayLen
+        (ww * 64) + lastStripes
+
+
+    let fromIntArraysAsBitStriped (arrayLength:arrayLength)
                                   (aas:seq<int[]>) =
         result {
             let! order = arrayLength |> ArrayLength.value |> Order.create
-            let! data = ByteUtils.createStripedArrayFromInts order aas
+            let! data = ByteUtils.createStripedArrayFromIntArrays order aas
             let! arrayCount = data.Length |> ArrayCount.create
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
 
-    let asBitStripedToIntArraySeq (uint64Roll:uint64Roll) =
+
+    let asBitStripedtoBitPack (uint64Roll:uint64Roll) =
+        result {
+            let! order = uint64Roll.arrayLength |> ArrayLength.value |> Order.create
+            let! symbolCount = uint64Roll.data |> ByteUtils.usedStripeCount 
+                                            |> (*) (order |> Order.value)
+                                            |> SymbolCount.create
+            let data = ByteUtils.fromStripeArrays false true order uint64Roll.data
+                        |> Seq.concat
+                        |> ByteUtils.storeBitSeqInBytes
+                        |> Seq.toArray
+            let! bitsPerSymbol = 2 |> BitsPerSymbol.create
+            return  { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
+         }
+
+
+    let asBitStripedToIntArrays (uint64Roll:uint64Roll) =
          let order = uint64Roll.arrayLength |> ArrayLength.value |> Order.createNr
          ByteUtils.fromStripeArrays 0 1 order uint64Roll.data
 
@@ -387,7 +422,7 @@ module Rollout =
         (rollout |> getArrayLength |> ArrayLength.value)
 
 
-    let fromIntArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
+    let fromIntArrays (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
                         (aas:seq<int[]>) =
         match rolloutFormat with
         | RfU8 -> result {
@@ -403,7 +438,7 @@ module Rollout =
                         return roll |> rollout.I32
                     }
         | RfU64 -> result {
-                        let! roll = Uint64Roll.fromIntArraySeq arrayLength aas
+                        let! roll = Uint64Roll.fromIntArrays arrayLength aas
                         return roll |> rollout.U64
                     }
 
@@ -413,7 +448,7 @@ module Rollout =
         | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toIntArraySeq
         | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toIntArraySeq
         | I32 _intRoll -> _intRoll |> IntRoll.toIntArraySeq
-        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toIntArraySeq
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toIntArrays
 
 
     let fromUInt64ArraySeq (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
@@ -435,7 +470,7 @@ module Rollout =
                         return roll |> rollout.I32
                     }
         | RfU64 -> result {
-                        let! roll = Uint64Roll.fromUint64ArraySeq arrayLength aas
+                        let! roll = Uint64Roll.fromUint64Arrays arrayLength aas
                         return roll |> rollout.U64
                     }
 
@@ -461,8 +496,7 @@ module Rollout =
                     }
 
 
-    let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
-        let rolloutFormat = bitPack.bitsPerSymbol |> RolloutFormat.fromBitWidth
+    let fromBitPack (rolloutFormat:rolloutFormat)  (arrayLength:arrayLength) (bitPack:bitPack) =
         fromBitPackRf rolloutFormat arrayLength bitPack
 
 

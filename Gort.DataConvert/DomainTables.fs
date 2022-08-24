@@ -67,7 +67,7 @@ module DomainTables =
     let bitPackToBitPackR (bitPack:bitPack) =
         let bitPackR = new BitPackR();
         let dd = bitPack |> BitPack.getData
-        bitPackR.BitsPerSymbol <- bitPack |> BitPack.getBitWidth 
+        bitPackR.BitsPerSymbol <- bitPack |> BitPack.getBitsPerSymbol 
                                           |> BitsPerSymbol.value
         bitPackR.SymbolCount <- bitPack |> BitPack.getSymbolCount 
                                         |> SymbolCount.value

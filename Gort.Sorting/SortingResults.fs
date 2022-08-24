@@ -1,5 +1,5 @@
 ﻿namespace global
-open System
+open SysExt
 
 
 type switchEventRolloutInt = {
@@ -12,7 +12,7 @@ type switchEventRolloutBp64 = {
         switchCount:switchCount;
         sortableCount:sortableCount;
         sortableBlockCount:int;
-        useRoll:uint64[] }
+        useRoll:uint64Roll }
 
 
 type switchEventRollout =
@@ -51,37 +51,37 @@ module SwitchEventRolloutInt =
 
 
 module SwitchEventRolloutBp64 =
-    let yab = None
-    //let create (switchCount:SwitchCount) 
-    //           (sortableCount:SortableCount) = 
 
-    //    let blockCount = (SortableCount.value sortableCount) |> BitsP64.pBlocksFor
-    //    let ur = BitsP64.zeroCreate
-    //                          ((SwitchCount.value switchCount) * 
-    //                           blockCount)
+    let create (switchCount:switchCount) 
+               (sortableCount:sortableCount) = 
 
-    //    {   switchCount = switchCount;
-    //        sortableCount = sortableCount;
-    //        sortableBlockCount = blockCount;
-    //        useRoll = ur 
-    //    }
+        let arrayCount = sortableCount 
+                          |> SortableCount.value
+                          |> ArrayCount.createNr
+        let sortableBlockCount = arrayCount 
+                                 |> Uint64Roll.stripeBlocksNeededForArrayCount
+        let sortableBlockLength = switchCount
+                                  |> SwitchCount.value
+                                  |> ArrayLength.createNr
 
-    //let init (sortableCount:SortableCount)
-    //         (weights:int[]) =
-    //    let zz = create (SwitchCount.fromInt weights.Length) 
-    //                    sortableCount
-    //    weights |> Array.iteri(fun i _ -> 
-    //                zz.useRoll.values.[i] <- weights.[i] |> uint64)
-    //    zz
+        let useRoll = Uint64Roll.createEmptyStripedSet 
+                            sortableBlockLength
+                            arrayCount
 
+        {   switchCount = switchCount;
+            sortableCount = sortableCount;
+            sortableBlockCount = sortableBlockCount;
+            useRoll = useRoll 
+        }
 
-    //let toSwitchUses (switchEvents:switchEventRolloutBp64) =
-    //    let switchCt = (SwitchCount.value switchEvents.switchCount)
-    //    let weights = switchEvents.useRoll.values
-    //                   |> Array.map(fun l -> ByteUtils.trueBitCount64 l )
-    //                   |> CollectionUtils.wrapAndSumCols switchCt
+    let toSwitchUses (switchEventRolloutBp64:switchEventRolloutBp64) =
+        let switchCt = (SwitchCount.value switchEventRolloutBp64.switchCount)
+        let useFlags = switchEventRolloutBp64.useRoll 
+                        |> Uint64Roll.getData
+                        |> Array.map(fun l -> l.count |> int)
+                        |> CollectionOps.wrapAndSumCols switchCt
 
-    //    { switchUses.weights = weights }
+        useFlags |> SwitchUses.make
 
 
 

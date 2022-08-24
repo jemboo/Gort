@@ -1,8 +1,7 @@
 ﻿namespace global
 open System
 
-// Sorter
-type expandBitSets = private ExpandBitSets of bool
+
 type sorterId = private SorterId of Guid
 type sortableCount = private SortableCount of int
 type sortableSetId = private SortableSetId of int
@@ -13,11 +12,6 @@ type stageWindowSize = private StageWindowSize of int
 type switchCount = private SwitchCount of int
 type switchFrequency = private SwitchFrequency of float
 type switchUses = private { useCounts:int[] }
-
-
-module ExpandBitSets =
-    let value (ExpandBitSets v) = v
-    let create v = ExpandBitSets v
 
 module SortableCount =
     let value (SortableCount v) = v

@@ -30,6 +30,12 @@ module RandVars =
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
 
 
+    let randBits (pctTrue:float) (rnd:IRando) 
+                      (len:int) =
+        Seq.init len (fun _ -> 
+                if (rnd.NextFloat > pctTrue) then false else true)
+
+
     let randSymbols (symbolCount:symbolSetSize) 
                     (rnd:IRando) (len:int) =
         let sc = symbolCount |> SymbolSetSize.value |> int

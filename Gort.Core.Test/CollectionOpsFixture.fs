@@ -145,7 +145,7 @@ type CollectionOpsFixture () =
     [<TestMethod>]
     member this.stackSortedBlocks () =
         let dgs = [4;2;2] |> List.map(Order.createNr)
-        let blocks = CollectionOps.stackSortedBlocks dgs 0 1
+        let blocks = CollectionOps.stackSortedBlocksOfTwoSymbols dgs 0 1
                      |> Seq.toArray
         Assert.AreEqual(45, blocks.Length);
 

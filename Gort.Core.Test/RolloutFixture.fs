@@ -73,14 +73,14 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.fromIntArraySeq arrayLen arOfIntAr
+        let roll64 = Uint64Roll.fromIntArrays arrayLen arOfIntAr
                     |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint64Roll.toIntArraySeq roll64 |> Seq.toArray
+        let arOfIntArBack = Uint64Roll.toIntArrays roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
         let bitPack = roll64 |> Uint64Roll.toBitPack ssSize |> Result.ExtractOrThrow
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = Uint64Roll.toIntArraySeq brB |> Seq.toArray
+        let arOfIntArBack2 = Uint64Roll.toIntArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
 
@@ -92,14 +92,14 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = (UInt64.MaxValue - 1uL) |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.fromUint64ArraySeq arrayLen arOfIntAr
+        let roll64 = Uint64Roll.fromUint64Arrays arrayLen arOfIntAr
                       |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint64Roll.toUint64ArraySeq roll64 |> Seq.toArray
+        let arOfIntArBack = Uint64Roll.toUint64Arrays roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
         let bitPack = roll64 |> Uint64Roll.toBitPack ssSize |> Result.ExtractOrThrow
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = Uint64Roll.toUint64ArraySeq brB |> Seq.toArray
+        let arOfIntArBack2 = Uint64Roll.toUint64Arrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
 
@@ -112,7 +112,7 @@ type RolloutFixture () =
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
 
-        let roll64 = Uint64Roll.saveIntArraysAsBitStriped arrayLen arOfIntAr
+        let roll64 = Uint64Roll.fromIntArraysAsBitStriped arrayLen arOfIntAr
                       |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint64Roll.asBitStripedToIntArraySeq roll64 |> Seq.toArray
+        let arOfIntArBack = Uint64Roll.asBitStripedToIntArrays roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)

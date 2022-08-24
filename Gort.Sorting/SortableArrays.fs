@@ -1,9 +1,17 @@
 ﻿namespace global
 
-    type sortableInts = private { 
+    type sortableInts = 
+        private { 
                     values:int[]; 
                     order:order;
                     symbolSetSize:symbolSetSize }
+
+
+    type sortableBits =
+        private { 
+                    values:bool[]; 
+                    order:order    }
+
 
     module SortableInts =
     
@@ -21,7 +29,7 @@
         let apply f (p:sortableInts) = f p.values
         let value p = apply id p
         let getValues (sia:sortableInts) = sia.values
-        let getOrder (sia:sortableInts) = sia.values.Length |> Order.createNr
+        let getOrder (sia:sortableInts) = sia.order
         let getSymbolSetSize (sia:sortableInts) = sia.symbolSetSize
     
         let make (order:order) 
@@ -29,7 +37,8 @@
                  (vals:int[]) =
             { sortableInts.values = vals;
               order = order;
-              symbolSetSize=symbolSetSize}
+              symbolSetSize = symbolSetSize}
+
 
         let makeAllBits (order:order) =
             let symbolSetSize = 2uL |> SymbolSetSize.createNr
@@ -60,7 +69,7 @@
         let makeSortedStacks (orderStack:order[]) =
             let symbolSetSize = 2uL |> SymbolSetSize.createNr
             let stackedOrder = Order.add orderStack
-            CollectionOps.stackSortedBlocks orderStack 1 0
+            CollectionOps.stackSortedBlocksOfTwoSymbols orderStack 1 0
             |> Seq.map(fun arr ->
                 { sortableInts.values = arr; 
                   order = stackedOrder;
@@ -98,7 +107,7 @@
               symbolSetSize = symbolSetSize }
 
 
-        let allBitVersions (sortableInts:sortableInts) =
+        let allBitVersionsO (sortableInts:sortableInts) =
             let order = sortableInts |> getOrder |> Order.value
             let symbolMod = sortableInts.symbolSetSize |> SymbolSetSize.value |> int
             let values = sortableInts |> getValues
@@ -107,10 +116,48 @@
                                           (fun dex-> if (values.[dex] >= thresh) then 1 else 0))
 
 
-        let expandToBitVersions (sortableIntsSeq:seq<sortableInts>) =
+        let expandToSortableBitsO (sortableIntsSeq:seq<sortableInts>) =
             let order = sortableIntsSeq |> Seq.head |> getOrder
             let symbolSetSize = sortableIntsSeq |> Seq.head |> getSymbolSetSize
-            sortableIntsSeq |> Seq.map(allBitVersions)
+            sortableIntsSeq |> Seq.map(allBitVersionsO)
                             |> Seq.concat
                             |> Seq.distinct
                             |> Seq.map(make order symbolSetSize)
+
+                            
+    module SortableBits =
+
+        let apply f (p:sortableBits) = f p.values
+        let getValues p = apply id p
+        let getOrder (sia:sortableBits) = sia.order
+    
+        let make (order:order) 
+                 (vals:bool[]) =
+            { sortableBits.values = vals;
+              order = order; }
+
+
+        let makeAllForOrder (order:order) =
+            let bitShift = order |> Order.value
+            { 0uL .. (1uL <<< bitShift) - 1uL }
+                |> Seq.map(ByteUtils.uint64ToBoolArray order)
+                |> Seq.map(fun arr ->
+                    { sortableBits.values = arr; order = order;})
+
+
+        let makeSortedStacks (orderStack:order[]) =
+            let stackedOrder = Order.add orderStack
+            CollectionOps.stackSortedBlocks orderStack
+            |> Seq.map(fun arr ->
+                { sortableBits.values = arr; order = stackedOrder;})
+
+
+        let makeRandomBits (order:order)
+                           (pctOnes:float)
+                           (randy:IRando) =
+            let arrayLength = order |> Order.value
+            { sortableBits.values = RandVars.randBits 
+                                        pctOnes randy arrayLength
+                                    |> Seq.toArray;
+              order = order; }
+

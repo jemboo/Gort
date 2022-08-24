@@ -56,6 +56,19 @@ module Order =
         seq { for i = 0 to (value deg) do 
                 yield (twoSymbolOrderedArray deg i hiVal loVal) }
 
+
+    let orderedBooleanArray (deg:order) (hiCt:int) =
+        [| for i in 0 .. ((value deg) - hiCt - 1) -> false; 
+           for i in ((value deg) - hiCt) .. ((value deg) - 1)  -> true |]
+
+
+    // Returns a order + 1 length int array of
+    // of all possible sorted boolean sequences of length order
+    let allBoolArrays (deg:order) =
+        seq { for i = 0 to (value deg) do 
+                yield (orderedBooleanArray deg i ) }
+
+
     let allSortableAsInt (order:order) =
         try
             let itemCt = order |> binExp
