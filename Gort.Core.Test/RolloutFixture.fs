@@ -101,18 +101,3 @@ type RolloutFixture () =
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
         let arOfIntArBack2 = Uint64Roll.toUint64Arrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
-
-
-
-
-    [<TestMethod>]
-    member this.fromIntArraySeqAsBitStriped () =
-        let arOfIntAr = [|[|1; 0; 1|]; [|0; 1; 1|]; [|0; 0; 0|]; [|1; 1; 1 |];|]
-        let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
-        let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
-        let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
-
-        let roll64 = Uint64Roll.fromIntArraysAsBitStriped arrayLen arOfIntAr
-                      |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint64Roll.asBitStripedToIntArrays roll64 |> Seq.toArray
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)

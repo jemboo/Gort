@@ -6,12 +6,12 @@ type sortableSetFormat =
 
 
 module SortableSetFormat =
+
     let makeBitStriped =
         sortableSetFormat.SsfBitStriped
 
     let makeRollout (rolloutFormat:rolloutFormat) =
         sortableSetFormat.SsfArrayRoll rolloutFormat
-
 
 
 type sortableSet = 
@@ -35,6 +35,19 @@ module SortableSet =
                 |> ArrayCount.value
                 |> SortableCount.create
         | BitStriped (_, _, sc)  -> sc
+
+
+    let getSortableSetId (sortableSet:sortableSet) = 
+        match sortableSet with
+        | ArrayRoll (ssid, _, _) -> ssid
+        | BitStriped (ssid, _, sc)  -> ssid
+
+
+    let getRollout (sortableSet:sortableSet) = 
+        match sortableSet with
+        | ArrayRoll (_, r, _) -> r |> Ok
+        | BitStriped (_, _, _)  -> 
+                sprintf "BitStriped does not have a rollout" |> Error
 
 
     let getOrder (sortableSet:sortableSet) = 
@@ -64,14 +77,33 @@ module SortableSet =
         |> sortableSet.BitStriped
 
 
+    let fromSortableBoolArrays (sortableSetId:sortableSetId)
+                               (sortableSetFormat:sortableSetFormat)
+                               (order:order)
+                               (sortableBoolSeq:seq<sortableBools>) =
+        let arrayLength = order |> Order.value |> ArrayLength.createNr
+        let symbolSetSize = 2uL |> SymbolSetSize.createNr
+        match sortableSetFormat with
+        | SsfArrayRoll rollfmt ->  
+            sortableBoolSeq 
+                    |> Seq.map(fun sints -> sints.values)
+                    |> Rollout.fromBoolArrays rollfmt arrayLength
+                    |> Result.map(makeArrayRoll sortableSetId symbolSetSize)
+        | SsfBitStriped -> 
+            sortableBoolSeq 
+                    |> Seq.map(fun sints -> sints.values)
+                    |> Uint64Roll.fromBoolArraysAsBitStriped arrayLength
+                    |> Result.map(makeBitStriped sortableSetId)
+
+
     let toSortableIntsArrays (sortableSet:sortableSet) =
         let order = sortableSet |> getOrder
         let symbolSetSize = getSymbolSetSize sortableSet
         match sortableSet with
-        | ArrayRoll (_, r, c) -> 
+        | ArrayRoll (_, r, _) -> 
                 r |> Rollout.toIntArraySeq
                   |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
-        | BitStriped (_, r64, sc) -> 
+        | BitStriped (_, r64, _) -> 
                 r64 |> Uint64Roll.asBitStripedToIntArrays
                     |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
 
@@ -90,9 +122,9 @@ module SortableSet =
                     |> Result.map(makeArrayRoll sortableSetId symbolSetSize)
         | SsfBitStriped -> 
             sortableIntsSeq 
-                    |> SortableInts.expandToSortableBitsO
+                    |> SortableBools.expandToSortableBits
                     |> Seq.map(fun sints -> sints.values)
-                    |> Uint64Roll.fromIntArraysAsBitStriped arrayLength
+                    |> Uint64Roll.fromBoolArraysAsBitStriped arrayLength
                     |> Result.map(makeBitStriped sortableSetId)
 
 
@@ -108,11 +140,13 @@ module SortableSet =
                 let! array2d = bitPk |> BitPack.toIntArrays arrayLen
                 let sortableInts = array2d |> Array.map(SortableInts.make order symbolSetSize)
 
-                let adjustedInts = 
-                        sortableInts |> SortableInts.expandToSortableBitsO
+                let expandedBoolArrays = 
+                        sortableInts |> SortableBools.expandToSortableBits
                                      |> Seq.map(fun sints -> sints.values)
 
-                let! uint64roll = adjustedInts |> Uint64Roll.fromIntArraysAsBitStriped arrayLen
+                let! uint64roll = expandedBoolArrays 
+                                  |> Uint64Roll.fromBoolArraysAsBitStriped arrayLen
+
                 return uint64roll |> makeBitStriped sortableSetId
             }
 
@@ -134,13 +168,11 @@ module SortableSet =
     let makeAllBits (sortableSetId:sortableSetId)
                     (sortableSetFormat:sortableSetFormat)
                     (order:order) =
-        let symbolSetSize = 2uL |> SymbolSetSize.createNr
-        let sortableInts = SortableInts.makeAllBits order
-        fromSortableIntsArrays  sortableSetId 
+        let sortableBits = SortableBools.makeAllBits order
+        fromSortableBoolArrays  sortableSetId 
                                 sortableSetFormat 
-                                order 
-                                symbolSetSize 
-                                sortableInts
+                                order
+                                sortableBits
 
 
     let makeOrbits (sortableSetId:sortableSetId)
@@ -163,13 +195,11 @@ module SortableSet =
                          (sortableSetFormat:sortableSetFormat)
                          (orderStack:order[]) = 
         let stackedOrder = Order.add orderStack
-        let symbolSetSize = 2uL |> SymbolSetSize.createNr
-        let sortableInts = SortableInts.makeSortedStacks orderStack
-        fromSortableIntsArrays sortableSetId 
+        let sortableBits = SortableBools.makeSortedStacks orderStack
+        fromSortableBoolArrays sortableSetId 
                                sortableSetFormat 
-                               stackedOrder 
-                               symbolSetSize 
-                               sortableInts
+                               stackedOrder
+                               sortableBits
 
 
     let makeRandomPermutation (sortableSetId:sortableSetId)
@@ -178,10 +208,10 @@ module SortableSet =
                               (sortableCount:sortableCount) 
                               (rando:IRando) =
         let symbolSetSize = order |> Order.value
-                            |> uint64
-                            |> SymbolSetSize.createNr
+                                  |> uint64
+                                  |> SymbolSetSize.createNr
         let sortableInts = SortableCount.makeSeq sortableCount 
-                            |> Seq.map(fun i -> SortableInts.makeRandomPermutation order rando)
+                            |> Seq.map(fun _ -> SortableInts.makeRandomPermutation order rando)
         fromSortableIntsArrays sortableSetId 
                                sortableSetFormat 
                                order 
@@ -192,19 +222,15 @@ module SortableSet =
     let makeRandomBits (sortableSetId:sortableSetId)
                        (sortableSetFormat:sortableSetFormat)
                        (order:order)
-                       (pctOnes:float)
+                       (pctTrue:float)
                        (sortableCount:sortableCount) 
                        (rando:IRando) =
-        let symbolSetSize = order |> Order.value
-                                  |> uint64
-                                  |> SymbolSetSize.createNr
-        let sortableInts = SortableCount.makeSeq sortableCount 
-                             |> Seq.map(fun i -> SortableInts.makeRandomBits order pctOnes rando)
-        fromSortableIntsArrays sortableSetId 
+        let sortableBools = SortableCount.makeSeq sortableCount 
+                             |> Seq.map(fun _ -> SortableBools.makeRandomBits order pctTrue rando)
+        fromSortableBoolArrays sortableSetId 
                                sortableSetFormat 
-                               order 
-                               symbolSetSize 
-                               sortableInts
+                               order
+                               sortableBools
 
 
     let makeRandomSymbols (sortableSetId:sortableSetId)
@@ -214,7 +240,7 @@ module SortableSet =
                           (sortableCount:sortableCount) 
                           (rando:IRando) =
         let sortableInts = SortableCount.makeSeq sortableCount 
-                              |> Seq.map(fun i -> SortableInts.makeRandomSymbols order symbolSetSize rando)
+                              |> Seq.map(fun _ -> SortableInts.makeRandomSymbols order symbolSetSize rando)
         fromSortableIntsArrays sortableSetId
                                sortableSetFormat
                                order

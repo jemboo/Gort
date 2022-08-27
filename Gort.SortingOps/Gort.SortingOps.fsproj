@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortingInts.fs" />
+    <Compile Include="SortingWithHistory.fs" />
+    <Compile Include="SortingArrayRoll.fs" />
+    <Compile Include="SortingBitstriped.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
 

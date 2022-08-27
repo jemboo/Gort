@@ -1,0 +1,35 @@
+namespace Gort.SortingOps.Test
+
+open System
+open Microsoft.VisualStudio.TestTools.UnitTesting
+
+[<TestClass>]
+type SortingHistFixture () =
+
+    [<TestMethod>]
+    member this.IntsHist() =
+        let order = Order.create 8 |> Result.ExtractOrThrow
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let sortableInts = SortableInts.makeRandomPermutation order randy
+        let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
+        let hist = SortingWithHistory.Ints.makeWithFullSorter goodSorter sortableInts
+        Assert.AreEqual(hist.Length, 1 + SwitchCount.value goodSorter.switchCount)
+        let result = hist.Item (hist.Length - 1)
+        Assert.IsTrue(result |> SortableInts.isSorted)
+
+
+    [<TestMethod>]
+    member this.BoolsHist() =
+        let order = Order.create 8 |> Result.ExtractOrThrow
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let sortableInts = SortableBools.makeRandomBits order 0.5 randy
+        let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
+        let hist = SortingWithHistory.Bools.makeWithFullSorter goodSorter sortableInts
+        Assert.AreEqual(hist.Length, 1 + SwitchCount.value goodSorter.switchCount)
+        let result = hist.Item (hist.Length - 1)
+        Assert.IsTrue(result |> SortableBools.isSorted)
+
+
+    [<TestMethod>]
+    member this.TestMethodPassing () =
+        Assert.IsTrue(true);

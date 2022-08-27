@@ -96,6 +96,14 @@ type CollectionPropsFixture () =
         let aUnRes2 = aUnSrted2 |> CollectionProps.isSorted_idiom
         Assert.IsFalse(aUnRes2)
 
+        let boolSrted = [|false; true; true; true|]
+        let bSrted = boolSrted |> CollectionProps.isSorted_idiom
+        Assert.IsTrue(bSrted)
+
+        let boolUnSrted = [|true; true; false; true|]
+        let bunSrted = boolUnSrted |> CollectionProps.isSorted_idiom
+        Assert.IsFalse(bunSrted)
+
 
     [<TestMethod>]
     member this.isSorted () =

@@ -6,22 +6,7 @@ open System.Security.Cryptography
 open System.IO
 
 
-module ByteUtils =
-
-    let structHash (o:obj) =
-        let s = sprintf "%A" o
-        let inputBytes = System.Text.Encoding.ASCII.GetBytes(s);
-        let md5 = MD5.Create();
-        md5.ComputeHash(inputBytes)
-
-
-    let hashObjs (oes:obj seq) =
-        use stream = new MemoryStream()
-        use writer = new BinaryWriter(stream)
-        oes |> Seq.iter(fun o -> writer.Write(sprintf "%A" o))
-        let md5 = MD5.Create()
-        md5.ComputeHash(stream.ToArray())
-
+module InlineScraps =
 
     //let inline yabba< ^a when ^a : (static member (<<<) : ^a * int -> ^a)> (qua:^a) i =
     //    qua &&& (1 <<< i) <> 0
@@ -63,7 +48,25 @@ module ByteUtils =
     let inline dodo (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a) and ^a : (static member (&&&) : ^a * ^a -> ^a)) =
         qua <<< 3
 
-    
+
+
+module ByteUtils =
+
+    let structHash (o:obj) =
+        let s = sprintf "%A" o
+        let inputBytes = System.Text.Encoding.ASCII.GetBytes(s);
+        let md5 = MD5.Create();
+        md5.ComputeHash(inputBytes)
+
+
+    let hashObjs (oes:obj seq) =
+        use stream = new MemoryStream()
+        use writer = new BinaryWriter(stream)
+        oes |> Seq.iter(fun o -> writer.Write(sprintf "%A" o))
+        let md5 = MD5.Create()
+        md5.ComputeHash(stream.ToArray())
+
+
     // creates a bit stream from a byte stream by selecting the first bitsPerSymbol bits.
     let bitsFromSpBytePositions (bitsPerSymbol:bitsPerSymbol) (byteSeq:seq<byte>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
@@ -155,7 +158,7 @@ module ByteUtils =
     // The way this is used, the last chunk may padding - in this case it is smaller 
     // than bitsPerSymbol, and it is ignored
     let bitsToSpUint64Positions (bitsPerSymbol:bitsPerSymbol) 
-                                       (bitsy:seq<bool>) =
+                                (bitsy:seq<bool>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _yab (_bs:seq<bool>) =
             let mutable bRet = new uint64()
@@ -178,16 +181,29 @@ module ByteUtils =
 
 
     let inline uint64To2ValArray< ^a> (ord:order)
-                                      (truVal:^a) (falseVal:^a)  
+                                      (truVal:^a) 
+                                      (falseVal:^a)  
                                       (d64:uint64) = 
         Array.init (Order.value ord) 
                    (fun dex -> if (d64.get dex) then truVal else falseVal)
 
                    
-    let inline uint64ToBoolArray (ord:order)
-                                 (d64:uint64) = 
+    let uint64ToBoolArray (ord:order)
+                          (d64:uint64) = 
         Array.init (Order.value ord) 
                    (fun dex -> if (d64.get dex) then true else false)
+
+
+    let boolArrayToInt (boolArray:bool[]) =
+        let mutable rv = 0
+        boolArray |> Array.iteri(fun dex v -> if v then rv <- rv.set dex)
+        rv
+
+
+    let boolArrayToUint64 (boolArray:bool[]) =
+        let mutable rv = 0uL
+        boolArray |> Array.iteri(fun dex v -> if v then rv <- rv.set dex)
+        rv
 
 
     let inline thresholdArrayToInt< ^a when ^a: comparison>  (array:^a[]) (oneThresh:^a) =
@@ -333,11 +349,11 @@ module ByteUtils =
 
     // for 2d arrays bool[a][b] where a <= 64 and b = order
     // returns uint64[c] where c <= (a / 64)
-    let makeStripedArrayFromBoolArrays
+    let makeStripedArraysFromBoolArrays
                        (ord:order) 
                        (boolSeq:bool[] seq) =
 
-         let _makeStripedArrayFromBoolArray
+        let _makeStripedArrayFromBoolArray
                                         (ord:order) 
                                         (twoDvals:bool[][]) =
             let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
@@ -345,49 +361,43 @@ module ByteUtils =
                 writeStripeFromBitArray twoDvals.[i] i stripedArray
             stripedArray
 
-         boolSeq |> Seq.chunkBySize 64
-              |> Seq.map(_makeStripedArrayFromBoolArray ord)
-
-
-
-    let inline writeStripeO< ^a when ^a: comparison> 
-                                    (oneThresh:^a)  
-                                    (values:^a[]) 
-                                    (stripePos:int)
-                                    (stripedArray:uint64[]) =
-        for i = 0 to values.Length - 1 do
-            if values.[i] >= oneThresh then
-                stripedArray.[i] <- 
-                        stripedArray.[i].set stripePos
-            
-            
-    let inline writeStripeArrayO< ^a when ^a: comparison> 
-                                    (oneThresh:^a)  
-                                    (ord:order) 
-                                    (aValues:^a[][]) =
-        let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
-        for i = 0 to aValues.Length - 1 do
-            writeStripeO oneThresh aValues.[i] i stripedArray
-        stripedArray
-
-
-    let inline toStripeArraysO< ^a when ^a: comparison> 
-                                    (oneThresh:^a)  
-                                    (ord:order) 
-                                    (aSeq:^a[] seq) =
-         aSeq |> Seq.chunkBySize 64
-              |> Seq.map(writeStripeArrayO oneThresh ord)
-
-
-    let createStripedArrayFromIntArrays 
-                                   (ord:order) 
-                                   (intSeq:int[] seq) =
         try
-            intSeq |> toStripeArraysO 1 ord 
-                   |> Seq.concat
-                   |> Seq.toArray |> Ok
+            boolSeq |> Seq.chunkBySize 64
+                    |> Seq.map(_makeStripedArrayFromBoolArray ord)
+                    |> Seq.concat
+                    |> Seq.toArray
+                    |> Ok
         with
-            | ex -> ("error in createStripedArray: " + ex.Message ) |> Result.Error
+            | ex -> ("error in makeStripedArraysFromBoolArrays: " + ex.Message ) 
+                    |> Result.Error
+
+    //let inline writeStripeO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (values:^a[]) 
+    //                                (stripePos:int)
+    //                                (stripedArray:uint64[]) =
+    //    for i = 0 to values.Length - 1 do
+    //        if values.[i] >= oneThresh then
+    //            stripedArray.[i] <- 
+    //                    stripedArray.[i].set stripePos
+            
+            
+    //let inline writeStripeArrayO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (ord:order) 
+    //                                (aValues:^a[][]) =
+    //    let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
+    //    for i = 0 to aValues.Length - 1 do
+    //        writeStripeO oneThresh aValues.[i] i stripedArray
+    //    stripedArray
+
+
+    //let inline toStripeArraysO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (ord:order) 
+    //                                (aSeq:^a[] seq) =
+    //     aSeq |> Seq.chunkBySize 64
+    //          |> Seq.map(writeStripeArrayO oneThresh ord)
 
 
     let fromStripeArray<'a when 'a : equality> (zero_v:'a) 
@@ -402,14 +412,18 @@ module ByteUtils =
                                     then one_v else zero_v)
             }
 
-
     let fromStripeArrays (zero_v:'a)
                          (one_v:'a)
                          (ord:order) 
                          (strSeq:uint64 seq) =
+
+         let _arrayIsNotZero (arr:'a[]) = 
+            not (arr |> Array.forall(fun dexV -> dexV = zero_v))
+
          strSeq |> Seq.chunkBySize (Order.value ord)
                 |> Seq.map(fromStripeArray zero_v one_v)
                 |> Seq.concat
+                |> Seq.filter(_arrayIsNotZero)
 
 
     let usedStripeCount  (striped:uint64[]) =

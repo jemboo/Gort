@@ -82,7 +82,7 @@ type SortableIntsFixture () =
                                         |> Seq.map(SortableInts.getValues)
                                         |> Seq.toArray
 
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack);
+        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
 
     [<TestMethod>]
@@ -103,16 +103,21 @@ type SortableIntsFixture () =
                                         |> Seq.take(scFromSs)
                                         |> Seq.toArray
 
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack);
+        let sOrig = Set.ofArray arOfIntAr
+        let sBack = Set.ofArray arOfIntArBack
+
+        Assert.IsTrue(CollectionProps.areEqual sOrig sBack)
 
 
     [<TestMethod>]
-    member this.fromAllSortableIntsStriped() =
-        let order = Order.create 3 |> Result.ExtractOrThrow
-        let symbolSetSize = 2uL |> SymbolSetSize.createNr
-        let sortableInts = SortableInts.makeAllBits order
+    member this.fromAllSortableIntsBitStriped() =
+        let order = Order.create 8 |> Result.ExtractOrThrow
+        let symbolSetSize = 5uL |> SymbolSetSize.createNr
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let sortableInts = SortableInts.makeRandomSymbolsSeq order symbolSetSize randy
         let arOfIntAr = sortableInts
                          |> Seq.map(SortableInts.getValues)
+                         |> Seq.take(10)
                          |> Seq.toArray
         let ssfStriped = sortableSetFormat.SsfBitStriped
         let sortableSetId = 123 |> SortableSetId.create
@@ -123,13 +128,18 @@ type SortableIntsFixture () =
                                 symbolSetSize
                                 sortableInts
                            |> Result.ExtractOrThrow
+
         let scFromSs  = sortableSet |> SortableSet.getSortableCount |> SortableCount.value
         let arOfIntArBack = sortableSet |> SortableSet.toSortableIntsArrays 
                                         |> Seq.map(SortableInts.getValues)
                                         |> Seq.take(arOfIntAr.Length)
                                         |> Seq.toArray
 
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack);
+        let sOrig = Set.ofArray arOfIntAr
+        let sBack = Set.ofArray arOfIntArBack
+
+        Assert.IsTrue(CollectionProps.areEqual sOrig sBack);
+
 
 
     [<TestMethod>]
@@ -138,7 +148,7 @@ type SortableIntsFixture () =
         let symbolSetSize = SymbolSetSize.createNr 5uL
         let intArr = [|0;1;3;2;4|]
         let sortableInts = SortableInts.make order symbolSetSize intArr
-        let bitExp = sortableInts |> SortableInts.allBitVersionsO
+        let bitExp = sortableInts |> SortableBools.allBitVersions
                                   |> Seq.toArray
 
         Assert.IsTrue(CollectionProps.areEqual bitExp.Length ((Order.value order) + 1));
@@ -151,12 +161,12 @@ type SortableIntsFixture () =
         let symbolSetSize = SymbolSetSize.createNr 5uL
         let intArrSeq = [| [|0;1;2;3;4|]; [|4;3;2;1;0|] |]
         let sortableIntsSeq = intArrSeq |> Seq.map(SortableInts.make order symbolSetSize)
-        let bitExp = sortableIntsSeq |> SortableInts.expandToSortableBitsO
+        let bitExp = sortableIntsSeq |> SortableBools.expandToSortableBits
                                      |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual bitExp.Length (2 * (Order.value order)));
 
         let intArrSeq2 = [| [|0;1;2;3;4|]; [|4;3;2;1;0|]; [|4;3;2;1;0|] |]
         let sortableIntsSeq2 = intArrSeq2 |> Seq.map(SortableInts.make order symbolSetSize)
-        let bitExp2 = sortableIntsSeq2 |> SortableInts.expandToSortableBitsO
+        let bitExp2 = sortableIntsSeq2 |> SortableBools.expandToSortableBits
                                        |> Seq.toArray
         Assert.AreEqual(bitExp.Length, bitExp2.Length);

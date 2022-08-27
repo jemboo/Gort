@@ -2,25 +2,25 @@
 open SysExt
 
 
-type switchEventRolloutInt = {
+type switchingLogArrayRoll = {
             switchCount:switchCount; 
             sortableCount:sortableCount; 
             useRoll:bool[]}
 
 
-type switchEventRolloutBp64 = {
+type switchingLogBitStriped = {
         switchCount:switchCount;
         sortableCount:sortableCount;
         sortableBlockCount:int;
         useRoll:uint64Roll }
 
 
-type switchEventRollout =
-     | Int of switchEventRolloutInt
-     | Bp64 of switchEventRolloutBp64
+type switchingLog =
+     | ArrayRoll of switchingLogArrayRoll
+     | BitStriped of switchingLogBitStriped
 
 
-module SwitchEventRolloutInt =
+module SwitchingLogArrayRoll =
 
     let create (switchCount:switchCount) 
                (sortableCount:sortableCount) 
@@ -31,12 +31,12 @@ module SwitchEventRolloutInt =
         if (useRoll.Length <> useRollLength) then 
                 failwith (sprintf "useRollLength %d is not correct" useRollLength)
         {   
-            switchEventRolloutInt.switchCount = switchCount;
+            switchingLogArrayRoll.switchCount = switchCount;
             sortableCount = sortableCount;
             useRoll = useRoll 
         }
 
-    let toSwitchUses (switchEvents:switchEventRolloutInt) =
+    let toSwitchUses (switchEvents:switchingLogArrayRoll) =
         let swCt = (SwitchCount.value switchEvents.switchCount)
         let useWeights = Array.zeroCreate swCt
         let upDateSwU dex v =
@@ -50,7 +50,7 @@ module SwitchEventRolloutInt =
 
 
 
-module SwitchEventRolloutBp64 =
+module SwitchingLogBitStriped =
 
     let create (switchCount:switchCount) 
                (sortableCount:sortableCount) = 
@@ -74,7 +74,7 @@ module SwitchEventRolloutBp64 =
             useRoll = useRoll 
         }
 
-    let toSwitchUses (switchEventRolloutBp64:switchEventRolloutBp64) =
+    let toSwitchUses (switchEventRolloutBp64:switchingLogBitStriped) =
         let switchCt = (SwitchCount.value switchEventRolloutBp64.switchCount)
         let useFlags = switchEventRolloutBp64.useRoll 
                         |> Uint64Roll.getData
@@ -85,10 +85,8 @@ module SwitchEventRolloutBp64 =
 
 
 
-
-
 type sortingResults = 
-        | NoGrouping of sortableSet * switchEventRollout
+        | NoGrouping of sortableSet * switchingLog
         | BySwitch of sortableSet * switchUses
 
 

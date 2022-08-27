@@ -73,6 +73,20 @@ module Uint8Roll =
         
         }
 
+
+    let fromBoolArraySeq (arrayLength:arrayLength) (aas:seq<bool[]>) =
+        result {
+            let uint8s = aas |> Seq.concat
+                             |> Seq.map(fun tf -> if tf then 0uy else 1uy)
+                             |> Seq.toArray
+
+            let arrayCount = (uint8s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
+            let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint8s
+            return { uInt8Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint8s }
+        }
+
+
     let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint8s = aas |> Seq.concat
@@ -124,6 +138,7 @@ module Uint16Roll =
             return { uInt16Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
 
+
     let toBitPack (symbolSetSize:symbolSetSize) (uInt16Roll:uInt16Roll) =
         result {
           let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
@@ -135,6 +150,19 @@ module Uint16Roll =
                                      |> Seq.toArray
           return { bitPack.bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = data }
         }
+
+    let fromBoolArraySeq (arrayLength:arrayLength) (aas:seq<bool[]>) =
+        result {
+            let uint16s = aas |> Seq.concat
+                              |> Seq.map(fun tf -> if tf then 0us else 1us)
+                              |> Seq.toArray
+
+            let arrayCount = (uint16s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
+            let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint16s
+            return { uInt16Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint16s }
+        }
+
 
     let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
@@ -206,6 +234,18 @@ module IntRoll =
         
         }
 
+    let fromBoolArraySeq (arrayLength:arrayLength) (aas:seq<bool[]>) =
+        result {
+            let uint8s = aas |> Seq.concat
+                             |> Seq.map(fun tf -> if tf then 0 else 1)
+                             |> Seq.toArray
+
+            let arrayCount = (uint8s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
+            let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint8s
+            return { intRoll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint8s }
+        }
+
     let fromIntArraySeq (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let intA = aas |> Seq.concat
@@ -267,6 +307,19 @@ module Uint64Roll =
         }
 
 
+    let fromBoolArraySeq (arrayLength:arrayLength) (aas:seq<bool[]>) =
+        result {
+            let uint8s = aas |> Seq.concat
+                             |> Seq.map(fun tf -> if tf then 0uL else 1uL)
+                             |> Seq.toArray
+
+            let arrayCount = (uint8s.Length / (ArrayLength.value arrayLength)) 
+                              |> ArrayCount.createNr
+            let! res = CollectionProps.check2dArraySize arrayLength arrayCount uint8s
+            return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint8s }
+        }
+
+
     let fromIntArrays (arrayLength:arrayLength) (aas:seq<int[]>) =
         result {
             let uint64s = aas |> Seq.concat
@@ -324,11 +377,11 @@ module Uint64Roll =
         (ww * 64) + lastStripes
 
 
-    let fromIntArraysAsBitStriped (arrayLength:arrayLength)
-                                  (aas:seq<int[]>) =
+    let fromBoolArraysAsBitStriped (arrayLength:arrayLength)
+                                   (aas:seq<bool[]>) =
         result {
             let! order = arrayLength |> ArrayLength.value |> Order.create
-            let! data = ByteUtils.createStripedArrayFromIntArrays order aas
+            let! data = ByteUtils.makeStripedArraysFromBoolArrays order aas
             let! arrayCount = data.Length |> ArrayCount.create
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = data }
         }
@@ -422,8 +475,29 @@ module Rollout =
         (rollout |> getArrayLength |> ArrayLength.value)
 
 
+    let fromBoolArrays (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
+                       (aas:seq<bool[]>) =
+        match rolloutFormat with
+        | RfU8 -> result {
+                        let! roll = Uint8Roll.fromBoolArraySeq arrayLength aas
+                        return roll |> rollout.U8
+                    }
+        | RfU16 -> result {
+                        let! roll = Uint16Roll.fromBoolArraySeq arrayLength aas
+                        return roll |> rollout.U16
+                    }
+        | RfI32 -> result {
+                        let! roll = IntRoll.fromBoolArraySeq arrayLength aas
+                        return roll |> rollout.I32
+                    }
+        | RfU64 -> result {
+                        let! roll = Uint64Roll.fromBoolArraySeq arrayLength aas
+                        return roll |> rollout.U64
+                    }
+
+
     let fromIntArrays (rolloutFormat:rolloutFormat) (arrayLength:arrayLength) 
-                        (aas:seq<int[]>) =
+                      (aas:seq<int[]>) =
         match rolloutFormat with
         | RfU8 -> result {
                         let! roll = Uint8Roll.fromIntArraySeq arrayLength aas

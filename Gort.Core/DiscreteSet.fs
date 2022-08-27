@@ -1,6 +1,86 @@
 ﻿namespace global
 
 
+
+type bitSet = private { values:bool[] }
+module BitSet =
+
+    let create (avs:bool[]) = 
+        {bitSet.values = avs}
+
+    let create8 (b:uint8[]) =
+        create (b |> Array.map(fun v -> v > 0uy)) |> Result.Ok
+
+    let create16 (b:uint16[]) =
+        create (b |> Array.map(fun v -> v > 0us)) |> Result.Ok
+
+    let zeroCreate (count:int) = 
+        { bitSet.values = Array.zeroCreate count }
+
+    let getValues (bitSet:bitSet) = 
+        bitSet.values
+
+    let copy (v:bitSet) = 
+        {bitSet.values = Array.copy (v.values) }
+    
+    let isSorted (bitSet:bitSet) =
+        CollectionProps.isSorted_inline bitSet.values
+
+    let isZero (ibs:bitSet) = 
+        ibs.values |> Array.forall((=) false)
+
+    let fromInteger (ord:order) (intVers:int) =
+        { bitSet.values = (intVers |> uint64) |> ByteUtils.uint64ToBoolArray ord }
+
+    let toInteger (arrayVers:bitSet) =
+        ByteUtils.boolArrayToInt arrayVers.values
+                
+    let fromUint64 (ord:order) (intVers:uint64) =
+        { bitSet.values = intVers |> ByteUtils.uint64ToBoolArray ord }
+                
+    let toUint64 (bitSet:bitSet) = 
+        ByteUtils.boolArrayToUint64 bitSet.values
+
+    let allBitsAsSeq (ord:order) =
+        { 0 .. (1 <<< (Order.value ord)) - 1 }
+        |> Seq.map (fun i -> fromInteger ord i)
+
+    let allBitsAsArray (ord:order) =
+        Array.init (1 <<< (Order.value ord)) (fromInteger ord)
+
+
+//*************************************************************
+//***************  byte conversions  **************************
+//*************************************************************
+
+    //let fromBytes (ord:order) (data:byte[]) = 
+    //    result {
+
+    //         let! ints =  ByteArray.convertBytesToInts data
+    //         return create ints
+    //    }
+
+    //let toBytes (perm:bitSet) =
+    //    ByteArray.convertIntsToBytes (perm.values)
+
+//*************************************************************
+//***************    IRando dependent   ***********************
+//*************************************************************
+
+    let createRandom (order:order) (rando:IRando) = 
+        let perm = 
+            Array.init (Order.value order)
+                        (fun _ -> let q = rando.NextFloat
+                                  if (q > 0.5) then true else false )
+        {bitSet.values = perm }
+
+    let createRandoms (order:order) 
+                      (rnd:IRando) =
+        seq { while true do 
+                yield createRandom order rnd }
+
+
+
 type intSet = private { values:int[] }
 module IntSet =
 
@@ -55,32 +135,31 @@ module IntSet =
 //***************  byte conversions  **************************
 //*************************************************************
 
-    let fromBytes (ord:order) (data:byte[]) = 
-        result {
+    //let fromBytes (data:byte[]) = 
+    //    result {
 
-             let! ints =  ByteArray.convertBytesToInts data
-             return create ints
-        }
+    //         let! ints =  ByteArray.convertBytesToInts data
+    //         return create ints
+    //    }
 
-    let toBytes (perm:intSet) =
-        ByteArray.convertIntsToBytes (perm.values)
+    //let toBytes (intSet:intSet) =
+    //    ByteArray.convertIntsToBytes (intSet.values)
 
 //*************************************************************
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (order:order) (rando:IRando) = 
-        let perm = 
-            Array.init (Order.value order)
-                        (fun _ -> let q = rando.NextFloat
-                                  if (q > 0.5) then 1 else 0 )
-        {intSet.values = perm }
+    //let createRandom (order:order) (rando:IRando) = 
+    //    let perm = 
+    //        Array.init (Order.value order)
+    //                    (fun _ -> let q = rando.NextFloat
+    //                              if (q > 0.5) then 1 else 0 )
+    //    {intSet.values = perm }
 
-    let createRandoms (order:order) 
-                      (rnd:IRando) =
-        seq { while true do 
-                yield createRandom order rnd }
-
+    //let createRandoms (order:order) 
+    //                  (rnd:IRando) =
+    //    seq { while true do 
+    //            yield createRandom order rnd }
 
 
 type intSet16 = private { values:uint16[] }
@@ -151,33 +230,31 @@ module IntSet16 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    let fromBytes (ord:order) (data:byte[]) = 
-        result {
+    //let fromBytes (data:byte[]) = 
+    //    result {
 
-             let! ints =  ByteArray.convertBytesToInts data
-             return create ints
-        }
+    //         let! ints =  ByteArray.convertBytesToInts data
+    //         return create ints
+    //    }
 
-    let toBytes (perm:intSet16) =
-        ByteArray.convertUint16sToBytes (perm.values)
+    //let toBytes (intSet16:intSet16) =
+    //    ByteArray.convertUint16sToBytes (intSet16.values)
 
 
 //*************************************************************
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (order:order) (rando:IRando) = 
-        let perm = 
-            Array.init (Order.value order)
-                        (fun _ -> let q = rando.NextFloat
-                                  if (q > 0.5) then 1us else 0us )
-        {intSet16.values = perm }
+    //let createRandom (order:order) (rando:IRando) = 
+    //    let perm = 
+    //        Array.init (Order.value order)
+    //                    (fun _ -> let q = rando.NextFloat
+    //                              if (q > 0.5) then 1us else 0us )
+    //    {intSet16.values = perm }
 
 
-    let createRandoms (order:order) 
-                      (rnd:IRando) =
-        seq { while true do yield createRandom order rnd }
-
+    //let createRandoms (order:order) (rnd:IRando) =
+    //    seq { while true do yield createRandom order rnd }
 
 
 
@@ -249,31 +326,30 @@ module IntSet8 =
 //***************  byte conversions****************************
 //*************************************************************
 
-    let fromBytes (ord:order) (data:byte[]) = 
-        result {
-             let! ints =  ByteArray.convertBytesToUint8s data
-             return! create8 ints
-        }
+    //let fromBytes (data:byte[]) = 
+    //    result {
+    //         let! ints =  ByteArray.convertBytesToUint8s data
+    //         return! create8 ints
+    //    }
 
-    let toBytes (perm:intSet8) =
-        ByteArray.convertUint8sToBytes (perm.values)
-
+    //let toBytes (intSet8:intSet8) =
+    //    ByteArray.convertUint8sToBytes (intSet8.values)
 
 
 //*************************************************************
 //***************    IRando dependent   ***********************
 //*************************************************************
 
-    let createRandom (order:order) (rando:IRando) = 
-        let perm = 
-            Array.init (Order.value order)
-                        (fun _ -> let q = rando.NextFloat
-                                  if (q > 0.5) then 1uy else 0uy )
-        {intSet8.values = perm }
+    //let createRandom (order:order) (rando:IRando) = 
+    //    let perm = 
+    //        Array.init (Order.value order)
+    //                    (fun _ -> let q = rando.NextFloat
+    //                              if (q > 0.5) then 1uy else 0uy )
+    //    {intSet8.values = perm }
 
 
-    let createRandoms (order:order) 
-                      (rnd:IRando) =
-        seq { while true do yield createRandom order rnd }
+    //let createRandoms (order:order) 
+    //                  (rnd:IRando) =
+    //    seq { while true do yield createRandom order rnd }
 
 

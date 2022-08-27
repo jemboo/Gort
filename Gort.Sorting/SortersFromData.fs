@@ -141,7 +141,7 @@ module RefSorter =
         | _ -> "no match found in RefSorterForDegree" |> Error
 
 
-    let goodRefSorterForDegree (order:order) =
+    let goodRefSorterForOrder (order:order) =
         result {
             let! refSorter = _goodRefSorterForDegree order
             return! createRefSorter refSorter

@@ -2,7 +2,7 @@
 open System
 //open SortingEval
 
-module SortingInts =
+module SortingArrayRoll =
     // uses a (sorter.switchcount * sortableCount ) length 
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
@@ -22,6 +22,7 @@ module SortingInts =
             let mutable localSwitchOffset = 0
             let sortableSetRolloutOffset = sortableIndex * orderV
             let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
+
             while ((localSwitchOffset < (sorter.switchCount |> SwitchCount.value)) && looP) do
                 let switch = sorter.switches.[localSwitchOffset]
                 let lv = rollArray.[switch.low + sortableSetRolloutOffset]
@@ -37,7 +38,7 @@ module SortingInts =
                                                 orderV)))
                 localSwitchOffset <- localSwitchOffset + 1
 
-        sortableIndex <- sortableIndex + 1
+            sortableIndex <- sortableIndex + 1
 
 
 
@@ -60,6 +61,7 @@ module SortingInts =
             let mutable localSwitchOffset = 0
             let sortableSetRolloutOffset = sortableIndex * orderV
             let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
+
             while ((localSwitchOffset < (sorter.switchCount |> SwitchCount.value)) && looP) do
                 let switch = sorter.switches.[localSwitchOffset]
                 let lv = rollArray.[switch.low + sortableSetRolloutOffset]
@@ -97,6 +99,7 @@ module SortingInts =
             let mutable localSwitchOffset = 0
             let sortableSetRolloutOffset = sortableIndex * orderV
             let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
+
             while ((localSwitchOffset < (sorter.switchCount |> SwitchCount.value)) && looP) do
                 let switch = sorter.switches.[localSwitchOffset]
                 let lv = rollArray.[switch.low + sortableSetRolloutOffset]
@@ -126,24 +129,27 @@ module SortingInts =
                     (sorter:sorter)
                     (sortableSetId:sortableSetId)
                     (symbolSetSize:symbolSetSize)
-                    (rollingSorableData:rollout) =
+                    (rollout:rollout) =
 
-        let switchCount = rollingSorableData 
-                                  |> Rollout.getArrayLength
-                                  |> ArrayLength.value
-                                  |> SwitchCount.create
+        let sortableCountV = rollout 
+                            |> Rollout.getArrayLength
+                            |> ArrayLength.value
 
-        if (switchCount <> sorter.switchCount) then 
-                failwith (sprintf "useRollLength %d is not correct" ( switchCount |> SwitchCount.value ))
+        //if (switchCount <> sorter.switchCount) then 
+        //        failwith (sprintf "useRollLength %d is not correct" ( switchCount |> SwitchCount.value ))
 
-        let sortableCount = rollingSorableData 
-                                    |> Rollout.getArrayCount
-                                    |> ArrayCount.value
-                                    |> SortableCount.create
+        let sortableCount = rollout 
+                                |> Rollout.getArrayCount
+                                |> ArrayCount.value
+                                |> SortableCount.create
 
-        let rollingUseCounts = Array.zeroCreate<bool> (rollingSorableData |> Rollout.getRolloutLength)
-        let rollingSortableDataCopy = rollingSorableData |> Rollout.copy
-        let sortableSetSorted = rollingSortableDataCopy |> SortableSet.makeArrayRoll sortableSetId symbolSetSize
+        let rollingUseCountArrayLength = (sorter.switchCount |> SwitchCount.value) *
+                                         (sortableCount |> SortableCount.value)
+
+        let rollingUseCounts = Array.zeroCreate<bool> rollingUseCountArrayLength
+        let rollingSortableDataCopy = rollout |> Rollout.copy
+        let sortableSetSorted = rollingSortableDataCopy 
+                                    |> SortableSet.makeArrayRoll sortableSetId symbolSetSize
         match rollingSortableDataCopy with
         | U8 _uInt8Roll -> switchRangeWithNoSAGuInt8Roll
                                 sorter
@@ -166,11 +172,11 @@ module SortingInts =
         | U64 _uInt64Roll -> failwith "not implemented"
 
 
-        let switchEventRollout = SwitchEventRolloutInt.create
-                                                switchCount
+        let switchEventRollout = SwitchingLogArrayRoll.create
+                                                sorter.switchCount
                                                 sortableCount
                                                 rollingUseCounts
-                                    |> switchEventRollout.Int
+                                    |> switchingLog.ArrayRoll
 
         (sortableSetSorted, switchEventRollout) |> sortingResults.NoGrouping
 
@@ -367,42 +373,3 @@ module SortingInts =
     //                                             |> List.map(rewrap intSetsRollout)
     //                                             |> Result.sequence
     //        }
-
-
-
-    //module History =
-
-    //    let sortTHistSwitches(switches:Switch list)
-    //                         (testCase:intSet) =
-    //        let mutable i = 0
-    //        let mutable lstRet = [testCase]
-    //        let mutable newCase = testCase
-
-    //        while (i < switches.Length) do
-    //            newCase <- newCase |> IntSet.copy
-    //            let intArray = newCase.values
-    //            let switch = switches.[i]
-    //            let lv = intArray.[switch.low]
-    //            let hv = intArray.[switch.hi]
-    //            if(lv > hv) then
-    //                intArray.[switch.hi] <- lv
-    //                intArray.[switch.low] <- hv
-    //            lstRet <- newCase::lstRet
-    //            i <- i+1
-    //        lstRet |> List.rev
-
-
-    //    let sortTHistSwitchList (sorter:sorter) 
-    //                            (mindex:int) 
-    //                            (maxdex:int) 
-    //                            (testCase:intSet) =
-    //        let sws = sorter.switches |> Array.skip(mindex)
-    //                                  |> Array.take(maxdex - mindex)
-    //                                  |> Array.toList
-    //        sortTHistSwitches sws testCase
-
-
-    //    let sortTHist (sorter:sorter) (testCase:intSet) =
-    //        let sl = SwitchCount.value sorter.switchCount
-    //        sortTHistSwitchList sorter 0 sl testCase
-
