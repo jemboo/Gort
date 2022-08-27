@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SortingHistFixture () =
+type SortingWithHistoryFixture () =
 
     [<TestMethod>]
     member this.IntsHist() =

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortingHistFixture.fs" />
+    <Compile Include="SortingWithHistoryFixture.fs" />
     <Compile Include="SortingArrayRollFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

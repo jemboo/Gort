@@ -149,6 +149,10 @@ module StageWindowSize =
     let fromInt v = create v
 
 module SwitchUses =
+    let init (switchCount:switchCount) =
+        { switchUses.useCounts = 
+            Array.zeroCreate<int> (switchCount |> SwitchCount.value)}
+
     let make (useCounts:int[]) =
         { switchUses.useCounts = useCounts}
 
