@@ -13,20 +13,21 @@ module SortingArrayRoll =
     let private sortAndMakeSwitchLogForIntRoll
                 (sorter:sorter)
                 (intRoll:intRoll) 
-                (rollingUseCounts:bool[])
+                (switchingLog:switchingLog)
                 (sortableCount:sortableCount) =
 
         let rollArray = intRoll |> IntRoll.getData
         let orderV = sorter.order |> Order.value
+        let rollingUseArray = switchingLog |> SwitchingLog.getRollingDataLog
 
+        // loop over sortables, then over switches
         let mutable sortableIndex = 0
         while (sortableIndex < (SortableCount.value sortableCount)) do
-
             let mutable looP = true
-            let mutable localSwitchOffset = 0
             let sortableSetRolloutOffset = sortableIndex * orderV
             let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
-
+            
+            let mutable localSwitchOffset = 0
             while ((localSwitchOffset < (sorter.switchCount |> SwitchCount.value)) && looP) do
                 let switch = sorter.switches.[localSwitchOffset]
                 let lv = rollArray.[switch.low + sortableSetRolloutOffset]
@@ -34,7 +35,7 @@ module SortingArrayRoll =
                 if(lv > hv) then
                     rollArray.[switch.hi + sortableSetRolloutOffset] <- lv
                     rollArray.[switch.low + sortableSetRolloutOffset] <- hv
-                    rollingUseCounts.[localSwitchOffset + switchEventRolloutOffset] <- true
+                    rollingUseArray.[localSwitchOffset + switchEventRolloutOffset] <- true
                 looP <- ((localSwitchOffset % 20 > 0) ||
                          (not (CollectionProps.isSortedOffset
                                                 rollArray
@@ -51,12 +52,14 @@ module SortingArrayRoll =
     let private sortAndMakeSwitchLogForUInt8Roll
                 (sorter:sorter)
                 (uInt8Roll:uInt8Roll) 
-                (rollingUseCounts:bool[])
+                (switchingLog:switchingLog)
                 (sortableCount:sortableCount) =
 
         let rollArray = uInt8Roll |> Uint8Roll.getData
         let orderV = sorter.order |> Order.value
+        let rollingUseArray = switchingLog |> SwitchingLog.getRollingDataLog
 
+        // loop over sortables, then over switches
         let mutable sortableIndex = 0
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
@@ -72,7 +75,7 @@ module SortingArrayRoll =
                 if(lv > hv) then
                     rollArray.[switch.hi + sortableSetRolloutOffset] <- lv
                     rollArray.[switch.low + sortableSetRolloutOffset] <- hv
-                    rollingUseCounts.[localSwitchOffset + switchEventRolloutOffset] <- true
+                    rollingUseArray.[localSwitchOffset + switchEventRolloutOffset] <- true
                 looP <- ((localSwitchOffset % 20 > 0) ||
                          (not (CollectionProps.isSortedOffset
                                                 rollArray
@@ -89,11 +92,13 @@ module SortingArrayRoll =
     let private sortAndMakeSwitchLogForUInt16Roll
                 (sorter:sorter)
                 (uInt8Roll:uInt16Roll) 
-                (rollingUseCounts:bool[])
+                (switchingLog:switchingLog)
                 (sortableCount:sortableCount) =
         let rollArray = uInt8Roll |> Uint16Roll.getData
         let orderV = sorter.order |> Order.value
+        let rollingUseArray = switchingLog |> SwitchingLog.getRollingDataLog
 
+        // loop over sortables, then over switches
         let mutable sortableIndex = 0
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
@@ -109,7 +114,7 @@ module SortingArrayRoll =
                 if(lv > hv) then
                     rollArray.[switch.hi + sortableSetRolloutOffset] <- lv
                     rollArray.[switch.low + sortableSetRolloutOffset] <- hv
-                    rollingUseCounts.[localSwitchOffset + switchEventRolloutOffset] <- true
+                    rollingUseArray.[localSwitchOffset + switchEventRolloutOffset] <- true
                 looP <- ((localSwitchOffset % 20 > 0) ||
                          (not (CollectionProps.isSortedOffset
                                                 rollArray
@@ -125,6 +130,7 @@ module SortingArrayRoll =
     // along with a bool[sorter.switchcount] to store each switch use.
     let applySorterAndMakeSwitchLog
                     (sorter:sorter)
+                    (sorterId:sorterId)
                     (sortableSetId:sortableSetId)
                     (symbolSetSize:symbolSetSize)
                     (rollout:rollout) =
@@ -134,42 +140,48 @@ module SortingArrayRoll =
                                 |> ArrayCount.value
                                 |> SortableCount.create
 
-        let rollingUseCountArrayLength = (sorter.switchCount |> SwitchCount.value) *
-                                         (sortableCount |> SortableCount.value)
+        let rollingUseCountArrayLength = 
+            (sorter.switchCount |> SwitchCount.value) *
+            (sortableCount |> SortableCount.value)
+
+        
+
+        let switchingLog = SwitchingLogArrayRoll.create
+                                                sorter.switchCount
+                                                sortableCount
+                                    |> switchingLog.ArrayRoll
+
 
         let rollingUseLog = Array.zeroCreate<bool> rollingUseCountArrayLength
         let rollingSortableDataCopy = rollout |> Rollout.copy
         let sortableSetSorted = rollingSortableDataCopy 
                                     |> SortableSet.makeArrayRoll sortableSetId symbolSetSize
         match rollingSortableDataCopy with
+        | B _ ->  failwith "not implemented"
+
         | U8 _uInt8Roll -> sortAndMakeSwitchLogForUInt8Roll
                                 sorter
                                 _uInt8Roll
-                                rollingUseLog
+                                switchingLog
                                 sortableCount
 
         | U16 _uInt16Roll -> sortAndMakeSwitchLogForUInt16Roll
                                 sorter
                                 _uInt16Roll
-                                rollingUseLog
+                                switchingLog
                                 sortableCount
 
         | I32 _intRoll -> sortAndMakeSwitchLogForIntRoll
                                 sorter
                                 _intRoll
-                                rollingUseLog
+                                switchingLog
                                 sortableCount
 
         | U64 _uInt64Roll -> failwith "not implemented"
 
 
-        let switchEventRollout = SwitchingLogArrayRoll.create
-                                                sorter.switchCount
-                                                sortableCount
-                                                rollingUseLog
-                                    |> switchingLog.ArrayRoll
-
-        (sortableSetSorted, switchEventRollout) |> sortingResults.NoGrouping
+        (sorter, sorterId, sortableSetSorted, switchingLog) 
+            |> sorterResults.NoGrouping
 
 
     
@@ -289,8 +301,6 @@ module SortingArrayRoll =
             sortableIndex <- sortableIndex + 1
 
 
-
-
     
     // Uses the sorter to sort a copy of the rollingSorableData
     // returns the transformed copy of the rollingSorableData
@@ -298,6 +308,7 @@ module SortingArrayRoll =
     // count of each switch use
     let applySorterAndMakeSwitchUses
                     (sorter:sorter)
+                    (sorterId:sorterId)
                     (sortableSetId:sortableSetId)
                     (symbolSetSize:symbolSetSize)
                     (rollout:rollout) =
@@ -312,6 +323,8 @@ module SortingArrayRoll =
         let sortableSetSorted = rollingSortableDataCopy 
                                     |> SortableSet.makeArrayRoll sortableSetId symbolSetSize
         match rollingSortableDataCopy with
+        | B _ ->  failwith "not implemented"
+
         | U8 _uInt8Roll -> sortAndMakeSwitchUsesForUInt8Roll
                                 sorter
                                 _uInt8Roll
@@ -332,7 +345,8 @@ module SortingArrayRoll =
 
         | U64 _uInt64Roll -> failwith "not implemented"
 
-        (sortableSetSorted, switchUses) |> sortingResults.BySwitch
+        (sorter, sorterId, sortableSetSorted, switchUses) 
+            |> sorterResults.BySwitch
 
 
 

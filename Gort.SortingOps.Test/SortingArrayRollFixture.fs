@@ -1,6 +1,5 @@
 namespace Gort.SortingOps.Test
 
-open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -12,6 +11,7 @@ type SortingArrayRollFixture () =
         let sortableSetId = 123 |> SortableSetId.create
         let sortableCount = 10 |> SortableCount.create
         let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
+        let sorterId = goodSorter |> Sorter.makeId
 
         let sortableSet = SortableSet.makeRandomPermutation 
                                 sortableSetId
@@ -30,18 +30,22 @@ type SortingArrayRollFixture () =
 
         let sortingResults = SortingArrayRoll.applySorterAndMakeSwitchLog
                                 goodSorter
+                                sorterId
                                 sortableSetId
                                 symbolSetSize
                                 rollout
         sortingResults
 
 
+
     let getResultsWithSwitchUses (sortableSetFormat:sortableSetFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        
         let sortableSetId = 123 |> SortableSetId.create
         let sortableCount = 10 |> SortableCount.create
         let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
+        let sorterId = goodSorter |> Sorter.makeId
 
         let sortableSet = SortableSet.makeRandomPermutation 
                                 sortableSetId
@@ -60,6 +64,7 @@ type SortingArrayRollFixture () =
 
         let sortingResults = SortingArrayRoll.applySorterAndMakeSwitchUses
                                 goodSorter
+                                sorterId
                                 sortableSetId
                                 symbolSetSize
                                 rollout

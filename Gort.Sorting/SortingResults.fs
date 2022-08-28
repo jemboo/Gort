@@ -2,17 +2,10 @@
 open SysExt
 
 
-type switchingLogArrayRoll = {
-            switchCount:switchCount; 
-            sortableCount:sortableCount; 
-            useRoll:bool[]}
+type switchingLogArrayRoll = private { useRoll:booleanRoll }
 
 
-type switchingLogBitStriped = {
-        switchCount:switchCount;
-        sortableCount:sortableCount;
-        sortableBlockCount:int;
-        useRoll:uint64Roll }
+type switchingLogBitStriped = private { useRoll:uint64Roll }
 
 
 type switchingLog =
@@ -23,29 +16,46 @@ type switchingLog =
 module SwitchingLogArrayRoll =
 
     let create (switchCount:switchCount) 
-               (sortableCount:sortableCount) 
-               (useRoll:bool[]) =
+               (sortableCount:sortableCount) =
 
-        let useRollLength = ((SwitchCount.value switchCount) * 
-                             (SortableCount.value sortableCount)) 
-        if (useRoll.Length <> useRollLength) then 
-                failwith (sprintf "useRollLength %d is not correct" useRollLength)
-        {   
-            switchingLogArrayRoll.switchCount = switchCount;
-            sortableCount = sortableCount;
-            useRoll = useRoll 
-        }
+        let arrayLength = (SwitchCount.value switchCount)
+                          |> ArrayLength.createNr
+        let arrayCount = (SortableCount.value sortableCount)
+                          |> ArrayCount.createNr
 
-    let toSwitchUses (switchEvents:switchingLogArrayRoll) =
-        let swCt = (SwitchCount.value switchEvents.switchCount)
-        let useWeights = Array.zeroCreate swCt
+        let booleanRoll = BooleanRoll.create arrayCount arrayLength
+        { switchingLogArrayRoll.useRoll = booleanRoll }
+
+
+    let getUseRoll (switchingLogArrayRoll:switchingLogArrayRoll) =
+        switchingLogArrayRoll.useRoll
+
+    let getData (switchingLogArrayRoll:switchingLogArrayRoll) =
+        switchingLogArrayRoll.useRoll
+        |> BooleanRoll.getData
+
+    let getSortableCount (switchingLogArrayRoll:switchingLogArrayRoll) =
+        switchingLogArrayRoll.useRoll |> BooleanRoll.getArrayCount
+                                       |> ArrayCount.value
+                                       |> SortableCount.create
+
+    let getSwitchCount (switchingLogArrayRoll:switchingLogArrayRoll) =
+        switchingLogArrayRoll.useRoll |> BooleanRoll.getArrayLength
+                                       |> ArrayLength.value
+                                       |> SwitchCount.create
+
+    let toSwitchUses (switchingLogArrayRoll:switchingLogArrayRoll) =
+        let switchCount = switchingLogArrayRoll |> getSwitchCount
+                                         |> SwitchCount.value
+        let useWeights = Array.zeroCreate switchCount
         let upDateSwU dex v =
-            let swUdex = dex % swCt
+            let swUdex = dex % switchCount
             if v then
                 useWeights.[swUdex] <- useWeights.[swUdex] + 1
 
-        let switchUseCounts = switchEvents.useRoll
-        switchUseCounts |> Array.iteri(fun dex v -> upDateSwU dex v)
+        let switchUseArrayRoll = switchingLogArrayRoll 
+                                 |> getData
+        switchUseArrayRoll |> Array.iteri(fun dex v -> upDateSwU dex v)
         useWeights |> SwitchUses.make
 
 
@@ -58,25 +68,38 @@ module SwitchingLogBitStriped =
         let arrayCount = sortableCount 
                           |> SortableCount.value
                           |> ArrayCount.createNr
-        let sortableBlockCount = arrayCount 
-                                 |> Uint64Roll.stripeBlocksNeededForArrayCount
-        let sortableBlockLength = switchCount
-                                  |> SwitchCount.value
-                                  |> ArrayLength.createNr
+
+        let arrayLength = switchCount
+                          |> SwitchCount.value
+                          |> ArrayLength.createNr
 
         let useRoll = Uint64Roll.createEmptyStripedSet 
-                            sortableBlockLength
+                            arrayLength
                             arrayCount
 
-        {   switchCount = switchCount;
-            sortableCount = sortableCount;
-            sortableBlockCount = sortableBlockCount;
-            useRoll = useRoll 
-        }
+        { useRoll = useRoll }
 
-    let toSwitchUses (switchEventRolloutBp64:switchingLogBitStriped) =
-        let switchCt = (SwitchCount.value switchEventRolloutBp64.switchCount)
-        let useFlags = switchEventRolloutBp64.useRoll 
+    let getSortableCount (switchingLogBitStriped:switchingLogBitStriped) =
+        switchingLogBitStriped.useRoll |> Uint64Roll.getArrayCount
+                                       |> ArrayCount.value
+                                       |> SortableCount.create
+
+    let getSwitchCount (switchingLogBitStriped:switchingLogBitStriped) =
+        switchingLogBitStriped.useRoll |> Uint64Roll.getArrayLength
+                                       |> ArrayLength.value
+                                       |> SwitchCount.create
+
+    let getUseRoll (switchingLogBitStriped:switchingLogBitStriped) =
+        switchingLogBitStriped.useRoll
+
+    let toSwitchUses (switchingLogBitStriped:switchingLogBitStriped) =
+        let useRoll = switchingLogBitStriped 
+                        |> getUseRoll
+        let switchCt = useRoll
+                        |> Uint64Roll.getArrayLength
+                        |> ArrayLength.value
+        
+        let useFlags =  useRoll 
                         |> Uint64Roll.getData
                         |> Array.map(fun l -> l.count |> int)
                         |> CollectionOps.wrapAndSumCols switchCt
@@ -84,17 +107,28 @@ module SwitchingLogBitStriped =
         useFlags |> SwitchUses.make
 
 
+module SwitchingLog = 
+    let getRollingDataLog (switchingLog:switchingLog) = 
+        match switchingLog with
+        | ArrayRoll switchingLogArrayRoll ->
+            switchingLogArrayRoll |> SwitchingLogArrayRoll.getData
+        | BitStriped _ -> failwith "not implemented"
 
-type sortingResults = 
-        | NoGrouping of sortableSet * switchingLog
-        | BySwitch of sortableSet * switchUses
+
+type sorterResults = 
+        | NoGrouping of sorter * sorterId * sortableSet * switchingLog
+        | BySwitch of sorter * sorterId * sortableSet * switchUses
 
 
 
-module SortingResults =
-    let getSortableSet(sortingResults:sortingResults) = 
+module SorterResults =
+
+    let getSortableSet(sortingResults:sorterResults) = 
         match sortingResults with
-        | NoGrouping (sortableSet, _) -> sortableSet
-        | BySwitch (sortableSet, _ ) -> sortableSet
+        | NoGrouping (_, _, sortableSet, _) -> sortableSet
+        | BySwitch (_, _, sortableSet, _ ) -> sortableSet
 
-
+    let getSorter(sortingResults:sorterResults) = 
+        match sortingResults with
+        | NoGrouping (sorter, _, _, _) -> sorter
+        | BySwitch (sorter, _, _, _ ) -> sorter

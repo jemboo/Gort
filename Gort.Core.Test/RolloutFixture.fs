@@ -101,3 +101,55 @@ type RolloutFixture () =
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
         let arOfIntArBack2 = Uint64Roll.toUint64Arrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
+
+
+    [<TestMethod>]
+    member this.isSorted () =
+    
+        let arrayLen = 7 |> ArrayLength.createNr
+        let rfU8 = rolloutFormat.RfU8
+        let rfI16 = rolloutFormat.RfU16
+        let rfI32 = rolloutFormat.RfI32
+
+        let sortedArrays8 = [|
+                             [|0; 1; 3; 4; 5; 6; 9|]; 
+                             [|10; 21; 33; 44; 55; 66; 77|]; 
+                             [|10; 21; 43; 64; 85; 96; 109|]; 
+                             [|1; 11; 31; 41; 51; 61; 91|]; 
+                           |]
+        let rolloutU8 = Rollout.fromIntArrays rfU8 arrayLen sortedArrays8 |> Result.ExtractOrThrow
+        let isSortedU8 = rolloutU8 |> Rollout.isSorted
+        Assert.IsTrue(isSortedU8)
+
+        let sortedArrays = [|
+                             [|0; 1; 3; 4; 5; 6; 9|]; 
+                             [|110; 221; 333; 444; 5555; 6666; 7779|]; 
+                             [|10; 21; 43; 64; 85; 96; 109|]; 
+                             [|1; 11; 31; 41; 51; 61; 91|]; 
+                           |]
+        let rolloutU16 = Rollout.fromIntArrays rfI16 arrayLen sortedArrays |> Result.ExtractOrThrow
+        let isSortedU16 = rolloutU16 |> Rollout.isSorted
+        Assert.IsTrue(isSortedU16)
+
+
+        let unSortedArrays = [|
+                                 [|0; 1; 3; 4; 5; 6; 9|]; 
+                                 [|11110; 22221; 33333; 444; 55555; 66666; 777779|]; 
+                                 [|10; 21; 43; 64; 85; 96; 109|]; 
+                                 [|1; 11; 31; 41; 51; 61; 91|]; 
+                             |]
+
+        let unsortedRI32 = Rollout.fromIntArrays rfI32 arrayLen unSortedArrays |> Result.ExtractOrThrow
+        let isUnSortedI32 = unsortedRI32 |> Rollout.isSorted
+        Assert.IsFalse(isUnSortedI32)
+
+
+        let unSortedArrays8 = [|
+                                 [|0; 1; 3; 4; 5; 6; 9|]; 
+                                 [|11; 21; 33; 4; 55; 66; 79|]; 
+                                 [|10; 21; 43; 64; 85; 96; 109|]; 
+                                 [|1; 11; 31; 41; 51; 61; 91|]; 
+                             |]
+        let unsortedR8 = Rollout.fromIntArrays rfU8 arrayLen unSortedArrays8 |> Result.ExtractOrThrow
+        let isUnSortedU8 = unsortedR8 |> Rollout.isSorted
+        Assert.IsFalse(isUnSortedU8)
