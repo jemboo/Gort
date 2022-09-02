@@ -18,7 +18,8 @@
     <Compile Include="ByteArray.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="RndVars.fs" />
-    <Compile Include="DiscreteSet.fs" />
+    <Compile Include="DiscreteSets.fs" />
+    <Compile Include="BitPack.fs" />
     <Compile Include="Rollout.fs" />
     <Compile Include="IntSeries.fs" />
     <Compile Include="Permutation.fs" />

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortableIntsFixture.fs" />
+    <Compile Include="SortableArraysFixture.fs" />
     <Compile Include="SortableSetFixture.fs" />
     <Compile Include="SwitchFixture.fs" />
     <Compile Include="StageFixture.fs" />

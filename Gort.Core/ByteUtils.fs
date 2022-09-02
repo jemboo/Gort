@@ -48,6 +48,34 @@ module InlineScraps =
     let inline dodo (qua: ^a when ^a : (static member (<<<) : ^a * int -> ^a) and ^a : (static member (&&&) : ^a * ^a -> ^a)) =
         qua <<< 3
 
+    
+    //let inline writeStripeO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (values:^a[]) 
+    //                                (stripePos:int)
+    //                                (stripedArray:uint64[]) =
+    //    for i = 0 to values.Length - 1 do
+    //        if values.[i] >= oneThresh then
+    //            stripedArray.[i] <- 
+    //                    stripedArray.[i].set stripePos
+            
+            
+    //let inline writeStripeArrayO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (ord:order) 
+    //                                (aValues:^a[][]) =
+    //    let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
+    //    for i = 0 to aValues.Length - 1 do
+    //        writeStripeO oneThresh aValues.[i] i stripedArray
+    //    stripedArray
+
+
+    //let inline toStripeArraysO< ^a when ^a: comparison> 
+    //                                (oneThresh:^a)  
+    //                                (ord:order) 
+    //                                (aSeq:^a[] seq) =
+    //     aSeq |> Seq.chunkBySize 64
+    //          |> Seq.map(writeStripeArrayO oneThresh ord)
 
 
 module ByteUtils =
@@ -80,6 +108,7 @@ module ByteUtils =
             seq { for i in 0 .. 7 -> v.isset i }
         seq { for bite in byteSeq do yield! _byteBits bite }
 
+
     // maps a bit stream to the first bitsPerSymbol in a generated stream of byte
     // The way this is used, the last chunk may padding - in this case it is smaller 
     // than bitsPerSymbol, and it is ignored
@@ -93,19 +122,31 @@ module ByteUtils =
               |> Seq.where(fun chunk -> chunk.Length = bw)
               |> Seq.map(_yab)
 
+
     // Creates a byte stream from a bit stream by filling each byte
+    // also returns the length of the bit stream
     let storeBitSeqInBytes (bitsy:seq<bool>) =
-        let _yab (_bs:seq<bool>) = 
+        let mutable totalBits = 0
+        // maps a full or partial array of bits to
+        // a new byte
+        let _yab (_bs:array<bool>) = 
             let mutable bRet = new byte()
-            _bs |> Seq.iteri(fun dex v -> if v then (bRet <- bRet.set dex) |> ignore)
+            let mutable curdex = 0
+            totalBits <- totalBits + _bs.Length
+            while curdex < _bs.Length do
+               if _bs.[curdex] then 
+                    bRet <- bRet.set curdex
+               curdex <- curdex + 1
             bRet
-        bitsy |> Seq.chunkBySize(8)
-              |> Seq.map(_yab)
+        let byteArray = bitsy 
+                        |> Seq.chunkBySize(8)
+                        |> Seq.map(_yab)
+                        |> Seq.toArray
+        (byteArray, totalBits)
 
 
     // creates a bit stream from a uint16 stream by selecting the first bitsPerSymbol bits.
     let bitsFromSpUint16Positions (bitsPerSymbol:bitsPerSymbol) (v:seq<uint16>) =
-
         let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _uint16ToBits (bitsPerSymbol:bitsPerSymbol) (v:uint16) =
             seq { for i in 0 .. (bw - 1) -> v.isset i }
@@ -347,57 +388,34 @@ module ByteUtils =
         stripedArray
 
 
-    // for 2d arrays bool[a][b] where a <= 64 and b = order
+    // for seq<bool[a][b] where a <= 64 and b = order
     // returns uint64[c] where c <= (a / 64)
     let makeStripedArraysFromBoolArrays
                        (ord:order) 
                        (boolSeq:bool[] seq) =
 
+        let mutable arrayCt = 0
         let _makeStripedArrayFromBoolArray
                                         (ord:order) 
                                         (twoDvals:bool[][]) =
             let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
             for i = 0 to twoDvals.Length - 1 do
                 writeStripeFromBitArray twoDvals.[i] i stripedArray
+                arrayCt <- arrayCt + 1
             stripedArray
 
         try
-            boolSeq |> Seq.chunkBySize 64
-                    |> Seq.map(_makeStripedArrayFromBoolArray ord)
-                    |> Seq.concat
-                    |> Seq.toArray
-                    |> Ok
+            let bsa = boolSeq |> Seq.toArray
+            let stripedArrays = 
+                bsa |> Seq.chunkBySize 64
+                        |> Seq.map(_makeStripedArrayFromBoolArray ord)
+                        |> Seq.concat
+                        |> Seq.toArray
+
+            (stripedArrays, arrayCt) |> Ok
         with
             | ex -> ("error in makeStripedArraysFromBoolArrays: " + ex.Message ) 
                     |> Result.Error
-
-    //let inline writeStripeO< ^a when ^a: comparison> 
-    //                                (oneThresh:^a)  
-    //                                (values:^a[]) 
-    //                                (stripePos:int)
-    //                                (stripedArray:uint64[]) =
-    //    for i = 0 to values.Length - 1 do
-    //        if values.[i] >= oneThresh then
-    //            stripedArray.[i] <- 
-    //                    stripedArray.[i].set stripePos
-            
-            
-    //let inline writeStripeArrayO< ^a when ^a: comparison> 
-    //                                (oneThresh:^a)  
-    //                                (ord:order) 
-    //                                (aValues:^a[][]) =
-    //    let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
-    //    for i = 0 to aValues.Length - 1 do
-    //        writeStripeO oneThresh aValues.[i] i stripedArray
-    //    stripedArray
-
-
-    //let inline toStripeArraysO< ^a when ^a: comparison> 
-    //                                (oneThresh:^a)  
-    //                                (ord:order) 
-    //                                (aSeq:^a[] seq) =
-    //     aSeq |> Seq.chunkBySize 64
-    //          |> Seq.map(writeStripeArrayO oneThresh ord)
 
 
     let fromStripeArray<'a when 'a : equality> (zero_v:'a) 
@@ -412,18 +430,13 @@ module ByteUtils =
                                     then one_v else zero_v)
             }
 
-    let fromStripeArrays (zero_v:'a)
-                         (one_v:'a)
-                         (ord:order) 
-                         (strSeq:uint64 seq) =
-
-         let _arrayIsNotZero (arr:'a[]) = 
-            not (arr |> Array.forall(fun dexV -> dexV = zero_v))
+    let fromStripeArrays 
+                    (ord:order) 
+                    (strSeq:uint64 seq) =
 
          strSeq |> Seq.chunkBySize (Order.value ord)
-                |> Seq.map(fromStripeArray zero_v one_v)
+                |> Seq.map(fromStripeArray false true)
                 |> Seq.concat
-                |> Seq.filter(_arrayIsNotZero)
 
 
     let usedStripeCount  (striped:uint64[]) =

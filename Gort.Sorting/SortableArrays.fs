@@ -32,6 +32,7 @@
         let getOrder (sia:sortableInts) = sia.order
         let getSymbolSetSize (sia:sortableInts) = sia.symbolSetSize
     
+
         let make (order:order) 
                  (symbolSetSize:symbolSetSize) 
                  (vals:int[]) =
@@ -47,6 +48,7 @@
         let isSorted (sortableInts:sortableInts) =
             sortableInts |> getValues 
                          |> CollectionProps.isSorted_idiom 
+
 
         let makeOrbits (maxCount:sortableCount option) 
                        (perm:permutation) =
@@ -71,7 +73,7 @@
               symbolSetSize = symbolSetSize }
 
 
-        let makeRandomSymbols (order:order) 
+        let makeRandomSymbol (order:order) 
                               (symbolSetSize:symbolSetSize) 
                               (randy:IRando) =
             let arrayLength = order |> Order.value
@@ -82,11 +84,11 @@
               symbolSetSize = symbolSetSize }
 
         
-        let makeRandomSymbolsSeq (order:order) 
-                                 (symbolSetSize:symbolSetSize) 
-                                 (rnd:IRando) =
+        let makeRandomSymbols (order:order) 
+                              (symbolSetSize:symbolSetSize) 
+                              (rnd:IRando) =
             seq { while true do 
-                    yield makeRandomSymbols order symbolSetSize rnd }
+                    yield makeRandomSymbol order symbolSetSize rnd }
 
 
 
@@ -140,20 +142,22 @@
                            (pctTrue:float)
                            (randy:IRando) =
             let arrayLength = order |> Order.value
-            { sortableBools.values = RandVars.randBits 
-                                        pctTrue randy arrayLength
-                                    |> Seq.toArray;
-              order = order; }
+            Seq.initInfinite (fun _ ->
+                { sortableBools.values = RandVars.randBits pctTrue randy arrayLength
+                                          |> Seq.toArray;
+                  order = order; } 
+              )
 
 
         let allBitVersions (sortableInts:sortableInts) =
             let order = sortableInts |> SortableInts.getOrder |> Order.value
             let symbolMod = sortableInts.symbolSetSize |> SymbolSetSize.value |> int
             let values = sortableInts |> SortableInts.getValues
-            seq { 0 .. symbolMod }
+            seq { 1 .. (symbolMod - 1) }
                 |> Seq.map(fun thresh ->
                     Array.init order 
-                                (fun dex-> if (values.[dex] >= thresh) then true else false))
+                               (fun dex ->
+                    if (values.[dex] >= thresh) then true else false))
 
 
         let expandToSortableBits (sortableIntsSeq:seq<sortableInts>) =

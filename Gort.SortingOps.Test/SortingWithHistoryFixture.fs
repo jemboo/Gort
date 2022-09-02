@@ -23,6 +23,7 @@ type SortingWithHistoryFixture () =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
         let sortableInts = SortableBools.makeRandomBits order 0.5 randy
+                            |> Seq.head
         let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
         let hist = SortingWithHistory.Bools.makeWithFullSorter goodSorter sortableInts
         Assert.AreEqual(hist.Length, 1 + SwitchCount.value goodSorter.switchCount)

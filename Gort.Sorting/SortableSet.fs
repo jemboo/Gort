@@ -16,7 +16,7 @@ module SortableSetFormat =
 
 type sortableSet = 
     | ArrayRoll of sortableSetId * rollout * symbolSetSize
-    | BitStriped of sortableSetId * uint64Roll * sortableCount
+    | BitStriped of sortableSetId * bs64Roll * sortableCount
 
  
 module SortableSet =
@@ -57,10 +57,10 @@ module SortableSet =
                         |> ArrayLength.value
                         |> Order.createNr
 
-        | BitStriped (_, u64Roll, _) -> 
-                u64Roll |> Uint64Roll.getArrayLength
-                        |> ArrayLength.value
-                        |> Order.createNr
+        | BitStriped (_, bs64Roll, _) -> 
+                bs64Roll |> Bs64Roll.getArrayLength
+                         |> ArrayLength.value
+                         |> Order.createNr
 
     let makeArrayRoll (sortableSetRId:sortableSetId)
                       (symbolSetSize: symbolSetSize) 
@@ -69,11 +69,11 @@ module SortableSet =
 
 
     let makeBitStriped (sortableSetId:sortableSetId)
-                       (uint64Roll:uint64Roll) =
-        let sortableCount = uint64Roll 
-                            |> Uint64Roll.getUsedStripes
+                       (bs64Roll:bs64Roll) =
+        let sortableCount = bs64Roll 
+                            |> Bs64Roll.getUsedStripes
                             |> SortableCount.create
-        (sortableSetId, uint64Roll, sortableCount) 
+        (sortableSetId, bs64Roll, sortableCount) 
         |> sortableSet.BitStriped
 
 
@@ -86,14 +86,25 @@ module SortableSet =
         match sortableSetFormat with
         | SsfArrayRoll rollfmt ->  
             sortableBoolSeq 
-                    |> Seq.map(fun sints -> sints.values)
+                    |> Seq.map(fun sivs -> sivs.values)
                     |> Rollout.fromBoolArrays rollfmt arrayLength
                     |> Result.map(makeArrayRoll sortableSetId symbolSetSize)
-        | SsfBitStriped -> 
+        | SsfBitStriped ->
             sortableBoolSeq 
-                    |> Seq.map(fun sints -> sints.values)
-                    |> Uint64Roll.fromBoolArraysAsBitStriped arrayLength
+                    |> Seq.map(fun sbs -> sbs.values)
+                    |> Bs64Roll.fromBoolArrays arrayLength
                     |> Result.map(makeBitStriped sortableSetId)
+
+
+    let toSortableBoolSets (sortableSet:sortableSet) =
+        let order = sortableSet |> getOrder
+        match sortableSet with
+        | ArrayRoll (_, r, _) -> 
+                failwith "not implemented"
+        | BitStriped (_, bs64Roll, _) -> 
+                bs64Roll 
+                |> Bs64Roll.toBoolArrays
+                |> Seq.map(fun ia -> SortableBools.make order ia)
 
 
     let toSortableIntsArrays (sortableSet:sortableSet) =
@@ -101,30 +112,31 @@ module SortableSet =
         let symbolSetSize = getSymbolSetSize sortableSet
         match sortableSet with
         | ArrayRoll (_, r, _) -> 
-                r |> Rollout.toIntArraySeq
+                r |> Rollout.toIntArrays
                   |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
-        | BitStriped (_, r64, _) -> 
-                r64 |> Uint64Roll.asBitStripedToIntArrays
-                    |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
+        | BitStriped (_, bs64Roll, _) -> 
+                bs64Roll 
+                |> Bs64Roll.toIntArrays
+                |> Seq.map(fun ia -> SortableInts.make order symbolSetSize ia)
 
 
-    let fromSortableIntsArrays (sortableSetId:sortableSetId)
-                               (sortableSetFormat:sortableSetFormat)
-                               (order:order)
-                               (symbolSetSize:symbolSetSize)
-                               (sortableIntsSeq:seq<sortableInts>) =
+    let fromSortableIntArrays (sortableSetId:sortableSetId)
+                              (sortableSetFormat:sortableSetFormat)
+                              (order:order)
+                              (symbolSetSize:symbolSetSize)
+                              (sortableInts:seq<sortableInts>) =
         let arrayLength = order |> Order.value |> ArrayLength.createNr
         match sortableSetFormat with
         | SsfArrayRoll rollfmt ->  
-            sortableIntsSeq 
+            sortableInts
                     |> Seq.map(fun sints -> sints.values)
                     |> Rollout.fromIntArrays rollfmt arrayLength
                     |> Result.map(makeArrayRoll sortableSetId symbolSetSize)
         | SsfBitStriped -> 
-            sortableIntsSeq 
+            sortableInts
                     |> SortableBools.expandToSortableBits
                     |> Seq.map(fun sints -> sints.values)
-                    |> Uint64Roll.fromBoolArraysAsBitStriped arrayLength
+                    |> Bs64Roll.fromBoolArrays arrayLength
                     |> Result.map(makeBitStriped sortableSetId)
 
 
@@ -145,7 +157,7 @@ module SortableSet =
                                      |> Seq.map(fun sints -> sints.values)
 
                 let! uint64roll = expandedBoolArrays 
-                                  |> Uint64Roll.fromBoolArraysAsBitStriped arrayLen
+                                  |> Bs64Roll.fromBoolArrays arrayLen
 
                 return uint64roll |> makeBitStriped sortableSetId
             }
@@ -161,8 +173,8 @@ module SortableSet =
         match sortableSet with
         | ArrayRoll (_, rollout, symbolSetSize) ->  
                 rollout |> Rollout.toBitPack symbolSetSize
-        | BitStriped (_, uint64roll, sc) -> 
-                uint64roll |> Uint64Roll.asBitStripedtoBitPack
+        | BitStriped (_, bs64roll, sc) -> 
+                bs64roll |> Bs64Roll.toBitPack
 
 
     let makeAllBits (sortableSetId:sortableSetId)
@@ -184,7 +196,7 @@ module SortableSet =
                             |> uint64
                             |> SymbolSetSize.createNr
         let sortableInts = SortableInts.makeOrbits maxCount perm
-        fromSortableIntsArrays sortableSetId 
+        fromSortableIntArrays sortableSetId 
                                sortableSetFormat 
                                order 
                                symbolSetSize 
@@ -212,7 +224,7 @@ module SortableSet =
                                   |> SymbolSetSize.createNr
         let sortableInts = SortableCount.makeSeq sortableCount 
                             |> Seq.map(fun _ -> SortableInts.makeRandomPermutation order rando)
-        fromSortableIntsArrays sortableSetId 
+        fromSortableIntArrays sortableSetId 
                                sortableSetFormat 
                                order 
                                symbolSetSize 
@@ -225,8 +237,8 @@ module SortableSet =
                        (pctTrue:float)
                        (sortableCount:sortableCount) 
                        (rando:IRando) =
-        let sortableBools = SortableCount.makeSeq sortableCount 
-                             |> Seq.map(fun _ -> SortableBools.makeRandomBits order pctTrue rando)
+        let sortableBools = SortableBools.makeRandomBits order pctTrue rando
+                            |> Seq.take (sortableCount |> SortableCount.value)
         fromSortableBoolArrays sortableSetId 
                                sortableSetFormat 
                                order
@@ -240,8 +252,8 @@ module SortableSet =
                           (sortableCount:sortableCount) 
                           (rando:IRando) =
         let sortableInts = SortableCount.makeSeq sortableCount 
-                              |> Seq.map(fun _ -> SortableInts.makeRandomSymbols order symbolSetSize rando)
-        fromSortableIntsArrays sortableSetId
+                              |> Seq.map(fun _ -> SortableInts.makeRandomSymbol order symbolSetSize rando)
+        fromSortableIntArrays sortableSetId
                                sortableSetFormat
                                order
                                symbolSetSize
@@ -255,7 +267,7 @@ module SortableSet =
         let sortableInts = Seq.empty<sortableInts>
         let order = sortableSet |> getOrder
         let symbolSetSize = sortableSet |> getSymbolSetSize
-        fromSortableIntsArrays sortableSetId 
+        fromSortableIntArrays sortableSetId 
                                sortableSetFormat 
                                order 
                                symbolSetSize 

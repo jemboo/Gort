@@ -21,6 +21,7 @@
     <Compile Include="PermutationFixture.fs" />
     <Compile Include="SwitchRflFixture.fs" />
     <Compile Include="TwoCycleFixture.fs" />
+    <Compile Include="BitPackFixture.fs" />
     <Compile Include="RolloutFixture.fs" />
     <Compile Include="IntSetFixture.fs" />
     <Compile Include="FileFixture.fs" />

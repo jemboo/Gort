@@ -106,61 +106,176 @@ type ByteUtilsFixture () =
 
 
     [<TestMethod>]
-    member this.stripeRnWInt32 () =
-        //let ord = Order.createNr 3
-        //let arOfIntAr = [|[|1; 0; 1|]; [|0; 1; 1|]; [|0; 0; 0|]; [|1; 1; 1 |];|]
-        //let stripeAs = arOfIntAr
-        //                |> ByteUtils.toStripeArrays 1 ord
-        //                |> Seq.toArray
-        //                |> Array.concat
-        //let zero_val = 0
-        //let one_val = 1
-        //let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays zero_val one_val ord
-        //                             |> Seq.take(arOfIntAr.Length)
-        //                             |> Seq.toList
-    
-        //Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-        Assert.AreEqual(1, 1);
+    member this.makeStripedArraysFromBoolArraysShort () =
+        let order = 5 |> Order.createNr
+
+        let boolArrays = 
+            [|
+                [|true; true; false; false; true|];
+                [|false; true; false; false; false|];
+                [|false; true; true; false; true|];
+                [|true; true; false; false; true|];
+                [|false; true; false; false; false|];
+                [|false; true; true; false; true|];
+                [|true; true; false; false; true|];
+                [|false; true; false; false; false|];
+                [|false; true; true; false; true|];
+            |]
+        let arrayCt = boolArrays.Length
+
+        let bitStripes, count = ByteUtils.makeStripedArraysFromBoolArrays
+                                    order
+                                    boolArrays 
+                                |> Result.ExtractOrThrow
+                                
+        Assert.AreEqual(arrayCt, count);
+
+        let boolArrayBack = bitStripes 
+                            |> ByteUtils.fromStripeArrays order
+                            |> Seq.take arrayCt
+                            |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual boolArrays boolArrayBack)
 
 
 
     [<TestMethod>]
-    member this.stripeRnW () =
-        //let ord = Order.createNr 8
-        //let boolSetIn = Bool
-        //let intSetIn = IntSet8.allBitsAsSeq ord |> Seq.toArray
-        //let stripeAs = intSetIn
-        //                |> Seq.map(IntSet8.getValues)
-        //                |> ByteUtils.toStripeArraysO 1uy ord
-        //                |> Seq.toArray
-        //                |> Array.concat
+    member this.makeStripedArraysFromBoolArraysLong () =
+        let order = 5 |> Order.createNr
 
-        //let intSetBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
-        //                          |> Seq.map(IntSet8.fromBytes ord)
-        //                          |> Seq.toList
-        //                          |> Result.sequence
-        //                          |> Result.ExtractOrThrow
-    
-        //Assert.AreEqual(intSetIn |> Array.toList, intSetBack);
+        let boolArrays = [|
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        |]
 
-        Assert.AreEqual(1, 1);
+        let arrayCt = boolArrays.Length
+
+        let bitStripes, count = ByteUtils.makeStripedArraysFromBoolArrays
+                                    order
+                                    boolArrays 
+                                |> Result.ExtractOrThrow
+                                
+        Assert.AreEqual(arrayCt, count);
+
+        let boolArrayBack = bitStripes 
+                            |> ByteUtils.fromStripeArrays order
+                            |> Seq.take arrayCt
+                            |> Seq.toArray
+
+        Assert.IsTrue(CollectionProps.areEqual boolArrays boolArrayBack)
+
+
+
+
 
 
     [<TestMethod>]
-    member this.stripeRnWuint8 () =
-        //let ord = Order.createNr 3
-        //let arOfIntAr = [|[|1uy; 0uy; 1uy|]; [|0uy; 1uy; 1uy|]; [|0uy; 0uy; 0uy|]; [|1uy; 1uy; 1uy |];|]
-        //let stripeAs = arOfIntAr
-        //                |> ByteUtils.toStripeArraysO 1uy ord
-        //                |> Seq.toArray
-        //                |> Array.concat
+    member this.usedStripeCountShort () =
+        let order = 5 |> Order.createNr
 
-        //let arOfIntArBack = stripeAs |> ByteUtils.fromStripeArrays 0uy 1uy ord
-        //                             |> Seq.take(arOfIntAr.Length)
-        //                             |> Seq.toList
-    
-        //Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-        Assert.AreEqual(1, 1);
+        let boolArrays = [|
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        |]
+        let arrayCt = boolArrays.Length
+
+        let bitStripes, count = ByteUtils.makeStripedArraysFromBoolArrays
+                                    order
+                                    boolArrays 
+                                |> Result.ExtractOrThrow
+                                
+        Assert.AreEqual(arrayCt, count);
+
+        let usedStripeCt = bitStripes |> ByteUtils.usedStripeCount
+
+        Assert.IsTrue(CollectionProps.areEqual arrayCt usedStripeCt)
+
+
+
+
+
+    [<TestMethod>]
+    member this.usedStripeCountLong () =
+        let order = 5 |> Order.createNr
+
+        let boolArrays = [|
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        [|true; true; false; false; true|];
+                        [|false; true; false; false; false|];
+                        [|false; true; true; false; true|];
+                        |]
+        let arrayCt = boolArrays.Length
+
+        let bitStripes, count = ByteUtils.makeStripedArraysFromBoolArrays
+                                    order
+                                    boolArrays 
+                                |> Result.ExtractOrThrow
+                                
+        Assert.AreEqual(arrayCt, count);
+
+        let usedStripeCt = bitStripes |> ByteUtils.usedStripeCount
+
+        Assert.IsTrue(CollectionProps.areEqual arrayCt usedStripeCt)
+
+
+
+
+
 
 
     [<TestMethod>]
@@ -190,24 +305,6 @@ type ByteUtilsFixture () =
         let paA =  bitsFromSpBytePositions max8 ua |> Seq.toArray
         let akB = bitsToSpBytePositions max8 paA |> Seq.toArray
 
-        Assert.AreEqual(1, 1);
-
-
-    [<TestMethod>]
-    member this.usedStripeCount () =
-        //let order = 4 |> Order.createNr
-        //let arraysToStoreFull = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|]|]
-        //let usedStripeCtFull = arraysToStoreFull.Length
-        //let stripedArray = ByteUtils.toStripeArraysO 1 order arraysToStoreFull
-        //                   |> Seq.head
-        //let actualUsedStripes = ByteUtils.usedStripeCount stripedArray
-        //Assert.AreEqual(usedStripeCtFull, actualUsedStripes);
-        //let arraysToStore3 = [|[|1;0;1;0|];[|0;0;0;1|];[|1;0;0;0|];[|0;0;0;0|]|]
-        //let usedStripeCt3 = 3
-        //let stripedArray = ByteUtils.toStripeArraysO 1 order arraysToStore3
-        //                   |> Seq.head
-        //let actualUsedStripes = ByteUtils.usedStripeCount stripedArray
-        //Assert.AreEqual(usedStripeCt3, actualUsedStripes);
         Assert.AreEqual(1, 1);
 
 
