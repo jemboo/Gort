@@ -581,7 +581,6 @@ module Bs64Roll =
                 data = bs64Roll.data |> Array.copy
         }
 
-    // ****************   bit striped  **********************
 
     let getUsedStripes (bs64Roll:bs64Roll) =
         let len = bs64Roll.data.Length
@@ -831,13 +830,49 @@ module Rollout =
 
 
     let uniqueMembers (rollout:rollout) =
-        rollout |> toIntArrays
-                |> Seq.distinct
+        match rollout with
+        | B _uBRoll -> _uBRoll 
+                        |> BooleanRoll.uniqueMembers
+                        |> Result.map B
+        | U8 _uInt8Roll -> _uInt8Roll 
+                           |> Uint8Roll.uniqueMembers
+                           |> Result.map U8
+        | U16 _uInt16Roll -> _uInt16Roll 
+                            |> Uint16Roll.uniqueMembers
+                            |> Result.map U16
+        | I32 _intRoll -> _intRoll 
+                            |> IntRoll.uniqueMembers
+                            |> Result.map I32
+        | U64 _uInt64Roll -> _uInt64Roll 
+                            |> Uint64Roll.uniqueMembers
+                            |> Result.map U64
+        | Bs64 _bs64Roll -> _bs64Roll 
+                            |> Bs64Roll.uniqueMembers
+                            |> Result.map Bs64
+
 
 
     let uniqueUnsortedMembers (rollout:rollout) =
-        rollout |> uniqueMembers
-                |> Seq.filter(fun ia -> not (CollectionProps.isSorted_inline ia))
+        match rollout with
+        | B _uBRoll -> _uBRoll 
+                        |> BooleanRoll.uniqueUnsortedMembers
+                        |> Result.map B
+        | U8 _uInt8Roll -> _uInt8Roll 
+                           |> Uint8Roll.uniqueUnsortedMembers
+                           |> Result.map U8
+        | U16 _uInt16Roll -> _uInt16Roll 
+                            |> Uint16Roll.uniqueUnsortedMembers
+                            |> Result.map U16
+        | I32 _intRoll -> _intRoll 
+                            |> IntRoll.uniqueUnsortedMembers
+                            |> Result.map I32
+        | U64 _uInt64Roll -> _uInt64Roll 
+                            |> Uint64Roll.uniqueUnsortedMembers
+                            |> Result.map U64
+        | Bs64 _bs64Roll -> _bs64Roll 
+                            |> Bs64Roll.uniqueUnsortedMembers
+                            |> Result.map Bs64
+
 
 
     let fromUInt64ArraySeq (rolloutFormat:rolloutFormat) 
@@ -868,6 +903,7 @@ module Rollout =
                     return roll |> rollout.U64
                     }
         | RfBs64 -> failwith "not implemented"
+
 
 
     let fromBitPack (rolloutFormat:rolloutFormat) 

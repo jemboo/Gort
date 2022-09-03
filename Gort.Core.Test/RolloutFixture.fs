@@ -27,7 +27,6 @@ type RolloutFixture () =
 
 
 
-
     [<TestMethod>]
     member this.bs64Roll_fromBitPack () =
         let arrayLen = 5 |> ArrayLength.createNr
