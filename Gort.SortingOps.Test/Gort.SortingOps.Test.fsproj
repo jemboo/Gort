@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <Compile Include="SortingWithHistoryFixture.fs" />
-    <Compile Include="SortingArrayRollFixture.fs" />
+    <Compile Include="SortingRolloutFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

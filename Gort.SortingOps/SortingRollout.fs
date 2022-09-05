@@ -156,28 +156,28 @@ module SortingRollout =
                         sorter.switchCount
                         sortableCount
 
-        let dataUseArray = switchingLg |> SwitchingLogBitStriped.getData
+        let switchUseArray = 
+            switchingLg |> SwitchingLogBitStriped.getData
 
         // loop over sortables, then over switches
         let mutable sortableIndex = 0
-        while (sortableIndex < (SortableCount.value sortableCount)) do
+        let mutable sortableSetOffset = 0
+        while (sortableSetOffset < (bs64Roll |> Bs64Roll.getDataArrayLength)) do
+            let switchEventOffset = sortableIndex * switchCts
             let mutable localSwitchOffset = 0
-            let sortableSetRolloutOffset = sortableIndex * orderV
-            let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
-            while (sortableIndex < (SortableCount.value sortableCount)) do
-                let mutable localSwitchOffset = 0
-                let sortableSetRolloutOffset = sortableIndex * orderV
+            while (localSwitchOffset < switchCts) do
+                let switch = sorter.switches.[localSwitchOffset]
+                let lv = rollArray.[switch.low + sortableSetOffset]
+                let hv = rollArray.[switch.hi + sortableSetOffset]
+                rollArray.[switch.hi + sortableSetOffset] <- (lv ||| hv)
+                rollArray.[switch.low + sortableSetOffset] <- (lv &&& hv)
 
-                while (localSwitchOffset < switchCts) do
-                    let switch = sorter.switches.[localSwitchOffset]
-                    let lv = rollArray.[switch.low + sortableSetRolloutOffset]
-                    let hv = rollArray.[switch.hi + sortableSetRolloutOffset]
-                    let rv = dataUseArray.[localSwitchOffset]
-                    rollArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
-                    rollArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
-                    dataUseArray.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
-                    localSwitchOffset <- localSwitchOffset + 1
-                sortableIndex <- sortableIndex + 1
+                let rv = switchUseArray.[localSwitchOffset]
+                switchUseArray.[switchEventOffset + localSwitchOffset] 
+                    <- (((~~~hv) &&& lv) ||| rv)
+                localSwitchOffset <- localSwitchOffset + 1
+            sortableIndex <- sortableIndex + 1
+            sortableSetOffset <- sortableSetOffset + orderV
         switchingLg |> switchingLog.BitStriped
 
 
@@ -355,8 +355,7 @@ module SortingRollout =
 
     let sortAndMakeSwitchUsesForBs64Roll
                 (sorter:sorter)
-                (bs64Roll:bs64Roll)
-                (sortableCount:sortableCount) =
+                (bs64Roll:bs64Roll) =
         
         let switchUses = SwitchUseTrackBitStriped.make sorter.switchCount
         let rollArray = bs64Roll |> Bs64Roll.getData
@@ -364,24 +363,57 @@ module SortingRollout =
         let orderV = sorter.order |> Order.value
         let switchCts = sorter.switchCount |> SwitchCount.value
 
-        let mutable sortableIndex = 0
-        while (sortableIndex < (SortableCount.value sortableCount)) do
+        let mutable sortableSetOffset = 0
+        while (sortableSetOffset < (bs64Roll |> Bs64Roll.getDataArrayLength )) do
             let mutable localSwitchOffset = 0
-            let sortableSetRolloutOffset = sortableIndex * orderV
-
             while (localSwitchOffset < switchCts) do
                 let switch = sorter.switches.[localSwitchOffset]
-                let lv = rollArray.[switch.low + sortableSetRolloutOffset]
-                let hv = rollArray.[switch.hi + sortableSetRolloutOffset]
+                let lv = rollArray.[switch.low + sortableSetOffset]
+                let hv = rollArray.[switch.hi + sortableSetOffset]
+                rollArray.[switch.hi + sortableSetOffset] <- (lv ||| hv)
+                rollArray.[switch.low + sortableSetOffset] <- (lv &&& hv)
+
                 let rv = useFlags.[localSwitchOffset]
-                rollArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
-                rollArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
                 useFlags.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
                 localSwitchOffset <- localSwitchOffset + 1
-            sortableIndex <- sortableIndex + 1
+            sortableSetOffset <- sortableSetOffset + orderV
         switchUses |> switchUseTrack.BitStriped
 
     
+
+    let sortAndMakeSwitchUsesForBs64Rollp
+                (sorter:sorter)
+                (bs64Roll:bs64Roll) =
+        
+        let switchUses = SwitchUseTrackBitStriped.make sorter.switchCount
+        let rollArray = bs64Roll |> Bs64Roll.getData
+        let useFlags = switchUses |> SwitchUseTrackBitStriped.getUseFlags 
+        let orderV = sorter.order |> Order.value
+        let switchCts = sorter.switchCount |> SwitchCount.value
+        let maxOffset = bs64Roll 
+                        |> Bs64Roll.getDataArrayLength
+                        |> (+) (-1)
+
+        let _sortIt (sortableSetOffset:int) =
+            let mutable localSwitchOffset = 0
+            while (localSwitchOffset < switchCts) do
+                let switch = sorter.switches.[localSwitchOffset]
+                let lv = rollArray.[switch.low + sortableSetOffset]
+                let hv = rollArray.[switch.hi + sortableSetOffset]
+                rollArray.[switch.hi + sortableSetOffset] <- (lv ||| hv)
+                rollArray.[switch.low + sortableSetOffset] <- (lv &&& hv)
+
+                let rv = useFlags.[localSwitchOffset]
+                useFlags.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
+                localSwitchOffset <- localSwitchOffset + 1
+          
+        let offsets = [|0 .. orderV .. maxOffset|]
+        let wak =
+            offsets
+            |> Array.Parallel.map(_sortIt)
+
+
+        switchUses |> switchUseTrack.BitStriped
     // Uses the sorter to sort a copy of the rollingSorableData
     // returns the transformed copy of the rollingSorableData
     // along with an int[sorter.switchcount] to accumulate the 
@@ -428,228 +460,6 @@ module SortingRollout =
                     sortAndMakeSwitchUsesForBs64Roll
                                     sorter
                                     _bs644Roll
-                                    sortableCount
 
         (sorterId, sortableSetId, rolloutCopy, switchUses) 
         |> sorterResults.BySwitch
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //// uses a sorter.switchcount length array to store accumulated
-    //// switch uses
-    //let private switchRangeMakeSwitchUses 
-    //                (sorter:sorter) 
-    //                (mindex:int) 
-    //                (maxdex:int) 
-    //                (switchUses:switchUses) 
-    //                (sortableSetRollout:intSetsRollout) 
-    //                (sortableIndex:int) =
-    //    let useWeights = (SwitchUses.getWeights switchUses)
-    //    let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
-    //    let mutable looP = true
-    //    let mutable localSwitchOffset = mindex
-    //    while ((localSwitchOffset < maxdex) && looP) do
-    //        let switch = sorter.switches.[localSwitchOffset]
-    //        let lv = sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset]
-    //        let hv = sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
-    //        if(lv > hv) then
-    //            sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- lv
-    //            sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- hv
-    //            useWeights.[localSwitchOffset] <- useWeights.[localSwitchOffset] + 1
-    //            looP <- ((localSwitchOffset % 20 > 0) ||
-    //                     (not (Combinatorics.isSortedOffsetI 
-    //                                            sortableSetRollout.baseArray 
-    //                                            sortableSetRolloutOffset 
-    //                                            (Degree.value(sorter.degree)))))
-    //        localSwitchOffset <- localSwitchOffset+1
-
-
-
-
-    //// uses a sorter.switchcount length array to store accumulated
-    //// switch uses
-    //let sorterMakeSwitchUses 
-    //                (sorter:sorter) 
-    //                (ssRollout:intSetsRollout) 
-    //                (switchusePlan:Sorting.switchUsePlan) =
-    //    let switchCount = (SwitchCount.value sorter.switchCount)
-    //    let firstSwitchDex, lastSwitchDex, switchUses = 
-    //        match switchusePlan with
-    //        | Sorting.switchUsePlan.All -> 
-    //            (0, switchCount, (SwitchUses.createEmpty sorter.switchCount))
-    //        | Sorting.switchUsePlan.Range (min, max) -> 
-    //            (min, max, (SwitchUses.createEmpty sorter.switchCount))
-    //        | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
-    //            let cpyWgts = swu.weights |> Array.copy
-    //            (min, max, SwitchUses.init cpyWgts)
-
-    //    let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)
-    //    let mutable sortableIndex=0
-    //    while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
-    //            switchRangeMakeSwitchUses 
-    //                sorter 
-    //                firstSwitchDex 
-    //                lastSwitchDex 
-    //                switchUses 
-    //                sortableSetRolloutCopy 
-    //                sortableIndex
-    //            sortableIndex <- sortableIndex + 1
-    //    switchEventRecords.BySwitch {
-    //        groupBySwitch.switchUses = switchUses; 
-    //        groupBySwitch.sortableRollout = sortableSetRollout.Int 
-    //                                            sortableSetRolloutCopy
-    //}
-
-    //// uses a sorter.switchcount length array to store accumulated
-    //// switch uses
-    //let private switchRangeMakeSwitchUsesSlice
-    //                (sorter:sorter) 
-    //                (mindex:int) 
-    //                (maxdex:int) 
-    //                (switchUses:switchUses) 
-    //                (sortableArray:int[]) =
-    //    let useWeights = (SwitchUses.getWeights switchUses)
-    //    let mutable looP = true
-    //    let mutable localSwitchOffset = mindex
-    //    while ((localSwitchOffset < maxdex) && looP) do
-    //        let switch = sorter.switches.[localSwitchOffset]
-    //        let lv = sortableArray.[switch.low]
-    //        let hv = sortableArray.[switch.hi]
-    //        if(lv > hv) then
-    //            sortableArray.[switch.hi] <- lv
-    //            sortableArray.[switch.low] <- hv
-    //            useWeights.[localSwitchOffset] <- useWeights.[localSwitchOffset] + 1
-    //            looP <- ((localSwitchOffset % 20 > 0) ||
-    //                     (not (Combinatorics.isSortedI sortableArray )))
-    //        localSwitchOffset <- localSwitchOffset+1
-
-
-
-    //// uses a sorter.switchcount length array to store accumulated
-    //// switch uses
-    //let sorterMakeSwitchUsesSlice
-    //                (sorter:sorter) 
-    //                (ssRollout:intSetsRollout) 
-    //                (switchusePlan:Sorting.switchUsePlan) =
-    //    let switchCount = (SwitchCount.value sorter.switchCount)
-    //    let firstSwitchDex, lastSwitchDex, switchUses = 
-    //        match switchusePlan with
-    //        | Sorting.switchUsePlan.All -> 
-    //            (0, switchCount, (SwitchUses.createEmpty sorter.switchCount))
-    //        | Sorting.switchUsePlan.Range (min, max) -> 
-    //            (min, max, (SwitchUses.createEmpty sorter.switchCount))
-    //        | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
-    //            let cpyWgts = swu.weights |> Array.copy
-    //            (min, max, SwitchUses.init cpyWgts)
-
-    //    let intsRolloutCopy = Array.zeroCreate ssRollout.baseArray.Length
-    //    let sortableArray = Array.zeroCreate (Degree.value ssRollout.degree)
-    //    let mutable sortableIndex=0
-    //    while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
-    //            let bDexMin = sortableIndex * (Degree.value sorter.degree)
-    //            let bDexMax = bDexMin + (Degree.value sorter.degree) - 1
-    //            ByteUtils.mapIntArrays bDexMin ssRollout.baseArray 0 sortableArray (Degree.value sorter.degree)
-    //            switchRangeMakeSwitchUsesSlice 
-    //                sorter 
-    //                firstSwitchDex 
-    //                lastSwitchDex 
-    //                switchUses 
-    //                sortableArray 
-    //            sortableIndex <- sortableIndex + 1
-    //            ByteUtils.mapIntArrays 0 sortableArray bDexMin intsRolloutCopy (Degree.value sorter.degree)
-    //    switchEventRecords.BySwitch {
-    //        groupBySwitch.switchUses = switchUses; 
-    //        groupBySwitch.sortableRollout = sortableSetRollout.Int 
-    //                                            (IntSetsRollout.createNr ssRollout.degree intsRolloutCopy)
-    //    }
-        
-
-    //let evalSorterOnIntSetsRollout
-    //                (sorter:sorter)
-    //                (intSetsRollout:intSetsRollout)
-    //                (switchusePlan:Sorting.switchUsePlan) 
-    //                (switchEventAgg:Sorting.eventGrouping) =
-    //    match switchEventAgg with
-    //    | Sorting.eventGrouping.NoGrouping -> 
-    //            sorterWithNoSAG 
-    //                sorter intSetsRollout switchusePlan
-    //    | Sorting.eventGrouping.BySwitch -> 
-    //            sorterMakeSwitchUses 
-    //                sorter intSetsRollout switchusePlan
-
-
-    //let evalSorterOnBinary (sorter:sorter)
-    //               (intSetsRollout:intSetsRollout)
-    //               (switchusePlan:Sorting.switchUsePlan) 
-    //               (switchEventAgg:Sorting.eventGrouping) =
-    //    evalSorterOnIntSetsRollout
-    //        sorter intSetsRollout switchusePlan switchEventAgg
-
-
-    //let evalSorterOnInteger (sorter:sorter)
-    //                        (intSetsRollout:intSetsRollout)
-    //                        (switchusePlan:Sorting.switchUsePlan) 
-    //                        (switchEventAgg:Sorting.eventGrouping) =
-    //    evalSorterOnIntSetsRollout
-    //        sorter intSetsRollout switchusePlan switchEventAgg
-
-
-
-    //module SorterSet =
-
-    //    let eval<'T> 
-    //            (sorterSet:sorterSet)
-    //            (intSetsRollout:intSetsRollout)
-    //            (switchusePlan:Sorting.switchUsePlan) 
-    //            (switchEventAgg:Sorting.eventGrouping) 
-    //            (_parallel:UseParallel) 
-    //            (proc:sortingResult -> Result<'T, string>) =
-
-    //        let rewrap ssr tup = 
-    //            let sorterId, sorter = tup
-    //            let swEvRecs = evalSorterOnIntSetsRollout 
-    //                                sorter ssr switchusePlan switchEventAgg
-    //            let resSoSS = {
-    //                sortingResult.sorter = sorter;
-    //                sortingResult.switchEventRecords = swEvRecs;
-    //                sortingResult.sorterId = sorterId;
-    //            }
-    //            proc resSoSS
-
-    //        result  {
-    //            return!
-    //                match UseParallel.value(_parallel) with
-    //                | true  -> sorterSet.sorters |> Map.toArray 
-    //                                             |> Array.Parallel.map(rewrap intSetsRollout)
-    //                                             |> Array.toList
-    //                                             |> Result.sequence
-    //                | false -> sorterSet.sorters |> Map.toList 
-    //                                             |> List.map(rewrap intSetsRollout)
-    //                                             |> Result.sequence
-    //        }

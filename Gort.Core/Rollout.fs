@@ -563,6 +563,9 @@ module Bs64Roll =
     let getData (bs64Roll:bs64Roll) =
         bs64Roll.data
     
+    let getDataArrayLength (bs64Roll:bs64Roll) =
+        bs64Roll.data.Length
+
     let stripeBlocksNeededForArrayCount (arrayCount:arrayCount) = 
         ( (ArrayCount.value arrayCount) + 63) / 64
 
@@ -659,8 +662,9 @@ module Bs64Roll =
 
 
     let isSorted (bs64Roll:bs64Roll) =
+        let yab = bs64Roll |> toBoolArrays |> Seq.toArray
         bs64Roll |> toBoolArrays
-                 |> Seq.forall(fun ia -> not (CollectionProps.isSorted_inline ia))
+                 |> Seq.forall(fun ia -> (CollectionProps.isSorted_inline ia))
 
 
     let toIntArrays (bs64Roll:bs64Roll) =
