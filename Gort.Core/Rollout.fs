@@ -237,7 +237,6 @@ module Uint16Roll =
             data = uInt16Roll.data |> Array.copy
         }
 
-
     let fromBitPack (arrayLength:arrayLength) (bitPack:bitPack) =
         result {
             let! arrayCount = ((bitPack.symbolCount |> SymbolCount.value) / 
@@ -679,7 +678,7 @@ type rolloutFormat = |RfB | RfU8 | RfU16 | RfI32 | RfU64 | RfBs64
 
 module RolloutFormat =
 
-    let toDto (rf: rolloutFormat) =
+    let toString (rf: rolloutFormat) =
         match rf with
         | rolloutFormat.RfB -> nameof rolloutFormat.RfB
         | rolloutFormat.RfU8 -> nameof rolloutFormat.RfU8
@@ -827,6 +826,16 @@ module Rollout =
         | I32 _intRoll -> _intRoll |> IntRoll.toIntArrays
         | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toIntArrays
         | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.toIntArrays
+
+
+    let toBoolArrays (rollout:rollout) =
+        match rollout with
+        | B _uBRoll -> _uBRoll |> BooleanRoll.toBoolArrays
+        | U8 _uInt8Roll -> failwith "not implemented"
+        | U16 _uInt16Roll -> failwith "not implemented"
+        | I32 _intRoll -> failwith "not implemented"
+        | U64 _uInt64Roll -> failwith "not implemented"
+        | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.toBoolArrays
 
 
     let uniqueMembers (rollout:rollout) =

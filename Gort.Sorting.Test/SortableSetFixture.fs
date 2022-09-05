@@ -10,11 +10,11 @@ type SortableSetFixture () =
     member this.makeAllBits () =
         let order = Order.createNr 10
         let ssRecId = 123 |> SortableSetId.create
-        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
-        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
-        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
-        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
-        let ssFmtBs = SortableSetFormat.makeBitStriped
+        let ssFmtRu8 = rolloutFormat.RfU8
+        let ssFmtRu16 = rolloutFormat.RfU16
+        let ssFmtRI32 = rolloutFormat.RfI32
+        let ssFmtRu64 = rolloutFormat.RfU64
+        let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 = SortableSet.makeAllBits ssRecId ssFmtRu8 order |> Result.ExtractOrThrow
         let ssRu16 = SortableSet.makeAllBits ssRecId ssFmtRu16 order |> Result.ExtractOrThrow
@@ -43,11 +43,11 @@ type SortableSetFixture () =
         let perm = Permutation.createRandom order randy
         let maxCount = Some (SortableCount.create 12)
 
-        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
-        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
-        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
-        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
-        let ssFmtBs = SortableSetFormat.makeBitStriped
+        let ssFmtRu8 = rolloutFormat.RfU8
+        let ssFmtRu16 = rolloutFormat.RfU16
+        let ssFmtRI32 = rolloutFormat.RfI32
+        let ssFmtRu64 = rolloutFormat.RfU64
+        let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 = SortableSet.makeOrbits ssRecId ssFmtRu8 maxCount perm |> Result.ExtractOrThrow
         let ssRu16 = SortableSet.makeOrbits ssRecId ssFmtRu16 maxCount perm |> Result.ExtractOrThrow
@@ -75,11 +75,11 @@ type SortableSetFixture () =
                           |> Result.ExtractOrThrow
                           |> List.toArray
 
-        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
-        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
-        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
-        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
-        let ssFmtBs = SortableSetFormat.makeBitStriped
+        let ssFmtRu8 = rolloutFormat.RfU8
+        let ssFmtRu16 = rolloutFormat.RfU16
+        let ssFmtRI32 = rolloutFormat.RfI32
+        let ssFmtRu64 = rolloutFormat.RfU64
+        let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 = SortableSet.makeSortedStacks ssRecId ssFmtRu8 orderStack |> Result.ExtractOrThrow
         let ssRu16 = SortableSet.makeSortedStacks ssRecId ssFmtRu16 orderStack |> Result.ExtractOrThrow
@@ -108,11 +108,11 @@ type SortableSetFixture () =
             Rando.create rngType.Lcg (123 |> RandomSeed.create)
 
 
-        let ssFmtRu8 = SortableSetFormat.makeRollout rolloutFormat.RfU8
-        let ssFmtRu16 = SortableSetFormat.makeRollout rolloutFormat.RfU16
-        let ssFmtRI32 = SortableSetFormat.makeRollout rolloutFormat.RfI32
-        let ssFmtRu64 = SortableSetFormat.makeRollout rolloutFormat.RfU64
-        let ssFmtBs = SortableSetFormat.makeBitStriped
+        let ssFmtRu8 = rolloutFormat.RfU8
+        let ssFmtRu16 = rolloutFormat.RfU16
+        let ssFmtRI32 = rolloutFormat.RfI32
+        let ssFmtRu64 = rolloutFormat.RfU64
+        let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 = SortableSet.makeRandomPermutation ssRecId ssFmtRu8 order sortableCount (_randy()) |> Result.ExtractOrThrow
         let ssRu16 = SortableSet.makeRandomPermutation ssRecId ssFmtRu16 order sortableCount (_randy())|> Result.ExtractOrThrow

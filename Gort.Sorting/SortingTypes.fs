@@ -11,7 +11,6 @@ type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
 type switchCount = private SwitchCount of int
 type switchFrequency = private SwitchFrequency of float
-type switchUses = private { useCounts:int[] }
 
 module SortableCount =
     let value (SortableCount v) = v
@@ -147,20 +146,3 @@ module StageWindowSize =
     let ToSwitchCount (ord:order) (tWz:stageWindowSize) =
         SwitchCount.create ((Order.value ord) * (value tWz) / 2)
     let fromInt v = create v
-
-module SwitchUses =
-   let init (switchCount:switchCount) =
-        { switchUses.useCounts = 
-            Array.zeroCreate<int> (switchCount |> SwitchCount.value)}
-
-   let make (useCounts:int[]) =
-        { switchUses.useCounts = useCounts}
-
-   let getUseCounts (switchUses:switchUses) =
-        switchUses.useCounts
-
-   let usedSwitchCount (switchUses:switchUses) = 
-       getUseCounts switchUses |> Array.filter(fun i-> i > 0) 
-                               |> Array.length
-                               |> SwitchCount.create
-

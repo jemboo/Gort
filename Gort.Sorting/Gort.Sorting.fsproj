@@ -9,6 +9,7 @@
     <Compile Include="SorterData.fs" />
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Switch.fs" />
+    <Compile Include="SwitchUse.fs" />
     <Compile Include="SwitchGen.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />

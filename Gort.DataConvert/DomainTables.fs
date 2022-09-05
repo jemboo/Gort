@@ -95,7 +95,7 @@ module DomainTables =
         let _sortableSetLookup (ctxt:IGortContext2) (sortableSetRId:int) =
             result {
                 let! order = 8 |> Order.create
-                let fmt = rolloutFormat.RfI32 |> sortableSetFormat.SsfArrayRoll
+                let fmt = rolloutFormat.RfI32
                 return! SortableSet.makeAllBits 
                     (sortableSetRId |> SortableSetId.create) fmt order 
             }

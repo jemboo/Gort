@@ -1,19 +1,19 @@
 ﻿namespace global
 
-    type sortableInts = 
+    type sortableIntArray = 
         private { 
                     values:int[]; 
                     order:order;
                     symbolSetSize:symbolSetSize }
 
 
-    type sortableBools =
+    type sortableBoolArray =
         private { 
-                    values:bool[]; 
-                    order:order    }
+                  values:bool[]; 
+                  order:order    }
 
 
-    module SortableInts =
+    module SortableIntArray =
     
         let Identity (order: order) (symbolCount:symbolSetSize) =
             let ordV = (order |> Order.value)
@@ -22,30 +22,30 @@
                 sprintf "order %d and symbolcount %d don't match" ordV sc 
                                 |> Error
             else
-                { sortableInts.values = [|0 .. ordV-1|]; 
+                { sortableIntArray.values = [|0 .. ordV-1|]; 
                   order = order;
                   symbolSetSize = symbolCount } |> Ok
 
-        let apply f (p:sortableInts) = f p.values
+        let apply f (p:sortableIntArray) = f p.values
         let value p = apply id p
-        let getValues (sia:sortableInts) = sia.values
-        let getOrder (sia:sortableInts) = sia.order
-        let getSymbolSetSize (sia:sortableInts) = sia.symbolSetSize
+        let getValues (sia:sortableIntArray) = sia.values
+        let getOrder (sia:sortableIntArray) = sia.order
+        let getSymbolSetSize (sia:sortableIntArray) = sia.symbolSetSize
     
 
         let make (order:order) 
                  (symbolSetSize:symbolSetSize) 
                  (vals:int[]) =
-            { sortableInts.values = vals;
+            { sortableIntArray.values = vals;
               order = order;
               symbolSetSize = symbolSetSize}
 
 
-        let copy (toCopy:sortableInts) =
+        let copy (toCopy:sortableIntArray) =
             { toCopy with values = toCopy.values |> Array.copy }
 
 
-        let isSorted (sortableInts:sortableInts) =
+        let isSorted (sortableInts:sortableIntArray) =
             sortableInts |> getValues 
                          |> CollectionProps.isSorted_idiom 
 
@@ -60,7 +60,7 @@
             Permutation.powers intOpt perm
             |> Seq.map(Permutation.getArray)
             |> Seq.map(fun arr ->
-                { sortableInts.values = arr;
+                { sortableIntArray.values = arr;
                   order = order;
                   symbolSetSize = symbolSetSize })
 
@@ -68,18 +68,21 @@
         let makeRandomPermutation (order:order) 
                                   (randy:IRando) =
             let symbolSetSize = order |> Order.value |> uint64 |> SymbolSetSize.createNr
-            { sortableInts.values = RandVars.randomPermutation randy order;
+            { sortableIntArray.values = RandVars.randomPermutation randy order;
               order = order;
               symbolSetSize = symbolSetSize }
 
 
         let makeRandomSymbol (order:order) 
-                              (symbolSetSize:symbolSetSize) 
-                              (randy:IRando) =
+                             (symbolSetSize:symbolSetSize) 
+                             (randy:IRando) =
             let arrayLength = order |> Order.value
-            { sortableInts.values = RandVars.randSymbols 
-                                        symbolSetSize randy arrayLength
-                                    |> Seq.toArray;
+            let intArray =
+                 RandVars.randSymbols 
+                      symbolSetSize randy arrayLength
+                 |> Seq.toArray
+
+            { sortableIntArray.values = intArray;
               order = order;
               symbolSetSize = symbolSetSize }
 
@@ -92,23 +95,23 @@
 
 
 
-    module SortableBools =
+    module SortableBoolArray =
 
-        let apply f (p:sortableBools) = f p.values
+        let apply f (p:sortableBoolArray) = f p.values
         let getValues p = apply id p
-        let getOrder (sia:sortableBools) = sia.order
+        let getOrder (sia:sortableBoolArray) = sia.order
     
         let make (order:order) 
                  (vals:bool[]) =
-            { sortableBools.values = vals;
+            { sortableBoolArray.values = vals;
               order = order; }
 
         
-        let copy (toCopy:sortableBools) =
+        let copy (toCopy:sortableBoolArray) =
             { toCopy with values = toCopy.values |> Array.copy }
 
 
-        let isSorted (sortableBools:sortableBools) =
+        let isSorted (sortableBools:sortableBoolArray) =
             sortableBools |> getValues 
                           |> CollectionProps.isSorted_idiom 
 
@@ -119,7 +122,7 @@
             { 0uL .. (1uL <<< bitShift) - 1uL }
                 |> Seq.map(ByteUtils.uint64ToBoolArray order)
                 |> Seq.map(fun arr ->
-                { sortableBools.values = arr;
+                { sortableBoolArray.values = arr;
                   order = order;})
 
 
@@ -128,14 +131,14 @@
             { 0uL .. (1uL <<< bitShift) - 1uL }
                 |> Seq.map(ByteUtils.uint64ToBoolArray order)
                 |> Seq.map(fun arr ->
-                    { sortableBools.values = arr; order = order;})
+                    { sortableBoolArray.values = arr; order = order;})
 
 
         let makeSortedStacks (orderStack:order[]) =
             let stackedOrder = Order.add orderStack
             CollectionOps.stackSortedBlocks orderStack
             |> Seq.map(fun arr ->
-                { sortableBools.values = arr; order = stackedOrder;})
+                { sortableBoolArray.values = arr; order = stackedOrder;})
 
 
         let makeRandomBits (order:order)
@@ -143,26 +146,28 @@
                            (randy:IRando) =
             let arrayLength = order |> Order.value
             Seq.initInfinite (fun _ ->
-                { sortableBools.values = RandVars.randBits pctTrue randy arrayLength
+                { sortableBoolArray.values = RandVars.randBits pctTrue randy arrayLength
                                           |> Seq.toArray;
                   order = order; } 
               )
 
 
-        let allBitVersions (sortableInts:sortableInts) =
-            let order = sortableInts |> SortableInts.getOrder |> Order.value
-            let symbolMod = sortableInts.symbolSetSize |> SymbolSetSize.value |> int
-            let values = sortableInts |> SortableInts.getValues
-            seq { 1 .. (symbolMod - 1) }
+        let allBooleanVersions (sortableInts:sortableIntArray) =
+            let order = sortableInts |> SortableIntArray.getOrder |> Order.value
+            let values = sortableInts |> SortableIntArray.getValues
+            let threshHolds = 
+                    values |> Set.ofArray |> Set.toArray 
+                    |> Array.sort |> Array.skip 1
+            threshHolds
                 |> Seq.map(fun thresh ->
-                    Array.init order 
-                               (fun dex ->
-                    if (values.[dex] >= thresh) then true else false))
+                    Array.init order (fun dex ->
+                        if (values.[dex] >= thresh) then true else false))
 
 
-        let expandToSortableBits (sortableIntsSeq:seq<sortableInts>) =
-            let order = sortableIntsSeq |> Seq.head |> SortableInts.getOrder
-            sortableIntsSeq |> Seq.map(allBitVersions)
+
+        let expandToSortableBits (sortableIntsSeq:seq<sortableIntArray>) =
+            let order = sortableIntsSeq |> Seq.head |> SortableIntArray.getOrder
+            sortableIntsSeq |> Seq.map(allBooleanVersions)
                             |> Seq.concat
                             |> Seq.distinct
                             |> Seq.map(make order)

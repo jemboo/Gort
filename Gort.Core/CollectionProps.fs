@@ -261,14 +261,3 @@ module CollectionProps =
 
     let unsortednessSquared_I (a:array<int>) =
         distanceSquared a [|0 .. (a.Length - 1)|]
-
-
-
-
-
-
-    //let inline distanceSquared_inline (a:^a[] when ^a:(member (+) : ^a -> ^a -> ^a) and ^a:(member (*) : ^a -> ^a -> ^a)) 
-    //                                  (b:^a[] when ^a:(member (+) : ^a -> ^a -> ^a) and ^a:(member (*) : ^a -> ^a -> ^a))  =
-    //           Array.fold2 (fun acc elem1 elem2 ->
-    //               acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b
-

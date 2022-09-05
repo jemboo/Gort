@@ -5,14 +5,14 @@ module SortingWithHistory =
     module Ints =
 
         let sortTHistSwitches (switches:switch list)
-                              (sortableInts:sortableInts) =
+                              (sortableInts:sortableIntArray) =
             let mutable i = 0
             let mutable lstRet = [sortableInts]
             let mutable newCase = sortableInts
 
             while (i < switches.Length) do
-                newCase <- newCase |> SortableInts.copy
-                let intArray = newCase |> SortableInts.getValues
+                newCase <- newCase |> SortableIntArray.copy
+                let intArray = newCase |> SortableIntArray.getValues
                 let switch = switches.[i]
                 let lv = intArray.[switch.low]
                 let hv = intArray.[switch.hi]
@@ -27,30 +27,29 @@ module SortingWithHistory =
         let makeWithSorterSegment (sorter:sorter) 
                                   (mindex:int) 
                                   (maxdex:int) 
-                                  (sortableInts:sortableInts) =
+                                  (sortableInts:sortableIntArray) =
             let sws = sorter.switches |> Array.skip(mindex)
                                       |> Array.take(maxdex - mindex)
                                       |> Array.toList
             sortTHistSwitches sws sortableInts
 
 
-        let makeWithFullSorter (sorter:sorter) (sortableInts:sortableInts) =
+        let makeWithFullSorter (sorter:sorter) (sortableInts:sortableIntArray) =
             let sl = SwitchCount.value sorter.switchCount
             makeWithSorterSegment sorter 0 sl sortableInts
-
 
 
     module Bools =
 
         let sortTHistSwitches (switches:switch list)
-                              (sortableBools:sortableBools) =
+                              (sortableBools:sortableBoolArray) =
             let mutable i = 0
             let mutable lstRet = [sortableBools]
             let mutable newCase = sortableBools
 
             while (i < switches.Length) do
-                newCase <- newCase |> SortableBools.copy
-                let intArray = newCase |> SortableBools.getValues
+                newCase <- newCase |> SortableBoolArray.copy
+                let intArray = newCase |> SortableBoolArray.getValues
                 let switch = switches.[i]
                 let lv = intArray.[switch.low]
                 let hv = intArray.[switch.hi]
@@ -65,13 +64,13 @@ module SortingWithHistory =
         let makeWithSorterSegment (sorter:sorter) 
                                 (mindex:int) 
                                 (maxdex:int) 
-                                (sortableBools:sortableBools) =
+                                (sortableBools:sortableBoolArray) =
             let sws = sorter.switches |> Array.skip(mindex)
                                       |> Array.take(maxdex - mindex)
                                       |> Array.toList
             sortTHistSwitches sws sortableBools
 
 
-        let makeWithFullSorter (sorter:sorter) (sortableBools:sortableBools) =
+        let makeWithFullSorter (sorter:sorter) (sortableBools:sortableBoolArray) =
             let sl = SwitchCount.value sorter.switchCount
             makeWithSorterSegment sorter 0 sl sortableBools

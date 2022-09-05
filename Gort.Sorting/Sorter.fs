@@ -94,41 +94,49 @@ module Sorter =
     let getSwitchesFromFirstStages
                     (stageCount:stageCount) 
                     (sorter:sorter) =
-        sorter.switches |> Stage.fromSwitches sorter.order
-                        |> Seq.take(StageCount.value stageCount)
-                        |> Seq.map(fun t -> t.switches)
-                        |> Seq.concat
+        sorter.switches 
+        |> Stage.fromSwitches sorter.order
+        |> Seq.take(StageCount.value stageCount)
+        |> Seq.map(fun t -> t.switches)
+        |> Seq.concat
 
 
     let fromTwoCycles
                 (order:order)
                 (switchCtTarget:switchCount)
                 (wPfx: switch seq) 
-                (tc:twoCycle seq) =
-        let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
-                          |> Seq.concat
+                (twoCycleSeq:twoCycle seq) =
+        let switches = 
+            twoCycleSeq 
+            |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
+            |> Seq.concat
+
         fromSwitchesWithPrefix order switchCtTarget wPfx switches
 
     
     let makeAltEvenOdd (order:order) 
                        (wPfx: switch seq)
                        (switchCount:switchCount) =
-        let switches = TwoCycle.makeAltEvenOdd order 
-                                    (Permutation.identity order)
-                        |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
-                        |> Seq.concat
+        let switches = 
+            TwoCycle.makeAltEvenOdd order (Permutation.identity order)
+            |> Seq.map(fun tc-> Switch.fromTwoCycle tc)
+            |> Seq.concat
 
         fromSwitchesWithPrefix order switchCount wPfx switches
 
 
-    let getUsedSwitches (switchUses:switchUses) 
-                       (sorter:sorter) =
+    let getUsedSwitches (switchUses:switchUseTrack) 
+                        (sorter:sorter) =
        let switches = sorter.switches
-       let useCounts = (SwitchUses.getUseCounts switchUses)
-       useCounts |> Seq.mapi(fun i w -> i,w)
-       |> Seq.filter(fun t -> (snd t) > 0 )
-       |> Seq.map(fun t -> switches.[(fst t)])
-       |> Seq.toArray
+       let useCounts = 
+            switchUses 
+            |> SwitchUseTrack.getSwitchUseCounts
+            |> SwitchUseCounts.getUseCounts
+       useCounts 
+           |> Seq.mapi(fun i w -> i,w)
+           |> Seq.filter(fun t -> (snd t) > 0 )
+           |> Seq.map(fun t -> switches.[(fst t)])
+           |> Seq.toArray
 
 
 

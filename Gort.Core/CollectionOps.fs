@@ -148,6 +148,20 @@ module CollectionOps =
                 else Map.add kk 1 acc
             ) Map.empty
 
+    //returns a sequence of bool[], where each bool[] has an ordering
+    //between it's members that does not contradict the ordering of the
+    //source array.
+    let allBooleanVersions (intArray:int[]) =
+        None
+        //let order = sortableInts |> SortableInts.getOrder |> Order.value
+        //let symbolMod = sortableInts.symbolSetSize |> SymbolSetSize.value |> int
+        //let values = sortableInts |> SortableInts.getValues
+        //seq { 1 .. (symbolMod - 1) }
+        //    |> Seq.map(fun thresh ->
+        //        Array.init order 
+        //                    (fun dex ->
+        //        if (values.[dex] >= thresh) then true else false))
+
 
 
 //*************************************************************

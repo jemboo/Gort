@@ -7,8 +7,7 @@
 
   <ItemGroup>
     <Compile Include="SortingWithHistory.fs" />
-    <Compile Include="SortingArrayRoll.fs" />
-    <Compile Include="SortingBitstriped.fs" />
+    <Compile Include="SortingRollout.fs" />
     <Compile Include="SortingEval.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
