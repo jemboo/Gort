@@ -18,11 +18,11 @@ type BenchMakeSorableStack() =
 //|                              Method |        Mean |     Error |      StdDev |
 //|------------------------------------ |------------:|----------:|------------:|
 //| applySorterAndMakeSwitchUses_RfBs64 |    264.0 us |  11.25 us |    33.18 us |
-//|  applySorterAndMakeSwitchLog_RfBs64 |    516.2 us |  16.55 us |    48.81 us |
+//|  applySorterAndMakeSwitchTrack_RfBs64 |    516.2 us |  16.55 us |    48.81 us |
 //|  applySorterAndMakeSwitchUses_RfI32 | 17,685.1 us | 353.28 us |   866.59 us |
-//|   applySorterAndMakeSwitchLog_RfI32 | 21,702.7 us | 417.33 us | 1,084.69 us |
+//|   applySorterAndMakeSwitchTrack_RfI32 | 21,702.7 us | 417.33 us | 1,084.69 us |
 //|   applySorterAndMakeSwitchUses_RfU8 | 16,560.4 us | 319.00 us |   313.30 us |
-//|    applySorterAndMakeSwitchLog_RfU8 | 19,457.1 us | 441.29 us | 1,301.15 us |
+//|    applySorterAndMakeSwitchTrack_RfU8 | 19,457.1 us | 441.29 us | 1,301.15 us |
 
 type BenchmarkSorterOnBp64() =
     let order = (Order.createNr 16 )
@@ -80,9 +80,9 @@ type BenchmarkSorterOnBp64() =
 
 
     [<Benchmark>]
-    member this.applySorterAndMakeSwitchLog_RfBs64() =
+    member this.applySorterAndMakeSwitchTrack_RfBs64() =
         let sorterResults = 
-            SortingRollout.applySorterAndMakeSwitchLog
+            SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
                                 sorterId
                                 sortableSetId
@@ -102,9 +102,9 @@ type BenchmarkSorterOnBp64() =
 
 
     [<Benchmark>]
-    member this.applySorterAndMakeSwitchLog_RfI32() =
+    member this.applySorterAndMakeSwitchTrack_RfI32() =
         let sorterResults = 
-            SortingRollout.applySorterAndMakeSwitchLog
+            SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
                                 sorterId
                                 sortableSetId
@@ -125,9 +125,9 @@ type BenchmarkSorterOnBp64() =
 
 
     [<Benchmark>]
-    member this.applySorterAndMakeSwitchLog_RfU8() =
+    member this.applySorterAndMakeSwitchTrack_RfU8() =
         let sorterResults = 
-            SortingRollout.applySorterAndMakeSwitchLog
+            SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
                                 sorterId
                                 sortableSetId

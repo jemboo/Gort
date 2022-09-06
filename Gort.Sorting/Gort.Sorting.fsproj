@@ -9,14 +9,12 @@
     <Compile Include="SorterData.fs" />
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Switch.fs" />
-    <Compile Include="SwitchUse.fs" />
     <Compile Include="SwitchGen.fs" />
     <Compile Include="Stage.fs" />
     <Compile Include="Sorter.fs" />
     <Compile Include="SorterSet.fs" />
     <Compile Include="SortableArrays.fs" />
     <Compile Include="SortableSet.fs" />
-    <Compile Include="SortingResults.fs" />
     <Compile Include="SortersFromData.fs" />
   </ItemGroup>
 

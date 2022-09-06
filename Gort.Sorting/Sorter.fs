@@ -125,21 +125,6 @@ module Sorter =
         fromSwitchesWithPrefix order switchCount wPfx switches
 
 
-    let getUsedSwitches (switchUses:switchUseTrack) 
-                        (sorter:sorter) =
-       let switches = sorter.switches
-       let useCounts = 
-            switchUses 
-            |> SwitchUseTrack.getSwitchUseCounts
-            |> SwitchUseCounts.getUseCounts
-       useCounts 
-           |> Seq.mapi(fun i w -> i,w)
-           |> Seq.filter(fun t -> (snd t) > 0 )
-           |> Seq.map(fun t -> switches.[(fst t)])
-           |> Seq.toArray
-
-
-
     //***********  IRando dependent  *********************************
 
     let randomSwitches (order:order)

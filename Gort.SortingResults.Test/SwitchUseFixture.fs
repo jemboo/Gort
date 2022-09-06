@@ -1,8 +1,10 @@
-namespace Gort.Sorting.Test
+namespace Gort.SortingResults.Test
+
+open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SwitchUseFixture () =
+type TestClass () =
 
     [<TestMethod>]
     member this.fromSortableIntsU8() =
@@ -30,3 +32,4 @@ type SwitchUseFixture () =
 
         Assert.AreEqual(expectedSitchCount, switchUseCountStandard);
         Assert.AreEqual(expectedSitchCount, switchUseCountBitStriped);
+

@@ -1,26 +1,10 @@
 ﻿namespace global
 open SysExt
 
-type switchUseCounts = private { useCounts:int[] }
-module SwitchUseCounts =
-    let make (switchCount:switchCount) =
-        { switchUseCounts.useCounts = 
-                Array.zeroCreate (switchCount |> SwitchCount.value)}
-
-    let apply (useCounts:int[]) =
-        { switchUseCounts.useCounts = useCounts}
-
-    let getUseCounts (switchUseCounts:switchUseCounts) =
-        switchUseCounts.useCounts
-
-    let getSwitchCount (switchUseCounts:switchUseCounts) =
-        switchUseCounts.useCounts.Length |> SwitchCount.create
-
-
 type switchUseTrackStandard = private { useCounts:int[] }
 module SwitchUseTrackStandard =
 
-   let getUseCounts (switchUses:switchUseTrackStandard) =
+   let getUseCounters (switchUses:switchUseTrackStandard) =
         switchUses.useCounts
 
    let make (switchCount:switchCount) =
@@ -77,17 +61,7 @@ module SwitchUseTrack =
    let getUseFlags (switchUses:switchUseTrackBitStriped) =
         switchUses.useFlags
 
-   let getSwitchUseCounts (switchUs:switchUseTrack) =
-       match switchUs with
-       | switchUseTrack.Standard useCounts -> 
-            useCounts 
-            |> SwitchUseTrackStandard.getUseCounts
-            |> SwitchUseCounts.apply
-       | switchUseTrack.BitStriped useFlags -> 
-            useFlags 
-            |> SwitchUseTrackBitStriped.getUseFlags
-            |> Array.map(fun u64 -> u64.count |> int)
-            |> SwitchUseCounts.apply
+
 
    let getUsedSwitchCount (switchUs:switchUseTrack) =
        match switchUs with

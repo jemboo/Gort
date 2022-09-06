@@ -5,7 +5,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type SortingRolloutFixture () =
 
-    let getResultsWithSwitchLog (rolloutFormat:rolloutFormat) =
+    let getResultsWithSwitchTrack (rolloutFormat:rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
         let sortableSetId = 123 |> SortableSetId.create
@@ -34,7 +34,7 @@ type SortingRolloutFixture () =
             sortableSet |> SortableSet.getRollout
 
         let sorterResults = 
-            SortingRollout.applySorterAndMakeSwitchLog
+            SortingRollout.applySorterAndMakeSwitchTrack
                                 goodSorter
                                 sorterId
                                 sortableSetId
@@ -42,12 +42,12 @@ type SortingRolloutFixture () =
 
 
         let sortedSet = sorterResults
-                        |> SorterResults.getRollout
+                        |> SorterOpTrack.getRollout
                         |> Rollout.toBoolArrays
                         |> Seq.toArray
 
 
-        let isSorted = sorterResults |> SorterResults.isSorted
+        let isSorted = sorterResults |> SorterOpTrack.isSorted
         Assert.IsTrue(isSorted)
 
 
@@ -87,24 +87,24 @@ type SortingRolloutFixture () =
                                 sortableSetId
                                 rollout
 
-        let isSorted = sorterResults |> SorterResults.isSorted
+        let isSorted = sorterResults |> SorterOpTrack.isSorted
         Assert.IsTrue(isSorted)
 
 
     [<TestMethod>]
-    member this.rolloutFormatWithSwitchLog () =
+    member this.rolloutFormatWithSwitchTrack () =
         
         //let sortableSetFormat_RfI32 = rolloutFormat.RfI32
-        //let results_RfI32 = getResultsWithSwitchLog sortableSetFormat_RfI32
+        //let results_RfI32 = getResultsWithSwitchTrack sortableSetFormat_RfI32
                 
         //let sortableSetFormat_RfU16 = rolloutFormat.RfU16 
-        //let results_RfU16 = getResultsWithSwitchLog sortableSetFormat_RfU16
+        //let results_RfU16 = getResultsWithSwitchTrack sortableSetFormat_RfU16
         
         //let sortableSetFormat_RfU8 = rolloutFormat.RfU8 
-        //let results_RfU8 = getResultsWithSwitchLog sortableSetFormat_RfU8
+        //let results_RfU8 = getResultsWithSwitchTrack sortableSetFormat_RfU8
 
         let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
-        let results_RfBs64 = getResultsWithSwitchLog sortableSetFormat_RfBs64
+        let results_RfBs64 = getResultsWithSwitchTrack sortableSetFormat_RfBs64
 
         Assert.IsTrue(true);
 

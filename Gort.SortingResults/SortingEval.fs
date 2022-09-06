@@ -1,7 +1,99 @@
 ﻿namespace global
 open System
+open SysExt
+
 
 module SortingEval =
+
+    type switchUseCounters = private { useCounts:int[] }
+    module SwitchUseCounters =
+        let make (switchCount:switchCount) =
+            { switchUseCounters.useCounts = 
+                    Array.zeroCreate (switchCount |> SwitchCount.value)}
+
+        let apply (useCounts:int[]) =
+            { switchUseCounters.useCounts = useCounts}
+
+        let getUseCounters (switchUseCounts:switchUseCounters) =
+            switchUseCounts.useCounts
+
+        let getUsedSwitchCount (switchUseCounts:switchUseCounters) =
+            switchUseCounts.useCounts
+            |> Seq.filter((<) 0)
+            |> Seq.length
+            |> SwitchCount.create
+
+
+        let getUsedSwitchesFromSorter
+                (sorter:sorter) 
+                (switchUseCnters:switchUseCounters) =
+           switchUseCnters 
+            |> getUseCounters
+            |> Seq.mapi(fun i w -> i,w)
+            |> Seq.filter(fun t -> (snd t) > 0 )
+            |> Seq.map(fun t -> sorter.switches.[(fst t)])
+            |> Seq.toArray
+
+
+        let fromSwitchUseTrack (switchUs:switchUseTrack) =
+           match switchUs with
+           | switchUseTrack.Standard useCounts -> 
+                useCounts 
+                |> SwitchUseTrackStandard.getUseCounters
+                |> apply
+           | switchUseTrack.BitStriped useFlags -> 
+                useFlags 
+                |> SwitchUseTrackBitStriped.getUseFlags
+                |> Array.map(fun u64 -> u64.count |> int)
+                |> apply
+
+
+        let fromSwitchBySortableTrackBitStriped 
+                (sbslbs:switchBySortableTrackBitStriped) =
+            let useRoll = sbslbs  |> SwitchBySortableTrackBitStriped.getUseRoll
+            let switchCt = useRoll
+                            |> Uint64Roll.getArrayLength
+                            |> ArrayLength.value
+        
+            let useFlags =  useRoll 
+                            |> Uint64Roll.getData
+                            |> Array.map(fun l -> l.count |> int)
+                            |> CollectionOps.wrapAndSumCols switchCt
+
+            useFlags |> apply
+
+
+        let fromSwitchBySortableTrackStandard 
+                (sbsls:switchBySortableTrackStandard) =
+            let switchCount = 
+                sbsls 
+                |> SwitchBySortableTrackStandard.getSwitchCount
+                |> SwitchCount.value
+
+            let useWeights = Array.zeroCreate switchCount
+            let _upDateSwU dex v =
+                let swUdex = dex % switchCount
+                if v then
+                    useWeights.[swUdex] <- useWeights.[swUdex] + 1
+
+            let _ = sbsls
+                    |> SwitchBySortableTrackStandard.getData
+                    |> Array.iteri(fun dex v -> _upDateSwU dex v)
+
+            useWeights |> apply
+
+
+        let fromSwitchBySortableTrack
+                (switchingTrack:switchBySortableTrack) = 
+            match switchingTrack with
+            | switchBySortableTrack.ArrayRoll switchBySortableTrackStd ->
+                switchBySortableTrackStd |> fromSwitchBySortableTrackStandard
+            | switchBySortableTrack.BitStriped switchBySortableTrackBitStripd -> 
+                switchBySortableTrackBitStripd |> fromSwitchBySortableTrackBitStriped
+
+
+
+
 
     //type noGrouping  = 
     //    {
