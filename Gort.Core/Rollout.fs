@@ -188,6 +188,12 @@ module Uint8Roll =
         }
 
 
+    let toBoolArrays (uInt8Roll:uInt8Roll) =
+         uInt8Roll.data
+         |> Seq.map(fun bv -> bv > 0uy)
+         |> Seq.chunkBySize(uInt8Roll.arrayLength |> ArrayLength.value)
+
+
     let toIntArrays (uInt8Roll:uInt8Roll) =
          uInt8Roll.data |> Seq.map(int)
                        |> Seq.chunkBySize(uInt8Roll.arrayLength |> ArrayLength.value)
@@ -290,6 +296,13 @@ module Uint16Roll =
                               |> ArrayCount.createNr
             return { uInt16Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint16s }
         }
+
+
+    let toBoolArrays (uInt16Roll:uInt16Roll) =
+         uInt16Roll.data
+         |> Seq.map(fun bv -> bv > 0us)
+         |> Seq.chunkBySize(uInt16Roll.arrayLength |> ArrayLength.value)
+
 
     let toIntArrays (uInt16Roll:uInt16Roll) =
          uInt16Roll.data |> Seq.map(int)
@@ -395,6 +408,13 @@ module IntRoll =
             return { intRoll.arrayCount = arrayCount; arrayLength = arrayLength; data = intA }
         }
 
+
+    let toBoolArrays (intRoll:intRoll) =
+         intRoll.data
+         |> Seq.map(fun bv -> bv > 0)
+         |> Seq.chunkBySize(intRoll.arrayLength |> ArrayLength.value)
+
+
     let toIntArrays (intRoll:intRoll) =
          intRoll.data |> Seq.chunkBySize(intRoll.arrayLength |> ArrayLength.value)
 
@@ -438,14 +458,6 @@ module Uint64Roll =
     
     let stripeBlocksNeededForArrayCount (arrayCount:arrayCount) = 
         ( (ArrayCount.value arrayCount) + 63) / 64
-
-    let createEmptyStripedSet (arrayLength:arrayLength) 
-                              (arrayCount:arrayCount) =
-        let blocksNeeded = stripeBlocksNeededForArrayCount arrayCount
-        let dataLength = (ArrayLength.value arrayLength) * blocksNeeded
-        let data = Array.zeroCreate<uint64> dataLength
-        { arrayCount=arrayCount; arrayLength=arrayLength; data=data }
-
 
     let copy (uint64Roll:uint64Roll) = 
         {
@@ -494,6 +506,12 @@ module Uint64Roll =
                               |> ArrayCount.createNr
             return { uint64Roll.arrayCount = arrayCount; arrayLength = arrayLength; data = uint8s }
         }
+
+
+    let toBoolArrays (uint64Roll:uint64Roll) =
+         uint64Roll.data
+         |> Seq.map(fun bv -> bv > 0uL)
+         |> Seq.chunkBySize(uint64Roll.arrayLength |> ArrayLength.value)
 
 
     let fromIntArrays (arrayLength:arrayLength) (aas:seq<int[]>) =
@@ -835,10 +853,10 @@ module Rollout =
     let toBoolArrays (rollout:rollout) =
         match rollout with
         | B _uBRoll -> _uBRoll |> BooleanRoll.toBoolArrays
-        | U8 _uInt8Roll -> failwith "not implemented"
-        | U16 _uInt16Roll -> failwith "not implemented"
-        | I32 _intRoll -> failwith "not implemented"
-        | U64 _uInt64Roll -> failwith "not implemented"
+        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toBoolArrays
+        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toBoolArrays
+        | I32 _intRoll -> _intRoll |> IntRoll.toBoolArrays
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toBoolArrays
         | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.toBoolArrays
 
 

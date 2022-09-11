@@ -3,437 +3,372 @@ open System
 open SysExt
 
 
-module SortingEval =
+type switchUseCounters = private { useCounts:int[] }
+module SwitchUseCounters =
 
-    type switchUseCounters = private { useCounts:int[] }
-    module SwitchUseCounters =
-        let make (switchCount:switchCount) =
-            { switchUseCounters.useCounts = 
-                    Array.zeroCreate (switchCount |> SwitchCount.value)}
+    let make (switchCount:switchCount) =
+        { switchUseCounters.useCounts = 
+                Array.zeroCreate (switchCount |> SwitchCount.value)}
 
-        let apply (useCounts:int[]) =
-            { switchUseCounters.useCounts = useCounts}
+    let apply (useCounts:int[]) =
+        { switchUseCounters.useCounts = useCounts}
 
-        let getUseCounters (switchUseCounts:switchUseCounters) =
-            switchUseCounts.useCounts
+    let getUseCounters (switchUseCounts:switchUseCounters) =
+        switchUseCounts.useCounts
 
-        let getUsedSwitchCount (switchUseCounts:switchUseCounters) =
-            switchUseCounts.useCounts
-            |> Seq.filter((<) 0)
-            |> Seq.length
-            |> SwitchCount.create
-
-
-        let getUsedSwitchesFromSorter
-                (sorter:sorter) 
-                (switchUseCnters:switchUseCounters) =
-           switchUseCnters 
-            |> getUseCounters
-            |> Seq.mapi(fun i w -> i,w)
-            |> Seq.filter(fun t -> (snd t) > 0 )
-            |> Seq.map(fun t -> sorter.switches.[(fst t)])
-            |> Seq.toArray
+    let getUsedSwitchCount (switchUseCounts:switchUseCounters) =
+        switchUseCounts.useCounts
+        |> Seq.filter((<) 0)
+        |> Seq.length
+        |> SwitchCount.create
 
 
-        let fromSwitchUseTrack (switchUs:switchUseTrack) =
-           match switchUs with
-           | switchUseTrack.Standard useCounts -> 
-                useCounts 
-                |> SwitchUseTrackStandard.getUseCounters
-                |> apply
-           | switchUseTrack.BitStriped useFlags -> 
-                useFlags 
-                |> SwitchUseTrackBitStriped.getUseFlags
-                |> Array.map(fun u64 -> u64.count |> int)
-                |> apply
+    let getUsedSwitchesFromSorter
+            (sorter:sorter) 
+            (switchUseCnters:switchUseCounters) =
+        switchUseCnters
+        |> getUseCounters
+        |> Seq.mapi(fun i w -> i,w)
+        |> Seq.filter(fun t -> (snd t) > 0 )
+        |> Seq.map(fun t -> sorter.switches.[(fst t)])
+        |> Seq.toArray
 
 
-        let fromSwitchBySortableTrackBitStriped 
-                (sbslbs:switchBySortableTrackBitStriped) =
-            let useRoll = sbslbs  |> SwitchBySortableTrackBitStriped.getUseRoll
-            let switchCt = useRoll
-                            |> Uint64Roll.getArrayLength
-                            |> ArrayLength.value
-        
-            let useFlags =  useRoll 
-                            |> Uint64Roll.getData
-                            |> Array.map(fun l -> l.count |> int)
-                            |> CollectionOps.wrapAndSumCols switchCt
+    let fromSorterOpResults (sorterOpRes:sorterOpResults) =
+        sorterOpRes 
+        |> SorterOpResults.getSorterOpTracker
+        |> SorterOpTracker.getSwitchUseCounts
 
-            useFlags |> apply
-
-
-        let fromSwitchBySortableTrackStandard 
-                (sbsls:switchBySortableTrackStandard) =
-            let switchCount = 
-                sbsls 
-                |> SwitchBySortableTrackStandard.getSwitchCount
-                |> SwitchCount.value
-
-            let useWeights = Array.zeroCreate switchCount
-            let _upDateSwU dex v =
-                let swUdex = dex % switchCount
-                if v then
-                    useWeights.[swUdex] <- useWeights.[swUdex] + 1
-
-            let _ = sbsls
-                    |> SwitchBySortableTrackStandard.getData
-                    |> Array.iteri(fun dex v -> _upDateSwU dex v)
-
-            useWeights |> apply
-
-
-        let fromSwitchBySortableTrack
-                (switchingTrack:switchBySortableTrack) = 
-            match switchingTrack with
-            | switchBySortableTrack.ArrayRoll switchBySortableTrackStd ->
-                switchBySortableTrackStd |> fromSwitchBySortableTrackStandard
-            | switchBySortableTrack.BitStriped switchBySortableTrackBitStripd -> 
-                switchBySortableTrackBitStripd |> fromSwitchBySortableTrackBitStriped
+    let fromSorterOpTracker (sorterOpTrackr:sorterOpTracker) =
+        sorterOpTrackr 
+        |> SorterOpTracker.getSwitchUseCounts
+        |> apply
 
 
 
+type sorterPerf = 
+    { 
+        usedSwitchCount:switchCount; 
+        usedStageCount:stageCount;
+        failCount:sortableCount Option
+    }
 
-
-    //type noGrouping  = 
-    //    {
-    //        switchEventRollout:switchEventRollout; 
-    //        sortableRollout:sortableSetRollout;
-    //    }
-
-    //type groupBySwitch = 
-    //    {
-    //        switchUses:switchUses; 
-    //        sortableRollout:sortableSetRollout;
-    //    }
-
-    //type switchEventRecords =
-    //    | NoGrouping of noGrouping
-    //    | BySwitch of groupBySwitch
-
-    type sorterPerf = 
-        { 
-            usedSwitchCount:switchCount; 
-            usedStageCount:stageCount;
-            failCount:sortableCount Option
+module SorterPerf =
+    let dflt = 
+        {
+            usedSwitchCount = SwitchCount.create 0;
+            usedStageCount = StageCount.create 0;
+            failCount = None
         }
+    let report (perf:sorterPerf) =
+        let fbo (v:sortableCount option) =
+            match v with
+            | Some tv -> sprintf "%d" (SortableCount.value tv)
+            | None -> "none"
 
-    module SorterPerf =
-        let dflt = 
-            {
-                usedSwitchCount = SwitchCount.create 0;
-                usedStageCount = StageCount.create 0;
-                failCount = None
-            }
-        let report (perf:sorterPerf) =
-            let fbo (v:sortableCount option) =
-                match v with
-                | Some tv -> sprintf "%d" (SortableCount.value tv)
-                | None -> "none"
+        sprintf "%s\t%d\t%d" 
+                    (fbo perf.failCount)
+                    (StageCount.value perf.usedStageCount)
+                    (SwitchCount.value perf.usedSwitchCount)
 
-            sprintf "%s\t%d\t%d" 
-                        (fbo perf.failCount)
-                        (StageCount.value perf.usedStageCount)
-                        (SwitchCount.value perf.usedSwitchCount)
-
-        let isSucessful (perf:sorterPerf) =
-            match perf.failCount with
-            | Some sc -> (SortableCount.value sc) = 0
-            | None -> false
+    let isSucessful (perf:sorterPerf) =
+        match perf.failCount with
+        | Some sc -> (SortableCount.value sc) = 0
+        | None -> false
 
 
-        let intFromFailCount (perf:sorterPerf) =
-            match perf.failCount with
-            | Some sc -> sc |> SortableCount.value
-            | None -> -1
+    let intFromFailCount (perf:sorterPerf) =
+        match perf.failCount with
+        | Some sc -> sc |> SortableCount.value
+        | None -> -1
 
-        let failCountFromInt (fc:int) =
-            if fc > -1 then (SortableCount.create fc) |> Some
-            else None
+    let failCountFromInt (fc:int) =
+        if fc > -1 then (SortableCount.create fc) |> Some
+        else None
 
-    type sorterPerfBin = 
-        { 
-            usedSwitchCount:switchCount; 
-            usedStageCount:stageCount;
-            sorterCount:sorterCount;
-            successCount:int;
-            failCount:int;
-        }
-
-
-    module SwitchEventRecords =
-        let yab = None
-        //let getSortableSetRollout (switchEventRecords:switchEventRecords) =
-        //    match switchEventRecords with
-        //    | NoGrouping seNg -> seNg.sortableRollout
-        //    | BySwitch seGs -> seGs.sortableRollout
+type sorterPerfBin = 
+    { 
+        usedSwitchCount:switchCount; 
+        usedStageCount:stageCount;
+        sorterCount:sorterCount;
+        successCount:int;
+        failCount:int;
+    }
 
 
-        //let getSwitchUses (switchEventRecords:switchEventRecords) =
-        //    match switchEventRecords with
-        //    | NoGrouping seNg -> seNg.switchEventRollout 
-        //                            |> SwitchEventRollout.toSwitchUses
-        //    | BySwitch seGs -> seGs.switchUses
+module SwitchEventRecords =
+    let yab = None
+    //let getSortableSetRollout (switchEventRecords:switchEventRecords) =
+    //    match switchEventRecords with
+    //    | NoGrouping seNg -> seNg.sortableRollout
+    //    | BySwitch seGs -> seGs.sortableRollout
 
 
-        //let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
-        //    match switchEventRecords with
-        //    | NoGrouping seNg -> seNg.sortableRollout 
-        //                            |> SortableSetRollout.isSorted
-        //    | BySwitch seGs ->  seGs.sortableRollout
-        //                            |> SortableSetRollout.isSorted
+    //let getSwitchUses (switchEventRecords:switchEventRecords) =
+    //    match switchEventRecords with
+    //    | NoGrouping seNg -> seNg.switchEventRollout 
+    //                            |> SwitchEventRollout.toSwitchUses
+    //    | BySwitch seGs -> seGs.switchUses
+
+
+    //let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
+    //    match switchEventRecords with
+    //    | NoGrouping seNg -> seNg.sortableRollout 
+    //                            |> SortableSetRollout.isSorted
+    //    | BySwitch seGs ->  seGs.sortableRollout
+    //                            |> SortableSetRollout.isSorted
 
                                     
-        //let getUniqueUnsortedCount (switchEventRecords:switchEventRecords) =
-        //    match switchEventRecords with
-        //    | NoGrouping seNg -> seNg.sortableRollout 
-        //                            |> SortableSetRollout.uniqueUnsortedCount
-        //    | BySwitch seGs ->  seGs.sortableRollout
-        //                            |> SortableSetRollout.uniqueUnsortedCount
+    //let getUniqueUnsortedCount (switchEventRecords:switchEventRecords) =
+    //    match switchEventRecords with
+    //    | NoGrouping seNg -> seNg.sortableRollout 
+    //                            |> SortableSetRollout.uniqueUnsortedCount
+    //    | BySwitch seGs ->  seGs.sortableRollout
+    //                            |> SortableSetRollout.uniqueUnsortedCount
 
 
-        //let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
-        //    result {
-        //        let switchUses = getSwitchUses switchEventRecords
-        //        return switchUses |> SwitchUses.usedSwitchCount
-        //    }
-
-
-    //type sortingResult =
-    //    {
-    //        sorterId:sorterId;
-    //        sorter:sorter; 
-    //        switchEventRecords:switchEventRecords;
+    //let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
+    //    result {
+    //        let switchUses = getSwitchUses switchEventRecords
+    //        return switchUses |> SwitchUses.usedSwitchCount
     //    }
 
-    type sorterCoverage = 
-        { 
-            sorterId:sorterId;
-            perf:sorterPerf;
-            usedSwitches:switch[];
-        }
+
+//type sortingResult =
+//    {
+//        sorterId:sorterId;
+//        sorter:sorter; 
+//        switchEventRecords:switchEventRecords;
+//    }
+
+type sorterCoverage = 
+    { 
+        sorterId:sorterId;
+        perf:sorterPerf;
+        usedSwitches:switch[];
+    }
         
                      
-    module SorterCoverage = 
-        let yab = None
-        //let fromSwitchEventRecords (checkSuccess:bool)
-        //                           (r:sortingResult) =
-        //    result {
-        //            let switchUses = 
-        //                    r.switchEventRecords |> SwitchEventRecords.getSwitchUses
-        //            let usedSwitchArray = 
-        //                    r.sorter |> Sorter.getUsedSwitches switchUses
-        //            let usedSwitchCount = SwitchCount.create usedSwitchArray.Length
-        //            let usedStageCount = Stage.getStageCount r.sorter.order usedSwitchArray
-        //            let failCount = 
-        //                match checkSuccess with
-        //                | true -> r.switchEventRecords 
-        //                          |> SwitchEventRecords.getUniqueUnsortedCount
-        //                          |> Some
-        //                | false -> None
+module SorterCoverage = 
+    let yab = None
+    //let fromSwitchEventRecords (checkSuccess:bool)
+    //                           (r:sortingResult) =
+    //    result {
+    //            let switchUses = 
+    //                    r.switchEventRecords |> SwitchEventRecords.getSwitchUses
+    //            let usedSwitchArray = 
+    //                    r.sorter |> Sorter.getUsedSwitches switchUses
+    //            let usedSwitchCount = SwitchCount.create usedSwitchArray.Length
+    //            let usedStageCount = Stage.getStageCount r.sorter.order usedSwitchArray
+    //            let failCount = 
+    //                match checkSuccess with
+    //                | true -> r.switchEventRecords 
+    //                          |> SwitchEventRecords.getUniqueUnsortedCount
+    //                          |> Some
+    //                | false -> None
 
-        //            let perfBin = {
-        //                            sorterPerf.usedStageCount = usedStageCount;
-        //                            failCount = failCount;
-        //                            usedSwitchCount=usedSwitchCount 
-        //                           }
-        //            return {
-        //                        sorterCoverage.perf = perfBin; 
-        //                        sorterId = r.sorterId;
-        //                        usedSwitches = usedSwitchArray;
-        //                   }
-        //       }
+    //            let perfBin = {
+    //                            sorterPerf.usedStageCount = usedStageCount;
+    //                            failCount = failCount;
+    //                            usedSwitchCount=usedSwitchCount 
+    //                           }
+    //            return {
+    //                        sorterCoverage.perf = perfBin; 
+    //                        sorterId = r.sorterId;
+    //                        usedSwitches = usedSwitchArray;
+    //                   }
+    //       }
 
 
-    module SorterPerfBin =
+module SorterPerfBin =
         
-        let merge (bins:sorterPerfBin seq) =
-            let _makeKey (bin:sorterPerfBin) =
-                (bin.usedSwitchCount, bin.usedStageCount)
-            let _add (taggedBins:(switchCount*stageCount)*sorterPerfBin array) =
-                let (wc, tc), bins = taggedBins
-                let totSorterCt = 
-                        bins 
-                          |> Seq.map(fun bin -> bin.sorterCount)
-                          |> Seq.fold SorterCount.add (SorterCount.create 0)
-                let totSuccessCt = 
-                        bins 
-                          |> Seq.map(fun bin -> bin.successCount)
-                          |> Seq.fold (+) 0
-                let totFailCt = 
-                        bins 
-                          |> Seq.map(fun bin -> bin.failCount)
-                          |> Seq.fold (+) 0
-                {
-                    sorterPerfBin.usedSwitchCount = wc;
-                    sorterPerfBin.usedStageCount = tc;
-                    sorterPerfBin.sorterCount = totSorterCt
-                    sorterPerfBin.successCount = totSuccessCt;
-                    sorterPerfBin.failCount = totFailCt;
-                }
+    let merge (bins:sorterPerfBin seq) =
+        let _makeKey (bin:sorterPerfBin) =
+            (bin.usedSwitchCount, bin.usedStageCount)
+        let _add (taggedBins:(switchCount*stageCount)*sorterPerfBin array) =
+            let (wc, tc), bins = taggedBins
+            let totSorterCt = 
+                    bins 
+                        |> Seq.map(fun bin -> bin.sorterCount)
+                        |> Seq.fold SorterCount.add (SorterCount.create 0)
+            let totSuccessCt = 
+                    bins 
+                        |> Seq.map(fun bin -> bin.successCount)
+                        |> Seq.fold (+) 0
+            let totFailCt = 
+                    bins 
+                        |> Seq.map(fun bin -> bin.failCount)
+                        |> Seq.fold (+) 0
+            {
+                sorterPerfBin.usedSwitchCount = wc;
+                sorterPerfBin.usedStageCount = tc;
+                sorterPerfBin.sorterCount = totSorterCt
+                sorterPerfBin.successCount = totSuccessCt;
+                sorterPerfBin.failCount = totFailCt;
+            }
 
-            bins 
-               |> Seq.toArray
-               |> Array.groupBy(_makeKey)
-               |> Seq.map(_add)
+        bins 
+            |> Seq.toArray
+            |> Array.groupBy(_makeKey)
+            |> Seq.map(_add)
 
 
     
-        let fromSorterPerfs (perfs:sorterPerf seq) =
-            let extractSorterPerfBin ((stc, swc), (perfs:sorterPerf[])) =
-                let _validPassing (sco: sortableCount option) = 
-                    match sco with
-                    | Some ct -> ct |> SortableCount.value = 0
-                    | None -> false
+    let fromSorterPerfs (perfs:sorterPerf seq) =
+        let extractSorterPerfBin ((stc, swc), (perfs:sorterPerf[])) =
+            let _validPassing (sco: sortableCount option) = 
+                match sco with
+                | Some ct -> ct |> SortableCount.value = 0
+                | None -> false
 
-                let sct = perfs |> Array.filter(fun sc -> 
-                                        sc.failCount |> _validPassing)
-                                |> Array.length
-                let fct = perfs |> Array.filter(fun sc -> 
-                                        sc.failCount |> _validPassing |> (not))
-                                |> Array.length
-                {
-                    sorterPerfBin.sorterCount = SorterCount.create perfs.Length
-                    usedStageCount = stc;
-                    usedSwitchCount = swc;
-                    successCount = sct;
-                    failCount = fct;
-                }
-            perfs
-                |> Seq.toArray
-                |> Array.groupBy(fun c -> (c.usedStageCount, 
-                                           c.usedSwitchCount))
-                |> Array.map(extractSorterPerfBin)
-
-
-        let fromSorterCoverages (coverages:sorterCoverage seq) =
-             coverages |> Seq.map(fun cov -> cov.perf)
-                       |> fromSorterPerfs
+            let sct = perfs |> Array.filter(fun sc -> 
+                                    sc.failCount |> _validPassing)
+                            |> Array.length
+            let fct = perfs |> Array.filter(fun sc -> 
+                                    sc.failCount |> _validPassing |> (not))
+                            |> Array.length
+            {
+                sorterPerfBin.sorterCount = SorterCount.create perfs.Length
+                usedStageCount = stc;
+                usedSwitchCount = swc;
+                successCount = sct;
+                failCount = fct;
+            }
+        perfs
+            |> Seq.toArray
+            |> Array.groupBy(fun c -> (c.usedStageCount, 
+                                        c.usedSwitchCount))
+            |> Array.map(extractSorterPerfBin)
 
 
-        //let toSorterPerfs (bins:sorterPerfBin seq) =
-        //    let _sp (spBin:sorterPerfBin) =
-        //        let ssfls =
-        //            {
-        //                sorterPerf.successful = Some true;
-        //                sorterPerf.usedStageCount = spBin.usedStageCount;
-        //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
-        //            } |> Seq.replicate spBin.successCount
-        //        let unSsfls =
-        //            {
-        //                sorterPerf.successful = Some false;
-        //                sorterPerf.usedStageCount = spBin.usedStageCount;
-        //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
-        //            } |> Seq.replicate spBin.failCount
-        //        ssfls |> Seq.append unSsfls
-
-        //    bins |> Seq.map(_sp) |> Seq.concat
+    let fromSorterCoverages (coverages:sorterCoverage seq) =
+            coverages |> Seq.map(fun cov -> cov.perf)
+                    |> fromSorterPerfs
 
 
+    //let toSorterPerfs (bins:sorterPerfBin seq) =
+    //    let _sp (spBin:sorterPerfBin) =
+    //        let ssfls =
+    //            {
+    //                sorterPerf.successful = Some true;
+    //                sorterPerf.usedStageCount = spBin.usedStageCount;
+    //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+    //            } |> Seq.replicate spBin.successCount
+    //        let unSsfls =
+    //            {
+    //                sorterPerf.successful = Some false;
+    //                sorterPerf.usedStageCount = spBin.usedStageCount;
+    //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+    //            } |> Seq.replicate spBin.failCount
+    //        ssfls |> Seq.append unSsfls
 
-        let getMinMaxMeanOfSuccessful (perfM:sorterPerfBin -> double)  
-                                      (bins:sorterPerfBin seq)  =
-            use enumer = bins.GetEnumerator()
-            let mutable min = Double.MaxValue
-            let mutable max = Double.MinValue
-            let mutable total = 0.0
-            let mutable count = 0.0
-            while enumer.MoveNext() do
-                if enumer.Current.successCount > 0 then
-                    let fct = (float enumer.Current.successCount)
-                    let curM = perfM enumer.Current
-                    if curM < min then 
-                        min <- curM
-                    if curM > max then
-                        max <- curM
-                    count <- count + fct
-                    total <- total + (curM * fct)
-            let mean = if count = 0.0 then 0.0 else total / count
-            (min, max, mean)
-
-
-        let getMinMaxMeanOfFails (perfM:sorterPerfBin -> double) 
-                                 (bins:sorterPerfBin seq)  =
-            use enumer = bins.GetEnumerator()
-            let mutable min = Double.MaxValue
-            let mutable max = Double.MinValue
-            let mutable total = 0.0
-            let mutable count = 0.0
-            while enumer.MoveNext() do
-                if enumer.Current.failCount > 0 then
-                    let fct = (float enumer.Current.failCount)
-                    let curM = perfM enumer.Current
-                    if curM < min then 
-                        min <- curM
-                    if curM > max then
-                        max <- curM
-                    count <- count + fct
-                    total <- total + (curM * fct)
-            let mean = if count = 0.0 then 0.0 else total / count
-            (min, max, mean)
-
-
-        let getStdevOfSuccessful (perfM:sorterPerfBin -> double) 
-                                 (centroid:float) 
-                                 (bins:sorterPerfBin seq) =
-            use enumer = bins.GetEnumerator()
-            let mutable totalCt = 0.0
-            let mutable totalRds = 0.0
-            while enumer.MoveNext() do
-                if enumer.Current.successCount > 0 then
-                    let binCt = (float enumer.Current.successCount)
-                    let curM = perfM enumer.Current
-                    totalCt <- totalCt + binCt
-                    totalRds <- totalRds + (Math.Sqrt ((curM - centroid) * (curM - centroid))) * binCt
-
-            if (totalCt = 0.0) then 0.0 else (totalRds / totalCt)
+    //    bins |> Seq.map(_sp) |> Seq.concat
 
 
 
-        let getRdsBetterWorseOfSuccessful (perfM:sorterPerfBin -> double) 
-                                          (centroid:float)
-                                          (bins:sorterPerfBin seq) =
-            use enumer = bins.GetEnumerator()
-            let mutable totalCtBetter = 0.0
-            let mutable totalRdsBetter = 0.0
-            let mutable totalCtWorse = 0.0
-            let mutable totalRdsWorse = 0.0
-            while enumer.MoveNext() do
-                if enumer.Current.successCount > 0 then
-                    let fct = (float enumer.Current.successCount)
-                    let curM = perfM enumer.Current
-                    if curM < centroid then 
-                        totalCtBetter <- totalCtBetter + fct
-                        totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
-                    else
-                        totalCtWorse <- totalCtWorse + fct
-                        totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
-            let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
-            let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
-            (bR, wR)
+    let getMinMaxMeanOfSuccessful (perfM:sorterPerfBin -> double)  
+                                    (bins:sorterPerfBin seq)  =
+        use enumer = bins.GetEnumerator()
+        let mutable min = Double.MaxValue
+        let mutable max = Double.MinValue
+        let mutable total = 0.0
+        let mutable count = 0.0
+        while enumer.MoveNext() do
+            if enumer.Current.successCount > 0 then
+                let fct = (float enumer.Current.successCount)
+                let curM = perfM enumer.Current
+                if curM < min then 
+                    min <- curM
+                if curM > max then
+                    max <- curM
+                count <- count + fct
+                total <- total + (curM * fct)
+        let mean = if count = 0.0 then 0.0 else total / count
+        (min, max, mean)
 
 
-        let getRdsBetterWorseOfFails (perfM:sorterPerfBin -> double)  
-                                     (centroid:float)
-                                     (bins:sorterPerfBin seq)  =
-            use enumer = bins.GetEnumerator()
-            let mutable totalCtBetter = 0.0
-            let mutable totalRdsBetter = 0.0
-            let mutable totalCtWorse = 0.0
-            let mutable totalRdsWorse = 0.0
-            while enumer.MoveNext() do
-                if enumer.Current.failCount > 0 then
-                    let fct = (float enumer.Current.failCount)
-                    let curM = perfM enumer.Current
-                    if curM < centroid then 
-                        totalCtBetter <- totalCtBetter + fct
-                        totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
-                    else
-                        totalCtWorse <- totalCtWorse + fct
-                        totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
-            let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
-            let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
-            (bR, wR)
+    let getMinMaxMeanOfFails (perfM:sorterPerfBin -> double) 
+                                (bins:sorterPerfBin seq)  =
+        use enumer = bins.GetEnumerator()
+        let mutable min = Double.MaxValue
+        let mutable max = Double.MinValue
+        let mutable total = 0.0
+        let mutable count = 0.0
+        while enumer.MoveNext() do
+            if enumer.Current.failCount > 0 then
+                let fct = (float enumer.Current.failCount)
+                let curM = perfM enumer.Current
+                if curM < min then 
+                    min <- curM
+                if curM > max then
+                    max <- curM
+                count <- count + fct
+                total <- total + (curM * fct)
+        let mean = if count = 0.0 then 0.0 else total / count
+        (min, max, mean)
+
+
+    let getStdevOfSuccessful (perfM:sorterPerfBin -> double) 
+                                (centroid:float) 
+                                (bins:sorterPerfBin seq) =
+        use enumer = bins.GetEnumerator()
+        let mutable totalCt = 0.0
+        let mutable totalRds = 0.0
+        while enumer.MoveNext() do
+            if enumer.Current.successCount > 0 then
+                let binCt = (float enumer.Current.successCount)
+                let curM = perfM enumer.Current
+                totalCt <- totalCt + binCt
+                totalRds <- totalRds + (Math.Sqrt ((curM - centroid) * (curM - centroid))) * binCt
+
+        if (totalCt = 0.0) then 0.0 else (totalRds / totalCt)
+
+
+
+    let getRdsBetterWorseOfSuccessful (perfM:sorterPerfBin -> double) 
+                                        (centroid:float)
+                                        (bins:sorterPerfBin seq) =
+        use enumer = bins.GetEnumerator()
+        let mutable totalCtBetter = 0.0
+        let mutable totalRdsBetter = 0.0
+        let mutable totalCtWorse = 0.0
+        let mutable totalRdsWorse = 0.0
+        while enumer.MoveNext() do
+            if enumer.Current.successCount > 0 then
+                let fct = (float enumer.Current.successCount)
+                let curM = perfM enumer.Current
+                if curM < centroid then 
+                    totalCtBetter <- totalCtBetter + fct
+                    totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
+                else
+                    totalCtWorse <- totalCtWorse + fct
+                    totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
+        let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
+        let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
+        (bR, wR)
+
+
+    let getRdsBetterWorseOfFails (perfM:sorterPerfBin -> double)  
+                                    (centroid:float)
+                                    (bins:sorterPerfBin seq)  =
+        use enumer = bins.GetEnumerator()
+        let mutable totalCtBetter = 0.0
+        let mutable totalRdsBetter = 0.0
+        let mutable totalCtWorse = 0.0
+        let mutable totalRdsWorse = 0.0
+        while enumer.MoveNext() do
+            if enumer.Current.failCount > 0 then
+                let fct = (float enumer.Current.failCount)
+                let curM = perfM enumer.Current
+                if curM < centroid then 
+                    totalCtBetter <- totalCtBetter + fct
+                    totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
+                else
+                    totalCtWorse <- totalCtWorse + fct
+                    totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
+        let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
+        let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
+        (bR, wR)
 
 
             
@@ -483,7 +418,7 @@ module SorterFitness =
 
     let fromSorterPerf (order:order)  
                        (stageWeight:stageWeight) 
-                       (perf:SortingEval.sorterPerf) =
+                       (perf:sorterPerf) =
         let pv =
             weighted order stageWeight 
                      perf.usedSwitchCount perf.usedStageCount
@@ -499,11 +434,11 @@ module SorterSaving =
 
     let chooseSorterCoverages (order:order)
                               (ssaving:sorterSaving) 
-                              (scs:SortingEval.sorterCoverage[]) =
+                              (scs:sorterCoverage[]) =
         let getBest (order:order) 
                     (sw:stageWeight) 
                     (sc:sorterCount) 
-                    (covs:SortingEval.sorterCoverage[]) =
+                    (covs:sorterCoverage[]) =
             let yab = covs |> Array.map(fun c -> 
                               (c, SorterFitness.fromSorterPerf order sw c.perf))
                            |> Array.sortBy(fun tup -> snd tup  |> Energy.value)
@@ -515,7 +450,7 @@ module SorterSaving =
         | NotAny -> [||]
         | All -> scs
         | Successful -> scs |> Array.filter(fun s -> 
-                               s.perf |> SortingEval.SorterPerf.isSucessful)
+                               s.perf |> SorterPerf.isSucessful)
         | Perf (sw, sc) -> getBest order sw sc scs
 
 
@@ -527,5 +462,5 @@ module SorterSaving =
 //            rngGen: RngGen;
 //            sorterCount:SorterCount;
 //            sortableSetType:sortableSetType;
-//            perfBins:SortingEval.sorterPerfBin array;
+//            perfBins:sorterPerfBin array;
 //        }

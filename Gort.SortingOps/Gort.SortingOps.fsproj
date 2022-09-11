@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SwitchUseTrack.fs" />
-    <Compile Include="SwitchBySortableTrack.fs" />
-    <Compile Include="SorterOpLog.fs" />
+    <Compile Include="SwitchOpTypes.fs" />
+    <Compile Include="SwitchUseTracker.fs" />
+    <Compile Include="SortableBySwitchTracker.fs" />
+    <Compile Include="SorterOpTrack.fs" />
     <Compile Include="SortingWithHistory.fs" />
     <Compile Include="SortingRollout.fs" />
     <Compile Include="Library.fs" />

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SwitchUseFixture.fs" />
+    <Compile Include="SortingEvalFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
     <ProjectReference Include="..\Gort.SortingOps\Gort.SortingOps.fsproj" />
+    <ProjectReference Include="..\Gort.SortingResults\Gort.SortingResults.fsproj" />
     <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
   </ItemGroup>
 

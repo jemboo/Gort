@@ -1,6 +1,9 @@
 ﻿namespace global
 
-type sortableSet = private { sortableSetId:sortableSetId; rollout:rollout; symbolSetSize:symbolSetSize } 
+type sortableSet = 
+    private { sortableSetId:sortableSetId; 
+              rollout:rollout; 
+              symbolSetSize:symbolSetSize } 
 
 module SortableSet =
 
