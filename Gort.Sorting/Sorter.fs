@@ -11,8 +11,7 @@ type sorter =
 module Sorter =
 
     let makeId (s:sorter) = 
-        let gu = [s.switches :> obj] |> GuidUtils.guidFromObjs
-        SorterId.create gu
+        SorterId.create (Guid.NewGuid())
 
 
     let fromSwitches (order:order) 

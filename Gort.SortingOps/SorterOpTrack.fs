@@ -2,18 +2,18 @@
 open SysExt
 
 type sorterOpTracker = 
-     | NoGrouping of sortableBySwitchTracker
-     | GroupBySwitch of switchUseTracker
+     | SwitchUses of sortableBySwitchTracker
+     | SwitchTrack of switchUseTracker
 
 
 module SorterOpTracker =
 
    let getSwitchUseCounts (sorterOpTracker:sorterOpTracker) =
        match sorterOpTracker with
-       | sorterOpTracker.NoGrouping sortableBySwitchTracker -> 
+       | sorterOpTracker.SwitchUses sortableBySwitchTracker -> 
             sortableBySwitchTracker
             |> SortableBySwitchTracker.getSwitchUseCounts
-       | sorterOpTracker.GroupBySwitch switchUseTracker -> 
+       | sorterOpTracker.SwitchTrack switchUseTracker -> 
             switchUseTracker 
             |> SwitchUseTracker.getSwitchUseCounts
 
@@ -28,6 +28,9 @@ module SorterOpResults =
              (rollout:rollout) (sorterOpTracker:sorterOpTracker) =
         { sorterId=sorterId; sortableSetId=sortableSetId; 
           rollout=rollout; sorterOpTracker=sorterOpTracker; }
+
+    let getSorterId (sorterOpResults:sorterOpResults) =
+        sorterOpResults.sorterId
 
     let getRollout (sorterOpResults:sorterOpResults) =
         sorterOpResults.rollout

@@ -9,19 +9,19 @@ type SortingRolloutFixture () =
             (rolloutFormat:rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = 123 |> SortableSetId.create
-        //let goodSorter = 
-        //    RefSorter.goodRefSorterForOrder order 
-        //    |> Result.ExtractOrThrow
-        let switchCount = SwitchCount.orderTo900SwitchCount order
-        let rando = Rando.create 
-                        rngType.Lcg
-                        (1233 |> RandomSeed.create)
         let goodSorter = 
-            Sorter.randomSwitches 
-                order
-                (Seq.empty)
-                switchCount
-                rando
+            RefSorter.goodRefSorterForOrder order 
+            |> Result.ExtractOrThrow
+        //let switchCount = SwitchCount.orderTo900SwitchCount order
+        //let rando = Rando.create 
+        //                rngType.Lcg
+        //                (1233 |> RandomSeed.create)
+        //let goodSorter = 
+        //    Sorter.randomSwitches 
+        //        order
+        //        (Seq.empty)
+        //        switchCount
+        //        rando
 
         let sortableSet = 
             SortableSet.makeAllBits
@@ -105,8 +105,7 @@ type SortingRolloutFixture () =
         let sot_RfU64_st = res_RfBs64_st |> SorterOpResults.getSorterOpTracker
         let suCt_RfU64_st = sot_RfU64_st |> SorterOpTracker.getSwitchUseCounts
 
-        // not sure why the counts are different here
-        //Assert.IsTrue(CollectionProps.areEqual suCt_RfU8_su suCt_RfU64_st)
+        Assert.IsTrue(CollectionProps.areEqual suCt_RfU8_su suCt_RfU64_st)
 
 
         Assert.IsTrue(true);

@@ -172,9 +172,8 @@ module SortingRollout =
                 rollArray.[switch.hi + sortableSetOffset] <- (lv ||| hv)
                 rollArray.[switch.low + sortableSetOffset] <- (lv &&& hv)
 
-                let rv = switchUseArray.[localSwitchOffset]
                 switchUseArray.[switchEventOffset + localSwitchOffset] 
-                    <- (((~~~hv) &&& lv) ||| rv)
+                    <- ((~~~hv) &&& lv)
                 localSwitchOffset <- localSwitchOffset + 1
             sortableIndex <- sortableIndex + 1
             sortableSetOffset <- sortableSetOffset + orderV
@@ -233,7 +232,7 @@ module SortingRollout =
             sorterId 
             sortableSetId 
             rolloutCopy 
-            (switchingTrack |> sorterOpTracker.NoGrouping )
+            (switchingTrack |> sorterOpTracker.SwitchUses )
 
 
     
@@ -468,7 +467,7 @@ module SortingRollout =
             sorterId 
             sortableSetId 
             rolloutCopy 
-            (switchUseTracker |> sorterOpTracker.GroupBySwitch )
+            (switchUseTracker |> sorterOpTracker.SwitchTrack )
 
 
     let evalSorterWithSortableSet

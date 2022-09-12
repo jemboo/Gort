@@ -44,7 +44,7 @@ module StageCover =
 
         let mutable stgCvrs = []
         let swEnumer = sws.GetEnumerator();
-        seq {while swEnumer.MoveNext() do
+        seq { while swEnumer.MoveNext() do
                 let (nuCvr, dexed) = _initOrRun stgCvrs swEnumer.Current
                 stgCvrs <- nuCvr
                 yield dexed }
