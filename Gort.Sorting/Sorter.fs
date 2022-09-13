@@ -2,7 +2,8 @@
 open System
 
 type sorter = 
-    { 
+    {
+        //sortrId:sorterId
         order:order; 
         switches:array<switch>; 
         switchCount:switchCount
@@ -21,9 +22,10 @@ module Sorter =
                                    |> Seq.toArray
         let switchCount = SwitchCount.create switchArray.Length
         {
-            sorter.order=order;
-            switchCount=switchCount;
-            switches = switchArray
+           // sorter.sortrId = SorterId.create (Guid.NewGuid());
+            sorter.order = order;
+            sorter.switchCount = switchCount;
+            sorter.switches = switchArray
         }
 
     let fromSwitchesWithPrefix (order:order)
