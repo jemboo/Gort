@@ -59,7 +59,7 @@ type SwitchFixture () =
         let degDest = Order.createNr 12
         let srtGreen = RefSorter.createRefSorter RefSorter.End16
                        |> Result.ExtractOrThrow
-        let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
+        let subSorters = Switch.allMasks degSrc degDest (srtGreen |> Sorter.getSwitches)
                          |> Seq.toArray
 
         let hist = subSorters |> CollectionOps.histogram (fun a -> a.Length)
@@ -74,7 +74,7 @@ type SwitchFixture () =
         let degDest = Order.createNr 12
         let srtGreen = RefSorter.createRefSorter RefSorter.End16
                        |> Result.ExtractOrThrow
-        let subSorters = Switch.rndMasks degSrc degDest srtGreen.switches rndy
+        let subSorters = Switch.rndMasks degSrc degDest (srtGreen |> Sorter.getSwitches) rndy
                          |> Seq.take(100)
                          |> Seq.toArray
 

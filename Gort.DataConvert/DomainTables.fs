@@ -104,7 +104,7 @@ module DomainTables =
             result {
                 let! order = 8 |> Order.create
                 let switchCt = 100 |> SwitchCount.create
-                return Sorter.fromSwitches order switchCt Seq.empty<switch>
+                return Sorter.fromSwitches order Seq.empty<switch>
             }
         
         let _bitpackLookup (ctxt:IGortContext2) (bitpackId:int) =

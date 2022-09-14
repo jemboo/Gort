@@ -1,39 +1,44 @@
 ﻿namespace global
 open System
 
-type sorter = 
-    {
-        //sortrId:sorterId
+type sorter = private   {
+        sortrId:sorterId
         order:order; 
-        switches:array<switch>; 
-        switchCount:switchCount
+        switches:array<switch>;
     }
 
 module Sorter =
+    let getSorterId (sortr:sorter) =
+        Guid.NewGuid()
+        |> SorterId.create
 
-    let makeId (s:sorter) = 
-        SorterId.create (Guid.NewGuid())
+    let getOrder (sortr:sorter) = 
+        sortr.order
+
+    let getSwitches (sortr:sorter) = 
+        sortr.switches
+
+    let getSwitchCount (sortr:sorter) = 
+        sortr.switches.Length
+        |> SwitchCount.create
 
 
     let fromSwitches (order:order) 
-                     (switchCtTarget:switchCount)
                      (switches:seq<switch>) =
-        let switchArray = switches |> Seq.take (switchCtTarget |> SwitchCount.value)
-                                   |> Seq.toArray
-        let switchCount = SwitchCount.create switchArray.Length
         {
-           // sorter.sortrId = SorterId.create (Guid.NewGuid());
+            sorter.sortrId = SorterId.create (Guid.NewGuid());
             sorter.order = order;
-            sorter.switchCount = switchCount;
-            sorter.switches = switchArray
+            sorter.switches = switches |> Seq.toArray
         }
 
     let fromSwitchesWithPrefix (order:order)
                                (switchCtTarget:switchCount)
                                (switchesPfx:seq<switch>)
                                (switches:seq<switch>) =
-        let combinedSwitches = switchesPfx |> Seq.append switches
-        fromSwitches order switchCtTarget combinedSwitches
+        let combinedSwitches = switchesPfx 
+                               |> Seq.append switches
+                               |> Seq.take (switchCtTarget |> SwitchCount.value)
+        fromSwitches order combinedSwitches
 
 
     let fromStagesWithPrefix (order:order)
@@ -51,12 +56,8 @@ module Sorter =
         let newSwitches = switchesToAppend 
                           |> Seq.append sorter.switches
                           |> Seq.toArray
-        let newSwitchCount = SwitchCount.create newSwitches.Length
-        {
-            sorter.order = sorter.order;
-            switchCount=newSwitchCount;
-            switches = newSwitches
-        }
+        fromSwitches (sorter |> getOrder) newSwitches
+
 
 
     let prependSwitches (newSwitches:seq<switch>) 
@@ -64,32 +65,35 @@ module Sorter =
         let newSwitches = sorter.switches 
                           |> Seq.append newSwitches
                           |> Seq.toArray
-        let newSwitchCount = SwitchCount.create newSwitches.Length
-        {
-            sorter.order = sorter.order;
-            switchCount=newSwitchCount;
-            switches = newSwitches
-        }
+        fromSwitches (sorter |> getOrder) newSwitches
 
 
-    let removeSwitchesFromTheStart (newLength:switchCount) (sorter:sorter) =
-        let numSwitchesToRemove = (SwitchCount.value sorter.switchCount) -
+    let removeSwitchesFromTheStart (newLength:switchCount) 
+                                   (sortr:sorter) =
+        let curSwitchCt = sortr |> getSwitchCount |> SwitchCount.value
+        let numSwitchesToRemove = curSwitchCt -
                                   (SwitchCount.value newLength)
         if numSwitchesToRemove < 0 then
             "New length is longer than sorter" |> Error
         else
-            let trimmedSwitches =  sorter.switches 
+            let trimmedSwitches =  sortr 
+                                   |> getSwitches
                                    |> Seq.skip(numSwitchesToRemove)
-            fromSwitches sorter.order newLength trimmedSwitches |> Ok
+                                   |> Seq.take (newLength |> SwitchCount.value)
+            fromSwitches (sortr |> getOrder) trimmedSwitches |> Ok
 
 
-    let removeSwitchesFromTheEnd (newLength:switchCount) (sorter:sorter) =
-        let numSwitchesToRemove = (SwitchCount.value sorter.switchCount) -
+    let removeSwitchesFromTheEnd (newLength:switchCount) 
+                                 (sortr:sorter) =
+        let curSwitchCt = sortr |> getSwitchCount |> SwitchCount.value
+        let numSwitchesToRemove = curSwitchCt -
                                   (SwitchCount.value newLength)
         if numSwitchesToRemove < 0 then
             "New length is longer than sorter" |> Error
         else
-            fromSwitches sorter.order newLength sorter.switches |> Ok
+            let trimmedSwitches = (sortr |> getSwitches)
+                                  |> Seq.take numSwitchesToRemove
+            fromSwitches (sortr |> getOrder) trimmedSwitches |> Ok
 
 
     let getSwitchesFromFirstStages
@@ -176,17 +180,17 @@ module Sorter =
 
 
 type sorterUniformMutatorType = |Switch |Stage |StageRfl
-type sorterUniformMutator = private {sumType:sorterUniformMutatorType;
-                                     mutationRate:mutationRate;
-                                     mFunc: sorter -> IRando -> Result<sorter, string> }
+type sorterUniformMutator = private { sumType:sorterUniformMutatorType;
+                                      mutationRate:mutationRate;
+                                      mFunc: sorter -> IRando -> Result<sorter, string> }
 
 module SorterUniformMutator =
 
-    let create t r f  = 
+    let create sorterUniformMutatorTyp mutationRat mutationFun  = 
         {
-            sorterUniformMutator.sumType = t; 
-            mutationRate =r; 
-            mFunc = f
+            sorterUniformMutator.sumType = sorterUniformMutatorTyp; 
+            mutationRate = mutationRat; 
+            mFunc = mutationFun
         }
 
     let getSorterUniformMutatorType (sum:sorterUniformMutator) =
@@ -195,22 +199,22 @@ module SorterUniformMutator =
     let getMutationRateVal (sum:sorterUniformMutator) =
         sum.mutationRate |> MutationRate.getRateValue
 
-    let mutateBySwitch (swMr:switchMutationRate) =
+    let mutateBySwitch (switchMutationRat:switchMutationRate) =
 
         (fun (sorter:sorter) (randy:IRando) ->
             result {
-                let newSwitches = Switch.mutateSwitches sorter.order 
-                                                        swMr
-                                                        randy
-                                                        sorter.switches
-                                   |> Seq.toArray
-                let newSwitchCount = newSwitches.Length |> SwitchCount.create
-                return {
-                           sorter.order = sorter.order;
-                           sorter.switchCount = newSwitchCount;
-                           sorter.switches =  newSwitches
-                        }
-            }) |> create sorterUniformMutatorType.Switch (swMr |> mutationRate.Switch)
+                let newSwitches = 
+                    Switch.mutateSwitches 
+                        sorter.order 
+                        switchMutationRat
+                        randy
+                        sorter.switches
+                    |> Seq.toArray
+                return Sorter.fromSwitches (sorter |> Sorter.getOrder) newSwitches
+
+            }
+         ) |> create sorterUniformMutatorType.Switch 
+                     (switchMutationRat |> mutationRate.Switch)
 
 
     let mutateByStage (stMr:stageMutationRate) =
@@ -224,14 +228,11 @@ module SorterUniformMutator =
                              |> Array.map(Stage.randomMutate randy stMr)
 
                 let newSwitches = [| for stage in mutantStages do yield! stage.switches |]
-                                   |> Seq.toArray
-                let newSwitchCount = newSwitches.Length |> SwitchCount.create
-                return {
-                        sorter.order = sorter.order;
-                        sorter.switchCount = newSwitchCount;
-                        sorter.switches =  newSwitches
-                        }
-            }) |> create sorterUniformMutatorType.Stage (stMr |> mutationRate.Stage)
+                                  |> Seq.toArray
+                return Sorter.fromSwitches (sorter |> Sorter.getOrder) newSwitches
+            }
+        ) |> create sorterUniformMutatorType.Stage 
+                    (stMr |> mutationRate.Stage)
 
 
     let mutateByStageRfl (stMr:stageMutationRate) =
@@ -245,14 +246,10 @@ module SorterUniformMutator =
                              |> Array.map(Stage.randomReflMutate randy stMr)
 
                 let newSwitches = [| for stage in mutantStages do yield! stage.switches |]
-                let newSwitchCount = newSwitches.Length |> SwitchCount.create
-
-                return {
-                        sorter.order = sorter.order;
-                        sorter.switchCount = newSwitchCount;
-                        sorter.switches =  newSwitches
-                        }
-            }) |> create sorterUniformMutatorType.StageRfl (stMr |> mutationRate.Stage)
+                return Sorter.fromSwitches (sorter |> Sorter.getOrder) newSwitches
+            }
+        ) |> create sorterUniformMutatorType.StageRfl 
+                    (stMr |> mutationRate.Stage)
 
 
 type sorterMutator =

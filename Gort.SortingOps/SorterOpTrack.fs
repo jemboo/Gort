@@ -19,18 +19,25 @@ module SorterOpTracker =
 
 
 
-type sorterOpResults = private { sorterId:sorterId; sortableSetId:sortableSetId; 
-        rollout:rollout; sorterOpTracker:sorterOpTracker; }
+type sorterOpResults = private { 
+        sortr:sorter; 
+        sortableSetId:sortableSetId; 
+        rollout:rollout; 
+        sorterOpTracker:sorterOpTracker; }
 
 module SorterOpResults = 
     
-    let make (sorterId:sorterId) ( sortableSetId:sortableSetId) 
+    let make (sortr:sorter) ( sortableSetId:sortableSetId) 
              (rollout:rollout) (sorterOpTracker:sorterOpTracker) =
-        { sorterId=sorterId; sortableSetId=sortableSetId; 
-          rollout=rollout; sorterOpTracker=sorterOpTracker; }
+        { 
+            sorterOpResults.sortr = sortr; 
+            sorterOpResults.sortableSetId = sortableSetId; 
+            sorterOpResults.rollout = rollout; 
+            sorterOpResults.sorterOpTracker = sorterOpTracker; 
+        }
 
-    let getSorterId (sorterOpResults:sorterOpResults) =
-        sorterOpResults.sorterId
+    let getSorter (sorterOpResults:sorterOpResults) =
+        sorterOpResults.sortr
 
     let getRollout (sorterOpResults:sorterOpResults) =
         sorterOpResults.rollout

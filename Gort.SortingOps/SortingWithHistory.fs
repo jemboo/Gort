@@ -24,19 +24,21 @@ module SortingWithHistory =
             lstRet |> List.rev
 
 
-        let makeWithSorterSegment (sorter:sorter) 
+        let makeWithSorterSegment (sortr:sorter) 
                                   (mindex:int) 
                                   (maxdex:int) 
                                   (sortableInts:sortableIntArray) =
-            let sws = sorter.switches |> Array.skip(mindex)
-                                      |> Array.take(maxdex - mindex)
-                                      |> Array.toList
+            let sws = 
+                sortr
+                |> Sorter.getSwitches
+                |> Array.skip(mindex)
+                |> Array.take(maxdex - mindex)
+                |> Array.toList
             sortTHistSwitches sws sortableInts
 
-
-        let makeWithFullSorter (sorter:sorter) (sortableInts:sortableIntArray) =
-            let sl = SwitchCount.value sorter.switchCount
-            makeWithSorterSegment sorter 0 sl sortableInts
+        let makeWithFullSorter (sortr:sorter) (sortableInts:sortableIntArray) =
+            let maxDex = sortr |> Sorter.getSwitchCount |> SwitchCount.value 
+            makeWithSorterSegment sortr 0 maxDex sortableInts
 
 
     module Bools =
@@ -65,12 +67,15 @@ module SortingWithHistory =
                                 (mindex:int) 
                                 (maxdex:int) 
                                 (sortableBools:sortableBoolArray) =
-            let sws = sorter.switches |> Array.skip(mindex)
-                                      |> Array.take(maxdex - mindex)
-                                      |> Array.toList
+            let sws = 
+                sorter
+                |> Sorter.getSwitches
+                |> Array.skip(mindex)
+                |> Array.take(maxdex - mindex)
+                |> Array.toList
             sortTHistSwitches sws sortableBools
 
 
-        let makeWithFullSorter (sorter:sorter) (sortableBools:sortableBoolArray) =
-            let sl = SwitchCount.value sorter.switchCount
-            makeWithSorterSegment sorter 0 sl sortableBools
+        let makeWithFullSorter (sortr:sorter) (sortableBools:sortableBoolArray) =
+            let maxDex = sortr |> Sorter.getSwitchCount |> SwitchCount.value 
+            makeWithSorterSegment sortr 0 maxDex sortableBools

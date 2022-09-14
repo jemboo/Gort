@@ -31,10 +31,7 @@ module SortersFromData =
         result {
            let! switchSeq = ParseToSwitches sorterString order
            let switches = switchSeq |> Seq.toArray
-           let switchCount = SwitchCount.create switches.Length 
-           return { sorter.order = order; 
-                    switchCount = switchCount;
-                    switches = switches }
+           return Sorter.fromSwitches order switches
         }
 
 

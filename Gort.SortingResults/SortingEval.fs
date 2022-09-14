@@ -33,13 +33,13 @@ module SwitchUseCounters =
 
 
     let getUsedSwitchesFromSorter
-            (sorter:sorter) 
+            (sortr:sorter) 
             (switchUseCnters:switchUseCounters) =
         switchUseCnters
         |> getUseCounters
         |> Seq.mapi(fun i w -> i,w)
         |> Seq.filter(fun t -> (snd t) > 0 )
-        |> Seq.map(fun t -> sorter.switches.[(fst t)])
+        |> Seq.map(fun t -> (sortr |> Sorter.getSwitches).[(fst t)])
         |> Seq.toArray
 
 
@@ -81,7 +81,8 @@ module SorterPerf =
             (usedSwitches |> StageCover.getStageCount)
         { 
             sorterPerf.sortrId = sortrOpResults 
-                        |> SorterOpResults.getSorterId ;
+                        |> SorterOpResults.getSorter
+                        |> Sorter.getSorterId;
             sorterPerf.sortrPhenotypeId = sortrPhenotypeId;
             sorterPerf.usedSwitchCount = usedSwitches.Length 
                         |> SwitchCount.create;

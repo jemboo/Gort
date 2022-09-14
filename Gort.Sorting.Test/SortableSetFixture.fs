@@ -64,7 +64,7 @@ type SortableSetFixture () =
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
-        Assert.IsTrue(srtIntsBs.Length > srtIntsRu8.Length);
+        Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length);
 
     [<TestMethod>]
     member this.makeSortedStacks() =
@@ -129,4 +129,4 @@ type SortableSetFixture () =
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16);
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32);
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64);
-        Assert.IsTrue(srtIntsBs.Length > srtIntsRu8.Length);
+        Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length);
