@@ -14,7 +14,6 @@ type BenchMakeSorableStack() =
 
 
 
-
 //|                              Method |        Mean |     Error |      StdDev |
 //|------------------------------------ |------------:|----------:|------------:|
 //| applySorterAndMakeSwitchUses_RfBs64 |    264.0 us |  11.25 us |    33.18 us |
@@ -26,7 +25,9 @@ type BenchMakeSorableStack() =
 
 type BenchmarkSorterOnBp64() =
     let order = (Order.createNr 16 )
-    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
+    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 
+                        |> Result.ExtractOrThrow
+
     let sortableSetId = 123 |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
     let sortableSet_RfBs64 = 
@@ -36,12 +37,6 @@ type BenchmarkSorterOnBp64() =
                             order
         |> Result.ExtractOrThrow
 
-    let rollout_RfBs64 = sortableSet_RfBs64 
-                         |> SortableSet.getRollout
-
-
-
-
     let sortableSetFormat_RfI32= rolloutFormat.RfI32
     let sortableSet_RfI32 = 
         SortableSet.makeAllBits
@@ -49,10 +44,6 @@ type BenchmarkSorterOnBp64() =
                             sortableSetFormat_RfI32
                             order
         |> Result.ExtractOrThrow
-
-    let rollout_RfI32= sortableSet_RfI32 
-                         |> SortableSet.getRollout
-
 
 
 
@@ -64,16 +55,13 @@ type BenchmarkSorterOnBp64() =
                             order
         |> Result.ExtractOrThrow
 
-    let rollout_RfU8= sortableSet_RfU8 
-                         |> SortableSet.getRollout
 
     [<Benchmark>]
     member this.applySorterAndMakeSwitchUses_RfBs64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchUses
                                 sorter16
-                                sortableSetId
-                                rollout_RfBs64
+                                sortableSet_RfBs64
         sorterResults
 
 
@@ -82,8 +70,7 @@ type BenchmarkSorterOnBp64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
-                                sortableSetId
-                                rollout_RfBs64
+                                sortableSet_RfBs64
         sorterResults
 
 
@@ -92,8 +79,7 @@ type BenchmarkSorterOnBp64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchUses
                                 sorter16
-                                sortableSetId
-                                rollout_RfI32
+                                sortableSet_RfI32
         sorterResults
 
 
@@ -102,8 +88,7 @@ type BenchmarkSorterOnBp64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
-                                sortableSetId
-                                rollout_RfI32
+                                sortableSet_RfI32
         sorterResults
 
 
@@ -113,8 +98,7 @@ type BenchmarkSorterOnBp64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchUses
                                 sorter16
-                                sortableSetId
-                                rollout_RfU8
+                                sortableSet_RfU8
         sorterResults
 
 
@@ -123,6 +107,5 @@ type BenchmarkSorterOnBp64() =
         let sorterResults = 
             SortingRollout.applySorterAndMakeSwitchTrack
                                 sorter16
-                                sortableSetId
-                                rollout_RfU8
+                                sortableSet_RfU8
         sorterResults

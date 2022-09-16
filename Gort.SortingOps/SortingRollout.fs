@@ -191,16 +191,17 @@ module SortingRollout =
     // along with a bool[sorter.switchcount] to store each switch use.
     let applySorterAndMakeSwitchTrack
                     (sortr:sorter)
-                    (sortableSetId:sortableSetId)
-                    (rollout:rollout) =
+                    (sortableSt:sortableSet) =
 
+        let rolloutCopy = 
+            sortableSt 
+                |> SortableSet.getRollout |> Rollout.copy
+        
         let sortableCount = 
-            rollout 
+            rolloutCopy 
             |> Rollout.getArrayCount
             |> ArrayCount.value
             |> SortableCount.create
-
-        let rolloutCopy = rollout |> Rollout.copy
 
         let switchingTrack =
             match rolloutCopy with
@@ -234,7 +235,7 @@ module SortingRollout =
 
         SorterOpResults.make 
             sortr
-            sortableSetId 
+            sortableSt 
             rolloutCopy 
             (switchingTrack |> sorterOpTracker.SwitchUses )
 
@@ -433,17 +434,19 @@ module SortingRollout =
     // count of each switch use
     let applySorterAndMakeSwitchUses
                     (sortr:sorter)
-                    (sortableSetId:sortableSetId)
-                    (rollout:rollout) =
+                    (sortableSt:sortableSet) =
 
+
+        let rolloutCopy = 
+            sortableSt 
+                |> SortableSet.getRollout |> Rollout.copy
+        
         let sortableCount = 
-            rollout 
+            rolloutCopy 
             |> Rollout.getArrayCount
             |> ArrayCount.value
             |> SortableCount.create
 
-        let rolloutCopy = rollout |> Rollout.copy
-        
         let switchUseTracker =
             match rolloutCopy with
             | B _ ->  failwith "not implemented"
@@ -476,7 +479,7 @@ module SortingRollout =
 
         SorterOpResults.make 
             sortr 
-            sortableSetId 
+            sortableSt 
             rolloutCopy 
             (switchUseTracker |> sorterOpTracker.SwitchTrack )
 
@@ -484,16 +487,14 @@ module SortingRollout =
     let evalSorterWithSortableSet
             (sorterOpTrackMod:sorterOpTrackMode)
             (sortr:sorter) 
-            (sortableSet:sortableSet) =
+            (sortableSt:sortableSet) =
 
         match sorterOpTrackMod with
         | sorterOpTrackMode.SwitchTrack ->
             applySorterAndMakeSwitchTrack
                 sortr
-                (sortableSet |> SortableSet.getSortableSetId)
-                (sortableSet |> SortableSet.getRollout)
+                sortableSt
         | sorterOpTrackMode.SwitchUses ->
             applySorterAndMakeSwitchUses
                 sortr
-                (sortableSet |> SortableSet.getSortableSetId)
-                (sortableSet |> SortableSet.getRollout)
+                sortableSt

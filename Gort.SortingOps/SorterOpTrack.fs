@@ -21,17 +21,17 @@ module SorterOpTracker =
 
 type sorterOpResults = private { 
         sortr:sorter; 
-        sortableSetId:sortableSetId; 
+        sortableSt:sortableSet; 
         rollout:rollout; 
         sorterOpTracker:sorterOpTracker; }
 
 module SorterOpResults = 
     
-    let make (sortr:sorter) ( sortableSetId:sortableSetId) 
+    let make (sortr:sorter) ( sortableSt:sortableSet) 
              (rollout:rollout) (sorterOpTracker:sorterOpTracker) =
         { 
             sorterOpResults.sortr = sortr; 
-            sorterOpResults.sortableSetId = sortableSetId; 
+            sorterOpResults.sortableSt = sortableSt; 
             sorterOpResults.rollout = rollout; 
             sorterOpResults.sorterOpTracker = sorterOpTracker; 
         }

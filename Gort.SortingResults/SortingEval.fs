@@ -3,7 +3,6 @@ open System
 open SysExt
 
 
-
 type sorterPhenotypeId = private SorterPhenotypeId of Guid
 module SorterPhenotypeId =
     let value (SorterPhenotypeId v) = v
@@ -19,11 +18,14 @@ module SwitchUseCounters =
         { switchUseCounters.useCounts = 
                 Array.zeroCreate (switchCount |> SwitchCount.value)}
 
+
     let apply (useCounts:int[]) =
         { switchUseCounters.useCounts = useCounts}
 
+
     let getUseCounters (switchUseCounts:switchUseCounters) =
         switchUseCounts.useCounts
+
 
     let getUsedSwitchCount (switchUseCounts:switchUseCounters) =
         switchUseCounts.useCounts
@@ -56,15 +58,26 @@ module SwitchUseCounters =
         |> apply
 
 
+
 type sorterPerf = private  { 
         usedSwitchCount:switchCount; 
         usedStageCount:stageCount;
-        successful:bool
+        isSuccessful:bool
         sortrPhenotypeId:sorterPhenotypeId
-        sortrId:sorterId
+        sortr:sorter
     }
 
 module SorterPerf =
+    let make (switchCt:switchCount) (stageCt:stageCount) 
+             (isSuccessfl:bool) (sorterPhenotypId:sorterPhenotypeId)  
+             (sortr:sorter)  =
+        { 
+            sorterPerf.sortr = sortr 
+            sorterPerf.sortrPhenotypeId = sorterPhenotypId;
+            sorterPerf.usedSwitchCount = switchCt 
+            sorterPerf.usedStageCount = stageCt;
+            sorterPerf.isSuccessful = isSuccessfl
+        }
 
     let fromSorterOpResults
             (sortr:sorter)
@@ -75,24 +88,22 @@ module SorterPerf =
             |> SwitchUseCounters.fromSorterOpResults 
             |> SwitchUseCounters.getUsedSwitchesFromSorter sortr
 
-        let sortrPhenotypeId = usedSwitches |> SorterPhenotypeId.create
-
-        let usedStageCount = 
+        let sortr = 
+            sortrOpResults |> SorterOpResults.getSorter
+        let sortrPhenotypId = 
+            usedSwitches |> SorterPhenotypeId.create
+        let usedSwitchCt = 
+            usedSwitches.Length |> SwitchCount.create;
+        let usedStageCt = 
             (usedSwitches |> StageCover.getStageCount)
-        { 
-            sorterPerf.sortrId = sortrOpResults 
-                        |> SorterOpResults.getSorter
-                        |> Sorter.getSorterId;
-            sorterPerf.sortrPhenotypeId = sortrPhenotypeId;
-            sorterPerf.usedSwitchCount = usedSwitches.Length 
-                        |> SwitchCount.create;
-            sorterPerf.usedStageCount = usedStageCount;
-            sorterPerf.successful = sortrOpResults 
-                        |> SorterOpResults.isSorted
-        }
+        let isSuccessfl = 
+            sortrOpResults |> SorterOpResults.isSorted
 
-    let isSucessful (perf:sorterPerf) =
-        perf.successful
+        make usedSwitchCt usedStageCt isSuccessfl sortrPhenotypId sortr
+
+
+    let getIsSucessful (perf:sorterPerf) =
+        perf.isSuccessful
 
     let getUsedSwitchCount (perf:sorterPerf) =
         perf.usedSwitchCount
@@ -100,70 +111,135 @@ module SorterPerf =
     let getUsedStageCount (perf:sorterPerf) =
         perf.usedStageCount
 
+    let getSorter (perf:sorterPerf) =
+        perf.sortr
+
+    let getSortrPhenotypeId (perf:sorterPerf) =
+        perf.sortrPhenotypeId
 
 
-//type sorterPerfBin = 
-//    { 
-//        usedSwitchCount:switchCount; 
-//        usedStageCount:stageCount;
-//        successCount:sorterCount;
-//        failCount:sorterCount;
-//    }
+type sorterPerfBin = private { 
+        usedSwitchCount:switchCount; 
+        usedStageCount:stageCount;
+        isSuccessful:bool
+        sortrs:sorter[];
+        sortrPhenotypeId:sorterPhenotypeId;
+    }
 
-//module SorterPerfBin =
+module SorterPerfBin =
     
-//    let fromSorterPerf (sorterPrf:sorterPerf) (srterId:sorterId)  =
-//        if sorterPrf.successful then
-//            {
-//                sorterPerfBin.usedSwitchCount = sorterPrf.usedSwitchCount
-//                sorterPerfBin.usedStageCount = sorterPrf.usedStageCount
-//                sorterPerfBin.successCount = 1 |> SorterCount.create
-//                sorterPerfBin.failCount = 0 |> SorterCount.create
-//            }
-//        else
-//            {
-//                sorterPerfBin.usedSwitchCount = sorterPrf.usedSwitchCount
-//                sorterPerfBin.usedStageCount = sorterPrf.usedStageCount
-//                sorterPerfBin.successCount = 0 |> SorterCount.create
-//                sorterPerfBin.failCount = 1 |> SorterCount.create
-//            }
+    let fromSorterPerfs (sorterPerfs:seq<sorterPerf>) =
+        let _makeBinFromSamePhenotypes
+                (spId:sorterPhenotypeId) 
+                (sorterPerfs:seq<sorterPerf>) =
+            let memA = sorterPerfs |> Seq.toArray
+            {
+                sorterPerfBin.usedSwitchCount = memA.[0].usedSwitchCount
+                sorterPerfBin.usedStageCount = memA.[0].usedStageCount
+                sorterPerfBin.isSuccessful = memA.[0].isSuccessful
+                sorterPerfBin.sortrs =
+                                memA 
+                                |> Array.map(fun sp -> sp.sortr)
+                sorterPerfBin.sortrPhenotypeId = spId
+            }
 
-//    let merge (bins:sorterPerfBin seq) =
-//        let _makeKey (bin:sorterPerfBin) =
-//            (bin.usedSwitchCount, bin.usedStageCount)
-//        let _add (taggedBins:(switchCount*stageCount)*sorterPerfBin array) =
-//            let (wc, tc), bins = taggedBins
-//            let totSuccessCt = 
-//                    bins 
-//                        |> Seq.map(fun bin -> 
-//                            bin.successCount |> SorterCount.value )
-//                        |> Seq.fold (+) 0
-//                        |> SorterCount.create
-
-//            let totFailCt = 
-//                    bins 
-//                        |> Seq.map(fun bin -> 
-//                            bin.failCount |> SorterCount.value )
-//                        |> Seq.fold (+) 0
-//                        |> SorterCount.create
-//            {
-//                sorterPerfBin.usedSwitchCount = wc;
-//                sorterPerfBin.usedStageCount = tc;
-//                sorterPerfBin.successCount = totSuccessCt;
-//                sorterPerfBin.failCount = totFailCt;
-//            }
-
-//        bins 
-//            |> Seq.toArray
-//            |> Array.groupBy(_makeKey)
-//            |> Seq.map(_add)
+        sorterPerfs 
+        |> Seq.groupBy(fun sp -> sp.sortrPhenotypeId)
+        |> Seq.map(fun (spId, mbrs) -> _makeBinFromSamePhenotypes spId mbrs)
 
 
-    
-//    let fromSorterPerfs (perfs:sorterPerf seq) =
-       
-//        perfs |> Seq.map(fromSorterPerf)
-//              |> merge
+    let getIsSucessful (perfBin:sorterPerfBin) =
+        perfBin.isSuccessful
+
+
+    let getUsedSwitchCount (perfBin:sorterPerfBin) =
+        perfBin.usedSwitchCount
+
+
+    let getUsedStageCount (perfBin:sorterPerfBin) =
+        perfBin.usedStageCount
+
+
+    let getSorters (perfBin:sorterPerfBin) =
+        perfBin.sortrs
+
+
+    let getSorterPhenotypeId (perfBin:sorterPerfBin) =
+        perfBin.sortrPhenotypeId
+
+
+type sorterPerfBinReport = private { 
+        usedSwitchCount:switchCount; 
+        usedStageCount:stageCount;
+        successCount:sorterCount
+        failCount:sorterCount
+        successfulPhenotypeCount:int;
+        failurePhenotypeCount:int;
+    }
+
+module SorterPerfBinReport =
+
+    let getUsedSwitchCount (perfR:sorterPerfBinReport) =
+        perfR.usedSwitchCount
+
+    let getUsedStageCount (perfR:sorterPerfBinReport) =
+        perfR.usedStageCount
+
+    let getSucessCount (perfR:sorterPerfBinReport) =
+        perfR.successCount
+
+    let getDistinctSuccessfulPhenotypeCount (perfR:sorterPerfBinReport) =
+        perfR.successfulPhenotypeCount
+
+    let getSortrPhenotypeId (perfR:sorterPerfBinReport) =
+        perfR.failurePhenotypeCount
+
+    // Similar bins have the same switch and stage counts
+    let mergeSimilarBins 
+        (sorterPerfBinReprtA:sorterPerfBinReport) 
+        (sorterPerfBinReprtB:sorterPerfBinReport) =
+        { 
+            sorterPerfBinReport.usedSwitchCount = sorterPerfBinReprtA.usedSwitchCount; 
+            sorterPerfBinReport.usedStageCount = sorterPerfBinReprtA.usedStageCount;
+            sorterPerfBinReport.successCount = 
+                sorterPerfBinReprtA.successCount |> SorterCount.add sorterPerfBinReprtB.successCount;
+            sorterPerfBinReport.failCount =
+                sorterPerfBinReprtA.failCount |> SorterCount.add sorterPerfBinReprtB.failCount;
+            sorterPerfBinReport.successfulPhenotypeCount = 
+                sorterPerfBinReprtA.successfulPhenotypeCount + sorterPerfBinReprtB.successfulPhenotypeCount;
+            sorterPerfBinReport.failurePhenotypeCount =
+                sorterPerfBinReprtA.failurePhenotypeCount + sorterPerfBinReprtB.failurePhenotypeCount;
+        }
+
+
+    let fromSorterPerfBin (sorterPerfBn:sorterPerfBin) =
+        let sortersInBin = sorterPerfBn.sortrs.Length |> SorterCount.create
+        let zerSorters = 0 |> SorterCount.create
+        if (sorterPerfBn.isSuccessful) then
+            { 
+                sorterPerfBinReport.usedSwitchCount = sorterPerfBn.usedSwitchCount; 
+                sorterPerfBinReport.usedStageCount = sorterPerfBn.usedStageCount;
+                sorterPerfBinReport.successCount = sortersInBin;
+                sorterPerfBinReport.failCount = zerSorters;
+                sorterPerfBinReport.successfulPhenotypeCount = 1;
+                sorterPerfBinReport.failurePhenotypeCount = 0;
+            }
+            else
+            { 
+                sorterPerfBinReport.usedSwitchCount = sorterPerfBn.usedSwitchCount; 
+                sorterPerfBinReport.usedStageCount = sorterPerfBn.usedStageCount;
+                sorterPerfBinReport.successCount = zerSorters;
+                sorterPerfBinReport.failCount = sortersInBin;
+                sorterPerfBinReport.successfulPhenotypeCount = 0;
+                sorterPerfBinReport.failurePhenotypeCount = 1;
+            }
+
+    let fromSorterPerfBins (sorterPerfBns:seq<sorterPerfBin>) =
+        sorterPerfBns
+        |> Seq.map(fromSorterPerfBin)
+        |> Seq.groupBy(fun spb -> (spb, spb))
+        |> Seq.map(fun gp -> gp |> snd |> Seq.reduce(mergeSimilarBins))
+
 
 
     //let getMinMaxMeanOfSuccessful (perfM:sorterPerfBin -> double)  

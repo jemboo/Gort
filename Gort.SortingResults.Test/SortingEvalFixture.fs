@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type TestClass () =
+type SortingEvalFixture () =
 
     let getResults 
             (sorterOpTrackMode:sorterOpTrackMode)
@@ -78,3 +78,102 @@ type TestClass () =
 
         Assert.AreEqual(1, 1);
 
+        
+
+    [<TestMethod>]
+    member this.SorterPerfBinReport_fromSorterPerfBins() =
+        let order = 8 |> Order.createNr
+        let sortrA = RefSorter.goodRefSorterForOrder order
+                       |> Result.ExtractOrThrow
+
+
+        let successflA = true
+        let unSuccessflA = false
+        let switchCtA = 11 |> SwitchCount.create
+        let switchCtB = 12 |> SwitchCount.create
+        let switchCtC = 13 |> SwitchCount.create
+        let switchCtD = 14 |> SwitchCount.create
+        let switchCtE = 15 |> SwitchCount.create
+
+        let stageCtA = 1 |> StageCount.create
+        let stageCtB = 2 |> StageCount.create
+        let stageCtC = 3 |> StageCount.create
+
+        let switchSeqA = [|1;2;3;4;5|] 
+                         |> Switch.fromSwitchIndexes
+                         |> Seq.toArray
+
+        let switchSeqB = [|11;12;13;14;15|] 
+                         |> Switch.fromSwitchIndexes
+                         |> Seq.toArray
+
+        let switchSeqC = [|21;22;23;24;25|] 
+                         |> Switch.fromSwitchIndexes
+                         |> Seq.toArray
+
+        let switchSeqD = [|31;12;13;14;15|] 
+                         |> Switch.fromSwitchIndexes
+                         |> Seq.toArray
+
+        let switchSeqE = [|41;22;23;24;25|] 
+                         |> Switch.fromSwitchIndexes
+                         |> Seq.toArray
+
+
+        let srtrPhenoTypeIdA = SorterPhenotypeId.create switchSeqA
+        let srtrPhenoTypeIdB = SorterPhenotypeId.create switchSeqB
+        let srtrPhenoTypeIdC = SorterPhenotypeId.create switchSeqC
+        let srtrPhenoTypeIdD = SorterPhenotypeId.create switchSeqD
+        let srtrPhenoTypeIdE = SorterPhenotypeId.create switchSeqE
+
+
+        let sorterPrfAAA1 = 
+            SorterPerf.make 
+                switchCtA stageCtA successflA srtrPhenoTypeIdA sortrA
+
+        let sorterPrfAAA2 = 
+            SorterPerf.make 
+                switchCtA stageCtA successflA srtrPhenoTypeIdA sortrA
+
+        let sorterPrfABB = 
+            SorterPerf.make 
+                switchCtA stageCtB successflA srtrPhenoTypeIdB sortrA
+
+        let sorterPrfABC = 
+            SorterPerf.make 
+                switchCtA stageCtB successflA srtrPhenoTypeIdC sortrA
+
+        let sorterPrfBAD = 
+            SorterPerf.make 
+                switchCtB stageCtA successflA srtrPhenoTypeIdD sortrA
+
+        let sorterPrfBAE = 
+            SorterPerf.make 
+                switchCtB stageCtA successflA srtrPhenoTypeIdE sortrA
+
+        let sorterPrfs = seq { sorterPrfAAA1; sorterPrfAAA2; sorterPrfABB;
+            sorterPrfABC; sorterPrfBAD; sorterPrfBAE; }
+
+        let totalSortersInSorterPrfs = 
+            sorterPrfs |> Seq.length
+            
+        let sorterPerfBns = 
+            sorterPrfs
+            |> SorterPerfBin.fromSorterPerfs
+            |> Seq.toArray
+
+        let totalSortersInBins = 
+            sorterPerfBns
+            |> Array.map(fun spb -> spb |> SorterPerfBin.getSorters)
+            |> Array.concat
+            |> Array.length
+                            
+        Assert.AreEqual (totalSortersInSorterPrfs, totalSortersInBins)
+
+
+        let sorterPerfBinReprt = 
+            sorterPerfBns 
+            |> SorterPerfBinReport.fromSorterPerfBins
+            |> Seq.toArray
+            
+        Assert.AreEqual (totalSortersInSorterPrfs, totalSortersInBins)
