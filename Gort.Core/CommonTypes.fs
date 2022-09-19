@@ -2,8 +2,15 @@
 open System
 open SysExt
 
-type order = private Order of int
 
+type useParallel = private UseParallel of bool
+module UseParallel =
+    let value (UseParallel v) = v
+    let create (value:bool) =
+        value |> UseParallel
+
+
+type order = private Order of int
 module Order =
     let value (Order v) = v
     let create (value:int) =
@@ -158,8 +165,8 @@ type arrayCount = private ArrayCount of int
 module ArrayCount = 
     let value (ArrayCount v) = v
     let create (value:int) =
-        if (value > 0) then value |> ArrayCount |> Ok
-        else "arrayCount must be greater than 0" |> Error
+        if (value >= 0) then value |> ArrayCount |> Ok
+        else "arrayCount must not be negative" |> Error
     let createNr (value:int) =
         value |> ArrayCount
 
@@ -168,7 +175,7 @@ type arrayLength = private ArrayLength of int
 module ArrayLength = 
     let value (ArrayLength v) = v
     let create (value:int) =
-        if (value > 0) then value |> ArrayLength |> Ok
-        else "arrayLength must be greater than 0" |> Error
+        if (value >= 0) then value |> ArrayLength |> Ok
+        else "arrayLength must not be negative" |> Error
     let createNr (value:int) =
         value |> ArrayLength

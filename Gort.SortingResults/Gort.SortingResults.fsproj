@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortingEval.fs" />
+    <Compile Include="SorterEval.fs" />
+    <Compile Include="SorterSetEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -9,7 +9,8 @@
     <Compile Include="SwitchOpTypes.fs" />
     <Compile Include="SwitchUseTracker.fs" />
     <Compile Include="SortableBySwitchTracker.fs" />
-    <Compile Include="SorterOpTrack.fs" />
+    <Compile Include="SorterOpTracker.fs" />
+    <Compile Include="SorterOpOutput.fs" />
     <Compile Include="SortingWithHistory.fs" />
     <Compile Include="SortingRollout.fs" />
     <Compile Include="Library.fs" />

@@ -233,7 +233,7 @@ module SortingRollout =
                         _bs64Roll
                         sortableCount
 
-        SorterOpResults.make 
+        SorterOpOutput.make 
             sortr
             sortableSt 
             rolloutCopy 
@@ -477,7 +477,7 @@ module SortingRollout =
                                     _bs644Roll
 
 
-        SorterOpResults.make 
+        SorterOpOutput.make 
             sortr 
             sortableSt 
             rolloutCopy 
@@ -486,15 +486,23 @@ module SortingRollout =
 
     let evalSorterWithSortableSet
             (sorterOpTrackMod:sorterOpTrackMode)
-            (sortr:sorter) 
-            (sortableSt:sortableSet) =
+            (sortableSt:sortableSet) 
+            (sortr:sorter) =
+
+        let _wrapo f sorter sortableSet =
+            try
+                f sorter sortableSet |> Ok
+            with
+                | ex -> ("error in evalSorterWithSortableSet: " + ex.Message ) |> Result.Error 
 
         match sorterOpTrackMod with
         | sorterOpTrackMode.SwitchTrack ->
-            applySorterAndMakeSwitchTrack
+            _wrapo
+                applySorterAndMakeSwitchTrack
                 sortr
                 sortableSt
         | sorterOpTrackMode.SwitchUses ->
-            applySorterAndMakeSwitchUses
+            _wrapo
+                applySorterAndMakeSwitchUses
                 sortr
                 sortableSt
