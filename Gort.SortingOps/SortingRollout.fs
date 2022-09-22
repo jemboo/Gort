@@ -484,7 +484,7 @@ module SortingRollout =
             (switchUseTracker |> sorterOpTracker.SwitchTrack )
 
 
-    let evalSorterWithSortableSet
+    let makeSorterOpOutput
             (sorterOpTrackMod:sorterOpTrackMode)
             (sortableSt:sortableSet) 
             (sortr:sorter) =
@@ -493,7 +493,8 @@ module SortingRollout =
             try
                 f sorter sortableSet |> Ok
             with
-                | ex -> ("error in evalSorterWithSortableSet: " + ex.Message ) |> Result.Error 
+                | ex -> 
+            ("error in evalSorterWithSortableSet: " + ex.Message ) |> Result.Error 
 
         match sorterOpTrackMod with
         | sorterOpTrackMode.SwitchTrack ->

@@ -22,7 +22,7 @@ type SortingRolloutFixture () =
 
 
         let sorterOpOutput = 
-            SortingRollout.evalSorterWithSortableSet
+            SortingRollout.makeSorterOpOutput
                                 sorterOpTrackMode
                                 sortableSet
                                 goodSorter
@@ -58,7 +58,7 @@ type SortingRolloutFixture () =
 
 
         let sorterOpOutput = 
-            SortingRollout.evalSorterWithSortableSet
+            SortingRollout.makeSorterOpOutput
                                 sorterOpTrackMode
                                 sortableSet
                                 failingSorter

@@ -32,6 +32,7 @@ type sorterEval =
     | Speed of sorterSpeed 
     | Perf of sorterPerf 
     | Output of sorterOutput
+    | SorterOpOutput of sorterOpOutput
 
 
 module SorterPhenotypeId =
@@ -53,12 +54,12 @@ module SwitchUseCounters =
         { switchUseCounters.useCounts = useCounts}
 
 
-    let getUseCounters (switchUseCounts:switchUseCounters) =
-        switchUseCounts.useCounts
+    let getUseCounters (switchUseCountrs:switchUseCounters) =
+        switchUseCountrs.useCounts
 
 
-    let getUsedSwitchCount (switchUseCounts:switchUseCounters) =
-        switchUseCounts.useCounts
+    let getUsedSwitchCount (switchUseCountrs:switchUseCounters) =
+        switchUseCountrs.useCounts
         |> Seq.filter((<) 0)
         |> Seq.length
         |> SwitchCount.create
@@ -66,8 +67,8 @@ module SwitchUseCounters =
 
     let getUsedSwitchesFromSorter
             (sortr:sorter) 
-            (switchUseCnters:switchUseCounters) =
-        switchUseCnters
+            (switchUseCountrs:switchUseCounters) =
+        switchUseCountrs
         |> getUseCounters
         |> Seq.mapi(fun i w -> i,w)
         |> Seq.filter(fun t -> (snd t) > 0 )
@@ -216,7 +217,11 @@ module SorterOutput =
 
 
 
-type sorterEvalMode = | SorterSpeed | SorterPerf | SorterOutput
+type sorterEvalMode = 
+    | SorterSpeed 
+    | SorterPerf 
+    | SorterOutput
+    | SorterOpOutput
 
 
 module SorterEval =
@@ -227,7 +232,7 @@ module SorterEval =
         (sortr:sorter) = 
 
         let _makeSorterOpOutput = 
-            SortingRollout.evalSorterWithSortableSet
+            SortingRollout.makeSorterOpOutput
                 sorterOpTrackMode.SwitchUses
                 sortableSt
                 sortr
@@ -250,4 +255,9 @@ module SorterEval =
                let! sout = _makeSorterOpOutput
                let! sopSpeed = sout |> SorterOutput.fromSorterOpOutput
                return sopSpeed  |> sorterEval.Output
+            }
+        | SorterOpOutput -> 
+            result {
+               let! sout = _makeSorterOpOutput
+               return sout  |> sorterEval.SorterOpOutput
             }

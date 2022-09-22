@@ -116,8 +116,6 @@ module SorterSpeedBinReport =
 
 
 
-
-
 type sorterPerfBin = private { 
         usedSwitchCount:switchCount; 
         usedStageCount:stageCount;

@@ -136,7 +136,7 @@ type BenchmarkSorterOnBp64() =
     member this.evalSorterWithSortableSet_getUsedSwitchCount_RfBs64() =
         let trackMode = sorterOpTrackMode.SwitchUses
         let sorterOpOutput = 
-            SortingRollout.evalSorterWithSortableSet
+            SortingRollout.makeSorterOpOutput
                                 trackMode
                                 sortableSet_RfBs64
                                 sorter16
@@ -151,7 +151,7 @@ type BenchmarkSorterOnBp64() =
     member this.evalSorterWithSortableSetR_getUsedSwitchCount_RfBs64() =
         let trackMode = sorterOpTrackMode.SwitchUses
         let sorterOpOutput = 
-            SortingRollout.evalSorterWithSortableSet
+            SortingRollout.makeSorterOpOutput
                                 trackMode
                                 sortableSet_RfBs64
                                 sorter16
