@@ -11,9 +11,6 @@ type SortingEvalFixture () =
             (rolloutFormat:rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = 123 |> SortableSetId.create
-        //let goodSorter = 
-        //    RefSorter.goodRefSorterForOrder order 
-        //    |> Result.ExtractOrThrow
         let switchCount = SwitchCount.orderTo900SwitchCount order
         let rando = Rando.create 
                         rngType.Lcg
@@ -32,13 +29,12 @@ type SortingEvalFixture () =
                                 order
             |> Result.ExtractOrThrow
 
-
         let sorterOpOutput = 
             SortingRollout.makeSorterOpOutput
                                 sorterOpTrackMode
                                 sortableSet
                                 goodSorter
-                            |> Result.ExtractOrThrow
+            |> Result.ExtractOrThrow
  
         goodSorter, sorterOpOutput
 
@@ -76,7 +72,7 @@ type SortingEvalFixture () =
                                 sorterOpTrackMode
                                 sortableSet
                                 failingSorter
-                            |> Result.ExtractOrThrow
+            |> Result.ExtractOrThrow
  
         failingSorter, sorterOpOutput
 
@@ -120,10 +116,8 @@ type SortingEvalFixture () =
         let suCt_RfBs64_su = sot_RfBs64_su |> SwitchUseCounters.fromSorterOpTracker
         let switches_RfBs64_su = suCt_RfBs64_su |> SwitchUseCounters.getUsedSwitchesFromSorter srtr
         Assert.IsTrue(CollectionProps.areEqual switches_RfU8_su switches_RfBs64_su)
-
-
-
         Assert.AreEqual(1, 1);
+
 
     [<TestMethod>]
     member this.refineSortableSetOfPermutations() =
@@ -135,7 +129,8 @@ type SortingEvalFixture () =
         let sortableSetFormat_RfU8 = rolloutFormat.RfU8 
         let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
 
-        let sortr, res_RfU8_su =  getResultsOfRandomPermutations sotmSwitchUses sortableSetFormat_RfU8
+        let sortr, res_RfU8_su = 
+            getResultsOfRandomPermutations sotmSwitchUses sortableSetFormat_RfU8
 
         let origSet_RfU8_su =
             res_RfU8_su 
@@ -150,7 +145,6 @@ type SortingEvalFixture () =
             |> Result.ExtractOrThrow
             |> Rollout.toIntArrays
             |> Seq.toArray
-
 
         Assert.AreEqual(1, 1);
 

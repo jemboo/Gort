@@ -25,6 +25,11 @@ module Result =
         | Ok v -> v
         | Error ex -> failwith (sprintf "%A" ex)
 
+    let ExtractErrorOrThrow (res:Result<'a, 'b>) =
+        match res with
+        | Ok v -> failwith (sprintf "%A" v)
+        | Error ev -> ev
+
     let ErrorOnException f arg =
         try
             f arg |> Ok

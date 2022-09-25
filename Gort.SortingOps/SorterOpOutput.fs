@@ -22,7 +22,6 @@ module SorterOpOutput =
     let getSorter (sorterOpOutput:sorterOpOutput) =
         sorterOpOutput.sortr
 
-
     let getSortableSet (sorterOpOutput:sorterOpOutput) =
         sorterOpOutput.sortableSt
 

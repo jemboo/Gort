@@ -494,7 +494,8 @@ module SortingRollout =
                 f sorter sortableSet |> Ok
             with
                 | ex -> 
-            ("error in evalSorterWithSortableSet: " + ex.Message ) |> Result.Error 
+                    (sprintf "error in evalSorterWithSortableSet: %s" ex.Message )
+                    |> Result.Error 
 
         match sorterOpTrackMod with
         | sorterOpTrackMode.SwitchTrack ->
