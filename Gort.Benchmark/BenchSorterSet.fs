@@ -30,6 +30,12 @@ open BenchmarkDotNet.Attributes
 //| evalSortableSet_RfBs64_SorterOpOutput |   158.1 ms |  3.16 ms |  5.10 ms |   57.06 MB |
 //|  evalSortableSet_RfI32_SorterOpOutput | 3,537.7 ms | 68.57 ms | 98.34 ms | 1800.44 MB |
 
+
+//|                 Method |       Mean |    Error |   StdDev | Allocated |
+//|----------------------- |-----------:|---------:|---------:|----------:|
+//| evalSortableSet_RfBs64 |   150.5 ms |  1.97 ms |  1.74 ms |  57.13 MB |
+//|  evalSortableSet_RfI32 | 3,493.4 ms | 43.00 ms | 40.22 ms | 1800.5 MB |
+
 [<MemoryDiagnoser>]
 type BenchSorterSet() =
     let rnGen = RngGen.createLcg  (123 |> RandomSeed.create)

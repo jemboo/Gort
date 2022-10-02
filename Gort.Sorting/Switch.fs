@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-
+[<Struct>]
 type switch = {low:int; hi:int}
 
 module Switch = 

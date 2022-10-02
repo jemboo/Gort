@@ -219,7 +219,6 @@ module SorterOutput =
         }
 
 
-
 type sorterEvalMode = 
     | SorterSpeed 
     | SorterPerf 

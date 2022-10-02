@@ -229,12 +229,12 @@ type SortingEvalFixture () =
             
         let sorterPerfBns = 
             sorterPrfs
-            |> SorterPerfBin.fromSorterPerfs
+            |> SorterPhenotypePerf.fromSorterPerfs
             |> Seq.toArray
 
         let totalSortersInBins = 
             sorterPerfBns
-            |> Array.map(fun spb -> spb |> SorterPerfBin.getSorters)
+            |> Array.map(fun spb -> spb |> SorterPhenotypePerf.getSorters)
             |> Array.concat
             |> Array.length
                             
@@ -243,7 +243,7 @@ type SortingEvalFixture () =
 
         let sorterPerfBinReprt = 
             sorterPerfBns 
-            |> SorterPerfBinReport.fromSorterPerfBins
+            |> Array.map(SorterPerf2.fromSorterPerfBin)
             |> Seq.toArray
             
         Assert.AreEqual (totalSortersInSorterPrfs, totalSortersInBins)

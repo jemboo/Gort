@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="SortingEvalFixture.fs" />
     <Compile Include="SorterSetEvalFixture.fs" />
+    <Compile Include="SorterSetReportingFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

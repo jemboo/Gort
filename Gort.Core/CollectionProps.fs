@@ -140,8 +140,6 @@ module CollectionProps =
                   proceed <- (curTup |> Option.isSome)
             }
 
-
-
     let fixedPointCount (a:int[]) =
         a |> Array.mapi(fun dex e -> if (dex = e) then 1 else 0)
           |> Array.reduce(+)
