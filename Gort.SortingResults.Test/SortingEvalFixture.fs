@@ -243,7 +243,7 @@ type SortingEvalFixture () =
 
         let sorterPerfBinReprt = 
             sorterPerfBns 
-            |> Array.map(SorterPerf2.fromSorterPerfBin)
+            |> Array.map(SorterPhenotypePerfsForSpeedBin.fromSorterPerfBin)
             |> Seq.toArray
             
         Assert.AreEqual (totalSortersInSorterPrfs, totalSortersInBins)

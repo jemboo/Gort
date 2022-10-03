@@ -38,7 +38,7 @@ type SorterSetReportingFixture () =
     member this.getBins() =
         let ordr = 16 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
-        let sorterCt = SorterCount.create 2000
+        let sorterCt = SorterCount.create 200
         let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
         let sorterSt = SorterSet.createRandomSwitches
                         ordr
@@ -54,16 +54,71 @@ type SorterSetReportingFixture () =
                             ordr
                          |> Result.ExtractOrThrow
 
-        let sorterEvalMod = sorterEvalMode.SorterSpeed
         let useParalll = true |> UseParallel.create
-        let sorterEvls, errs = 
+
+
+        let sorterSpeedEvls, errs = 
                 SorterSetEval.eval
-                        sorterEvalMod
+                        sorterEvalMode.SorterSpeed
                         sortableSt
                         sorterSt
                         useParalll
 
+        let sorterSpeedRs =
+                sorterSpeedEvls
+                |> Array.map(SorterEval.getSorterSpeed)
+                |> Array.toList
+        
+        let sorterSpeeds =
+                sorterSpeedRs
+                |> Result.sequence
+                |> Result.ExtractOrThrow
+
+        let spsfsbs = 
+            sorterSpeeds
+             |> SorterPhenotypeSpeedsForSpeedBin.fromSorterSpeeds
+             |> Seq.toArray
+             |> Array.sortBy(fun sp -> 
+                    sp |> SorterPhenotypeSpeedsForSpeedBin.getSpeedBin
+                       |> SorterSpeedBin.getIndexOfBin )
 
 
+    //////////////
+        let sorterPerfEvls, errs = 
+                SorterSetEval.eval
+                        sorterEvalMode.SorterPerf
+                        sortableSt
+                        sorterSt
+                        useParalll
+
+        let sorterPerfRs =
+                sorterPerfEvls
+                |> Array.map(SorterEval.getSorterPerf)
+                |> Array.toList
+        
+        let sorterPerfs =
+                sorterPerfRs
+                |> Result.sequence
+                |> Result.ExtractOrThrow
+
+        let sppfsbs = 
+            sorterPerfs
+             |> SorterPhenotypePerfsForSpeedBin.fromSorterPerfs
+             |> Seq.toArray
+             |> Array.sortBy(fun sp -> 
+                    sp |> SorterPhenotypePerfsForSpeedBin.getSpeedBin
+                       |> SorterSpeedBin.getIndexOfBin)
+
+
+        let mutable dex = 0
+
+        while dex < sppfsbs.Length do
+            let res =
+                SorterPhenotypePerfsForSpeedBin.couldBeTheSame 
+                        sppfsbs.[dex] 
+                        spsfsbs.[dex]
+
+            Assert.IsTrue(res)
+            dex <- dex + 1
 
         Assert.AreEqual(1, 1);
