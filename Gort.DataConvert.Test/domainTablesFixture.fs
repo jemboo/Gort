@@ -1,9 +1,10 @@
 namespace Gort.DataConvert.Test
+
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open Gort.DataStore.DataModel
 
 [<TestClass>]
-type domainTablesFixture () =
+type domainTablesFixture() =
 
     let makeCause () =
         let causeR = new CauseR()
@@ -14,7 +15,7 @@ type domainTablesFixture () =
 
     [<TestMethod>]
     member this.rngGenToRandGenR() =
-        let causeR = makeCause()
+        let causeR = makeCause ()
         let causePath = "causePath"
         let seedV = 123
         let seed = seedV |> RandomSeed.create
@@ -27,7 +28,7 @@ type domainTablesFixture () =
 
     [<TestMethod>]
     member this.sorterMutatorToComponentR() =
-        let causeR = makeCause()
+        let causeR = makeCause ()
         let causePath = "causePath"
         let stageMutRate = 0.7 |> StageMutationRate.create
         let sum = SorterUniformMutator.mutateByStage stageMutRate |> sorterMutator.Uniform

@@ -1,15 +1,19 @@
 ﻿namespace global
+
 open BenchmarkDotNet.Attributes
 
 
 [<MemoryDiagnoser>]
 type BenchMakeSortableStack() =
     let order = Order.create 16 |> Result.ExtractOrThrow
-    let orders = [| Order.create 8; Order.create 4; Order.create 2; Order.create 2 |]
-                  |> Array.toList
-                  |> Result.sequence
-                  |> Result.ExtractOrThrow
-                  |> List.toArray
+
+    let orders =
+        [| Order.create 8; Order.create 4; Order.create 2; Order.create 2 |]
+        |> Array.toList
+        |> Result.sequence
+        |> Result.ExtractOrThrow
+        |> List.toArray
+
     let offset = 7
 
 
@@ -68,41 +72,34 @@ type BenchMakeSortableStack() =
 
 
 type BenchmarkSorterOnBp64() =
-    let order = (Order.createNr 16 )
-    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 
-                        |> Result.ExtractOrThrow
+    let order = (Order.createNr 16)
+    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
 
     let sortableSetId = 123 |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
-    let sortableSet_RfBs64 = 
-        SortableSet.makeAllBits
-                            sortableSetId
-                            sortableSetFormat_RfBs64
-                            order
+
+    let sortableSet_RfBs64 =
+        SortableSet.makeAllBits sortableSetId sortableSetFormat_RfBs64 order
         |> Result.ExtractOrThrow
 
-    let sortableSetFormat_RfI32= rolloutFormat.RfI32
-    let sortableSet_RfI32 = 
-        SortableSet.makeAllBits
-                            sortableSetId
-                            sortableSetFormat_RfI32
-                            order
+    let sortableSetFormat_RfI32 = rolloutFormat.RfI32
+
+    let sortableSet_RfI32 =
+        SortableSet.makeAllBits sortableSetId sortableSetFormat_RfI32 order
         |> Result.ExtractOrThrow
 
 
 
-    let sortableSetFormat_RfU8= rolloutFormat.RfU8
-    let sortableSet_RfU8 = 
-        SortableSet.makeAllBits
-                            sortableSetId
-                            sortableSetFormat_RfU8
-                            order
+    let sortableSetFormat_RfU8 = rolloutFormat.RfU8
+
+    let sortableSet_RfU8 =
+        SortableSet.makeAllBits sortableSetId sortableSetFormat_RfU8 order
         |> Result.ExtractOrThrow
 
 
     //[<Benchmark>]
     //member this.applySorterAndMakeSwitchUses_RfBs64() =
-    //    let sorterOpOutput = 
+    //    let sorterOpOutput =
     //        SortingRollout.applySorterAndMakeSwitchUses
     //                            sorter16
     //                            sortableSet_RfBs64
@@ -111,7 +108,7 @@ type BenchmarkSorterOnBp64() =
 
     //[<Benchmark>]
     //member this.applySorterAndMakeSwitchTrack_RfBs64() =
-    //    let sorterOpOutput = 
+    //    let sorterOpOutput =
     //        SortingRollout.applySorterAndMakeSwitchTrack
     //                            sorter16
     //                            sortableSet_RfBs64
@@ -120,12 +117,12 @@ type BenchmarkSorterOnBp64() =
 
     //[<Benchmark>]
     //member this.applySorterAndMakeSwitchUses_getUsedSwitchCount_RfBs64() =
-    //    let sorterOpOutput = 
+    //    let sorterOpOutput =
     //        SortingRollout.applySorterAndMakeSwitchUses
     //                            sorter16
     //                            sortableSet_RfBs64
-    //    let usedSwitchCt = 
-    //        sorterOpOutput 
+    //    let usedSwitchCt =
+    //        sorterOpOutput
     //        |> SwitchUseCounters.fromSorterOpOutput
     //        |> SwitchUseCounters.getUsedSwitchCount
     //    sorterOpOutput, usedSwitchCt
@@ -135,180 +132,179 @@ type BenchmarkSorterOnBp64() =
     [<Benchmark>]
     member this.evalSorterWithSortableSet_getUsedSwitchCount_RfBs64() =
         let trackMode = sorterOpTrackMode.SwitchUses
-        let sorterOpOutput = 
-            SortingRollout.makeSorterOpOutput
-                                trackMode
-                                sortableSet_RfBs64
-                                sorter16
-                            |> Result.ExtractOrThrow
-        let usedSwitchCt = 
-            sorterOpOutput 
+
+        let sorterOpOutput =
+            SortingRollout.makeSorterOpOutput trackMode sortableSet_RfBs64 sorter16
+            |> Result.ExtractOrThrow
+
+        let usedSwitchCt =
+            sorterOpOutput
             |> SwitchUseCounters.fromSorterOpOutput
             |> SwitchUseCounters.getUsedSwitchCount
+
         sorterOpOutput, usedSwitchCt
 
     [<Benchmark>]
     member this.evalSorterWithSortableSetR_getUsedSwitchCount_RfBs64() =
         let trackMode = sorterOpTrackMode.SwitchUses
-        let sorterOpOutput = 
-            SortingRollout.makeSorterOpOutput
-                                trackMode
-                                sortableSet_RfBs64
-                                sorter16
+
+        let sorterOpOutput =
+            SortingRollout.makeSorterOpOutput trackMode sortableSet_RfBs64 sorter16
             |> Result.ExtractOrThrow
 
-        let usedSwitchCt = 
-            sorterOpOutput 
+        let usedSwitchCt =
+            sorterOpOutput
             |> SwitchUseCounters.fromSorterOpOutput
             |> SwitchUseCounters.getUsedSwitchCount
+
         sorterOpOutput, usedSwitchCt
 
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_getSwitchUseCts_RfBs64() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfBs64
-    //    let usedSwitchCt = 
-    //        sorterOpOutput 
-    //        |> SwitchUseCounters.fromSorterOpOutput
-    //        |> SwitchUseCounters.getUsedSwitchCount
-    //    sorterOpOutput, usedSwitchCt
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_getSwitchUseCts_RfBs64() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfBs64
+//    let usedSwitchCt =
+//        sorterOpOutput
+//        |> SwitchUseCounters.fromSorterOpOutput
+//        |> SwitchUseCounters.getUsedSwitchCount
+//    sorterOpOutput, usedSwitchCt
 
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchUses_checkSorted_RfBs64() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfBs64
-    //    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
-    //    sorterOpOutput, isSorted
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchUses_checkSorted_RfBs64() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfBs64
+//    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
+//    sorterOpOutput, isSorted
 
 
 
-    //[<Benchmark>]
-    //member this.applySorter_getUsedSwitchCount_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfI32
+//[<Benchmark>]
+//member this.applySorter_getUsedSwitchCount_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfI32
 
-    //    let usedSwitchCt = 
-    //        sorterOpOutput 
-    //        |> SwitchUseCounters.fromSorterOpOutput
-    //        |> SwitchUseCounters.getUsedSwitchCount
-    //    sorterOpOutput, usedSwitchCt
-
-
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    sorterOpOutput
+//    let usedSwitchCt =
+//        sorterOpOutput
+//        |> SwitchUseCounters.fromSorterOpOutput
+//        |> SwitchUseCounters.getUsedSwitchCount
+//    sorterOpOutput, usedSwitchCt
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchUses_checkSorted_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
-    //    sorterOpOutput, isSorted
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfI32
+//    sorterOpOutput
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchUses_checkSorted_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
-    //    sorterOpOutput, isSorted
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchUses_checkSorted_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfI32
+//    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
+//    sorterOpOutput, isSorted
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_getUnsortedCt_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    let unSortedCt = sorterOpOutput 
-    //                     |> SorterOpOutput.getUnsortedCt
-    //                     |> Result.ExtractOrThrow
-    //    sorterOpOutput, unSortedCt
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchUses_checkSorted_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfI32
+//    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
+//    sorterOpOutput, isSorted
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_checkSorted_RfBs64() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfBs64
-    //    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
-    //    sorterOpOutput, isSorted
-
-    
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_getUnsortedCt_RfBs64() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfBs64
-    //    let unSortedCt = 
-    //        sorterOpOutput 
-    //                |> SorterOpOutput.getRefinedSortableSet
-    //                |> Result.ExtractOrThrow
-    //    sorterOpOutput, unSortedCt
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_getUnsortedCt_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfI32
+//    let unSortedCt = sorterOpOutput
+//                     |> SorterOpOutput.getUnsortedCt
+//                     |> Result.ExtractOrThrow
+//    sorterOpOutput, unSortedCt
 
 
-
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchUses_getSwitchUseCts_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    let usedSwitchCt = 
-    //        sorterOpOutput 
-    //        |> SwitchUseCounters.fromSorterOpOutput
-    //        |> SwitchUseCounters.getUsedSwitchCount
-    //    sorterOpOutput, usedSwitchCt
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_checkSorted_RfBs64() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfBs64
+//    let isSorted = sorterOpOutput |> SorterOpOutput.isSorted
+//    sorterOpOutput, isSorted
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_getSwitchUseCts_RfI32() =
-    //    let sorterOpOutput = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfI32
-    //    let usedSwitchCt = 
-    //        sorterOpOutput 
-    //        |> SwitchUseCounters.fromSorterOpOutput
-    //        |> SwitchUseCounters.getUsedSwitchCount
-    //    sorterOpOutput, usedSwitchCt
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_getUnsortedCt_RfBs64() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfBs64
+//    let unSortedCt =
+//        sorterOpOutput
+//                |> SorterOpOutput.getRefinedSortableSet
+//                |> Result.ExtractOrThrow
+//    sorterOpOutput, unSortedCt
 
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchUses_RfU8() =
-    //    let sorterResults = 
-    //        SortingRollout.applySorterAndMakeSwitchUses
-    //                            sorter16
-    //                            sortableSet_RfU8
-    //    sorterResults
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchUses_getSwitchUseCts_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfI32
+//    let usedSwitchCt =
+//        sorterOpOutput
+//        |> SwitchUseCounters.fromSorterOpOutput
+//        |> SwitchUseCounters.getUsedSwitchCount
+//    sorterOpOutput, usedSwitchCt
 
 
-    //[<Benchmark>]
-    //member this.applySorterAndMakeSwitchTrack_RfU8() =
-    //    let sorterResults = 
-    //        SortingRollout.applySorterAndMakeSwitchTrack
-    //                            sorter16
-    //                            sortableSet_RfU8
-    //    sorterResults
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_getSwitchUseCts_RfI32() =
+//    let sorterOpOutput =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfI32
+//    let usedSwitchCt =
+//        sorterOpOutput
+//        |> SwitchUseCounters.fromSorterOpOutput
+//        |> SwitchUseCounters.getUsedSwitchCount
+//    sorterOpOutput, usedSwitchCt
+
+
+
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchUses_RfU8() =
+//    let sorterResults =
+//        SortingRollout.applySorterAndMakeSwitchUses
+//                            sorter16
+//                            sortableSet_RfU8
+//    sorterResults
+
+
+//[<Benchmark>]
+//member this.applySorterAndMakeSwitchTrack_RfU8() =
+//    let sorterResults =
+//        SortingRollout.applySorterAndMakeSwitchTrack
+//                            sorter16
+//                            sortableSet_RfU8
+//    sorterResults

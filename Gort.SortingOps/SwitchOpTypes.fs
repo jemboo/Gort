@@ -1,4 +1,5 @@
 ﻿namespace global
+
 open SysExt
 
 
@@ -7,6 +8,6 @@ type sorterOpTrackMode =
     | SwitchTrack
 
 
-type switchOpMode = 
-    | Standard 
+type switchOpMode =
+    | Standard
     | BitStriped

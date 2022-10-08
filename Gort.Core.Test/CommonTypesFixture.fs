@@ -4,7 +4,7 @@ open SysExt
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type CommonTypesFixture () =
+type CommonTypesFixture() =
 
     [<TestMethod>]
     member this.Degree_maxSwitchesPerStage() =
@@ -12,7 +12,7 @@ type CommonTypesFixture () =
         let msw = 3
         let cc = Order.maxSwitchesPerStage order
         Assert.AreEqual(msw, cc)
-    
+
 
     [<TestMethod>]
     member this.Degree_reflect() =
@@ -30,35 +30,41 @@ type CommonTypesFixture () =
 
 
     [<TestMethod>]
-    member this.TestMethodPassing () =
+    member this.TestMethodPassing() =
         let ord = Order.createNr 8
         let sA = Order.twoSymbolOrderedArray ord 6 1us 0us
-        let sAs = Order.allTwoSymbolOrderedArrays ord 1us 0us
-                    |> Seq.toArray
-        Assert.AreEqual(sA.Length, (Order.value ord));
-        Assert.AreEqual(sAs.Length, (Order.value ord) + 1);
+        let sAs = Order.allTwoSymbolOrderedArrays ord 1us 0us |> Seq.toArray
+        Assert.AreEqual(sA.Length, (Order.value ord))
+        Assert.AreEqual(sAs.Length, (Order.value ord) + 1)
 
 
     [<TestMethod>]
-    member this.SymbolCount0ToByteWidth () =
+    member this.SymbolCount0ToByteWidth() =
         let sc = 9uL |> SymbolSetSize.createNr
-        let bw = sc |> BitsPerSymbol.fromSymbolSetSize
-                    |> Result.ExtractOrThrow
-                    |> BitsPerSymbol.value
-        Assert.AreEqual(4, bw);
+
+        let bw =
+            sc
+            |> BitsPerSymbol.fromSymbolSetSize
+            |> Result.ExtractOrThrow
+            |> BitsPerSymbol.value
+
+        Assert.AreEqual(4, bw)
 
     [<TestMethod>]
-    member this.leftmost_index () =
+    member this.leftmost_index() =
         let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
         let mutable i = 0
+
         while i < 100 do
             let nuRnd = randy.NextULong
             let leftDex = nuRnd.leftmost_index
             let bv = nuRnd.get (leftDex + 0)
             let bvS = nuRnd.get (leftDex + 1)
             Assert.IsTrue(bv)
+
             if (leftDex < 63) then
                 Assert.IsFalse(bvS)
+
             i <- i + 1
 
-        Assert.AreEqual(3, 3);
+        Assert.AreEqual(3, 3)

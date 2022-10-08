@@ -1,12 +1,11 @@
 namespace Gort.DataConvert.Test
+
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open DomainTables
 
 [<TestClass>]
-type sortableSetDtoFixture () =
+type sortableSetDtoFixture() =
 
 
     [<TestMethod>]
-    member this.test() =
-        Assert.IsTrue(true)
-
+    member this.test() = Assert.IsTrue(true)

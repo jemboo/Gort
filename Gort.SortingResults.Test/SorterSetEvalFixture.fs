@@ -3,7 +3,7 @@ namespace Gort.SortingResults.Test
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterSetEvalFixture () =
+type SorterSetEvalFixture() =
 
     [<TestMethod>]
     member this.getResults() =
@@ -11,34 +11,24 @@ type SorterSetEvalFixture () =
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 2000
         let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
-        let sorterSt = SorterSet.createRandomSwitches
-                        ordr
-                        [||]
-                        switchCt
-                        sorterCt
-                        rnGn
+        let sorterSt = SorterSet.createRandomSwitches ordr [||] switchCt sorterCt rnGn
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create 123
-        let sortableSt = SortableSet.makeAllBits 
-                            sortableStId 
-                            rolloutFormt
-                            ordr
-                         |> Result.ExtractOrThrow
+
+        let sortableSt =
+            SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
         let sorterEvalMod = sorterEvalMode.SorterSpeed
         let useParalll = true |> UseParallel.create
-        let sorterEvls, errs = 
-                SorterSetEval.eval
-                        sorterEvalMod
-                        sortableSt
-                        sorterSt
-                        useParalll
 
-        Assert.AreEqual(sorterEvls.Length, (sorterCt |> SorterCount.value));
+        let sorterEvls, errs =
+            SorterSetEval.eval sorterEvalMod sortableSt sorterSt useParalll
+
+        Assert.AreEqual(sorterEvls.Length, (sorterCt |> SorterCount.value))
 
 
     [<TestMethod>]
     member this.tt() =
 
 
-        Assert.AreEqual(1, 1);
+        Assert.AreEqual(1, 1)

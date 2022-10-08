@@ -1,12 +1,11 @@
 ﻿namespace global
+
 open Microsoft.FSharp.Core
 open Gort.DataStore.DataModel
 
 
 module DomainTables =
-    let checkComponentR (componentR:ComponentR) 
-                        (categoryName:string) 
-                        (versionName:string) =
+    let checkComponentR (componentR: ComponentR) (categoryName: string) (versionName: string) =
 
         match (componentR.Category, componentR.Version) with
         | (c, v) when (c = categoryName && v = versionName) -> true |> Ok
@@ -14,9 +13,7 @@ module DomainTables =
 
 
 
-    let rngGenToComponentR (rg:rngGen) 
-                           (causeR:CauseR) 
-                           (causePath:string) =
+    let rngGenToComponentR (rg: rngGen) (causeR: CauseR) (causePath: string) =
         let cereal = rg |> RngGenDto.toDto |> Json.serialize
         let componentR = new ComponentR()
         componentR.CauseR <- causeR
@@ -27,21 +24,22 @@ module DomainTables =
         componentR
 
 
-    let componentRToRngGen (componentR:ComponentR) =
+    let componentRToRngGen (componentR: ComponentR) =
         result {
-            let chk = checkComponentR componentR (nameof Versions.RandGen) Versions.RandGen.rndGen
+            let chk =
+                checkComponentR componentR (nameof Versions.RandGen) Versions.RandGen.rndGen
+
             let! dto = componentR.Json |> Json.deserialize<rngGenDto>
-            let! rg = ( dto |> RngGenDto.fromDto)
+            let! rg = (dto |> RngGenDto.fromDto)
             return rg
         }
 
-    let sorterMutatorToComponentR (sm:sorterMutator) 
-                                  (causeR:CauseR) 
-                                  (causePath:string) =
+    let sorterMutatorToComponentR (sm: sorterMutator) (causeR: CauseR) (causePath: string) =
         let componentR = new ComponentR()
         componentR.CauseR <- causeR
         componentR.CausePath <- causePath
         componentR.Category <- nameof Versions.SorterMutator
+
         let (vers, cereal) =
             match sm with
             | Uniform sum ->
@@ -53,29 +51,28 @@ module DomainTables =
         componentR
 
 
-    let componentRToSorterMutator (componentR:ComponentR) =
+    let componentRToSorterMutator (componentR: ComponentR) =
         result {
             match componentR.Version with
             | Versions.SorterMutator.uniform ->
-                return! componentR.Json  |> SorterUniformMutatorDto.fromJson
-                                         |> Result.map(sorterMutator.Uniform)
-            | _ -> 
-               return! (sprintf "%s is not matched" componentR.Version) |> Error
+                return!
+                    componentR.Json
+                    |> SorterUniformMutatorDto.fromJson
+                    |> Result.map (sorterMutator.Uniform)
+            | _ -> return! (sprintf "%s is not matched" componentR.Version) |> Error
         }
 
 
-    let bitPackToBitPackR (bitPack:bitPack) =
-        let bitPackR = new BitPackR();
+    let bitPackToBitPackR (bitPack: bitPack) =
+        let bitPackR = new BitPackR()
         let dd = bitPack |> BitPack.getData
-        bitPackR.BitsPerSymbol <- bitPack |> BitPack.getBitsPerSymbol 
-                                          |> BitsPerSymbol.value
-        bitPackR.SymbolCount <- bitPack |> BitPack.getSymbolCount 
-                                        |> SymbolCount.value
+        bitPackR.BitsPerSymbol <- bitPack |> BitPack.getBitsPerSymbol |> BitsPerSymbol.value
+        bitPackR.SymbolCount <- bitPack |> BitPack.getSymbolCount |> SymbolCount.value
         bitPackR.Data <- bitPack |> BitPack.getData
         bitPackR
 
 
-    let bitPackRToBitPack (bitPackR:BitPackR) =
+    let bitPackRToBitPack (bitPackR: BitPackR) =
         result {
             let! bitsPerSymbol = bitPackR.BitsPerSymbol |> BitsPerSymbol.create
             let! symbolCount = bitPackR.SymbolCount |> SymbolCount.create
@@ -84,30 +81,29 @@ module DomainTables =
             return bitPack
         }
 
-    let rec sortableSetRIdToSortableSet (ctxt:IGortContext2) (sortableSetRId:int) =
+    let rec sortableSetRIdToSortableSet (ctxt: IGortContext2) (sortableSetRId: int) =
 
-        let _rngGenLookup (ctxt:IGortContext2) (rndGenId:int) =
+        let _rngGenLookup (ctxt: IGortContext2) (rndGenId: int) =
             result {
                 let! rndGenR = DbLookup.GetRandGenRById ctxt rndGenId
                 return! componentRToRngGen rndGenR
             }
 
-        let _sortableSetLookup (ctxt:IGortContext2) (sortableSetRId:int) =
+        let _sortableSetLookup (ctxt: IGortContext2) (sortableSetRId: int) =
             result {
                 let! order = 8 |> Order.create
                 let fmt = rolloutFormat.RfI32
-                return! SortableSet.makeAllBits 
-                    (sortableSetRId |> SortableSetId.create) fmt order 
+                return! SortableSet.makeAllBits (sortableSetRId |> SortableSetId.create) fmt order
             }
 
-        let _sorterLookup (ctxt:IGortContext2) (sorterId:int) =
+        let _sorterLookup (ctxt: IGortContext2) (sorterId: int) =
             result {
                 let! order = 8 |> Order.create
                 let switchCt = 100 |> SwitchCount.create
                 return Sorter.fromSwitches order Seq.empty<switch>
             }
-        
-        let _bitpackLookup (ctxt:IGortContext2) (bitpackId:int) =
+
+        let _bitpackLookup (ctxt: IGortContext2) (bitpackId: int) =
             result {
                 let! bitpackR = DbLookup.GetBitPackRById ctxt bitpackId
                 return! bitPackRToBitPack bitpackR
@@ -117,27 +113,18 @@ module DomainTables =
             let! sortableSetR = DbLookup.GetSortableSetRById ctxt sortableSetRId
             let! ssVers = sortableSetR.Version |> SortableSetVersion.parse
 
-            return! match ssVers with
-                    | AllBitsForOrder -> 
-                            SortableSetAllBitsDto.fromJson sortableSetR.Json
-                    | Orbit -> 
-                            SortableSetOrbitDto.fromJson sortableSetR.Json
-                    | SortedStack -> 
-                            SortableSetSortedStacksDto.fromJson sortableSetR.Json
-                    | RandomPermutation -> 
-                            SortableSetRandomPermutationDto.fromJson sortableSetR.Json 
-                                                                     (_rngGenLookup ctxt)
-                    | RandomBits -> 
-                            SortableSetRandomBitsDto.fromJson sortableSetR.Json 
-                                                              (_rngGenLookup ctxt)
-                    | RandomSymbols -> 
-                            SortableSetRandomSymbolsDto.fromJson sortableSetR.Json 
-                                                                 (_rngGenLookup ctxt)
-                    | Explicit -> 
-                            SortableSetExplicitDto.fromJson sortableSetR.Json 
-                                                              (_bitpackLookup ctxt)
-                    | SwitchReduced -> 
-                            SortableSetSwitchReducedDto.fromJson sortableSetR.Json 
-                                                                 (sortableSetRIdToSortableSet ctxt)
-                                                                 (_sorterLookup ctxt)
+            return!
+                match ssVers with
+                | AllBitsForOrder -> SortableSetAllBitsDto.fromJson sortableSetR.Json
+                | Orbit -> SortableSetOrbitDto.fromJson sortableSetR.Json
+                | SortedStack -> SortableSetSortedStacksDto.fromJson sortableSetR.Json
+                | RandomPermutation -> SortableSetRandomPermutationDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
+                | RandomBits -> SortableSetRandomBitsDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
+                | RandomSymbols -> SortableSetRandomSymbolsDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
+                | Explicit -> SortableSetExplicitDto.fromJson sortableSetR.Json (_bitpackLookup ctxt)
+                | SwitchReduced ->
+                    SortableSetSwitchReducedDto.fromJson
+                        sortableSetR.Json
+                        (sortableSetRIdToSortableSet ctxt)
+                        (_sorterLookup ctxt)
         }

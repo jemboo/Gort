@@ -10,10 +10,10 @@ open RunSortableSet
 [<EntryPoint>]
 let main argv =
     let ctx = new GortContext()
-    let res = RunCbSortableSetRand ctx "WksRnd3a" 
-    //let res = RunCbSortableSetRand ctx "WksRnd3a" 
-    //let res = RunCbSortableSetRand ctx "WksRnd3a" 
-    //let res = RunCbSortableSetRand ctx "WksRnd3a" 
+    let res = RunCbSortableSetRand ctx "WksRnd3a"
+    //let res = RunCbSortableSetRand ctx "WksRnd3a"
+    //let res = RunCbSortableSetRand ctx "WksRnd3a"
+    //let res = RunCbSortableSetRand ctx "WksRnd3a"
     let yab = res |> Result.ExtractOrThrow
 
     printfn "%s %A" "Hi Pongki" res

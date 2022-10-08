@@ -4,8 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type FileFixture () =
+type FileFixture() =
 
     [<TestMethod>]
-    member this.TestMethodPassing () =
-        Assert.IsTrue(true);
+    member this.TestMethodPassing() = Assert.IsTrue(true)

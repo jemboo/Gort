@@ -1,4 +1,5 @@
 ﻿namespace global
+
 open BenchmarkDotNet.Attributes
 
 //|            Method |     Mean |   Error |  StdDev |      Gen0 |      Gen1 |      Gen2 | Allocated |
@@ -38,9 +39,9 @@ open BenchmarkDotNet.Attributes
 
 [<MemoryDiagnoser>]
 type BenchSorterSet() =
-    let rnGen = RngGen.createLcg  (123 |> RandomSeed.create)
+    let rnGen = RngGen.createLcg (123 |> RandomSeed.create)
     let useParall = true |> UseParallel.create
-    let order = (Order.createNr 18 )
+    let order = (Order.createNr 18)
     let switchCt = SwitchCount.orderTo900SwitchCount order
     let sorterCt = 100 |> SorterCount.create
     let sortableSetId = 123 |> SortableSetId.create
@@ -48,44 +49,26 @@ type BenchSorterSet() =
     let sortableSetFormat_RfI32 = rolloutFormat.RfI32
     let sorterSetEvalMod = sorterEvalMode.SorterOpOutput
 
-    let sortableSet_RfBs64 = 
-        SortableSet.makeAllBits
-                            sortableSetId
-                            sortableSetFormat_RfBs64
-                            order
+    let sortableSet_RfBs64 =
+        SortableSet.makeAllBits sortableSetId sortableSetFormat_RfBs64 order
         |> Result.ExtractOrThrow
 
-    let sortableSet_RfI32 = 
-        SortableSet.makeAllBits
-                            sortableSetId
-                            sortableSetFormat_RfI32
-                            order
+    let sortableSet_RfI32 =
+        SortableSet.makeAllBits sortableSetId sortableSetFormat_RfI32 order
         |> Result.ExtractOrThrow
 
 
-    let sorterSt = SorterSet.createRandomSwitches
-                    order
-                    Seq.empty<switch>
-                    switchCt
-                    sorterCt
-                    rnGen
+    let sorterSt =
+        SorterSet.createRandomSwitches order Seq.empty<switch> switchCt sorterCt rnGen
 
 
     [<Benchmark>]
     member this.evalSortableSet_RfBs64() =
-        let res = SorterSetEval.eval
-                        sorterSetEvalMod
-                        sortableSet_RfBs64
-                        sorterSt
-                        useParall
+        let res = SorterSetEval.eval sorterSetEvalMod sortableSet_RfBs64 sorterSt useParall
         res
 
 
     [<Benchmark>]
     member this.evalSortableSet_RfI32() =
-        let res = SorterSetEval.eval
-                        sorterSetEvalMod
-                        sortableSet_RfI32
-                        sorterSt
-                        useParall
+        let res = SorterSetEval.eval sorterSetEvalMod sortableSet_RfI32 sorterSt useParall
         res

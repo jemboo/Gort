@@ -5,9 +5,9 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open Gort.Data.Utils
 
 [<TestClass>]
-type TestClass () =
+type TestClass() =
 
     [<TestMethod>]
-    member this.TestMethodPassing () =
+    member this.TestMethodPassing() =
         let nextCause = CauseQuery.GetPendingCauseForWorkspace "WorkspaceRand"
-        Assert.IsTrue(true);
+        Assert.IsTrue(true)
