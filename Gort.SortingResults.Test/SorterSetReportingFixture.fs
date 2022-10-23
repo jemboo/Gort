@@ -31,9 +31,10 @@ type SorterSetReportingFixture() =
 
     [<TestMethod>]
     member this.getBins() =
+        let useParalll = true |> UseParallel.create
         let ordr = 16 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
-        let sorterCt = SorterCount.create 200
+        let sorterCt = SorterCount.create 500
         let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
         let sorterSt = SorterSet.createRandomSwitches ordr [||] switchCt sorterCt rnGn
         let rolloutFormt = rolloutFormat.RfBs64
@@ -41,8 +42,6 @@ type SorterSetReportingFixture() =
 
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
-
-        let useParalll = true |> UseParallel.create
 
 
         let sorterSpeedEvls, errs =

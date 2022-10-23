@@ -43,7 +43,7 @@ type BenchSorterSet() =
     let useParall = true |> UseParallel.create
     let order = (Order.createNr 18)
     let switchCt = SwitchCount.orderTo900SwitchCount order
-    let sorterCt = 100 |> SorterCount.create
+    let sorterCt = 500 |> SorterCount.create
     let sortableSetId = 123 |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
     let sortableSetFormat_RfI32 = rolloutFormat.RfI32
@@ -67,8 +67,29 @@ type BenchSorterSet() =
         let res = SorterSetEval.eval sorterSetEvalMod sortableSet_RfBs64 sorterSt useParall
         res
 
-
     [<Benchmark>]
-    member this.evalSortableSet_RfI32() =
-        let res = SorterSetEval.eval sorterSetEvalMod sortableSet_RfI32 sorterSt useParall
-        res
+    member this.repSortableSet_RfBs64() =
+        let sorterSpeedEvls, errs = 
+                SorterSetEval.eval sorterSetEvalMod sortableSet_RfBs64 sorterSt useParall
+
+        let sorterSpeedRs =
+            sorterSpeedEvls |> Array.map (SorterEval.getSorterSpeed)
+
+        let sorterSpeeds = sorterSpeedRs 
+                                |> Array.filter(fun rv -> rv |> Result.isOk)
+                                |> Array.map(Result.ExtractOrThrow)
+
+        let spsfsbs =
+            sorterSpeeds
+            |> SorterPhenotypeSpeedsForSpeedBin.fromSorterSpeeds
+            |> Seq.toArray
+            |> Array.sortBy (fun sp ->
+                sp
+                |> SorterPhenotypeSpeedsForSpeedBin.getSpeedBin
+                |> SorterSpeedBin.getIndexOfBin)
+        spsfsbs
+
+    //[<Benchmark>]
+    //member this.evalSortableSet_RfI32() =
+    //    let res = SorterSetEval.eval sorterSetEvalMod sortableSet_RfI32 sorterSt useParall
+    //    res

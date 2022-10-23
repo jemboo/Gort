@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Script1.fsx" />
     <Compile Include="InlineScraps.fs" />
     <Compile Include="SysExt.fs" />
     <Compile Include="Result.fs" />
@@ -28,5 +29,7 @@
     <Compile Include="TwoCycle.fs" />
     <Compile Include="File.fs" />
   </ItemGroup>
+
+  <ItemGroup />
 
 </Project>
