@@ -17,6 +17,7 @@ type CollectionPropsFixture() =
         Assert.IsTrue(c1)
         Assert.IsFalse(c2)
 
+
     [<TestMethod>]
     member this.arrayEquals() =
         let a1 = [| 1; 2; 3 |]
@@ -101,6 +102,15 @@ type CollectionPropsFixture() =
         let boolUnSrted = [| true; true; false; true |]
         let bunSrted = boolUnSrted |> CollectionProps.isSorted_idiom
         Assert.IsFalse(bunSrted)
+
+
+
+    [<TestMethod>]
+    member this.isSorted2() =
+        let aa = [|2;3;4;5;6;|]
+        let ba = [|0;1;2;3;4;|]
+        let yab = CollectionProps.distanceSquared_generic aa ba
+        Assert.IsTrue(true)
 
 
     [<TestMethod>]

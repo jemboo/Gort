@@ -114,3 +114,47 @@ let good2 = strToInt "1" >>= strAdd "2" >>= strAdd "3"
 let bad2 = strToInt "1" >>= strAdd "xyz" >>= strAdd "3"
 
 
+
+
+
+open System.Net
+open Microsoft.FSharp.Control.WebExtensions
+
+let urlList = [ "GreatSpaceX", "https://www.youtube.com/watch?v=BUvqbgGip-Y"
+                "MSDN", "http://msdn.microsoft.com/"
+                "Bing", "http://www.bing.com"
+              ]
+
+let fetchAsync(name, url:string) =
+    async {
+        try
+            let uri = new System.Uri(url)
+            let httpClient = new System.Net.Http.HttpClient()
+            let! html = Async.AwaitTask (httpClient.GetStringAsync(uri))
+            //let webClient = new WebClient()
+            //let! html = webClient.AsyncDownloadString(uri)
+            printfn "Read %d characters for %s" html.Length name
+        with
+            | ex -> printfn "%s" (ex.Message);
+    }
+
+
+//fetchAsync urlList.Head |> Async.RunSynchronously
+
+let runAll() =
+    urlList
+    |> Seq.map fetchAsync
+    |> Seq.map Async.Start
+    |> Seq.toArray
+    |> ignore
+
+
+
+//let runAll() =
+//    urlList
+//    |> Seq.map fetchAsync
+//    |> Async.Parallel
+//    |> Async.RunSynchronously
+//    |> ignore
+
+runAll()

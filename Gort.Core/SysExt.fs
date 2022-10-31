@@ -1,6 +1,11 @@
-﻿//namespace global
-//open System
+﻿
 module SysExt
+
+let inline zero_of (target:'a) : 'a = LanguagePrimitives.GenericZero<'a>
+
+let inline one_of (target:'a) : 'a = LanguagePrimitives.GenericOne<'a>
+
+
 (*
 2s complement, i.e. invert each bit and add 1
 ex. 5 = 00101 (5) -> 11010 -> 11010 + 1 - > 11011 = -5 

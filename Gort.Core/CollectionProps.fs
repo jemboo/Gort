@@ -3,6 +3,7 @@
 open System
 open System.Collections
 open System.Runtime.CompilerServices
+open SysExt
 
 
 module CollectionProps =
@@ -70,7 +71,56 @@ module CollectionProps =
             |> Error
 
 
-    let distanceSquared (a: 'a[]) (b: 'a[]) =
+    let inline distanceSquared_generic  (a: ^a[]) (b: ^a[]) =
+        let mutable i = 0
+        let mutable acc = zero_of a.[0]
+        while (i < a.Length) do
+            acc <- acc + (a.[i] - b.[i]) * (a.[i] - b.[i])
+            i <- i + 1
+        acc
+
+
+    let inline distanceSquared_genericR  (a: ^a[]) (b: ^a[]) =
+        try
+            let mutable i = 0
+            let mutable acc = zero_of a.[0]
+            while (i < a.Length) do
+                acc <- acc + (a.[i] - b.[i]) * (a.[i] - b.[i])
+                i <- i + 1
+            acc |> Ok
+        with ex ->
+            $"error in distanceSquared: { ex.Message }" |> Result.Error
+
+
+    let inline isDistanceGtZero  (a: ^a[]) (b: ^a[]) =
+        try
+            let mutable i = 0
+            let mutable acc = zero_of a.[0]
+            while (i < a.Length) do
+                acc <- acc + (a.[i] - b.[i]) * (a.[i] - b.[i])
+                i <- i + 1
+            (acc > (zero_of a.[0]) ) |> Ok
+        with ex ->
+            $"error in distanceSquared: { ex.Message }" |> Result.Error
+
+
+    let inline isDistanceGtZeroC  (a: ^a[]) (b: ^a[]) =
+        result {
+            let! dist = distanceSquared_genericR a b
+            return (dist > (zero_of a.[0]) )
+        }
+
+
+    let distanceSquared_int (a: int[]) (b: int[]) =
+        let mutable i = 0
+        let mutable acc = 0
+        while (i < a.Length) do
+            acc <- acc + (a.[i] - b.[i]) * (a.[i] - b.[i])
+            i <- i + 1
+        acc
+
+
+    let distanceSquared_idiom (a: 'a[]) (b: 'a[]) =
         Array.fold2 (fun acc elem1 elem2 -> acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b
 
 
@@ -156,12 +206,8 @@ module CollectionProps =
         while _cont && (dex < a.Length - 1) do
             let dv = a.[dex]
             _cont <- (dv > - 1) && (dv < a.Length) && flags.[dv]
-
-            if _cont then
-                flags.[dv] <- false
-
+            if _cont then flags.[dv] <- false
             dex <- dex + 1
-
         _cont
 
 
@@ -177,7 +223,6 @@ module CollectionProps =
         while ((i < values.Length) && looP) do
             looP <- (values.[i - 1] <= values.[i])
             i <- i + 1
-
         looP
 
 
@@ -188,7 +233,6 @@ module CollectionProps =
         while ((i < values.Length) && looP) do
             looP <- (values.[i - 1] <= values.[i])
             i <- i + 1
-
         looP
 
 
@@ -199,7 +243,6 @@ module CollectionProps =
         while ((i < values.Length) && looP) do
             looP <- (values.[i - 1] <= values.[i])
             i <- i + 1
-
         looP
 
 
@@ -210,7 +253,6 @@ module CollectionProps =
         while ((i < length) && looP) do
             looP <- (baseValues.[i + offset - 1] <= baseValues.[i + offset])
             i <- i + 1
-
         looP
 
 
@@ -222,7 +264,6 @@ module CollectionProps =
             let dv = a.[dex]
             _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = dex)
             dex <- dex + 1
-
         _cont
 
 
@@ -234,7 +275,6 @@ module CollectionProps =
             let dv = a.[dex] |> int
             _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint8))
             dex <- dex + 1
-
         _cont
 
 
@@ -246,7 +286,6 @@ module CollectionProps =
             let dv = a.[dex] |> int
             _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint16))
             dex <- dex + 1
-
         _cont
 
 
@@ -258,7 +297,6 @@ module CollectionProps =
             let dv = a.[dex] |> int
             _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint32))
             dex <- dex + 1
-
         _cont
 
     // returns a sequence of items that occur more than once
@@ -280,4 +318,4 @@ module CollectionProps =
 
 
     let unsortednessSquared_I (a: array<int>) =
-        distanceSquared a [| 0 .. (a.Length - 1) |]
+        distanceSquared_idiom a [| 0 .. (a.Length - 1) |]

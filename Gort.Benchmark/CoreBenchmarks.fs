@@ -23,6 +23,170 @@ type ClownTest() =
 
 
 
+//|             Method |   size |          Mean |        Error |       StdDev |        Median |   Gen0 | Allocated |
+//|------------------- |------- |--------------:|-------------:|-------------:|--------------:|-------:|----------:|
+//|   distanceSquared2 |     10 |      12.12 ns |     0.166 ns |     0.155 ns |      12.10 ns |      - |         - |
+//|    distanceSquared |     10 |      35.45 ns |     0.750 ns |     1.100 ns |      35.12 ns |      - |         - |
+//|   distanceSquaredG |     10 |      11.02 ns |     0.077 ns |     0.068 ns |      11.04 ns |      - |         - |
+//|  distanceSquaredGr |     10 |      15.50 ns |     0.221 ns |     0.207 ns |      15.60 ns |      - |         - |
+//| distanceSquaredGrE |     10 |  15,708.25 ns |   298.195 ns |   278.932 ns |  15,694.75 ns | 0.0916 |     360 B |
+//|   distanceSquared2 |    100 |     106.32 ns |     0.961 ns |     0.852 ns |     106.41 ns |      - |         - |
+//|    distanceSquared |    100 |     244.24 ns |     2.884 ns |     2.557 ns |     244.57 ns |      - |         - |
+//|   distanceSquaredG |    100 |     105.91 ns |     1.188 ns |     1.112 ns |     105.85 ns |      - |         - |
+//|  distanceSquaredGr |    100 |     118.51 ns |     2.291 ns |     4.883 ns |     116.34 ns |      - |         - |
+//| distanceSquaredGrE |    100 |  15,720.33 ns |   296.410 ns |   291.114 ns |  15,663.80 ns | 0.0916 |     360 B |
+//|   distanceSquared2 |   1000 |     993.89 ns |    17.105 ns |    16.000 ns |     993.43 ns |      - |         - |
+//|    distanceSquared |   1000 |   2,287.24 ns |    32.913 ns |    30.786 ns |   2,277.15 ns |      - |         - |
+//|   distanceSquaredG |   1000 |     998.87 ns |    18.928 ns |    18.590 ns |     999.72 ns |      - |         - |
+//|  distanceSquaredGr |   1000 |   1,077.77 ns |    20.182 ns |    22.432 ns |   1,074.35 ns |      - |         - |
+//| distanceSquaredGrE |   1000 |  15,985.53 ns |   312.472 ns |   395.177 ns |  15,902.98 ns | 0.0916 |     360 B |
+//|   distanceSquared2 |  10000 |  10,371.71 ns |   201.113 ns |   239.410 ns |  10,399.28 ns |      - |         - |
+//|    distanceSquared |  10000 |  23,292.27 ns |   461.538 ns |   783.726 ns |  23,435.47 ns |      - |         - |
+//|   distanceSquaredG |  10000 |  10,398.97 ns |   198.191 ns |   212.062 ns |  10,326.56 ns |      - |         - |
+//|  distanceSquaredGr |  10000 |  10,997.44 ns |   198.680 ns |   165.907 ns |  11,010.31 ns |      - |         - |
+//| distanceSquaredGrE |  10000 |  21,790.33 ns |   432.347 ns |   768.496 ns |  21,677.27 ns | 0.0916 |     360 B |
+//|   distanceSquared2 | 100000 | 103,372.30 ns | 2,018.269 ns | 1,887.890 ns | 102,874.54 ns |      - |         - |
+//|    distanceSquared | 100000 | 232,603.09 ns | 2,531.334 ns | 2,367.811 ns | 232,626.44 ns |      - |         - |
+//|   distanceSquaredG | 100000 | 105,503.33 ns | 1,991.755 ns | 2,045.386 ns | 105,416.39 ns |      - |         - |
+//|  distanceSquaredGr | 100000 | 110,162.25 ns | 1,850.448 ns | 2,056.768 ns | 110,025.69 ns |      - |         - |
+//| distanceSquaredGrE | 100000 |  74,512.79 ns | 1,486.298 ns | 2,400.094 ns |  74,300.93 ns |      - |     360 B |
+
+
+[<MemoryDiagnoser>]
+type DistanceTest() =
+
+    [<Params(10, 100, 1000, 10000, 100000)>]
+    member val size = 0 with get, set
+
+    member val arrayA = [||] with get, set
+    member val arrayB = [||] with get, set
+    member val arrayC = [||] with get, set
+
+    [<GlobalSetup>]
+    member this.Setup() =
+        this.arrayA <- Array.init this.size (fun dex -> (int dex))
+        this.arrayB <- Array.init this.size (fun dex -> (int dex) + 1)
+        this.arrayC <- Array.init (this.size / 2) (fun dex -> (int dex) + 1)
+
+    [<Benchmark>]
+    member this.distanceSquared2() =
+        let yow = CollectionProps.distanceSquared_int this.arrayA this.arrayB
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquared() =
+        let yow = CollectionProps.distanceSquared_idiom this.arrayA this.arrayB
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquaredG() =
+        let yow = CollectionProps.distanceSquared_generic this.arrayA this.arrayB
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquaredGr() =
+        let yow = CollectionProps.distanceSquared_genericR this.arrayA this.arrayB
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquaredGrE() =
+        let yow = CollectionProps.distanceSquared_genericR this.arrayA this.arrayC
+        yow
+
+
+//|              Method |   size |          Mean |        Error |       StdDev |        Median | Allocated |
+//|-------------------- |------- |--------------:|-------------:|-------------:|--------------:|----------:|
+//| distanceSquaredG_us |     10 |      12.67 ns |     0.160 ns |     0.150 ns |      12.65 ns |         - |
+//| distanceSquaredG_uL |     10 |      10.12 ns |     0.166 ns |     0.139 ns |      10.08 ns |         - |
+//|    distanceSquaredG |     10 |      10.14 ns |     0.216 ns |     0.202 ns |      10.15 ns |         - |
+//| distanceSquaredG_us |   1000 |   1,302.51 ns |    17.012 ns |    15.081 ns |   1,297.59 ns |         - |
+//| distanceSquaredG_uL |   1000 |     863.71 ns |    16.691 ns |    37.674 ns |     846.45 ns |         - |
+//|    distanceSquaredG |   1000 |     858.35 ns |    17.095 ns |    39.279 ns |     846.02 ns |         - |
+//| distanceSquaredG_us | 100000 | 126,937.30 ns | 2,382.214 ns | 3,708.821 ns | 125,911.99 ns |         - |
+//| distanceSquaredG_uL | 100000 |  90,166.51 ns | 1,024.398 ns |   958.223 ns |  90,200.95 ns |         - |
+//|    distanceSquaredG | 100000 |  87,386.45 ns | 1,211.828 ns | 1,074.254 ns |  87,326.81 ns |         - |
+
+[<MemoryDiagnoser>]
+type DistanceTest2() =
+
+    [<Params(10, 1000, 100000)>]
+    member val size = 0 with get, set
+
+    member val arrayA_us = [||] with get, set
+    member val arrayB_us = [||] with get, set
+    member val arrayA = [||] with get, set
+    member val arrayB = [||] with get, set
+    member val arrayA_uL = [||] with get, set
+    member val arrayB_uL = [||] with get, set
+
+
+    [<GlobalSetup>]
+    member this.Setup() =
+        this.arrayA_us <- Array.init this.size (fun dex -> (uint16 dex))
+        this.arrayB_us <- Array.init this.size (fun dex -> (uint16 dex) + 1us)
+        this.arrayA <- Array.init this.size (fun dex -> (int dex))
+        this.arrayB <- Array.init this.size (fun dex -> (int dex) + 1)
+        this.arrayA_uL <- Array.init this.size (fun dex -> (uint64 dex))
+        this.arrayB_uL <- Array.init this.size (fun dex -> (uint64 dex) + 1UL)
+
+
+    [<Benchmark>]
+    member this.distanceSquaredG_us() =
+        let yow = CollectionProps.distanceSquared_generic this.arrayA_us this.arrayB_us
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquaredG_uL() =
+        let yow = CollectionProps.distanceSquared_generic this.arrayA_uL this.arrayB_uL
+        yow
+
+    [<Benchmark>]
+    member this.distanceSquaredG() =
+        let yow = CollectionProps.distanceSquared_generic this.arrayA this.arrayB
+        yow
+
+
+
+
+//|            Method |   size |         Mean |        Error |       StdDev |   Gen0 | Allocated |
+//|------------------ |------- |-------------:|-------------:|-------------:|-------:|----------:|
+//|  isDistanceGtZero |     10 |     12.59 ns |     0.155 ns |     0.145 ns |      - |         - |
+//| isDistanceGtZeroC |     10 |    145.05 ns |     2.786 ns |     4.500 ns | 0.0076 |      24 B |
+//|  isDistanceGtZero |    100 |     96.04 ns |     1.315 ns |     1.230 ns |      - |         - |
+//| isDistanceGtZeroC |    100 |    225.49 ns |     2.355 ns |     1.966 ns | 0.0076 |      24 B |
+//|  isDistanceGtZero |   1000 |    827.98 ns |     7.141 ns |     5.963 ns |      - |         - |
+//| isDistanceGtZeroC |   1000 |  1,003.59 ns |    10.184 ns |     9.028 ns | 0.0076 |      24 B |
+//|  isDistanceGtZero |  10000 |  8,269.85 ns |    86.082 ns |    80.521 ns |      - |         - |
+//| isDistanceGtZeroC |  10000 |  9,432.98 ns |   171.390 ns |   176.005 ns |      - |      24 B |
+//|  isDistanceGtZero | 100000 | 88,974.35 ns |   986.962 ns |   874.916 ns |      - |         - |
+//| isDistanceGtZeroC | 100000 | 93,276.14 ns | 1,362.177 ns | 1,621.575 ns |      - |      24 B |
+
+[<MemoryDiagnoser>]
+type DistanceTest3() =
+
+    [<Params(10, 100, 1000, 10000, 100000)>]
+    member val size = 0 with get, set
+    member val arrayA = [||] with get, set
+    member val arrayB = [||] with get, set
+    member val arrayC = [||] with get, set
+
+    [<GlobalSetup>]
+    member this.Setup() =
+        this.arrayA <- Array.init this.size (fun dex -> (int dex))
+        this.arrayB <- Array.init this.size (fun dex -> (int dex) + 1)
+
+    [<Benchmark>]
+    member this.isDistanceGtZero() =
+        let yow = CollectionProps.isDistanceGtZero this.arrayA this.arrayB
+        yow
+
+    [<Benchmark>]
+    member this.isDistanceGtZeroC() =
+        let yow = CollectionProps.isDistanceGtZeroC this.arrayA this.arrayB
+        yow
+
+
+
 //|          Method |      Mean |     Error |    StdDev | Allocated |
 //|---------------- |----------:|----------:|----------:|----------:|
 //|     isSorted_uL | 1.3540 ns | 0.0358 ns | 0.0318 ns |         - |

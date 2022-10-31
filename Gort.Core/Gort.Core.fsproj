@@ -11,8 +11,8 @@
     <Compile Include="InlineScraps.fs" />
     <Compile Include="SysExt.fs" />
     <Compile Include="Result.fs" />
-    <Compile Include="Annealer.fs" />
     <Compile Include="CommonTypes.fs" />
+    <Compile Include="Annealer.fs" />
     <Compile Include="CollectionProps.fs" />
     <Compile Include="CollectionOps.fs" />
     <Compile Include="ByteUtils.fs" />

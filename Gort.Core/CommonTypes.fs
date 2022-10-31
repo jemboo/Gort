@@ -1,8 +1,5 @@
 ﻿namespace global
-
-open System
 open SysExt
-
 
 type useParallel = private UseParallel of bool
 
