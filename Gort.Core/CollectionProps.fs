@@ -255,7 +255,6 @@ module CollectionProps =
             i <- i + 1
         looP
 
-        //when a:(static member op_Explicit:^a->int)
 
     let inline isTwoCycle< ^a when ^a: comparison and ^a:(static member op_Explicit:^a->int)> (values: ^a[]) =
         let mutable dex = 0
@@ -267,49 +266,6 @@ module CollectionProps =
             dex <- dex + 1
         _cont
 
-
-    //let isTwoCycle (a: int[]) =
-    //    let mutable dex = 0
-    //    let mutable _cont = true
-
-    //    while _cont && (dex < a.Length - 1) do
-    //        let dv = a.[dex]
-    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = dex)
-    //        dex <- dex + 1
-    //    _cont
-
-
-    //let isTwoCycle8 (a: uint8[]) =
-    //    let mutable dex = 0
-    //    let mutable _cont = true
-
-    //    while _cont && (dex < a.Length - 1) do
-    //        let dv = a.[dex] |> int
-    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint8))
-    //        dex <- dex + 1
-    //    _cont
-
-
-    //let isTwoCycle16 (a: uint16[]) =
-    //    let mutable dex = 0
-    //    let mutable _cont = true
-
-    //    while _cont && (dex < a.Length - 1) do
-    //        let dv = a.[dex] |> int
-    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint16))
-    //        dex <- dex + 1
-    //    _cont
-
-
-    //let isTwoCycle32 (a: uint32[]) =
-    //    let mutable dex = 0
-    //    let mutable _cont = true
-
-    //    while _cont && (dex < a.Length - 1) do
-    //        let dv = a.[dex] |> int
-    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint32))
-    //        dex <- dex + 1
-    //    _cont
 
     // returns a sequence of items that occur more than once
     let itemsOccuringMoreThanOnce items =

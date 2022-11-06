@@ -128,26 +128,8 @@ type CollectionPropsFixture() =
         Assert.IsFalse(aUnRes2)
 
 
-    //[<TestMethod>]
-    //member this.isTwoCycle() =
-    //    let tc = [| 0; 1; 2; 3; 4; 6; 5 |]
-    //    let ntc = [| 0; 1; 2; 3; 6; 4; 5 |]
-    //    let tc2 = [| 0; 4; 2; 3; 1; 6; 5 |]
-    //    let ntc2 = [| 9; 1; 2; 3; 6; 5; 4 |]
-    //    let tc3 = [| 0; 4; 2; 3; 1; 6; 5 |]
-    //    let ntc3 = [| 1; 1; 2; 3; 6; 5; 4 |]
-
-    //    Assert.IsTrue(CollectionProps.isTwoCycle tc)
-    //    Assert.IsFalse(CollectionProps.isTwoCycle ntc)
-    //    Assert.IsTrue(CollectionProps.isTwoCycle tc2)
-    //    Assert.IsFalse(CollectionProps.isTwoCycle ntc2)
-    //    Assert.IsTrue(CollectionProps.isTwoCycle tc3)
-    //    Assert.IsFalse(CollectionProps.isTwoCycle ntc3)
-
-
-
     [<TestMethod>]
-    member this.isTwoCycle_inline() =
+    member this.isTwoCycle() =
         let tc = [| 0; 1; 2; 3; 4; 6; 5 |]
         let ntc = [| 0; 1; 2; 3; 6; 4; 5 |]
         let tc2 = [| 0; 4; 2; 3; 1; 6; 5 |]
