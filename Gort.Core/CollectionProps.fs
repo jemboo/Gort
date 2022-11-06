@@ -216,17 +216,17 @@ module CollectionProps =
         |> Seq.forall (fun dex -> values.[dex] >= values.[dex - 1])
 
 
-    let isSorted (values: 'a[]) =
-        let mutable i = 1
-        let mutable looP = true
+    //let isSorted (values: 'a[]) =
+    //    let mutable i = 1
+    //    let mutable looP = true
 
-        while ((i < values.Length) && looP) do
-            looP <- (values.[i - 1] <= values.[i])
-            i <- i + 1
-        looP
+    //    while ((i < values.Length) && looP) do
+    //        looP <- (values.[i - 1] <= values.[i])
+    //        i <- i + 1
+    //    looP
 
 
-    let inline isSorted_inline< ^a when ^a: comparison> (values: ^a[]) =
+    let inline isSorted< ^a when ^a: comparison> (values: ^a[]) =
         let mutable i = 1
         let mutable looP = true
 
@@ -255,49 +255,61 @@ module CollectionProps =
             i <- i + 1
         looP
 
+        //when a:(static member op_Explicit:^a->int)
 
-    let isTwoCycle (a: int[]) =
+    let inline isTwoCycle< ^a when ^a: comparison and ^a:(static member op_Explicit:^a->int)> (values: ^a[]) =
         let mutable dex = 0
         let mutable _cont = true
 
-        while _cont && (dex < a.Length - 1) do
-            let dv = a.[dex]
-            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = dex)
+        while _cont && (dex < values.Length - 1) do
+            let dv = values.[dex] |> int
+            _cont <- (dv > - 1) && (dv < values.Length) && (values.[dv] |> int = dex)
             dex <- dex + 1
         _cont
 
 
-    let isTwoCycle8 (a: uint8[]) =
-        let mutable dex = 0
-        let mutable _cont = true
+    //let isTwoCycle (a: int[]) =
+    //    let mutable dex = 0
+    //    let mutable _cont = true
 
-        while _cont && (dex < a.Length - 1) do
-            let dv = a.[dex] |> int
-            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint8))
-            dex <- dex + 1
-        _cont
-
-
-    let isTwoCycle16 (a: uint16[]) =
-        let mutable dex = 0
-        let mutable _cont = true
-
-        while _cont && (dex < a.Length - 1) do
-            let dv = a.[dex] |> int
-            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint16))
-            dex <- dex + 1
-        _cont
+    //    while _cont && (dex < a.Length - 1) do
+    //        let dv = a.[dex]
+    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = dex)
+    //        dex <- dex + 1
+    //    _cont
 
 
-    let isTwoCycle32 (a: uint32[]) =
-        let mutable dex = 0
-        let mutable _cont = true
+    //let isTwoCycle8 (a: uint8[]) =
+    //    let mutable dex = 0
+    //    let mutable _cont = true
 
-        while _cont && (dex < a.Length - 1) do
-            let dv = a.[dex] |> int
-            _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint32))
-            dex <- dex + 1
-        _cont
+    //    while _cont && (dex < a.Length - 1) do
+    //        let dv = a.[dex] |> int
+    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint8))
+    //        dex <- dex + 1
+    //    _cont
+
+
+    //let isTwoCycle16 (a: uint16[]) =
+    //    let mutable dex = 0
+    //    let mutable _cont = true
+
+    //    while _cont && (dex < a.Length - 1) do
+    //        let dv = a.[dex] |> int
+    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint16))
+    //        dex <- dex + 1
+    //    _cont
+
+
+    //let isTwoCycle32 (a: uint32[]) =
+    //    let mutable dex = 0
+    //    let mutable _cont = true
+
+    //    while _cont && (dex < a.Length - 1) do
+    //        let dv = a.[dex] |> int
+    //        _cont <- (dv > - 1) && (dv < a.Length) && (a.[dv] = (dex |> uint32))
+    //        dex <- dex + 1
+    //    _cont
 
     // returns a sequence of items that occur more than once
     let itemsOccuringMoreThanOnce items =

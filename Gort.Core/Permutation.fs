@@ -57,7 +57,7 @@ module Permutation =
         { values = CollectionOps.invertArrayNr perm.values ia }
 
     let isSorted (perm: permutation) =
-        CollectionProps.isSorted_inline perm.values
+        CollectionProps.isSorted perm.values
 
     let isTwoCycle (perm: permutation) = CollectionProps.isTwoCycle perm.values
 

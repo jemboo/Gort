@@ -23,7 +23,7 @@ module BitSet =
         { bitSet.values = Array.copy (v.values) }
 
     let isSorted (bitSet: bitSet) =
-        CollectionProps.isSorted_inline bitSet.values
+        CollectionProps.isSorted bitSet.values
 
     let isZero (ibs: bitSet) = ibs.values |> Array.forall ((=) false)
 
@@ -101,7 +101,7 @@ module IntSet =
         { intSet.values = Array.copy (intSet.values) }
 
     let isSorted (intSet: intSet) =
-        CollectionProps.isSorted_inline intSet.values
+        CollectionProps.isSorted intSet.values
 
     let isTwoCycle (ist: intSet) = CollectionProps.isTwoCycle ist.values
 
@@ -180,10 +180,10 @@ module IntSet16 =
     let isZero (ibs: intSet16) = ibs.values |> Array.forall ((=) 0us)
 
     let isSorted (intSet: intSet16) =
-        CollectionProps.isSorted_inline intSet.values
+        CollectionProps.isSorted intSet.values
 
     let isTwoCycle (is16: intSet16) =
-        CollectionProps.isTwoCycle16 is16.values
+        CollectionProps.isTwoCycle is16.values
 
     let sorted_O_1_Sequence (order: order) (onesCount: int) =
         let totalSize = (Order.value order)
@@ -274,9 +274,9 @@ module IntSet8 =
     let isZero (ibs: intSet8) = ibs.values |> Array.forall ((=) 0uy)
 
     let isSorted (intSet: intSet8) =
-        CollectionProps.isSorted_inline intSet.values
+        CollectionProps.isSorted intSet.values
 
-    let isTwoCycle (is8: intSet8) = CollectionProps.isTwoCycle8 is8.values
+    let isTwoCycle (is8: intSet8) = CollectionProps.isTwoCycle is8.values
 
     let sorted_O_1_Sequence (order: order) (onesCount: int) =
         let totalSize = (Order.value order)

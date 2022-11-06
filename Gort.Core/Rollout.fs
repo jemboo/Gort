@@ -116,7 +116,7 @@ module BooleanRoll =
     let uniqueUnsortedMembers (booleanRoll: booleanRoll) =
         booleanRoll
         |> toBoolArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromBoolArrays (booleanRoll |> getArrayLength)
 
@@ -254,7 +254,7 @@ module Uint8Roll =
     let uniqueUnsortedMembers (uInt8Roll: uInt8Roll) =
         uInt8Roll
         |> toIntArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromIntArrays (uInt8Roll |> getArrayLength)
 
@@ -388,7 +388,7 @@ module Uint16Roll =
     let uniqueUnsortedMembers (uInt16Roll: uInt16Roll) =
         uInt16Roll
         |> toIntArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromIntArrays (uInt16Roll |> getArrayLength)
 
@@ -523,7 +523,7 @@ module IntRoll =
     let uniqueUnsortedMembers (intRoll: intRoll) =
         intRoll
         |> toIntArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromIntArrays (intRoll |> getArrayLength)
 
@@ -679,7 +679,7 @@ module Uint64Roll =
     let uniqueUnsortedMembers (uint64Roll: uint64Roll) =
         uint64Roll
         |> toIntArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromIntArrays (uint64Roll |> getArrayLength)
 
@@ -818,7 +818,7 @@ module Bs64Roll =
     let uniqueUnsortedMembers (bs64Roll: bs64Roll) =
         bs64Roll
         |> toBoolArrays
-        |> Seq.filter (fun ia -> not (CollectionProps.isSorted_inline ia))
+        |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
         |> fromBoolArrays (bs64Roll |> getArrayLength)
 
@@ -828,7 +828,7 @@ module Bs64Roll =
 
         bs64Roll
         |> toBoolArrays
-        |> Seq.forall (fun ia -> (CollectionProps.isSorted_inline ia))
+        |> Seq.forall (fun ia -> (CollectionProps.isSorted ia))
 
 
     let toIntArrays (bs64Roll: bs64Roll) =

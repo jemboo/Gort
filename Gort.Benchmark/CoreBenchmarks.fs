@@ -220,7 +220,7 @@ type BenchIsSorted_Arrays() =
 
     [<Benchmark>]
     member this.isSorted_inline() =
-        let ssR = CollectionProps.isSorted_inline this.testArray
+        let ssR = CollectionProps.isSorted this.testArray
         0
 
 

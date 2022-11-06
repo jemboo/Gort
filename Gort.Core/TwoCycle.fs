@@ -31,7 +31,7 @@ module TwoCycle =
         { twoCycle.values = [| 0 .. order - 1 |] }
 
     let isSorted (tc: twoCycle) =
-        CollectionProps.isSorted_inline tc.values
+        CollectionProps.isSorted tc.values
 
     let makeMonoCycle (order: order) (aDex: int) (bDex: int) =
         { values =
