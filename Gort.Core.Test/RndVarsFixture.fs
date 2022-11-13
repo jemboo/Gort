@@ -32,12 +32,12 @@ type RndGenFixture() =
     [<TestMethod>]
     member this.rndTwoCycleArray() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let arraySize = 16
+        let order = Order.createNr 16
         let cycleCount = 2
-        let block = RandVars.rndTwoCycle rndy arraySize cycleCount
+        let block = RandVars.rndPartialTwoCycle rndy order cycleCount
         Assert.IsTrue(CollectionProps.isTwoCycle block)
         let cycleCount = 8
-        let block2 = RandVars.rndTwoCycle rndy arraySize cycleCount
+        let block2 = RandVars.rndPartialTwoCycle rndy order cycleCount
         Assert.IsTrue(CollectionProps.isTwoCycle block2)
 
 

@@ -54,7 +54,7 @@ module Permutation =
 
     let inverse (perm: permutation) =
         let ia = Array.zeroCreate perm.values.Length
-        { values = CollectionOps.invertArrayNr perm.values ia }
+        { values = CollectionOps.invertArray perm.values ia }
 
     let isSorted (perm: permutation) =
         CollectionProps.isSorted perm.values
@@ -64,7 +64,7 @@ module Permutation =
     // will work without error if the permutations are the same size
     let productNr (lhs: permutation) (rhs: permutation) =
         { permutation.values =
-            CollectionOps.arrayProductInt (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
+            CollectionOps.arrayProduct (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
 
 
     let product (lhs: permutation) (rhs: permutation) =
@@ -72,7 +72,7 @@ module Permutation =
             "permuation orders dont match" |> Error
         else
             { permutation.values =
-                CollectionOps.arrayProductInt (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
+                CollectionOps.arrayProduct (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
             |> Ok
 
 

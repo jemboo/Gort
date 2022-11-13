@@ -123,14 +123,13 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
-        =
-        let switches =
+        (rando: IRando)  =
+        let _switches =
             (Stage.rndSeq order switchFreq rando)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
 
-        fromSwitchesWithPrefix order switchCount wPfx switches
+        fromSwitchesWithPrefix order switchCount wPfx _switches
 
 
     let randomSymmetric (order: order) (wPfx: switch seq) (switchCount: switchCount) (rando: IRando) =

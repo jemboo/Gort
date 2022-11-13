@@ -1,6 +1,7 @@
 ﻿namespace global
 
 open System
+open SysExt
 
 
 module CollectionOps =
@@ -13,44 +14,23 @@ module CollectionOps =
 
 
     // product map composition: a(b()).
-    let arrayProductInt (lhs: array<int>) (rhs: array<int>) (prod: array<int>) =
-        for i = 0 to lhs.Length - 1 do
-            prod.[i] <- lhs.[rhs.[i]]
-
-        prod
-
-
-    // product map composition: a(b()).
-    let arrayProduct16 (lhs: array<uint16>) (rhs: array<uint16>) (prod: array<uint16>) =
-        let dmax = lhs.Length |> uint16
-        let mutable curdex = 0us
-
+    let inline arrayProduct< ^a when ^a:(static member op_Explicit:^a->int)>
+                    (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
+        let dmax = lhs.Length
+        //let mutable curdex = zero_of lhs.[0]
+        let mutable curdex = 0
         while curdex < dmax do
-            let i = curdex |> int
-            prod.[i] <- lhs.[rhs.[i] |> int]
-            curdex <- curdex + 1us
-
+            prod.[curdex] <- lhs.[rhs.[curdex] |> int]
+            curdex <- curdex + 1
         prod
 
-
-    // product map composition: a(b()).
-    let arrayProduct8 (lhs: array<uint8>) (rhs: array<uint8>) (prod: array<uint8>) =
-        let dmax = lhs.Length |> uint8
-        let mutable curdex = 0uy
-
-        while curdex < dmax do
-            let i = curdex |> int
-            prod.[i] <- lhs.[rhs.[i] |> int]
-            curdex <- curdex + 1uy
-
-        prod
-
-
-    let arrayProductIntR (lhs: array<int>) (rhs: array<int>) (prod: array<int>) =
+        
+    let arrayProductR (lhs: array<int>) (rhs: array<int>) (prod: array<int>) =
         try
-            arrayProductInt lhs rhs prod |> Ok
+            arrayProduct lhs rhs prod |> Ok
         with ex ->
             ("error in compIntArrays: " + ex.Message) |> Result.Error
+
 
     let allPowers (a_core: array<int>) =
         seq {
@@ -60,7 +40,7 @@ module CollectionOps =
 
             while _continue do
                 let a_next = Array.zeroCreate a_cur.Length
-                a_cur <- arrayProductInt a_core a_cur a_next
+                a_cur <- arrayProduct a_core a_cur a_next
                 _continue <- not (CollectionProps.isIdentity a_next)
                 yield a_cur
         }
@@ -74,7 +54,7 @@ module CollectionOps =
             while (_continue && (dex < maxCount)) do
                 yield a_cur
                 let a_next = Array.zeroCreate a_cur.Length
-                a_cur <- arrayProductInt a_core a_cur a_next
+                a_cur <- arrayProduct a_core a_cur a_next
                 _continue <- not (CollectionProps.isIdentity a_next)
                 dex <- dex + 1
         }
@@ -82,7 +62,6 @@ module CollectionOps =
     let conjIntArraysNr (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
         for i = 0 to a_conj.Length - 1 do
             a_out.[a_conj.[i]] <- a_conj.[a_core.[i]]
-
         a_out
 
 
@@ -93,6 +72,7 @@ module CollectionOps =
             conjIntArraysNr a_conj a_core a_out |> Ok
         with ex ->
             ("error in conjIntArrays: " + ex.Message) |> Result.Error
+
 
     let filterByPickList (data: 'a[]) (picks: bool[]) =
         try
@@ -110,16 +90,22 @@ module CollectionOps =
             ("error in filterByPickList: " + ex.Message) |> Result.Error
 
 
-    let invertArrayNr (a: array<int>) (inv_out: array<int>) =
-        for i = 0 to a.Length - 1 do
-            inv_out.[a.[i]] <- i
-
+    let inline invertArray< ^a when ^a:(static member Zero:^a) and 
+                                    ^a:(static member One:^a) and  
+                                    ^a:(static member (+):^a* ^a -> ^a) and 
+                                    ^a:(static member op_Explicit:^a->int)>
+                    (ar: array<^a>) (inv_out: array<^a>) =
+        let mutable iv = zero_of ar.[0]
+        let incr = one_of ar.[0]          
+        for i = 0 to ar.Length - 1 do
+            inv_out.[ar.[i] |> int] <- iv
+            iv <- iv + incr
         inv_out
 
 
-    let invertArray (a: array<int>) (inv_out: array<int>) =
+    let invertArrayR (a: array<int>) (inv_out: array<int>) =
         try
-            invertArrayNr a inv_out |> Ok
+            invertArray a inv_out |> Ok
         with ex ->
             ("error in inverseMapArray: " + ex.Message) |> Result.Error
 
@@ -127,9 +113,9 @@ module CollectionOps =
     // a_conj * a_core * (a_conj ^ -1)
     let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
         result {
-            let! a_conj_inv = invertArray a_conj (Array.zeroCreate a_core.Length)
-            let! rhs = arrayProductIntR a_core a_conj_inv (Array.zeroCreate a_core.Length)
-            return! arrayProductIntR a_conj rhs (Array.zeroCreate a_core.Length)
+            let! a_conj_inv = invertArrayR a_conj (Array.zeroCreate a_core.Length)
+            let! rhs = arrayProductR a_core a_conj_inv (Array.zeroCreate a_core.Length)
+            return! arrayProductR a_conj rhs (Array.zeroCreate a_core.Length)
         }
 
 

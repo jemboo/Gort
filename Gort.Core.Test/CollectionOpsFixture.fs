@@ -23,8 +23,8 @@ type CollectionOpsFixture() =
         let aBAexp = [| 1; 4; 0; 3; 2 |]
         let aABact = [| 0; 0; 0; 0; 0 |]
         let aBAact = [| 0; 0; 0; 0; 0 |]
-        CollectionOps.arrayProductInt aA aB aABact |> ignore
-        CollectionOps.arrayProductInt aB aA aBAact |> ignore
+        CollectionOps.arrayProduct aA aB aABact |> ignore
+        CollectionOps.arrayProduct aB aA aBAact |> ignore
         let abExp = aABexp |> Array.toList
         let baExp = aBAexp |> Array.toList
         let abAct = aABact |> Array.toList
@@ -41,8 +41,8 @@ type CollectionOpsFixture() =
         let aBAexp = [| 1us; 4us; 0us; 3us; 2us |]
         let aABact = [| 0us; 0us; 0us; 0us; 0us |]
         let aBAact = [| 0us; 0us; 0us; 0us; 0us |]
-        CollectionOps.arrayProduct16 aA aB aABact |> ignore
-        CollectionOps.arrayProduct16 aB aA aBAact |> ignore
+        CollectionOps.arrayProduct aA aB aABact |> ignore
+        CollectionOps.arrayProduct aB aA aBAact |> ignore
         Assert.AreEqual(aABact |> Array.toList, aABexp |> Array.toList)
         Assert.AreEqual(aBAact |> Array.toList, aBAexp |> Array.toList)
 
@@ -67,11 +67,11 @@ type CollectionOpsFixture() =
             let bloke = RandVars.randomPermutation randy order
 
             let inv =
-                CollectionOps.invertArray bloke (Array.zeroCreate (Order.value order))
+                CollectionOps.invertArrayR bloke (Array.zeroCreate (Order.value order))
                 |> Result.ExtractOrThrow
 
             let prod =
-                CollectionOps.arrayProductIntR bloke inv (Array.zeroCreate bloke.Length)
+                CollectionOps.arrayProductR bloke inv (Array.zeroCreate bloke.Length)
                 |> Result.ExtractOrThrow
 
             Assert.IsTrue((prod = (CollectionProps.identity (Order.value order))))
@@ -90,14 +90,14 @@ type CollectionOpsFixture() =
             let core2 = RandVars.randomPermutation randy order
 
             let coreProd =
-                CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
+                CollectionOps.arrayProductR core1 core2 (Array.zeroCreate core1.Length)
                 |> Result.ExtractOrThrow
 
             let conj1 = core1 |> CollectionOps.conjIntArraysR conjer |> Result.ExtractOrThrow
             let conj2 = core2 |> CollectionOps.conjIntArraysR conjer |> Result.ExtractOrThrow
 
             let prodOfConj =
-                CollectionOps.arrayProductIntR conj1 conj2 (Array.zeroCreate conj1.Length)
+                CollectionOps.arrayProductR conj1 conj2 (Array.zeroCreate conj1.Length)
                 |> Result.ExtractOrThrow
                 |> Array.toList
 
@@ -123,14 +123,14 @@ type CollectionOpsFixture() =
             let core2 = RandVars.randomPermutation randy order
 
             let coreProd =
-                CollectionOps.arrayProductIntR core1 core2 (Array.zeroCreate core1.Length)
+                CollectionOps.arrayProductR core1 core2 (Array.zeroCreate core1.Length)
                 |> Result.ExtractOrThrow
 
             let conj1 = core1 |> CollectionOps.conjIntArrays conjer |> Result.ExtractOrThrow
             let conj2 = core2 |> CollectionOps.conjIntArrays conjer |> Result.ExtractOrThrow
 
             let prodOfConj =
-                CollectionOps.arrayProductIntR conj1 conj2 (Array.zeroCreate conj1.Length)
+                CollectionOps.arrayProductR conj1 conj2 (Array.zeroCreate conj1.Length)
                 |> Result.ExtractOrThrow
                 |> Array.toList
 

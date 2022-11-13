@@ -91,22 +91,19 @@ module RandVars =
         Seq.initInfinite (fun _ -> randomPermutation rnd order)
 
 
-    let rndTwoCycle (rnd: IRando) (arraysize: int) (cycleCount: int) =
-        let initialList = [| 0 .. arraysize - 1 |]
-        let arrayRet = Array.init arraysize (id)
-
-        let rndTupes =
-            (fisherYatesShuffle rnd initialList) |> (Seq.chunkBySize 2) |> Seq.toArray
-
+    let rndPartialTwoCycle (rnd: IRando) (order: order) (cycleCount: int) =
+        let rndTupes = randomPermutation rnd order 
+                        |> (Seq.chunkBySize 2) |> Seq.toArray
+        
+        let arrayRet = Array.init (Order.value order) (id)
         for i = 0 to cycleCount - 1 do
             arrayRet.[rndTupes.[i].[0]] <- rndTupes.[i].[1]
             arrayRet.[rndTupes.[i].[1]] <- rndTupes.[i].[0]
-
         arrayRet
 
 
-    let rndFullTwoCycle (rnd: IRando) (arraysize: int) =
-        rndTwoCycle rnd arraysize (arraysize / 2)
+    let rndFullTwoCycle (rnd: IRando) (order: order) =
+        rndPartialTwoCycle rnd order (order |> Order.maxSwitchesPerStage)
 
 
     // returns a sequence of int[] of length m, made by drawing m
@@ -122,3 +119,13 @@ module RandVars =
             |> Seq.toList
 
         randomPermutations rnd (Order.createNr n) |> Seq.map (_capN n m)
+
+
+    let binomial (rnd: IRando) (freq: float) (numDraws: int) =
+            let __draw (randy: IRando) = if randy.NextFloat < freq then 1 else 0
+            let mutable i = 0
+            let mutable successCount = 0
+            while (i < numDraws) do
+                successCount <- successCount + __draw rnd
+                i <- i + 1
+            successCount

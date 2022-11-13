@@ -41,10 +41,10 @@ type TwoCycleFixture() =
         let seed = RandomSeed.fromNow ()
         let iRando = Rando.fromRngGen (RngGen.createNet seed)
         let ord = Order.createNr 16
-        let switchFreq = 0.5
+        let switchCt = 4
 
         for i in { 0..20 } do
-            let tcp = TwoCycle.rndTwoCycle ord switchFreq iRando
+            let tcp = TwoCycle.rndPartialTwoCycle ord switchCt iRando
             Assert.IsTrue(tcp |> TwoCycle.toPerm |> Permutation.isTwoCycle)
 
 

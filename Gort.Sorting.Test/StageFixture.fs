@@ -7,7 +7,21 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type StageFixture() =
 
     [<TestMethod>]
-    member this.tst() = Assert.IsTrue(true)
+    member this.trndSeqst() = 
+        
+        let switchFreq = 0.5 |> SwitchFrequency.create
+        let order = 16 |> Order.createNr
+        let randy = RngGen.createLcg (RandomSeed.create 1234) |> Rando.fromRngGen
+        let rndTwoCycles = 
+                Stage.rndSeq order switchFreq randy
+                    |> Seq.map(Stage.convertToTwoCycle)
+                    |> Seq.take 20
+                    |> Seq.toArray
+
+        rndTwoCycles |> Seq.map(TwoCycle.isATwoCycle)
+                     |> Seq.iter(fun bv -> Assert.IsTrue(bv))
+        
+        Assert.IsTrue(true)
 
 
     [<TestMethod>]

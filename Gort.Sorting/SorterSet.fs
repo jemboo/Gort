@@ -30,8 +30,7 @@ module SorterSet =
         (switchCount: switchCount)
         (sorterRndGen: order -> switch seq -> switchCount -> IRando -> sorter)
         (sorterCt: sorterCount)
-        (rnGen: rngGen)
-        =
+        (rnGen: rngGen) =
         let randy = rnGen |> Rando.fromRngGen
 
         seq { 1 .. (sorterCt |> SorterCount.value) }
@@ -44,8 +43,7 @@ module SorterSet =
         (wPfx: switch seq)
         (switchCount: switchCount)
         (sorterCt: sorterCount)
-        (rnGen: rngGen)
-        =
+        (rnGen: rngGen)  =
         createRandom order wPfx switchCount Sorter.randomSwitches sorterCt rnGen
 
 
@@ -55,8 +53,7 @@ module SorterSet =
         (wPfx: switch seq)
         (switchCount: switchCount)
         (sorterCt: sorterCount)
-        (rnGen: rngGen)
-        =
+        (rnGen: rngGen)  =
         createRandom order wPfx switchCount (Sorter.randomStages switchFreq) sorterCt rnGen
 
 
@@ -65,8 +62,7 @@ module SorterSet =
         (wPfx: switch seq)
         (switchCount: switchCount)
         (sorterCt: sorterCount)
-        (rnGen: rngGen)
-        =
+        (rnGen: rngGen) =
         createRandom order wPfx switchCount Sorter.randomSymmetric sorterCt rnGen
 
 
@@ -76,6 +72,5 @@ module SorterSet =
         (wPfx: switch seq)
         (switchCount: switchCount)
         (sorterCt: sorterCount)
-        (rnGen: rngGen)
-        =
+        (rnGen: rngGen)  =
         createRandom order wPfx switchCount (Sorter.randomBuddies stageWindowSz) sorterCt rnGen

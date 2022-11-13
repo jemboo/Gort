@@ -157,10 +157,12 @@ module Stage =
 
     // IRando dependent
     let rndSeq (order: order) (switchFreq: switchFrequency) (rnd: IRando) =
-
+        let nextCycleCount () = 
+            RandVars.binomial rnd (SwitchFrequency.value switchFreq) 
+                                  (order |> Order.maxSwitchesPerStage)
         let _aa (rnd: IRando) =
             { switches =
-                TwoCycle.rndTwoCycle order (SwitchFrequency.value switchFreq) rnd
+                TwoCycle.rndPartialTwoCycle order (nextCycleCount ()) rnd
                 |> Switch.fromTwoCycle
                 |> Seq.toList
               order = order }

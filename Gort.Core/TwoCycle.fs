@@ -195,24 +195,12 @@ module TwoCycle =
         makeMonoCycle order (fst tup) (snd tup)
 
 
-    let rndTwoCycle (order: order) (switchFreq: float) (rnd: IRando) =
-        let _multiDraw (rnd: IRando) (freq: float) (numDraws: int) =
-            let __draw (randy: IRando) = if randy.NextFloat < freq then 1 else 0
-            let mutable i = 0
-            let mutable successCount = 0
-
-            while (i < numDraws) do
-                successCount <- successCount + __draw rnd
-                i <- i + 1
-
-            successCount
-
-        let cycleCount = _multiDraw rnd switchFreq (order |> Order.maxSwitchesPerStage)
-        { twoCycle.values = RandVars.rndTwoCycle rnd (Order.value order) cycleCount }
+    let rndPartialTwoCycle (order: order) (cycleCount: int) (rnd: IRando) =
+        { twoCycle.values = RandVars.rndPartialTwoCycle rnd order cycleCount }
 
 
     let rndFullTwoCycle (order: order) (rnd: IRando) =
-        { values = RandVars.rndFullTwoCycle rnd (Order.value order) }
+        { values = RandVars.rndFullTwoCycle rnd order }
 
 
     let rndSymmetric (ord: order) (rnd: IRando) =
