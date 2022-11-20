@@ -82,6 +82,7 @@ module Order =
         with ex ->
             ("error in allIntForDegree: " + ex.Message) |> Result.Error
 
+
     let allSortableAsUint64 (order: order) =
         try
             let itemCt = order |> binExp
@@ -90,9 +91,7 @@ module Order =
             ("error in allUint64ForDegree: " + ex.Message) |> Result.Error
 
 
-type bitsPerSymbol = private BitsPerSymbol of int
 type symbolSetSize = private SymbolSetSize of uint64
-
 module SymbolSetSize =
     let value (SymbolSetSize v) = v
 
@@ -104,6 +103,8 @@ module SymbolSetSize =
 
     let createNr (value: uint64) = value |> SymbolSetSize
 
+
+type bitsPerSymbol = private BitsPerSymbol of int
 module BitsPerSymbol =
     let value (BitsPerSymbol v) = v
     let createNr (value: int) = value |> BitsPerSymbol
@@ -120,7 +121,6 @@ module BitsPerSymbol =
 
 
 type byteWidth = private ByteWidth of int
-
 module ByteWidth =
     let value (ByteWidth v) = v
 
@@ -131,34 +131,13 @@ module ByteWidth =
             "byteWidth must be 1, 2, 4 or 8" |> Error
 
 
-type switchMutationRate = private SwitchMutationRate of float
-
-module SwitchMutationRate =
-    let value (SwitchMutationRate v) = v
-    let create (v: float) = SwitchMutationRate v
-
-
-type stageMutationRate = private StageMutationRate of float
-
-module StageMutationRate =
-    let value (StageMutationRate v) = v
-    let create (v: float) = StageMutationRate v
-
-type mutationRate =
-    | Switch of switchMutationRate
-    | Stage of stageMutationRate
-
+type mutationRate = private MutationRate of float
 module MutationRate =
-
-    let getRateValue mr =
-        match mr with
-        | Switch swMr -> swMr |> SwitchMutationRate.value
-        | Stage stMr -> stMr |> StageMutationRate.value
-
+    let value (MutationRate v) = v
+    let create (v: float) = MutationRate v
 
 
 type symbolCount = private SymbolCount of int
-
 module SymbolCount =
     let value (SymbolCount v) = v
 
@@ -172,7 +151,6 @@ module SymbolCount =
 
 
 type arrayCount = private ArrayCount of int
-
 module ArrayCount =
     let value (ArrayCount v) = v
 
@@ -186,7 +164,6 @@ module ArrayCount =
 
 
 type arrayLength = private ArrayLength of int
-
 module ArrayLength =
     let value (ArrayLength v) = v
 

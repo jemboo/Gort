@@ -10,13 +10,11 @@ module SortableSet =
 
     let getSymbolSetSize (sortableSet: sortableSet) = sortableSet.symbolSetSize
 
-
     let getSortableCount (sortableSet: sortableSet) =
         sortableSet.rollout
         |> Rollout.getArrayCount
         |> ArrayCount.value
         |> SortableCount.create
-
 
     let getSortableSetId (sortableSet: sortableSet) = sortableSet.sortableSetId
 
@@ -29,12 +27,10 @@ module SortableSet =
         |> ArrayLength.value
         |> Order.createNr
 
-
     let make (sortableSetRId: sortableSetId) (symbolSetSize: symbolSetSize) (rollout: rollout) =
         { sortableSetId = sortableSetRId
           rollout = rollout
           symbolSetSize = symbolSetSize }
-
 
     let fromSortableBoolArrays
         (sortableSetId: sortableSetId)

@@ -1,6 +1,4 @@
 ﻿namespace global
-
-open System
 open SysExt
 
 
@@ -17,7 +15,6 @@ module CollectionOps =
     let inline arrayProduct< ^a when ^a:(static member op_Explicit:^a->int)>
                     (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
         let dmax = lhs.Length
-        //let mutable curdex = zero_of lhs.[0]
         let mutable curdex = 0
         while curdex < dmax do
             prod.[curdex] <- lhs.[rhs.[curdex] |> int]
@@ -25,11 +22,12 @@ module CollectionOps =
         prod
 
         
-    let arrayProductR (lhs: array<int>) (rhs: array<int>) (prod: array<int>) =
+    let inline arrayProductR< ^a when ^a:(static member op_Explicit:^a->int)>
+            (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
         try
             arrayProduct lhs rhs prod |> Ok
         with ex ->
-            ("error in compIntArrays: " + ex.Message) |> Result.Error
+            ("error in arrayProductR: " + ex.Message) |> Result.Error
 
 
     let allPowers (a_core: array<int>) =
@@ -59,17 +57,17 @@ module CollectionOps =
                 dex <- dex + 1
         }
 
-    let conjIntArraysNr (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
+    let conjIntArrays (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
         for i = 0 to a_conj.Length - 1 do
             a_out.[a_conj.[i]] <- a_conj.[a_core.[i]]
         a_out
 
 
     // a_conj * a_core * (a_conj ^ -1)
-    let conjIntArrays (a_conj: array<int>) (a_core: array<int>) =
+    let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
         try
             let a_out = Array.zeroCreate a_conj.Length
-            conjIntArraysNr a_conj a_core a_out |> Ok
+            conjIntArrays a_conj a_core a_out |> Ok
         with ex ->
             ("error in conjIntArrays: " + ex.Message) |> Result.Error
 
@@ -108,15 +106,6 @@ module CollectionOps =
             invertArray a inv_out |> Ok
         with ex ->
             ("error in inverseMapArray: " + ex.Message) |> Result.Error
-
-
-    // a_conj * a_core * (a_conj ^ -1)
-    let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
-        result {
-            let! a_conj_inv = invertArrayR a_conj (Array.zeroCreate a_core.Length)
-            let! rhs = arrayProductR a_core a_conj_inv (Array.zeroCreate a_core.Length)
-            return! arrayProductR a_conj rhs (Array.zeroCreate a_core.Length)
-        }
 
 
     let histogram<'d, 'r when 'r: comparison> (keymaker: 'd -> 'r) (qua: seq<'d>) =

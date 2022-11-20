@@ -126,8 +126,8 @@ type CollectionOpsFixture() =
                 CollectionOps.arrayProductR core1 core2 (Array.zeroCreate core1.Length)
                 |> Result.ExtractOrThrow
 
-            let conj1 = core1 |> CollectionOps.conjIntArrays conjer |> Result.ExtractOrThrow
-            let conj2 = core2 |> CollectionOps.conjIntArrays conjer |> Result.ExtractOrThrow
+            let conj1 = core1 |> CollectionOps.conjIntArraysR conjer |> Result.ExtractOrThrow
+            let conj2 = core2 |> CollectionOps.conjIntArraysR conjer |> Result.ExtractOrThrow
 
             let prodOfConj =
                 CollectionOps.arrayProductR conj1 conj2 (Array.zeroCreate conj1.Length)
@@ -136,7 +136,7 @@ type CollectionOpsFixture() =
 
             let coreProdConj =
                 coreProd
-                |> CollectionOps.conjIntArrays conjer
+                |> CollectionOps.conjIntArraysR conjer
                 |> Result.ExtractOrThrow
                 |> Array.toList
 

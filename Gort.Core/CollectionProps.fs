@@ -195,6 +195,9 @@ module CollectionProps =
 
 
     let identity (order: int) = [| 0 .. order - 1 |]
+    //let inline identity< ^a when ^a:(static member op_Explicit:^a-> int) and
+    //                             ^a: (static member op_Explicit:int-> ^a) >
+    //                (order: ^a) = 0 |> ^a
 
     let isIdentity (wh: int[]) = wh |> arrayEquals (identity wh.Length)
 
@@ -216,27 +219,7 @@ module CollectionProps =
         |> Seq.forall (fun dex -> values.[dex] >= values.[dex - 1])
 
 
-    //let isSorted (values: 'a[]) =
-    //    let mutable i = 1
-    //    let mutable looP = true
-
-    //    while ((i < values.Length) && looP) do
-    //        looP <- (values.[i - 1] <= values.[i])
-    //        i <- i + 1
-    //    looP
-
-
     let inline isSorted< ^a when ^a: comparison> (values: ^a[]) =
-        let mutable i = 1
-        let mutable looP = true
-
-        while ((i < values.Length) && looP) do
-            looP <- (values.[i - 1] <= values.[i])
-            i <- i + 1
-        looP
-
-
-    let isSorted_uL (values: uint64[]) =
         let mutable i = 1
         let mutable looP = true
 

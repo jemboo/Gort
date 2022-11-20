@@ -9,9 +9,10 @@
 
   <ItemGroup>
     <Compile Include="utilsFixture.fs" />
-    <Compile Include="rngGenDtoFixture.fs" />
-    <Compile Include="sortableSetDtoFixture.fs" />
+    <Compile Include="componentDtoFixture.fs" />
+    <Compile Include="sorterDtoFixture.fs" />
     <Compile Include="sorterSetDtoFixture.fs" />
+    <Compile Include="sortableSetDtoFixture.fs" />
     <Compile Include="recordVersionsFixture.fs" />
     <Compile Include="domainTablesFixture.fs" />
     <Compile Include="Program.fs" />

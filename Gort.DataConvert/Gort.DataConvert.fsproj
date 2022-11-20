@@ -8,9 +8,10 @@
   <ItemGroup>
     <Compile Include="JsonUtils.fs" />
     <Compile Include="DbLookup.fs" />
-    <Compile Include="componentDto.fs" />
-    <Compile Include="SortableSetDto.fs" />
+    <Compile Include="ComponentDto.fs" />
+    <Compile Include="SortertDto.fs" />
     <Compile Include="SorterSetDto.fs" />
+    <Compile Include="SortableSetDto.fs" />
     <Compile Include="RecordVersions.fs" />
     <Compile Include="DomainTables.fs" />
     <Compile Include="Program.fs" />

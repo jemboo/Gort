@@ -10,13 +10,15 @@ type SwitchFixture() =
     [<TestMethod>]
     member this.switchMap() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
-        let _nextSwitch = Switch.switchMap.[rndy.NextPositiveInt % Switch.mapIndexUb]
-
+        let sw1 = {switch.low = 21; switch.hi = 21} // = 252
+        let sw2 = {switch.low = 360; switch.hi = 360} // = 65340
+        let sw1Dex = Switch.toIndex sw2
+        let dd = sw1Dex |> uint16
         for i = 0 to 100 do
-            let sw = _nextSwitch
-            let dex = Switch.getIndex sw
-            let swBack = Switch.switchMap.[dex]
-            Assert.AreEqual(sw, swBack)
+            let swDex = rndy.NextPositiveInt % 100000
+            let swtch = Switch.fromIndex swDex
+            let swDexBack = Switch.toIndex swtch
+            Assert.AreEqual(swDex, swDexBack)
 
 
     [<TestMethod>]
@@ -25,7 +27,9 @@ type SwitchFixture() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
 
         let switches =
-            Switch.rndNonDegenSwitchesOfDegree degSrc rndy |> Seq.take 10 |> Seq.toArray
+            Switch.rndNonDegenSwitchesOfDegree degSrc rndy 
+            |> Seq.take 10 
+            |> Seq.toArray
 
         for i = 0 to switches.Length - 1 do
             let sw = switches.[i]
@@ -44,13 +48,16 @@ type SwitchFixture() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
 
         let switches =
-            Switch.rndNonDegenSwitchesOfDegree degSrc rndy |> Seq.take 10 |> Seq.toArray
+            Switch.rndNonDegenSwitchesOfDegree degSrc rndy 
+                |> Seq.take 10 
+                |> Seq.toArray
 
         for i = 0 to switches.Length - 1 do
             let sw = switches.[i]
 
             let hiFriends =
-                Switch.hiOverlapping degSrc sw.hi |> Switch.fromSwitchIndexes |> Seq.toArray
+                Switch.hiOverlapping degSrc sw.hi 
+                    |> Switch.fromSwitchIndexes |> Seq.toArray
 
             for j = 0 to hiFriends.Length - 1 do
                 let fr = hiFriends.[j]

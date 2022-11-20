@@ -184,18 +184,18 @@ module Stage =
         }
 
 
-    let randomMutate (rnd: IRando) (mutationRate: stageMutationRate) (stage: stage) =
+    let randomMutate (rnd: IRando) (mutationRate: mutationRate) (stage: stage) =
         match rnd.NextFloat with
-        | k when k < (StageMutationRate.value mutationRate) ->
+        | k when k < (MutationRate.value mutationRate) ->
             let symbolSetSize = stage.order |> Order.value |> uint64 |> SymbolSetSize.createNr
             let tcp = RandVars.drawTwoWithoutRep symbolSetSize rnd
             mutateStageByPair stage tcp
         | _ -> stage
 
 
-    let randomReflMutate (rnd: IRando) (mutationRate: stageMutationRate) (stage: stage) =
+    let randomReflMutate (rnd: IRando) (mutationRate: mutationRate) (stage: stage) =
         match rnd.NextFloat with
-        | k when k < (StageMutationRate.value mutationRate) ->
+        | k when k < (MutationRate.value mutationRate) ->
             let sc = stage.order |> Order.value |> uint64 |> SymbolSetSize.createNr
 
             let tcp =

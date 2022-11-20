@@ -21,7 +21,6 @@ module SorterSpeedBin =
         let stageCtV = sorterSpeedBn.stageCt |> StageCount.value
         ((switchCtV * (switchCtV + 1)) / 2) + stageCtV
 
-
     let getBinFromIndex (index: int) =
         let indexFlt = (index |> float) + 1.0
         let p = (sqrt (1.0 + 8.0 * indexFlt) - 1.0) / 2.0
@@ -77,15 +76,13 @@ module SorterPhenotypeSpeed =
     let getUsedSwitchCount (sorterSpeedBn: sorterPhenotypeSpeed) =
         sorterSpeedBn.sorterSpeedBn |> SorterSpeedBin.getSwitchCount
 
-
     let getUsedStageCount (sorterSpeedBn: sorterPhenotypeSpeed) =
         sorterSpeedBn.sorterSpeedBn |> SorterSpeedBin.getStageCount
 
-
     let getSorters (sorterSpeedBn: sorterPhenotypeSpeed) = sorterSpeedBn.sortrs
 
-
     let getSorterPhenotypeId (sorterSpeedBn: sorterPhenotypeSpeed) = sorterSpeedBn.sortrPhenotypeId
+
 
 
 type sorterPhenotypeSpeedsForSpeedBin =
@@ -210,6 +207,8 @@ module SorterPhenotypePerfsForSpeedBin =
 
     let getFailurePhenotypeCount (perfR: sorterPhenotypePerfsForSpeedBin) = perfR.failingPhenotypeBins.Length
 
+    let hasAFailure (perfR: sorterPhenotypePerfsForSpeedBin) = (getFailurePhenotypeCount perfR) > 0
+
     let isSameBin (sorterPerfBn: sorterPhenotypePerfsForSpeedBin) (sorterSpeedBn: sorterPhenotypeSpeedsForSpeedBin) =
         ((sorterPerfBn |> getUsedStageCount) = (sorterSpeedBn |> SorterPhenotypeSpeedsForSpeedBin.getUsedStageCount))
         && ((sorterPerfBn |> getUsedSwitchCount) = (sorterSpeedBn |> SorterPhenotypeSpeedsForSpeedBin.getUsedSwitchCount))
@@ -222,8 +221,7 @@ module SorterPhenotypePerfsForSpeedBin =
 
     let couldBeTheSame
         (sorterPerfBn: sorterPhenotypePerfsForSpeedBin)
-        (sorterSpeedBn: sorterPhenotypeSpeedsForSpeedBin)
-        =
+        (sorterSpeedBn: sorterPhenotypeSpeedsForSpeedBin) =
         (isSameBin sorterPerfBn sorterSpeedBn)
         && (hasSameCount sorterPerfBn sorterSpeedBn)
 

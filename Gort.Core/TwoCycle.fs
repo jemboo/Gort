@@ -76,7 +76,7 @@ module TwoCycle =
 
     let conjugate (tc: twoCycle) (perm: permutation) =
         { twoCycle.values =
-            CollectionOps.conjIntArraysNr
+            CollectionOps.conjIntArrays
                 (Permutation.getArray perm)
                 (getArray tc)
                 (Array.zeroCreate perm.values.Length) }

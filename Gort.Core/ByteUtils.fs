@@ -54,12 +54,10 @@ module ByteUtils =
 
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new byte ()
-
             _bs
             |> Seq.iteri (fun dex v ->
                 if v then
                     (bRet <- bRet.set dex) |> ignore)
-
             bRet
 
         bitsy
@@ -84,7 +82,6 @@ module ByteUtils =
                     bRet <- bRet.set curdex
 
                 curdex <- curdex + 1
-
             bRet
 
         let byteArray = bitsy |> Seq.chunkBySize (8) |> Seq.map (_yab) |> Seq.toArray
@@ -103,6 +100,7 @@ module ByteUtils =
                 yield! _uint16ToBits bitsPerSymbol i
         }
 
+
     // maps a bit stream to the first bitsPerSymbol in a generated stream of uint16
     // The way this is used, the last chunk may padding - in this case it is smaller
     // than bitsPerSymbol, and it is ignored
@@ -111,18 +109,17 @@ module ByteUtils =
 
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint16 ()
-
             _bs
             |> Seq.iteri (fun dex v ->
                 if v then
                     (bRet <- bRet.set dex) |> ignore)
-
             bRet
 
         bitsy
         |> Seq.chunkBySize (bw)
         |> Seq.where (fun chunk -> chunk.Length = bw)
         |> Seq.map (_yab)
+
 
     // creates a bit stream from a int stream by selecting the first bitsPerSymbol bits.
     let bitsFromSpIntPositions (bitsPerSymbol: bitsPerSymbol) (v: seq<int>) =
@@ -145,12 +142,10 @@ module ByteUtils =
 
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new int ()
-
             _bs
             |> Seq.iteri (fun dex v ->
                 if v then
                     (bRet <- bRet.set dex) |> ignore)
-
             bRet
 
         bitsy
@@ -180,12 +175,10 @@ module ByteUtils =
 
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint64 ()
-
             _bs
             |> Seq.iteri (fun dex v ->
                 if v then
                     (bRet <- bRet.set dex) |> ignore)
-
             bRet
 
         bitsy
@@ -215,44 +208,36 @@ module ByteUtils =
 
     let boolArrayToInt (boolArray: bool[]) =
         let mutable rv = 0
-
         boolArray
         |> Array.iteri (fun dex v ->
             if v then
                 rv <- rv.set dex)
-
         rv
 
 
     let boolArrayToUint64 (boolArray: bool[]) =
         let mutable rv = 0uL
-
         boolArray
         |> Array.iteri (fun dex v ->
             if v then
                 rv <- rv.set dex)
-
         rv
 
 
     let inline thresholdArrayToInt< ^a when ^a: comparison> (array: ^a[]) (oneThresh: ^a) =
         let mutable rv = 0
-
         array
         |> Array.iteri (fun dex v ->
             if (v >= oneThresh) then
                 rv <- rv.set dex)
-
         rv
 
     let inline thresholdArrayToUint64< ^a when ^a: comparison> (array: ^a[]) (oneThresh: ^a) =
         let mutable rv = 0uL
-
         array
         |> Array.iteri (fun dex v ->
             if (v >= oneThresh) then
                 rv <- rv.set dex)
-
         rv
 
 
@@ -320,7 +305,6 @@ module ByteUtils =
                     for j = 0 to (Order.value ord) - 1 do
                         if packedArray.[i].isset j then
                             stripedArray.[j, block] <- stripedArray.[j, block].set stripe
-
                     i <- i + 1
                     stripe <- stripe + 1
 
@@ -393,7 +377,6 @@ module ByteUtils =
             for i = 0 to twoDvals.Length - 1 do
                 writeStripeFromBitArray twoDvals.[i] i stripedArray
                 arrayCt <- arrayCt + 1
-
             stripedArray
 
         try

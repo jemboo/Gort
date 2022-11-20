@@ -55,13 +55,13 @@ module SorterUniformMutatorDto =
             let! res =
                 match dto.sumType with
                 | (nameof sorterUniformMutatorType.Switch) ->
-                    let swMr = dto.mutationRate |> SwitchMutationRate.create
+                    let swMr = dto.mutationRate |> MutationRate.create
                     SorterUniformMutator.mutateBySwitch swMr |> Ok
                 | (nameof sorterUniformMutatorType.Stage) ->
-                    let stMr = dto.mutationRate |> StageMutationRate.create
+                    let stMr = dto.mutationRate |> MutationRate.create
                     SorterUniformMutator.mutateByStage stMr |> Ok
                 | (nameof sorterUniformMutatorType.StageRfl) ->
-                    let stMr = dto.mutationRate |> StageMutationRate.create
+                    let stMr = dto.mutationRate |> MutationRate.create
                     SorterUniformMutator.mutateByStageRfl stMr |> Ok
                 | _ -> sprintf "%s not matched" dto.sumType |> Error
 
@@ -78,10 +78,11 @@ module SorterUniformMutatorDto =
 
     let toDto (sum: sorterUniformMutator) =
         let sumType = sum |> SorterUniformMutator.getSorterUniformMutatorType
-        let mutRateVal = sum |> SorterUniformMutator.getMutationRateVal
-
+        let mutRateVal = sum |> SorterUniformMutator.getMutationRate
+                             |> MutationRate.value
         { sorterUniformMutatorDto.sumType = string sumType
           mutationRate = mutRateVal }
 
 
-    let toJson (rngGen: sorterUniformMutator) = rngGen |> toDto |> Json.serialize
+    let toJson (sorterUniformMutato: sorterUniformMutator) = 
+        sorterUniformMutato |> toDto |> Json.serialize

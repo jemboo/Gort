@@ -9,25 +9,27 @@ module Switch =
 
     let toString (sw: switch) = sprintf "(%d, %d)" sw.low sw.hi
 
-    let maxDegree = 255
-
-    let switchMap =
-        [ for hi = 0 to maxDegree do
-              for low = 0 to hi do
-                  yield { switch.low = low; hi = hi } ]
-
-    let mapIndexUb = switchMap.Length
+    let fromIndex (dex:int) = 
+        let indexFlt = (dex |> float) + 1.0
+        let p = (sqrt (1.0 + 8.0 * indexFlt) - 1.0) / 2.0
+        let pfloor = Math.Floor(p)
+        if (p = pfloor) then
+            {switch.low= (int pfloor) - 1; hi = (int pfloor) - 1 }
+        else
+            let lo = (float dex) - (pfloor * (pfloor + 1.0)) / 2.0 |> int
+            let hi = (int pfloor)
+            {switch.low = lo; hi = hi }
 
     let maxSwitchIndexForOrder (ord: order) =
         uint32 ((Order.value ord) * (Order.value ord + 1) / 2)
 
     let fromSwitchIndexes (dexes: int seq) =
-        dexes |> Seq.map (fun dex -> switchMap.[dex])
+        dexes |> Seq.map (fromIndex)
 
     let removeDegenerateIndexes (dexes: int seq) =
         dexes |> fromSwitchIndexes |> Seq.filter (fun sw -> sw.low <> sw.hi)
 
-    let getIndex (switch: switch) =
+    let toIndex (switch: switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
 
     // all switch indexes for order with lowVal
@@ -81,8 +83,7 @@ module Switch =
         seq {
             while true do
                 let p = (int (rnd.NextUInt % maxDex))
-                let sw = switchMap.[p]
-
+                let sw = fromIndex p
                 if (sw.low <> sw.hi) then
                     yield sw
         }
@@ -93,9 +94,8 @@ module Switch =
         seq {
             while true do
                 let p = (int (rnd.NextUInt % maxDex))
-                yield switchMap.[p]
+                yield fromIndex p
         }
-
 
     let rndSymmetric (order: order) (rnd: IRando) =
         let aa (rnd: IRando) =
@@ -106,13 +106,13 @@ module Switch =
                 yield! (aa rnd)
         }
 
-
-    let mutateSwitches (order: order) (mutationRate: switchMutationRate) (rnd: IRando) (switches: seq<switch>) =
+    let mutateSwitches (order: order) (mutationRate: mutationRate) (rnd: IRando) (switches: seq<switch>) =
         let mDex = uint32 ((Order.value order) * (Order.value order + 1) / 2)
 
         let mutateSwitch (switch: switch) =
             match rnd.NextFloat with
-            | k when k < (SwitchMutationRate.value mutationRate) -> switchMap.[(int (rnd.NextUInt % mDex))]
+            | k when k < (MutationRate.value mutationRate)
+                        -> fromIndex (int (rnd.NextUInt % mDex))
             | _ -> switch
 
         switches |> Seq.map (fun sw -> mutateSwitch sw)

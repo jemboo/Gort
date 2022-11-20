@@ -11,12 +11,6 @@ type RndGenFixture() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
         let weightFunction (w: float) = 1.0 / w
 
-        let res0 =
-            testArray
-            |> (RandVars.fromWeightedDistribution weightFunction rndy)
-            |> Seq.take 1000
-            |> Seq.toArray
-
         let res =
             testArray
             |> (RandVars.fromWeightedDistribution weightFunction rndy)

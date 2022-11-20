@@ -33,7 +33,7 @@ module Permutation =
 
     let conjugate (conj: permutation) (pA: permutation) =
         result {
-            let! res = CollectionOps.conjIntArrays (pA |> getArray) (conj |> getArray)
+            let! res = CollectionOps.conjIntArraysR (pA |> getArray) (conj |> getArray)
             return create res
         }
 

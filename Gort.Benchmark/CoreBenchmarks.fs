@@ -236,19 +236,6 @@ type BenchIsSorted_Arrays() =
         let ssR = CollectionProps.isSorted_idiom this.testArray
         0
 
-
-    [<Benchmark>]
-    member this.isSorted_uL() =
-        let ssR = CollectionProps.isSorted_uL this.testArray
-        0
-
-
-    [<Benchmark>]
-    member this.isSorted_inline() =
-        let ssR = CollectionProps.isSorted this.testArray
-        0
-
-
     [<Benchmark>]
     member this.isSorted() =
         let ssR = CollectionProps.isSorted this.testArray
@@ -388,7 +375,7 @@ type BenchConj() =
 
     [<Benchmark>]
     member this.conjIntArrays() =
-        let ssR = CollectionOps.conjIntArrays aConj aCore |> Result.ExtractOrThrow
+        let ssR = CollectionOps.conjIntArraysR aConj aCore |> Result.ExtractOrThrow
         0
 
 

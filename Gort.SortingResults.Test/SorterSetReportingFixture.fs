@@ -43,7 +43,6 @@ type SorterSetReportingFixture() =
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
-
         let sorterSpeedEvls, errs =
             SorterSetEval.eval sorterEvalMode.SorterSpeed sortableSt sorterSt useParalll
 
@@ -60,7 +59,6 @@ type SorterSetReportingFixture() =
                 sp
                 |> SorterPhenotypeSpeedsForSpeedBin.getSpeedBin
                 |> SorterSpeedBin.getIndexOfBin)
-
 
         //////////////
         let sorterPerfEvls, errs =
@@ -80,13 +78,12 @@ type SorterSetReportingFixture() =
                 |> SorterPhenotypePerfsForSpeedBin.getSpeedBin
                 |> SorterSpeedBin.getIndexOfBin)
 
-
         let mutable dex = 0
-
         while dex < sppfsbs.Length do
             let res = SorterPhenotypePerfsForSpeedBin.couldBeTheSame sppfsbs.[dex] spsfsbs.[dex]
-
             Assert.IsTrue(res)
             dex <- dex + 1
 
-        Assert.AreEqual(1, 1)
+        let hasAFailure = sppfsbs |> Array.exists(fun spps -> spps |> SorterPhenotypePerfsForSpeedBin.hasAFailure)
+
+        Assert.IsTrue(hasAFailure)
