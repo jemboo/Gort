@@ -29,7 +29,7 @@ module RngGenDto =
         result {
             let! typ = RngType.create dto.rngType
             let rs = RandomSeed.create dto.seed
-            return { rngGen.rngType = typ; seed = rs }
+            return RngGen.create typ rs
         }
 
     let fromJson (jstr: string) =
@@ -39,21 +39,21 @@ module RngGenDto =
         }
 
     let toDto (rngGen: rngGen) =
-        { rngType = (RngType.toDto rngGen.rngType)
-          seed = RandomSeed.value rngGen.seed }
+        { rngType = rngGen |> RngGen.getType |> RngType.toDto
+          seed =  rngGen |> RngGen.getSeed |> RandomSeed.value }
 
     let toJson (rngGen: rngGen) = rngGen |> toDto |> Json.serialize
 
 
 type sorterUniformMutatorDto =
-    { sumType: string; mutationRate: float }
+    { mutFuncType: string; mutationRate: float }
 
 module SorterUniformMutatorDto =
 
     let fromDto (dto: sorterUniformMutatorDto) =
         result {
             let! res =
-                match dto.sumType with
+                match dto.mutFuncType with
                 | (nameof sorterUniformMutatorType.Switch) ->
                     let swMr = dto.mutationRate |> MutationRate.create
                     SorterUniformMutator.mutateBySwitch swMr |> Ok
@@ -63,7 +63,7 @@ module SorterUniformMutatorDto =
                 | (nameof sorterUniformMutatorType.StageRfl) ->
                     let stMr = dto.mutationRate |> MutationRate.create
                     SorterUniformMutator.mutateByStageRfl stMr |> Ok
-                | _ -> sprintf "%s not matched" dto.sumType |> Error
+                | _ -> sprintf "%s not matched" dto.mutFuncType |> Error
 
             return res
         }
@@ -80,7 +80,7 @@ module SorterUniformMutatorDto =
         let sumType = sum |> SorterUniformMutator.getSorterUniformMutatorType
         let mutRateVal = sum |> SorterUniformMutator.getMutationRate
                              |> MutationRate.value
-        { sorterUniformMutatorDto.sumType = string sumType
+        { sorterUniformMutatorDto.mutFuncType = string sumType
           mutationRate = mutRateVal }
 
 

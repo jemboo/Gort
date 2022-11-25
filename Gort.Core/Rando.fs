@@ -4,12 +4,27 @@ open System
 
 // Rando
 type randomSeed = private RandomSeed of int
+module RandomSeed =
+    let value (RandomSeed seed) = seed
+    let create (seed: int) =
+        (Math.Abs(seed) % 2147483647) |> RandomSeed
+    let fromNow () = DateTime.Now.Ticks |> int |> create
+
 
 type rngType =
     | Lcg = 1
     | Net = 2
 
-type rngGen = { rngType: rngType; seed: randomSeed }
+
+type rngGen = private { rngType:rngType; seed:randomSeed }
+module RngGen =
+    let create (rngTyp: rngType) (seed: randomSeed) = { rngType = rngTyp; seed = seed }
+    let getType (rgn:rngGen) =  rgn.rngType
+    let getSeed (rgn:rngGen) =  rgn.seed
+    let createLcg (seed: randomSeed) = create rngType.Lcg seed
+    let createNet (seed: randomSeed) = create rngType.Net seed
+    let lcgFromNow () = RandomSeed.fromNow () |> createLcg
+
 
 type IRando =
     abstract member Count: int
@@ -19,20 +34,6 @@ type IRando =
     abstract member NextULong: uint64
     abstract member NextFloat: float
     abstract member rngType: rngType
-
-module RandomSeed =
-    let value (RandomSeed seed) = seed
-
-    let create (seed: int) =
-        (Math.Abs(seed) % 2147483647) |> RandomSeed
-
-    let fromNow () = DateTime.Now.Ticks |> int |> create
-
-
-module RngGen =
-    let createLcg (seed: randomSeed) = { rngType = rngType.Lcg; seed = seed }
-    let lcgFromNow () = RandomSeed.fromNow () |> createLcg
-    let createNet (seed: randomSeed) = { rngType = rngType.Net; seed = seed }
 
 
 type RandomNet(seed: randomSeed) =
@@ -101,9 +102,38 @@ module Rando =
         | rngType.Lcg -> new RandomLcg(seed) :> IRando
         | rngType.Net -> new RandomNet(seed) :> IRando
 
-
     let fromRngGen (rg: rngGen) = create rg.rngType rg.seed
-
 
     let nextRngGen (randy: IRando) =
         create randy.rngType (RandomSeed.create randy.NextPositiveInt)
+
+
+type rndGuid = private { r1:IRando; r2:IRando; r3:IRando; r4:IRando }
+
+module RndGuid = 
+    let make (gud:Guid) (rngTyp:rngType) =
+        let randos = 
+            gud 
+            |> GuidUtils.toUint32s
+            |> Array.map(int)
+            |> Array.map(RandomSeed.create)
+            |> Array.map(Rando.create rngTyp)
+        { rndGuid.r1= randos.[0];
+          rndGuid.r2= randos.[1];
+          rndGuid.r3= randos.[2];
+          rndGuid.r4= randos.[3]; }
+
+    let makeLcg (gud:Guid) =
+        make gud rngType.Lcg
+
+    let makeNet (gud:Guid) =
+        make gud rngType.Net
+
+    let nextUints (rndGud:rndGuid) =
+        [| rndGud.r1.NextUInt; rndGud.r2.NextUInt; 
+           rndGud.r3.NextUInt; rndGud.r4.NextUInt; |]
+
+    let nextGuid (rndGud:rndGuid) =
+        GuidUtils.fromUint32s 
+            rndGud.r1.NextUInt rndGud.r2.NextUInt
+            rndGud.r3.NextUInt rndGud.r4.NextUInt

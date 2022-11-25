@@ -1,6 +1,6 @@
 ﻿namespace global
-
 open Microsoft.FSharp.Core
+open System;
 open Gort.DataStore.DataModel
 
 
@@ -96,11 +96,12 @@ module DomainTables =
                 return! SortableSet.makeAllBits (sortableSetRId |> SortableSetId.create) fmt order
             }
 
-        let _sorterLookup (ctxt: IGortContext2) (sorterId: int) =
+        let _sorterLookup (ctxt: IGortContext2) (gud: Guid) =
             result {
                 let! order = 8 |> Order.create
                 let switchCt = 100 |> SwitchCount.create
-                return Sorter.fromSwitches order Seq.empty<switch>
+                let sortrId = gud |> SorterId.create
+                return Sorter.fromSwitches sortrId order Seq.empty<switch>
             }
 
         let _bitpackLookup (ctxt: IGortContext2) (bitpackId: int) =

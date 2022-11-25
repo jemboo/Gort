@@ -1,5 +1,5 @@
 namespace Gort.SortingOps.Test
-
+open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -8,7 +8,8 @@ type SortingRolloutFixture() =
     let getGoodRefResults (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = 123 |> SortableSetId.create
-        let goodSorter = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
+        let sortrId = Guid.NewGuid() |> SorterId.create
+        let goodSorter = RefSorter.goodRefSorterForOrder sortrId order |> Result.ExtractOrThrow
 
         let sortableSet =
             SortableSet.makeAllBits sortableSetId rolloutFormat order
@@ -21,28 +22,22 @@ type SortingRolloutFixture() =
         sorterOpOutput
 
 
-
-
     let getIncompleteSortResults (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = 123 |> SortableSetId.create
-
         let switchCount = SwitchCount.orderToRecordSwitchCount order
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
-        let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando
+        let sortrId = Guid.NewGuid() |> SorterId.create
+        let failingSorter = Sorter.randomSwitches sortrId order (Seq.empty) switchCount rando
 
         let sortableSet =
             SortableSet.makeAllBits sortableSetId rolloutFormat order
             |> Result.ExtractOrThrow
 
-
         let sorterOpOutput =
             SortingRollout.makeSorterOpOutput sorterOpTrackMode sortableSet failingSorter
 
         sorterOpOutput
-
-
-
 
 
     [<TestMethod>]

@@ -1,9 +1,20 @@
 namespace Gort.Core.Test
-
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System
 
 [<TestClass>]
 type RndGenFixture() =
+
+    [<TestMethod>]
+    member this.rndGuidsLcg() =
+        let arrayLen = 10
+        let gud = new Guid()
+        let tstArray = RandVars.rndGuidsLcg gud
+                       |> Seq.take(arrayLen)
+                       |> Seq.toArray
+
+        Assert.IsTrue(true)
+
 
     [<TestMethod>]
     member this.fromWeightedDistribution() =

@@ -143,7 +143,7 @@ module CollectionProps =
     let enumNchooseM (n: int) (m: int) =
         let maxVal = n - 1
 
-        let newMaxf l r =
+        let _newMaxf l r =
             let rh, rt =
                 match r with
                 | rh :: rt -> (rh, rt)
@@ -151,21 +151,21 @@ module CollectionProps =
 
             rh + 2 + (l |> List.length)
 
-        let rightPack l r =
+        let _rightPack l r =
             let rh, rt =
                 match r with
                 | rh :: rt -> (rh, rt)
                 | [] -> failwith "boo boo"
 
-            let curMax = newMaxf l r
+            let curMax = _newMaxf l r
             let rhS = rh + 1
-
             if (curMax = maxVal) then
                 [ (rhS + 1) .. maxVal ], rhS, rt
             else
                 [], curMax, [ (curMax - 1) .. -1 .. rhS ] @ rt
 
-        let rec makeNext (lhs: int list) (c: int) (rhs: int list) =
+
+        let rec _makeNext (lhs: int list) (c: int) (rhs: int list) =
             let maxShift =
                 match lhs with
                 | a :: _ -> a - 1
@@ -174,21 +174,22 @@ module CollectionProps =
             match lhs, c, rhs with
             | l, md, [] when md = maxShift -> None
             | l, md, r when md < maxShift -> Some(l, md + 1, r)
-            | l, md, rh :: rt when (md = maxShift) && (rh = (maxShift - 1)) -> makeNext (md :: l) rh rt
-            | l, md, r when (md = maxShift) -> Some(rightPack l r)
+            | l, md, rh :: rt when (md = maxShift) && (rh = (maxShift - 1)) -> _makeNext (md :: l) rh rt
+            | l, md, r when (md = maxShift) -> Some(_rightPack l r)
             | l, md, r when md = maxShift -> Some(md :: l, md + 1, r)
             | _, _, _ -> None
 
+
         let mutable proceed = true
         let mutable curTup = Some([], m - 1, [ (m - 2) .. -1 .. 0 ])
-
         seq {
             while proceed do
                 let a, b, c = curTup |> Option.get
                 yield a @ (b :: c) |> List.sort
-                curTup <- makeNext a b c
+                curTup <- _makeNext a b c
                 proceed <- (curTup |> Option.isSome)
         }
+
 
     let fixedPointCount (a: int[]) =
         a |> Array.mapi (fun dex e -> if (dex = e) then 1 else 0) |> Array.reduce (+)

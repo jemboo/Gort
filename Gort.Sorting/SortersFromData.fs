@@ -25,13 +25,12 @@ module SortersFromData =
         }
 
 
-    let ParseToSorter (sorterString: string) (order: order) =
+    let ParseToSorter (sorterD:sorterId) (sorterString: string) (order: order) =
         result {
             let! switchSeq = ParseToSwitches sorterString order
             let switches = switchSeq |> Seq.toArray
-            return Sorter.fromSwitches order switches
+            return Sorter.fromSwitches sorterD order switches
         }
-
 
 
 module SorterWriter =
@@ -167,10 +166,10 @@ module RefSorter =
         | _ -> "no match found in GetStringAndDegree" |> Error
 
 
-    let createRefSorter (refSorter: RefSorter) =
+    let createRefSorter (sorterD:sorterId) (refSorter: RefSorter) =
         result {
             let! (sorterString, order) = (getStringAndDegree refSorter)
-            return! SortersFromData.ParseToSorter sorterString order
+            return! SortersFromData.ParseToSorter sorterD sorterString order
         }
 
 
@@ -211,8 +210,8 @@ module RefSorter =
         | _ -> "no match found in RefSorterForDegree" |> Error
 
 
-    let goodRefSorterForOrder (order: order) =
+    let goodRefSorterForOrder (sorterD:sorterId) (order: order) =
         result {
             let! refSorter = _goodRefSorterForDegree order
-            return! createRefSorter refSorter
+            return! createRefSorter sorterD refSorter
         }

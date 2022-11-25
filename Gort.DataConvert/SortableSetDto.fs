@@ -1,5 +1,5 @@
 ﻿namespace global
-
+open System
 open Microsoft.FSharp.Core
 
 type sortableSetAllBitsDto =
@@ -318,8 +318,7 @@ module SortableSetExplicitDto =
         (order: order)
         (symbolSetSz: symbolSetSize)
         (sortableCt: sortableCount)
-        (bitPackRId: int)
-        =
+        (bitPackRId: int)  =
         { sortableSetExplicitDto.sortableSetRId = sortableSetId |> SortableSetId.value
           order = order |> Order.value
           symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int
@@ -332,8 +331,7 @@ module SortableSetExplicitDto =
         (order: order)
         (symbolSetSz: symbolSetSize)
         (sortableCt: sortableCount)
-        (rngGenId: int)
-        =
+        (rngGenId: int) =
         rngGenId
         |> toDto sortableSetId rolloutFormt order symbolSetSz sortableCt
         |> Json.serialize
@@ -351,30 +349,34 @@ module SortableSetSwitchReducedDto =
     let fromDto
         (dto: sortableSetSwitchReducedDto)
         (sortableSetLookup: int -> Result<sortableSet, string>)
-        (sorterLookup: int -> Result<sorter, string>)
-        =
+        (sorterLookup: Guid -> Result<sorter, string>) =
         result {
             let! sortableSet = sortableSetLookup dto.sortableSetSourceId
-            let! sorter = sorterLookup dto.sorterId
+            let! sorter = sorterLookup  (Guid.NewGuid()) //dto.sorterId
             let! ssFormat = dto.fmt |> RolloutFormat.fromString
-            return! SortableSet.switchReduce (dto.sortableSetRId |> SortableSetId.create) ssFormat sortableSet sorter
+            return! SortableSet.switchReduce 
+                        (dto.sortableSetRId |> SortableSetId.create) ssFormat sortableSet sorter
         }
 
     let fromJson
         (jstr: string)
         (sortableSetLookup: int -> Result<sortableSet, string>)
-        (sorterLookup: int -> Result<sorter, string>)
-        =
+        (sorterLookup: Guid -> Result<sorter, string>) =
         result {
             let! dto = Json.deserialize<sortableSetSwitchReducedDto> jstr
             return! fromDto dto sortableSetLookup sorterLookup
         }
 
-    let toDto (sortableSetId: sortableSetId) (rolloutFormt: rolloutFormat) (sorterId: int) (sortableSetSourceId: int) =
+    let toDto 
+            (sortableSetId: sortableSetId) 
+            (rolloutFormt: rolloutFormat) 
+            (sorterId: int) (sortableSetSourceId: int) =
         { sortableSetSwitchReducedDto.sorterId = sorterId
           fmt = rolloutFormt |> RolloutFormat.toString
           sortableSetRId = sortableSetId |> SortableSetId.value
           sortableSetSourceId = sortableSetSourceId }
 
-    let toJson (sortableSetId: sortableSetId) (rolloutFormt: rolloutFormat) (sorterId: int) (sortableSetSourceId: int) =
+    let toJson 
+            (sortableSetId: sortableSetId) (rolloutFormt: rolloutFormat) 
+            (sorterId: int) (sortableSetSourceId: int) =
         toDto sortableSetId rolloutFormt sorterId sortableSetSourceId |> Json.serialize

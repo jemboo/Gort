@@ -1,5 +1,5 @@
 ﻿namespace global
-
+open System
 open BenchmarkDotNet.Attributes
 
 
@@ -73,7 +73,8 @@ type BenchMakeSortableStack() =
 
 type BenchmarkSorterOnBp64() =
     let order = (Order.createNr 16)
-    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
+    let sortrId = (Guid.NewGuid()) |> SorterId.create
+    let sorter16 = RefSorter.createRefSorter sortrId RefSorter.Green16 |> Result.ExtractOrThrow
 
     let sortableSetId = 123 |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64

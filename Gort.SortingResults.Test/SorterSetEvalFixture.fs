@@ -1,5 +1,5 @@
 namespace Gort.SortingResults.Test
-
+open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -11,7 +11,8 @@ type SorterSetEvalFixture() =
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 2000
         let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
-        let sorterSt = SorterSet.createRandomSwitches ordr [||] switchCt sorterCt rnGn
+        let sorterSetId = Guid.NewGuid() |> SorterSetId.create
+        let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create 123
 

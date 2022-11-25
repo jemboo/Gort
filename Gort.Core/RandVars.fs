@@ -4,6 +4,10 @@ open System
 
 module RandVars =
 
+    let rndGuidsLcg (gud:Guid) =
+        let rndGud = RndGuid.makeLcg gud
+        Seq.initInfinite(fun _ -> RndGuid.nextGuid rndGud)
+
     let rndBitsUint64 (order: order) (rnd: IRando) =
         rnd.NextULong &&& (order |> Order.bitMaskUint64)
 
@@ -122,10 +126,10 @@ module RandVars =
 
 
     let binomial (rnd: IRando) (freq: float) (numDraws: int) =
-            let __draw (randy: IRando) = if randy.NextFloat < freq then 1 else 0
+            let _draw (randy: IRando) = if randy.NextFloat < freq then 1 else 0
             let mutable i = 0
             let mutable successCount = 0
             while (i < numDraws) do
-                successCount <- successCount + __draw rnd
+                successCount <- successCount + _draw rnd
                 i <- i + 1
             successCount

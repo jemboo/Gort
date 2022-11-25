@@ -61,5 +61,5 @@ module gcOps =
             let! r = MakeRandGenFromRecord randGenId ctxt
             let! rngt = r.RandGenType |> miscConv.RandGenTypeToRngType
             let seed = r.Seed |> RandomSeed.create
-            return { rngType = rngt; seed = seed }
+            return RngGen.create rngt seed
         }

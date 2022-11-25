@@ -66,9 +66,10 @@ type SwitchFixture() =
 
     [<TestMethod>]
     member this.allMasks() =
+        let sortrId = (Guid.NewGuid()) |> SorterId.create
         let degSrc = Order.createNr 16
         let degDest = Order.createNr 12
-        let srtGreen = RefSorter.createRefSorter RefSorter.End16 |> Result.ExtractOrThrow
+        let srtGreen = RefSorter.createRefSorter sortrId RefSorter.End16 |> Result.ExtractOrThrow
 
         let subSorters =
             Switch.allMasks degSrc degDest (srtGreen |> Sorter.getSwitches) |> Seq.toArray
@@ -84,10 +85,12 @@ type SwitchFixture() =
 
     [<TestMethod>]
     member this.rndMasks() =
+        let sortrId = (Guid.NewGuid()) |> SorterId.create
+        let sortrId = (Guid.NewGuid()) |> SorterId.create
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
         let degSrc = Order.createNr 16
         let degDest = Order.createNr 12
-        let srtGreen = RefSorter.createRefSorter RefSorter.End16 |> Result.ExtractOrThrow
+        let srtGreen = RefSorter.createRefSorter sortrId RefSorter.End16 |> Result.ExtractOrThrow
 
         let subSorters =
             Switch.rndMasks degSrc degDest (srtGreen |> Sorter.getSwitches) rndy

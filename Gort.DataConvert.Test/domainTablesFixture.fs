@@ -1,5 +1,5 @@
 namespace Gort.DataConvert.Test
-
+open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open Gort.DataStore.DataModel
 
@@ -20,7 +20,7 @@ type domainTablesFixture() =
         let seedV = 123
         let seed = seedV |> RandomSeed.create
         let rngT = rngType.Lcg
-        let rngGen = { rngGen.rngType = rngT; seed = seed }
+        let rngGen = RngGen.create rngT seed
         let rndGenR = DomainTables.rngGenToComponentR rngGen causeR causePath
         let rngGenBack = rndGenR |> DomainTables.componentRToRngGen |> Result.ExtractOrThrow
         Assert.AreEqual(rngGen, rngGenBack)

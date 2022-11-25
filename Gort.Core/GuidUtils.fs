@@ -6,7 +6,7 @@ open System.Security.Cryptography
 
 module GuidUtils =
 
-    let fromUint64s (g1: uint64) (g2: uint64) (g3: uint64) (g4: uint64) =
+    let fromUint32s (g1: uint32) (g2: uint32) (g3: uint32) (g4: uint32) =
         let pc0 = System.BitConverter.GetBytes(g1)
         let pc1 = System.BitConverter.GetBytes(g2)
         let pc2 = System.BitConverter.GetBytes(g3)
@@ -14,26 +14,21 @@ module GuidUtils =
 
         let woof =
             seq {
-                pc0.[0]
-                pc0.[1]
-                pc0.[2]
-                pc0.[3]
-                pc1.[0]
-                pc1.[1]
-                pc1.[2]
-                pc1.[3]
-                pc2.[0]
-                pc2.[1]
-                pc2.[2]
-                pc2.[3]
-                pc3.[0]
-                pc3.[1]
-                pc3.[2]
-                pc3.[3]
+                pc0.[0]; pc0.[1]; pc0.[2]; pc0.[3]
+                pc1.[0]; pc1.[1]; pc1.[2]; pc1.[3]
+                pc2.[0]; pc2.[1]; pc2.[2]; pc2.[3]
+                pc3.[0]; pc3.[1]; pc3.[2]; pc3.[3]
             }
             |> Seq.toArray
 
         new System.Guid(woof)
+
+
+    let toUint32s (guy:Guid) =
+        let bytes = guy.ToByteArray()
+        let uints = Array.zeroCreate<uint32> 4
+        Buffer.BlockCopy(bytes, 0, uints, 0, 16)
+        uints
 
 
     let guidFromBytes (ba: byte[]) = new Guid(ba)
@@ -46,7 +41,7 @@ module GuidUtils =
         new System.Guid(pcsS)
 
 
-    let addGuidsO (g1: Guid option) (g2: Guid option) =
+    let addGuidsOpt (g1: Guid option) (g2: Guid option) =
         match g1, g2 with
         | Some v1, Some v2 -> addGuids v1 v2
         | None, Some v2 -> v2
@@ -70,7 +65,7 @@ module GuidUtils =
         | false -> "not a guid: " + gstr |> Result.Error
 
 
-    let guidFromStringO (gstr: string) =
+    let guidFromStringOpt (gstr: string) =
         let mutable gv = Guid.NewGuid()
 
         match Guid.TryParse(gstr, &gv) with
@@ -113,7 +108,6 @@ module GuidUtils =
             blob |> Ok
         with ex ->
             ("error in mapGuidsToBytes: " + ex.Message) |> Result.Error
-
 
 
     let convertBytesToGuids (blob: byte[]) =

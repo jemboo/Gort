@@ -11,7 +11,8 @@ type SortingEvalFixture() =
         let sortableSetId = 123 |> SortableSetId.create
         let switchCount = SwitchCount.orderTo900SwitchCount order
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
-        let goodSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando
+        let sorterId = Guid.NewGuid() |> SorterId.create
+        let goodSorter = Sorter.randomSwitches sorterId order (Seq.empty) switchCount rando
 
         let sortableSet =
             SortableSet.makeAllBits sortableSetId rolloutFormat order
@@ -29,14 +30,14 @@ type SortingEvalFixture() =
         let sortableSetId = 123 |> SortableSetId.create
         let switchCount = SwitchCount.orderToRecordSwitchCount order
         let sortableCount = 4000 |> SortableCount.create
+        let sorterId = Guid.NewGuid() |> SorterId.create
 
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
-        let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando
+        let failingSorter = Sorter.randomSwitches sorterId order (Seq.empty) switchCount rando
 
         let sortableSet =
             SortableSet.makeRandomPermutation sortableSetId rolloutFormat order sortableCount rando
             |> Result.ExtractOrThrow
-
 
         let sorterOpOutput =
             SortingRollout.makeSorterOpOutput sorterOpTrackMode sortableSet failingSorter
@@ -138,8 +139,8 @@ type SortingEvalFixture() =
     [<TestMethod>]
     member this.SorterPerfBinReport_fromSorterPerfBins() =
         let order = 8 |> Order.createNr
-        let sortrA = RefSorter.goodRefSorterForOrder order |> Result.ExtractOrThrow
-
+        let sorterId = Guid.NewGuid() |> SorterId.create
+        let sortrA = RefSorter.goodRefSorterForOrder sorterId order |> Result.ExtractOrThrow
 
         let successflA = true
         let unSuccessflA = false

@@ -1,5 +1,5 @@
 namespace Gort.SortingResults.Test
-
+open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -31,12 +31,14 @@ type SorterSetReportingFixture() =
 
     [<TestMethod>]
     member this.getBins() =
+        let sorterSetId = Guid.NewGuid() |> SorterSetId.create
         let useParalll = true |> UseParallel.create
         let ordr = 16 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 500
         let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
-        let sorterSt = SorterSet.createRandomSwitches ordr [||] switchCt sorterCt rnGn
+
+        let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create 123
 

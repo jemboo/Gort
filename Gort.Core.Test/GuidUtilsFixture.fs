@@ -7,6 +7,24 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type GuidUtilsFixture() =
 
     [<TestMethod>]
+    member this.fromUint32s() =
+        let g1 = 1234ul
+        let g2 = 123456ul
+        let g3 = 12345678ul
+        let g4 = 1234567891ul
+
+        let gu = GuidUtils.fromUint32s g1 g2 g3 g4
+
+        let intsBack = GuidUtils.toUint32s gu
+
+        Assert.AreEqual(intsBack.[0], g1)
+        Assert.AreEqual(intsBack.[1], g2)
+        Assert.AreEqual(intsBack.[2], g3)
+        Assert.AreEqual(intsBack.[3], g4)
+
+
+
+    [<TestMethod>]
     member this.guidFromBytes() =
         let bytesIn =
             seq {
