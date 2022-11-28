@@ -143,7 +143,7 @@ module Sorter =
             (wPfx: switch seq) 
             (switchCount: switchCount) 
             (rnd: IRando) =
-        let switches = Switch.rndNonDegenSwitchesOfDegree order rnd
+        let switches = Switch.rndNonDegenSwitchesOfOrder order rnd
         fromSwitchesWithPrefix sorterD order switchCount wPfx switches
 
 

@@ -106,7 +106,6 @@ module ByteUtils =
     // than bitsPerSymbol, and it is ignored
     let bitsToSpUint16Positions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
-
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint16 ()
             _bs
@@ -124,7 +123,6 @@ module ByteUtils =
     // creates a bit stream from a int stream by selecting the first bitsPerSymbol bits.
     let bitsFromSpIntPositions (bitsPerSymbol: bitsPerSymbol) (v: seq<int>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
-
         let _intToBits (v: int) =
             seq { for i in 0 .. (bw - 1) -> v.isset i }
 
@@ -138,19 +136,17 @@ module ByteUtils =
     // The way this is used, the last chunk may padding - in this case it is smaller
     // than bitsPerSymbol, and it is ignored
     let bitsToSpIntPositions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
-        let bw = bitsPerSymbol |> BitsPerSymbol.value
-
         let _yab (_bs: seq<bool>) =
-            let mutable bRet = new int ()
-            _bs
-            |> Seq.iteri (fun dex v ->
-                if v then
-                    (bRet <- bRet.set dex) |> ignore)
+            let mutable bRet = 0
+            _bs |> Seq.iteri (fun dex v ->
+                    if v then
+                        (bRet <- bRet.set dex) |> ignore)
             bRet
 
+        let bps = bitsPerSymbol |> BitsPerSymbol.value
         bitsy
-        |> Seq.chunkBySize (bw)
-        |> Seq.where (fun chunk -> chunk.Length = bw)
+        |> Seq.chunkBySize (bps)
+        |> Seq.where (fun chunk -> chunk.Length = bps)
         |> Seq.map (_yab)
 
 
@@ -172,7 +168,6 @@ module ByteUtils =
     // than bitsPerSymbol, and it is ignored
     let bitsToSpUint64Positions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
-
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint64 ()
             _bs

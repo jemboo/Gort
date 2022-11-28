@@ -115,9 +115,9 @@ module BitsPerSymbol =
         else
             "bitsPerSymbol must be gt 0" |> Error
 
-    let fromSymbolSetSize (symbolCount: symbolSetSize) =
-        let sc = symbolCount |> SymbolSetSize.value
-        (sc.leftmost_index + 1) |> create
+    let fromSymbolSetSize (symbolSetSiz: symbolSetSize) =
+        let sc = symbolSetSiz |> SymbolSetSize.value
+        (sc.leftmost_index + 1) |> createNr
 
 
 type byteWidth = private ByteWidth of int

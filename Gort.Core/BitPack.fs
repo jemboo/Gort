@@ -16,69 +16,84 @@ module BitPack =
 
     let getData (bitPack: bitPack) = bitPack.data
 
-    let create (bitsPerSymbol: bitsPerSymbol) (symbolCount: symbolCount) (data: byte[]) =
+    let create (bitsPerSymbol: bitsPerSymbol) 
+               (symbolCount: symbolCount) 
+               (data: byte[]) =
         { bitPack.bitsPerSymbol = bitsPerSymbol
-          symbolCount = symbolCount
-          data = data }
+          symbolCount = symbolCount;  data = data }
+
+
+    let fromBytes (bitsPerSymbol: bitsPerSymbol) 
+                  (data: byte[]) =
+        let bps = (bitsPerSymbol |> BitsPerSymbol.value)
+        let bitCt = (data.Length * 8)
+        let skud = bitCt % bps
+        let symbolCt = ((bitCt - skud) / bps) |> SymbolCount.createNr
+        create bitsPerSymbol symbolCt data
+
+
+    let toInts (bitPack: bitPack) =
+        bitPack
+        |> getData
+        |> ByteUtils.getAllBitsFromByteSeq
+        |> ByteUtils.bitsToSpIntPositions (bitPack |> getBitsPerSymbol)
+        
 
     let toIntArrays (arrayLength: arrayLength) (bitPack: bitPack) =
-        result {
-            let bitsPerSymbol = bitPack |> getBitsPerSymbol
-
-            let allInts =
-                bitPack
-                |> getData
-                |> ByteUtils.getAllBitsFromByteSeq
-                |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
-                |> Seq.toArray
-
-            return allInts |> Array.chunkBySize (arrayLength |> ArrayLength.value)
-        }
+        let arrayLen = (arrayLength |> ArrayLength.value)
+        toInts bitPack 
+        |> Seq.chunkBySize arrayLen
+        |> Seq.filter (fun ba -> ba.Length = arrayLen)
 
 
-    let fromIntArrays (symbolSetSize: symbolSetSize) (intArrays: seq<int[]>) =
-        result {
-            let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+    let fromInts (bitsPerSymbl: bitsPerSymbol) (ints: seq<int>) =
+        let byteSeq, bitCt =
+            ints
+            |> ByteUtils.bitsFromSpIntPositions bitsPerSymbl
+            |> ByteUtils.storeBitSeqInBytes
 
-            let byteSeq, bitCt =
-                intArrays
-                |> Seq.concat
-                |> ByteUtils.bitsFromSpIntPositions bitsPerSymbol
-                |> ByteUtils.storeBitSeqInBytes
+        let data = byteSeq |> Seq.toArray
+        let symbolCt = bitCt / (BitsPerSymbol.value bitsPerSymbl) 
+                       |> SymbolCount.createNr
 
-            let data = byteSeq |> Seq.toArray
-            let! symbolCount = bitCt / (BitsPerSymbol.value bitsPerSymbol) |> SymbolCount.create
+        { bitPack.bitsPerSymbol = bitsPerSymbl;
+          symbolCount = symbolCt; data = data }
 
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
-        }
+
+    let fromIntArrays (bitsPerSymbl: bitsPerSymbol) 
+                      (intArrays: seq<int[]>) =
+        fromInts bitsPerSymbl (intArrays |> Seq.concat)
+
+
+    let toBoolArray (arrayLength: arrayLength) (bitPack: bitPack) =
+        let arrayLen = (arrayLength |> ArrayLength.value)
+        bitPack
+        |> getData
+        |> ByteUtils.getAllBitsFromByteSeq
+        |> Seq.chunkBySize arrayLen
+        |> Seq.filter (fun ba -> ba.Length = arrayLen)
 
 
     let toBoolArrays (arrayLength: arrayLength) (bitPack: bitPack) =
-        result {
-            let arrayLv = (arrayLength |> ArrayLength.value)
+        let arrayLv = (arrayLength |> ArrayLength.value)
+        bitPack
+        |> getData
+        |> ByteUtils.getAllBitsFromByteSeq
+        |> Seq.chunkBySize arrayLv
+        |> Seq.filter (fun ba -> ba.Length = arrayLv)
 
-            return
-                bitPack
-                |> getData
-                |> ByteUtils.getAllBitsFromByteSeq
-                |> Seq.chunkBySize arrayLv
-                |> Seq.filter (fun ba -> ba.Length = arrayLv)
-                |> Seq.toArray
-        }
+
+    let fromBools (boolArrays: seq<bool>) =
+        let bitsPerSymbol = 1 |> BitsPerSymbol.createNr
+        let byteSeq, bitCt = boolArrays |> ByteUtils.storeBitSeqInBytes
+        let data = byteSeq |> Seq.toArray
+        let symbolCount = bitCt |> SymbolCount.createNr
+        { bitPack.bitsPerSymbol = bitsPerSymbol;
+          symbolCount = symbolCount;  data = data; }
 
 
     let fromBoolArrays (boolArrays: seq<bool[]>) =
-        result {
-            let! bitsPerSymbol = 1 |> BitsPerSymbol.create
-            let byteSeq, bitCt = boolArrays |> Seq.concat |> ByteUtils.storeBitSeqInBytes
-            let data = byteSeq |> Seq.toArray
-            let! symbolCount = bitCt |> SymbolCount.create
+        fromBools (boolArrays |> Seq.concat)
 
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
-        }
+
+

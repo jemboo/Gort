@@ -22,20 +22,38 @@ type SwitchFixture() =
 
 
     [<TestMethod>]
+    member this.toBitPack() =
+        let orderSrc = Order.createNr 16
+        let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
+        let switchCount = 100 |> SwitchCount.create
+        let switches =
+            Switch.rndNonDegenSwitchesOfOrder orderSrc rndy 
+            |> Seq.take (switchCount |> SwitchCount.value)
+            |> Seq.toList
+
+        let bitPck = Switch.toBitPack orderSrc switches
+        let switchesBack = 
+                Switch.fromBitPack bitPck
+                |> Seq.toList
+
+        Assert.AreEqual(switches, switchesBack)
+
+
+    [<TestMethod>]
     member this.lowOverlapping() =
-        let degSrc = Order.createNr 16
+        let orderSrc = Order.createNr 16
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
 
         let switches =
-            Switch.rndNonDegenSwitchesOfDegree degSrc rndy 
+            Switch.rndNonDegenSwitchesOfOrder orderSrc rndy 
             |> Seq.take 10 
             |> Seq.toArray
 
         for i = 0 to switches.Length - 1 do
             let sw = switches.[i]
-
             let lowFriends =
-                Switch.lowOverlapping degSrc sw.low |> Switch.fromSwitchIndexes |> Seq.toArray
+                Switch.lowOverlapping orderSrc sw.low 
+                |> Switch.fromSwitchIndexes |> Seq.toArray
 
             for j = 0 to lowFriends.Length - 1 do
                 let fr = lowFriends.[j]
@@ -48,7 +66,7 @@ type SwitchFixture() =
         let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
 
         let switches =
-            Switch.rndNonDegenSwitchesOfDegree degSrc rndy 
+            Switch.rndNonDegenSwitchesOfOrder degSrc rndy 
                 |> Seq.take 10 
                 |> Seq.toArray
 

@@ -180,8 +180,7 @@ module Uint8Roll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (uInt8Roll: uInt8Roll) =
         result {
-            let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-
+            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
             let! symbolCount =
                 ((uInt8Roll.arrayCount |> ArrayCount.value)
                  * (uInt8Roll.arrayLength |> ArrayLength.value))
@@ -191,9 +190,7 @@ module Uint8Roll =
                 uInt8Roll.data
                 |> ByteUtils.bitsFromSpBytePositions bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
-
             let data = byteSeq |> Seq.toArray
-
             return
                 { bitPack.bitsPerSymbol = bitsPerSymbol
                   symbolCount = symbolCount
@@ -316,7 +313,7 @@ module Uint16Roll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (uInt16Roll: uInt16Roll) =
         result {
-            let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 
             let! symbolCount =
                 ((uInt16Roll.arrayCount |> ArrayCount.value)
@@ -327,9 +324,7 @@ module Uint16Roll =
                 uInt16Roll.data
                 |> ByteUtils.bitsFromSpUint16Positions bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
-
             let data = byteSeq |> Seq.toArray
-
             return
                 { bitPack.bitsPerSymbol = bitsPerSymbol
                   symbolCount = symbolCount
@@ -455,7 +450,7 @@ module IntRoll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (intRoll: intRoll) =
         result {
-            let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 
             let! symbolCount =
                 ((intRoll.arrayCount |> ArrayCount.value)
@@ -468,7 +463,6 @@ module IntRoll =
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-
             return
                 { bitPack.bitsPerSymbol = bitsPerSymbol
                   symbolCount = symbolCount
@@ -479,10 +473,8 @@ module IntRoll =
         result {
             let uint8s =
                 aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1 else 0) |> Seq.toArray
-
             let arrayCount =
                 (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-
             return
                 { intRoll.arrayCount = arrayCount
                   arrayLength = arrayLength
@@ -492,10 +484,8 @@ module IntRoll =
     let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
         result {
             let intA = aas |> Seq.concat |> Seq.toArray
-
             let arrayCount =
                 (intA.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-
             return
                 { intRoll.arrayCount = arrayCount
                   arrayLength = arrayLength
@@ -588,7 +578,7 @@ module Uint64Roll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (uint64Roll: uint64Roll) =
         result {
-            let! bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 
             let! symbolCount =
                 uint64Roll.arrayCount
@@ -602,7 +592,6 @@ module Uint64Roll =
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-
             return
                 { bitPack.bitsPerSymbol = bitsPerSymbol
                   symbolCount = symbolCount
@@ -614,10 +603,8 @@ module Uint64Roll =
         result {
             let uint8s =
                 aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1uL else 0uL) |> Seq.toArray
-
             let arrayCount =
                 (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-
             return
                 { uint64Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
@@ -634,10 +621,8 @@ module Uint64Roll =
     let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
         result {
             let uint64s = aas |> Seq.concat |> Seq.map (uint64) |> Seq.toArray
-
             let arrayCount =
                 (uint64s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-
             return
                 { uint64Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
@@ -658,10 +643,8 @@ module Uint64Roll =
     let fromUint64Arrays (arrayLength: arrayLength) (aas: seq<uint64[]>) =
         result {
             let uint64s = aas |> Seq.concat |> Seq.toArray
-
             let arrayCount =
                 (uint64s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-
             return
                 { uint64Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
@@ -689,13 +672,11 @@ module Uint64Roll =
         let iIncr = uint64Roll.arrayLength |> ArrayLength.value
         let iMax = uint64Roll.data.Length
         let mutable looP = true
-
         while ((i < iMax) && looP) do
             looP <- CollectionProps.isSortedOffset uint64Roll.data i iIncr
             i <- i + iIncr
 
         looP
-
 
 
 type bs64Roll =

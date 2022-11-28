@@ -41,13 +41,10 @@ type CommonTypesFixture() =
     [<TestMethod>]
     member this.SymbolCount0ToByteWidth() =
         let sc = 9uL |> SymbolSetSize.createNr
-
         let bw =
             sc
             |> BitsPerSymbol.fromSymbolSetSize
-            |> Result.ExtractOrThrow
             |> BitsPerSymbol.value
-
         Assert.AreEqual(4, bw)
 
     [<TestMethod>]
@@ -64,7 +61,6 @@ type CommonTypesFixture() =
 
             if (leftDex < 63) then
                 Assert.IsFalse(bvS)
-
             i <- i + 1
 
         Assert.AreEqual(3, 3)

@@ -264,8 +264,7 @@ module SortableSetRandomSymbolsDto =
         (order: order)
         (symbolSetSz: symbolSetSize)
         (sortableCt: sortableCount)
-        (rngGenId: int)
-        =
+        (rngGenId: int)  =
         { sortableSetRandomSymbolsDto.sortableSetRId = sortableSetId |> SortableSetId.value
           order = order |> Order.value
           symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int
@@ -279,8 +278,7 @@ module SortableSetRandomSymbolsDto =
         (order: order)
         (symbolSetSz: symbolSetSize)
         (sortableCt: sortableCount)
-        (rngGenId: int)
-        =
+        (rngGenId: int)  =
         rngGenId
         |> toDto sortableSetId rolloutFormt order symbolSetSz sortableCt
         |> Json.serialize

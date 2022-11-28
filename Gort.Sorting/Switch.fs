@@ -32,6 +32,29 @@ module Switch =
     let toIndex (switch: switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
 
+    let maxIndexForOrder (ordr:order) =
+        let ov = ordr |> Order.value 
+        (ov * (ov + 3)) / 2
+
+
+    let bitsPerSymbolRequired (ordr:order) =
+        ordr |> maxIndexForOrder |> uint64
+             |> SymbolSetSize.createNr
+             |> BitsPerSymbol.fromSymbolSetSize
+
+
+    let toBitPack (ordr:order)
+                  (switchs: seq<switch>) =
+        let bps = bitsPerSymbolRequired ordr
+        switchs |> Seq.map(toIndex)
+                |> BitPack.fromInts bps
+
+
+    let fromBitPack (bitPck:bitPack) =
+        bitPck |> BitPack.toInts
+               |> fromSwitchIndexes
+
+
     // all switch indexes for order with lowVal
     let lowOverlapping (ord: order) (lowVal: int) =
         seq {
@@ -77,9 +100,8 @@ module Switch =
         }
 
     // IRando dependent
-    let rndNonDegenSwitchesOfDegree (order: order) (rnd: IRando) =
+    let rndNonDegenSwitchesOfOrder (order: order) (rnd: IRando) =
         let maxDex = maxSwitchIndexForOrder order
-
         seq {
             while true do
                 let p = (int (rnd.NextUInt % maxDex))
@@ -88,25 +110,27 @@ module Switch =
                     yield sw
         }
 
-    let rndSwitchesOfDegree (order: order) (rnd: IRando) =
-        let maxDex = maxSwitchIndexForOrder order
 
+    let rndSwitchesOfOrder (order: order) (rnd: IRando) =
+        let maxDex = maxSwitchIndexForOrder order
         seq {
             while true do
                 let p = (int (rnd.NextUInt % maxDex))
                 yield fromIndex p
         }
 
+
     let rndSymmetric (order: order) (rnd: IRando) =
         let aa (rnd: IRando) =
             (TwoCycle.rndSymmetric order rnd) |> fromTwoCycle
-
         seq {
             while true do
                 yield! (aa rnd)
         }
 
-    let mutateSwitches (order: order) (mutationRate: mutationRate) (rnd: IRando) (switches: seq<switch>) =
+
+    let mutateSwitches (order: order) (mutationRate: mutationRate) 
+                       (rnd: IRando) (switches: seq<switch>) =
         let mDex = uint32 ((Order.value order) * (Order.value order + 1) / 2)
 
         let mutateSwitch (switch: switch) =
@@ -129,7 +153,6 @@ module Switch =
     // according to the subset. Ex, if the subset was [2;5;8], then
     // index 2 -> 0; index 5-> 1; index 8 -> 2
     let rebufo (order: order) (swa: switch array) (subset: int list) =
-
         let _mapSubset (order: order) (subset: int list) =
             let aRet = Array.create (Order.value order) None
             subset |> List.iteri (fun dex dv -> aRet.[dv] <- Some dex)
@@ -155,7 +178,6 @@ module Switch =
     let allMasks (orderSource: order) (orderDest: order) (swa: switch array) =
         let sd = (Order.value orderSource)
         let dd = (Order.value orderDest)
-
         if sd < dd then
             failwith "source order cannot be smaller than dest"
 

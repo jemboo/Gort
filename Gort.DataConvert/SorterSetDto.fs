@@ -1,5 +1,7 @@
 ﻿namespace global
-
+open System
 open Microsoft.FSharp.Core
 
-type sorterSetFormatDto = { key: string; value: string }
+type sorterSetDto = { 
+        id: Guid; order:int; sorterIds: Guid[]; 
+        offsets: int[]; byteLens:int[] }

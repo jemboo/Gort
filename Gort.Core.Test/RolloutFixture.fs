@@ -43,7 +43,7 @@ type RolloutFixture() =
                [| false; true; false; false; false |]
                [| false; true; true; false; true |] |]
 
-        let bitPack = boolArrays |> BitPack.fromBoolArrays |> Result.ExtractOrThrow
+        let bitPack = boolArrays |> BitPack.fromBoolArrays 
 
 
         let bs64Roll = bitPack |> Bs64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
@@ -53,7 +53,7 @@ type RolloutFixture() =
 
 
         let boolArraysBack =
-            bitPackBack |> BitPack.toBoolArrays arrayLen |> Result.ExtractOrThrow
+            bitPackBack |> BitPack.toBoolArrays arrayLen 
 
         Assert.IsTrue(CollectionProps.areEqual boolArrays boolArraysBack)
 

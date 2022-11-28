@@ -223,7 +223,6 @@ module CollectionProps =
     let inline isSorted< ^a when ^a: comparison> (values: ^a[]) =
         let mutable i = 1
         let mutable looP = true
-
         while ((i < values.Length) && looP) do
             looP <- (values.[i - 1] <= values.[i])
             i <- i + 1
@@ -233,7 +232,6 @@ module CollectionProps =
     let inline isSortedOffset< ^a when ^a: comparison> (baseValues: 'a[]) offset length =
         let mutable i = 1
         let mutable looP = true
-
         while ((i < length) && looP) do
             looP <- (baseValues.[i + offset - 1] <= baseValues.[i + offset])
             i <- i + 1
@@ -243,7 +241,6 @@ module CollectionProps =
     let inline isTwoCycle< ^a when ^a: comparison and ^a:(static member op_Explicit:^a->int)> (values: ^a[]) =
         let mutable dex = 0
         let mutable _cont = true
-
         while _cont && (dex < values.Length - 1) do
             let dv = values.[dex] |> int
             _cont <- (dv > - 1) && (dv < values.Length) && (values.[dv] |> int = dex)
@@ -255,7 +252,6 @@ module CollectionProps =
     let itemsOccuringMoreThanOnce items =
         seq {
             let d = System.Collections.Generic.Dictionary()
-
             for i in items do
                 match d.TryGetValue(i) with
                 | false, _ -> d.[i] <- false // first observance

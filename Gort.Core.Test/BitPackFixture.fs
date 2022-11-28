@@ -9,7 +9,8 @@ type BitPackFixture() =
     [<TestMethod>]
     member this.fromIntArrays() =
         let arrayLen = 7 |> ArrayLength.createNr
-        let symbolSetSize = (1111111uL) |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = (1111111uL) |> SymbolSetSize.createNr
+                                       |> BitsPerSymbol.fromSymbolSetSize
 
         let sortedArrays =
             [| [| 0; 1; 3; 4; 5; 6; 9 |]
@@ -18,10 +19,10 @@ type BitPackFixture() =
                [| 1; 11; 31; 41; 51; 61; 91 |] |]
 
         let bitPack =
-            sortedArrays |> BitPack.fromIntArrays symbolSetSize |> Result.ExtractOrThrow
+            sortedArrays |> BitPack.fromIntArrays bitsPerSymbl
 
         let sortedArraysBack =
-            bitPack |> BitPack.toIntArrays arrayLen |> Result.ExtractOrThrow
+            bitPack |> BitPack.toIntArrays arrayLen
 
         Assert.IsTrue(CollectionProps.areEqual sortedArrays sortedArraysBack)
 
@@ -41,10 +42,10 @@ type BitPackFixture() =
                [| false; true; false; false; false |]
                [| false; true; true; false; true |] |]
 
-        let bytePack = boolArrays |> BitPack.fromBoolArrays |> Result.ExtractOrThrow
+        let bytePack = boolArrays |> BitPack.fromBoolArrays
 
 
         let boolArraysBack =
-            bytePack |> BitPack.toBoolArrays arrayLen |> Result.ExtractOrThrow
+            bytePack |> BitPack.toBoolArrays arrayLen
 
         Assert.IsTrue(CollectionProps.areEqual boolArrays boolArraysBack)
