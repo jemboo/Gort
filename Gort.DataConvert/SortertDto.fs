@@ -5,7 +5,6 @@ open Microsoft.FSharp.Core
 type sorterDto = { id: Guid; order:int; switches: byte[] }
 
 module SorterDto =
-    let yab = None
 
     let fromDto (dto:sorterDto) =
         result {
@@ -29,7 +28,8 @@ module SorterDto =
         let sOrder = sortr |> Sorter.getOrder
         { sorterDto.id = sortr |> Sorter.getSorterId |> SorterId.value;
           order =  sOrder |> Order.value;
-          switches = sortr |> Sorter.getSwitches |> Switch.toBitPack sOrder |> BitPack.getData }
+          switches = sortr |> Sorter.getSwitches |> Switch.toBitPack sOrder |> BitPack.getData 
+        }
 
 
     let toJson (sortr: sorter) =

@@ -161,14 +161,13 @@ module Uint8Roll =
             let! arrayCount =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
                 |> ArrayCount.create
-
-            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
-
             let data =
                 bitPack
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
-                |> ByteUtils.bitsToSpBytePositions bitsPerSymbol
+                |> ByteUtils.bitsToSpBytePositions 
+                                (bitPack |> BitPack.getBitsPerSymbol)
+                                (bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
@@ -295,13 +294,13 @@ module Uint16Roll =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
                 |> ArrayCount.create
 
-            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
-
             let data =
                 bitPack
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
-                |> ByteUtils.bitsToSpUint16Positions bitsPerSymbol
+                |> ByteUtils.bitsToSpUint16Positions 
+                                (bitPack |> BitPack.getBitsPerSymbol)
+                                (bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
@@ -314,7 +313,6 @@ module Uint16Roll =
     let toBitPack (symbolSetSize: symbolSetSize) (uInt16Roll: uInt16Roll) =
         result {
             let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-
             let! symbolCount =
                 ((uInt16Roll.arrayCount |> ArrayCount.value)
                  * (uInt16Roll.arrayLength |> ArrayLength.value))
@@ -432,14 +430,13 @@ module IntRoll =
             let! arrayCount =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
                 |> ArrayCount.create
-
-            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
-
             let data =
                 bitPack
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
-                |> ByteUtils.bitsToSpIntPositions bitsPerSymbol
+                |> ByteUtils.bitsToSpIntPositions 
+                                (bitPack |> BitPack.getBitsPerSymbol)
+                                (bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
@@ -560,13 +557,13 @@ module Uint64Roll =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
                 |> ArrayCount.create
 
-            let bitsPerSymbol = bitPack |> BitPack.getBitsPerSymbol
-
             let data =
                 bitPack
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
-                |> ByteUtils.bitsToSpUint64Positions bitsPerSymbol
+                |> ByteUtils.bitsToSpUint64Positions 
+                                    ( bitPack |> BitPack.getBitsPerSymbol)
+                                    ( bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
@@ -576,7 +573,8 @@ module Uint64Roll =
         }
 
 
-    let toBitPack (symbolSetSize: symbolSetSize) (uint64Roll: uint64Roll) =
+    let toBitPack (symbolSetSize: symbolSetSize) 
+                  (uint64Roll: uint64Roll) =
         result {
             let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 

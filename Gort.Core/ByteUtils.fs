@@ -47,9 +47,9 @@ module ByteUtils =
 
 
     // maps a bit stream to the first bitsPerSymbol in a generated stream of byte
-    // The way this is used, the last chunk may padding - in this case it is smaller
-    // than bitsPerSymbol, and it is ignored
-    let bitsToSpBytePositions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
+    let bitsToSpBytePositions (bitsPerSymbol: bitsPerSymbol) 
+                              (symbolCt:symbolCount)
+                              (bitsy: seq<bool>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
 
         let _yab (_bs: seq<bool>) =
@@ -62,7 +62,7 @@ module ByteUtils =
 
         bitsy
         |> Seq.chunkBySize (bw)
-        |> Seq.where (fun chunk -> chunk.Length = bw)
+        |> Seq.take (symbolCt |> SymbolCount.value)
         |> Seq.map (_yab)
 
 
@@ -70,26 +70,24 @@ module ByteUtils =
     // also returns the length of the bit stream
     let storeBitSeqInBytes (bitsy: seq<bool>) =
         let mutable totalBits = 0
-        // maps a full or partial array of bits to
-        // a new byte
+        // maps a full or partial array of bits to a new byte
         let _yab (_bs: array<bool>) =
-            let mutable bRet = new byte ()
-            let mutable curdex = 0
+            let mutable byteRet = 0uy
+            let mutable bitDex = 0
             totalBits <- totalBits + _bs.Length
-
-            while curdex < _bs.Length do
-                if _bs.[curdex] then
-                    bRet <- bRet.set curdex
-
-                curdex <- curdex + 1
-            bRet
+            while bitDex < _bs.Length do
+                if _bs.[bitDex] then
+                    byteRet <- byteRet.set bitDex
+                bitDex <- bitDex + 1
+            byteRet
 
         let byteArray = bitsy |> Seq.chunkBySize (8) |> Seq.map (_yab) |> Seq.toArray
         (byteArray, totalBits)
 
 
     // creates a bit stream from a uint16 stream by selecting the first bitsPerSymbol bits.
-    let bitsFromSpUint16Positions (bitsPerSymbol: bitsPerSymbol) (v: seq<uint16>) =
+    let bitsFromSpUint16Positions (bitsPerSymbol: bitsPerSymbol) 
+                                  (v: seq<uint16>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
 
         let _uint16ToBits (bitsPerSymbol: bitsPerSymbol) (v: uint16) =
@@ -102,10 +100,9 @@ module ByteUtils =
 
 
     // maps a bit stream to the first bitsPerSymbol in a generated stream of uint16
-    // The way this is used, the last chunk may padding - in this case it is smaller
-    // than bitsPerSymbol, and it is ignored
-    let bitsToSpUint16Positions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
-        let bw = bitsPerSymbol |> BitsPerSymbol.value
+    let bitsToSpUint16Positions (bitsPerSymbol: bitsPerSymbol) 
+                                (symbolCt:symbolCount)
+                                (bitsy: seq<bool>) =
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint16 ()
             _bs
@@ -115,13 +112,14 @@ module ByteUtils =
             bRet
 
         bitsy
-        |> Seq.chunkBySize (bw)
-        |> Seq.where (fun chunk -> chunk.Length = bw)
+        |> Seq.chunkBySize (bitsPerSymbol |> BitsPerSymbol.value)
+        |> Seq.take (symbolCt |> SymbolCount.value)
         |> Seq.map (_yab)
 
 
     // creates a bit stream from a int stream by selecting the first bitsPerSymbol bits.
-    let bitsFromSpIntPositions (bitsPerSymbol: bitsPerSymbol) (v: seq<int>) =
+    let bitsFromSpIntPositions (bitsPerSymbol: bitsPerSymbol) 
+                               (v: seq<int>) =
         let bw = bitsPerSymbol |> BitsPerSymbol.value
         let _intToBits (v: int) =
             seq { for i in 0 .. (bw - 1) -> v.isset i }
@@ -133,9 +131,9 @@ module ByteUtils =
 
 
     // maps a bit stream to the first bitsPerSymbol in a generated stream of int
-    // The way this is used, the last chunk may padding - in this case it is smaller
-    // than bitsPerSymbol, and it is ignored
-    let bitsToSpIntPositions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
+    let bitsToSpIntPositions (bitsPerSymbol: bitsPerSymbol) 
+                             (symbolCt:symbolCount)
+                             (bitsy: seq<bool>) =
         let _yab (_bs: seq<bool>) =
             let mutable bRet = 0
             _bs |> Seq.iteri (fun dex v ->
@@ -143,10 +141,9 @@ module ByteUtils =
                         (bRet <- bRet.set dex) |> ignore)
             bRet
 
-        let bps = bitsPerSymbol |> BitsPerSymbol.value
         bitsy
-        |> Seq.chunkBySize (bps)
-        |> Seq.where (fun chunk -> chunk.Length = bps)
+        |> Seq.chunkBySize (bitsPerSymbol |> BitsPerSymbol.value)
+        |> Seq.take (symbolCt |> SymbolCount.value)
         |> Seq.map (_yab)
 
 
@@ -164,10 +161,9 @@ module ByteUtils =
 
 
     // maps a bit stream to the first bitsPerSymbol in a generated stream of uint64
-    // The way this is used, the last chunk may padding - in this case it is smaller
-    // than bitsPerSymbol, and it is ignored
-    let bitsToSpUint64Positions (bitsPerSymbol: bitsPerSymbol) (bitsy: seq<bool>) =
-        let bw = bitsPerSymbol |> BitsPerSymbol.value
+    let bitsToSpUint64Positions (bitsPerSymbol: bitsPerSymbol)
+                                (symbolCt:symbolCount)
+                                (bitsy: seq<bool>) =
         let _yab (_bs: seq<bool>) =
             let mutable bRet = new uint64 ()
             _bs
@@ -177,8 +173,8 @@ module ByteUtils =
             bRet
 
         bitsy
-        |> Seq.chunkBySize (bw)
-        |> Seq.where (fun chunk -> chunk.Length = bw)
+        |> Seq.chunkBySize (bitsPerSymbol |> BitsPerSymbol.value)
+        |> Seq.take (symbolCt |> SymbolCount.value)
         |> Seq.map (_yab)
 
 
@@ -313,8 +309,7 @@ module ByteUtils =
         (packedArray: uint64[])
         (stripeLoad: int)
         (stripedOffset: int)
-        (stripeArray: uint64)
-        =
+        (stripeArray: uint64) =
         let packedArrayBtPos = (stripedOffset % (Order.value ord))
         let packedArrayRootOffset = (stripedOffset / (Order.value ord)) * 64
 
@@ -343,7 +338,9 @@ module ByteUtils =
 
     // stripePos <=64
     // if values.Length = stripedArray.Length
-    let writeStripeFromBitArray (values: bool[]) (stripePos: int) (stripedArray: uint64[]) =
+    let writeStripeFromBitArray (values: bool[]) 
+                                (stripePos: int) 
+                                (stripedArray: uint64[]) =
         for i = 0 to values.Length - 1 do
             if values.[i] then
                 stripedArray.[i] <- stripedArray.[i].set stripePos
@@ -362,10 +359,9 @@ module ByteUtils =
 
     // for seq<bool[a][b] where a <= 64 and b = order
     // returns uint64[c] where c <= (a / 64)
-    let makeStripedArraysFromBoolArrays (ord: order) (boolSeq: bool[] seq) =
-
+    let makeStripedArraysFromBoolArrays (ord: order) 
+                                        (boolSeq: bool[] seq) =
         let mutable arrayCt = 0
-
         let _makeStripedArrayFromBoolArray (ord: order) (twoDvals: bool[][]) =
             let stripedArray = Array.zeroCreate<uint64> (Order.value ord)
 

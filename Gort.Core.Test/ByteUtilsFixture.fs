@@ -284,39 +284,24 @@ type ByteUtilsFixture() =
         Assert.IsTrue(CollectionProps.areEqual arrayCt usedStripeCt)
 
 
-
-
-
-
-
     [<TestMethod>]
     member this.intPack() =
-        let bitsPerSymbol = 32 |> BitsPerSymbol.create |> Result.ExtractOrThrow
-        let v = 5uL
-        let va = [ 23454234uL; 23423uL ]
+        let bitsPerSymbol = 24 |> BitsPerSymbol.create |> Result.ExtractOrThrow
+        let symbolCt = 3 |> SymbolCount.createNr
+        let va = [ 454234uL; 23423uL; 523423uL ]
         let qaA = bitsFromSpUint64Positions bitsPerSymbol va |> Seq.toArray
-
-        let max8 = 8 |> BitsPerSymbol.create |> Result.ExtractOrThrow
-        let ua = [ 234uy; 42uy ]
-        let paA = bitsFromSpBytePositions max8 ua |> Seq.toArray
-
-        Assert.AreEqual(1, 1)
+        let vaB = bitsToSpUint64Positions bitsPerSymbol symbolCt qaA  |> Seq.toArray
+        Assert.IsTrue(CollectionProps.areEqual va vaB)
 
 
     [<TestMethod>]
-    member this.intUnPack() =
-        let bitsPerSymbol = 32 |> BitsPerSymbol.create |> Result.ExtractOrThrow
-        let va = [ 23454234uL; 23423uL ]
-        let qaA = bitsFromSpUint64Positions bitsPerSymbol va |> Seq.toArray
-        let qaB = bitsToSpUint64Positions bitsPerSymbol qaA |> Seq.toArray
-
-
-        let max8 = 8 |> BitsPerSymbol.create |> Result.ExtractOrThrow
-        let ua = [ 234uy; 42uy ]
-        let paA = bitsFromSpBytePositions max8 ua |> Seq.toArray
-        let akB = bitsToSpBytePositions max8 paA |> Seq.toArray
-
-        Assert.AreEqual(1, 1)
+    member this.bytePack() =
+        let bitsPerSymbol = 8 |> BitsPerSymbol.create |> Result.ExtractOrThrow
+        let symbolCt = 3 |> SymbolCount.createNr
+        let va = [ 234uy; 42uy; 122uy ]
+        let paA = bitsFromSpBytePositions bitsPerSymbol va |> Seq.toArray
+        let vaB = bitsToSpBytePositions bitsPerSymbol symbolCt paA |> Seq.toArray
+        Assert.IsTrue(CollectionProps.areEqual va vaB)
 
 
     [<TestMethod>]

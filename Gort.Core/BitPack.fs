@@ -36,7 +36,9 @@ module BitPack =
         bitPack
         |> getData
         |> ByteUtils.getAllBitsFromByteSeq
-        |> ByteUtils.bitsToSpIntPositions (bitPack |> getBitsPerSymbol)
+        |> ByteUtils.bitsToSpIntPositions 
+                    (bitPack |> getBitsPerSymbol)
+                    (bitPack |> getSymbolCount)
         
 
     let toIntArrays (arrayLength: arrayLength) (bitPack: bitPack) =
