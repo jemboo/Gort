@@ -6,6 +6,7 @@ type bitPack =
     private
         { bitsPerSymbol: bitsPerSymbol
           symbolCount: symbolCount
+          offset:int
           data: byte[] }
 
 module BitPack =
@@ -13,15 +14,23 @@ module BitPack =
     let getBitsPerSymbol (bitPack: bitPack) = bitPack.bitsPerSymbol
 
     let getSymbolCount (bitPack: bitPack) = bitPack.symbolCount
+    
+    let getOffset (bitPack: bitPack) = bitPack.offset
 
-    let getData (bitPack: bitPack) = bitPack.data
+    let getData (bitPack: bitPack) = 
+        bitPack.data |> Seq.skip bitPack.offset
 
     let create (bitsPerSymbol: bitsPerSymbol) 
-               (symbolCount: symbolCount) 
+               (symbolCount: symbolCount)
+               (offst:int)
                (data: byte[]) =
         { bitPack.bitsPerSymbol = bitsPerSymbol
-          symbolCount = symbolCount;  data = data }
+          symbolCount = symbolCount;
+          offset = offst;
+          data = data }
 
+    let changeOffset (bitPck:bitPack) (newOffset:int) =
+        {bitPck with offset = newOffset }
 
     let fromBytes (bitsPerSymbol: bitsPerSymbol) 
                   (data: byte[]) =
@@ -29,7 +38,7 @@ module BitPack =
         let bitCt = (data.Length * 8)
         let skud = bitCt % bps
         let symbolCt = ((bitCt - skud) / bps) |> SymbolCount.createNr
-        create bitsPerSymbol symbolCt data
+        create bitsPerSymbol symbolCt 0 data
 
 
     let toInts (bitPack: bitPack) =
@@ -57,9 +66,7 @@ module BitPack =
         let data = byteSeq |> Seq.toArray
         let symbolCt = bitCt / (BitsPerSymbol.value bitsPerSymbl) 
                        |> SymbolCount.createNr
-
-        { bitPack.bitsPerSymbol = bitsPerSymbl;
-          symbolCount = symbolCt; data = data }
+        create bitsPerSymbl symbolCt 0 data
 
 
     let fromIntArrays (bitsPerSymbl: bitsPerSymbol) 
@@ -86,12 +93,11 @@ module BitPack =
 
 
     let fromBools (boolArrays: seq<bool>) =
-        let bitsPerSymbol = 1 |> BitsPerSymbol.createNr
+        let bitsPerSymbl = 1 |> BitsPerSymbol.createNr
         let byteSeq, bitCt = boolArrays |> ByteUtils.storeBitSeqInBytes
         let data = byteSeq |> Seq.toArray
-        let symbolCount = bitCt |> SymbolCount.createNr
-        { bitPack.bitsPerSymbol = bitsPerSymbol;
-          symbolCount = symbolCount;  data = data; }
+        let symbolCt = bitCt |> SymbolCount.createNr
+        create bitsPerSymbl symbolCt 0 data
 
 
     let fromBoolArrays (boolArrays: seq<bool[]>) =

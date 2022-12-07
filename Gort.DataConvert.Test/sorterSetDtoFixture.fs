@@ -1,14 +1,22 @@
 namespace Gort.DataConvert.Test
+open System
 
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open DomainTables
 
 [<TestClass>]
 type sorterSetDtoFixture() =
 
     [<TestMethod>]
-    member this.sb() =
-        let quaMain = [| 1; 2; 3 |]
-        let quaAppend = [| 4; 5; 6 |]
-        let jam = quaAppend |> Array.append quaMain
-        Assert.IsTrue(true)
+    member this.toDto() =
+      let sorterSetId = Guid.NewGuid() |> SorterSetId.create
+      let ordr = 64 |> Order.createNr
+      let wPfx = Seq.empty<switch>
+      let switchCt = 100 |> SwitchCount.create
+      let sorterCt = 10 |> SorterCount.create
+      let rndGn = RngGen.lcgFromNow ()
+
+      let sorterSt = SorterSet.createRandomSwitches 
+                        sorterSetId sorterCt ordr wPfx switchCt rndGn
+
+      
+      Assert.IsTrue(true)

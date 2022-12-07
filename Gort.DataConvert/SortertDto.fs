@@ -28,7 +28,10 @@ module SorterDto =
         let sOrder = sortr |> Sorter.getOrder
         { sorterDto.id = sortr |> Sorter.getSorterId |> SorterId.value;
           order =  sOrder |> Order.value;
-          switches = sortr |> Sorter.getSwitches |> Switch.toBitPack sOrder |> BitPack.getData 
+          switches = sortr |> Sorter.getSwitches 
+                           |> Switch.toBitPack sOrder 
+                           |> BitPack.getData
+                           |> Seq.toArray
         }
 
 

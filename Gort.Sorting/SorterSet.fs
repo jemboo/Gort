@@ -12,6 +12,8 @@ module SorterSet =
 
     let getId (sorterSet: sorterSet) = sorterSet.id
 
+    let getOrder (sorterSet: sorterSet) = sorterSet.order
+
     let getSorterCount (sorterSet: sorterSet) = sorterSet.sorterMap.Count
 
     let getSorters (sorterSet: sorterSet) = sorterSet.sorterMap.Values

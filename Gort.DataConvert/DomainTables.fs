@@ -68,7 +68,7 @@ module DomainTables =
         let dd = bitPack |> BitPack.getData
         bitPackR.BitsPerSymbol <- bitPack |> BitPack.getBitsPerSymbol |> BitsPerSymbol.value
         bitPackR.SymbolCount <- bitPack |> BitPack.getSymbolCount |> SymbolCount.value
-        bitPackR.Data <- bitPack |> BitPack.getData
+        bitPackR.Data <- bitPack |> BitPack.getData |> Seq.toArray
         bitPackR
 
 
@@ -77,7 +77,7 @@ module DomainTables =
             let! bitsPerSymbol = bitPackR.BitsPerSymbol |> BitsPerSymbol.create
             let! symbolCount = bitPackR.SymbolCount |> SymbolCount.create
             let data = bitPackR.Data
-            let bitPack = BitPack.create bitsPerSymbol symbolCount data
+            let bitPack = BitPack.create bitsPerSymbol symbolCount 0 data
             return bitPack
         }
 

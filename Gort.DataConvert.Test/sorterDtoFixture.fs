@@ -1,7 +1,6 @@
 namespace Gort.DataConvert.Test
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open DomainTables
 
 [<TestClass>]
 type sorterDtoFixture() =

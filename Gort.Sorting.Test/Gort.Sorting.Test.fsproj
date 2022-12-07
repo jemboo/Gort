@@ -12,6 +12,7 @@
     <Compile Include="SortableSetFixture.fs" />
     <Compile Include="SwitchFixture.fs" />
     <Compile Include="StageFixture.fs" />
+    <Compile Include="SorterSetFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -45,9 +45,9 @@ module BooleanRoll =
 
     let toBitPack (booleanRoll: booleanRoll) =
         result {
-            let! bitsPerSymbol = 1 |> BitsPerSymbol.create
+            let! bitsPerSymbl = 1 |> BitsPerSymbol.create
 
-            let! symbolCount =
+            let! symbolCt =
                 ((booleanRoll.arrayCount |> ArrayCount.value)
                  * (booleanRoll.arrayLength |> ArrayLength.value))
                 |> SymbolCount.create
@@ -55,11 +55,7 @@ module BooleanRoll =
             let byteSeq, bitCt = booleanRoll.data |> ByteUtils.storeBitSeqInBytes
             let data = byteSeq |> Seq.toArray
 
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
-
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
@@ -179,21 +175,18 @@ module Uint8Roll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (uInt8Roll: uInt8Roll) =
         result {
-            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-            let! symbolCount =
+            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let! symbolCt =
                 ((uInt8Roll.arrayCount |> ArrayCount.value)
                  * (uInt8Roll.arrayLength |> ArrayLength.value))
                 |> SymbolCount.create
 
             let byteSeq, bitCt =
                 uInt8Roll.data
-                |> ByteUtils.bitsFromSpBytePositions bitsPerSymbol
+                |> ByteUtils.bitsFromSpBytePositions bitsPerSymbl
                 |> ByteUtils.storeBitSeqInBytes
             let data = byteSeq |> Seq.toArray
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
@@ -312,21 +305,19 @@ module Uint16Roll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (uInt16Roll: uInt16Roll) =
         result {
-            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-            let! symbolCount =
+            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let! symbolCt =
                 ((uInt16Roll.arrayCount |> ArrayCount.value)
                  * (uInt16Roll.arrayLength |> ArrayLength.value))
                 |> SymbolCount.create
 
             let byteSeq, bitCt =
                 uInt16Roll.data
-                |> ByteUtils.bitsFromSpUint16Positions bitsPerSymbol
+                |> ByteUtils.bitsFromSpUint16Positions bitsPerSymbl
                 |> ByteUtils.storeBitSeqInBytes
             let data = byteSeq |> Seq.toArray
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
+            
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
@@ -447,23 +438,20 @@ module IntRoll =
 
     let toBitPack (symbolSetSize: symbolSetSize) (intRoll: intRoll) =
         result {
-            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 
-            let! symbolCount =
+            let! symbolCt =
                 ((intRoll.arrayCount |> ArrayCount.value)
                  * (intRoll.arrayLength |> ArrayLength.value))
                 |> SymbolCount.create
 
             let byteSeq, bitCt =
                 intRoll.data
-                |> ByteUtils.bitsFromSpIntPositions bitsPerSymbol
+                |> ByteUtils.bitsFromSpIntPositions bitsPerSymbl
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
     let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
@@ -576,9 +564,9 @@ module Uint64Roll =
     let toBitPack (symbolSetSize: symbolSetSize) 
                   (uint64Roll: uint64Roll) =
         result {
-            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
 
-            let! symbolCount =
+            let! symbolCt =
                 uint64Roll.arrayCount
                 |> ArrayCount.value
                 |> (*) (uint64Roll.arrayLength |> ArrayLength.value)
@@ -586,14 +574,11 @@ module Uint64Roll =
 
             let byteSeq, bitCt =
                 uint64Roll.data
-                |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbol
+                |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbl
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = data }
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
@@ -759,24 +744,21 @@ module Bs64Roll =
     let toBitPack (bs64Roll: bs64Roll) =
         result {
             let! order = bs64Roll.arrayLength |> ArrayLength.value |> Order.create
-            let! bitsPerSymbol = 1 |> BitsPerSymbol.create
+            let! bitsPerSymbl = 1 |> BitsPerSymbol.create
 
-            let! symbolCount =
+            let! symbolCt =
                 bs64Roll.arrayCount
                 |> ArrayCount.value
                 |> (*) (bs64Roll.arrayLength |> ArrayLength.value)
                 |> SymbolCount.create
 
-            let byteArrays, bitCt =
+            let data, bitCt =
                 ByteUtils.fromStripeArrays order bs64Roll.data
                 |> Seq.take (bs64Roll.arrayCount |> ArrayCount.value)
                 |> Seq.concat
                 |> ByteUtils.storeBitSeqInBytes
-
-            return
-                { bitPack.bitsPerSymbol = bitsPerSymbol
-                  symbolCount = symbolCount
-                  data = byteArrays }
+            
+            return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
