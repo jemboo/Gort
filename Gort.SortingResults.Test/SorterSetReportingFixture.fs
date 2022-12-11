@@ -12,7 +12,7 @@ type SorterSetReportingFixture() =
         let maxW = 60
         let rndy = Rando.fromRngGen (RngGen.createLcg (4213 |> RandomSeed.create))
 
-        while i < 1000 do
+        while i < 100 do
             let switchCt = maxW |> (%) rndy.NextPositiveInt |> SwitchCount.create
 
             let stageCt =

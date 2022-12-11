@@ -2,7 +2,7 @@
 open System
 open Microsoft.FSharp.Core
 
-type sorterDto = { id: Guid; order:int; switches: byte[] }
+type sorterDto = { id:Guid; order:int; switches:byte[] }
 
 module SorterDto =
 
@@ -25,13 +25,10 @@ module SorterDto =
 
 
     let toDto (sortr: sorter) =
-        let sOrder = sortr |> Sorter.getOrder
-        { sorterDto.id = sortr |> Sorter.getSorterId |> SorterId.value;
-          order =  sOrder |> Order.value;
-          switches = sortr |> Sorter.getSwitches 
-                           |> Switch.toBitPack sOrder 
-                           |> BitPack.getData
-                           |> Seq.toArray
+        { 
+          sorterDto.id = sortr |> Sorter.getSorterId |> SorterId.value;
+          order =  sortr |> Sorter.getOrder |> Order.value;
+          switches = sortr |> Sorter.toByteArray
         }
 
 

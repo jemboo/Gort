@@ -18,6 +18,12 @@ module Sorter =
     let getSwitchCount (sortr: sorter) =
         sortr.switches.Length |> SwitchCount.create
 
+    let toByteArray (sortr: sorter) =
+        sortr |> getSwitches 
+              |> Switch.toBitPack (sortr |> getOrder) 
+              |> BitPack.getData
+              |> Seq.toArray
+
 
     let fromSwitches 
             (sorterD:sorterId)

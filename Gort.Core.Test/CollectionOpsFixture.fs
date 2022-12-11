@@ -8,12 +8,25 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type CollectionOpsFixture() =
 
     [<TestMethod>]
+    member this.bookMarkArrays() =
+        let a1 = [| 1; 2; 3; |]
+        let a2 = [| 10; 20; 30; 40; 50; 60; 70;|]
+        let a3 = [| 100; 200; 300; 400;|]
+        let testArrs = [| a1;a2;a3 |]
+        let bookMarks, concato = CollectionOps.bookMarkArrays testArrs
+        let testArrsBack = CollectionOps.deBookMarkArray bookMarks concato
+                           |> Seq.toArray
+        Assert.IsTrue(CollectionProps.areEqual testArrs testArrsBack)
+
+
+    [<TestMethod>]
     member this.takeUpto() =
         let a1 = [| 1; 2; 3; 4; 5; 6; 7; 8 |]
         let yab = a1 |> CollectionOps.takeUpto 3 |> Seq.toArray
         let zab = a1 |> CollectionOps.takeUpto 30 |> Seq.toArray
         Assert.IsTrue(yab.Length = 3)
         Assert.IsTrue(zab.Length = 8)
+
 
     [<TestMethod>]
     member this.arrayProductInt() =

@@ -1,8 +1,33 @@
 ﻿namespace global
 open SysExt
+open System
 
 
 module CollectionOps =
+
+    let bookMarkArrays<'a> (arrs:'a[][]) =
+        let mutable acc = 0
+        let mutable j = 0
+        let bookMarks = Array.zeroCreate (arrs.GetLength 0)
+        for h in arrs do
+            acc <- acc + h.Length
+            bookMarks.[j] <- acc
+            j <- j + 1
+        bookMarks, (arrs |> Array.concat)
+
+
+    let deBookMarkArray<'a> (bookMarks:int[]) (arr:'a[]) =
+        seq {
+            let mutable dex = 0
+            let mutable lastEnd = 0
+            while (dex < bookMarks.Length) do
+                let curRay = Array.create (bookMarks.[dex] - lastEnd)  Unchecked.defaultof<'a>
+                Array.Copy(arr, lastEnd, curRay, 0, curRay.Length)
+                yield curRay
+                lastEnd <- bookMarks.[dex]
+                dex <- dex + 1
+        }
+
 
     let takeUpto<'a> (maxCt: int) (source: seq<'a>) =
         source

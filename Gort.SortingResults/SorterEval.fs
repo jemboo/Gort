@@ -51,20 +51,16 @@ module SwitchUseCounters =
     let make (switchCount: switchCount) =
         { switchUseCounters.useCounts = Array.zeroCreate (switchCount |> SwitchCount.value) }
 
-
     let apply (useCounts: int[]) =
         { switchUseCounters.useCounts = useCounts }
 
-
     let getUseCounters (switchUseCountrs: switchUseCounters) = switchUseCountrs.useCounts
-
 
     let getUsedSwitchCount (switchUseCountrs: switchUseCounters) =
         switchUseCountrs.useCounts
         |> Seq.filter ((<) 0)
         |> Seq.length
         |> SwitchCount.create
-
 
     let getUsedSwitchesFromSorter (sortr: sorter) (switchUseCountrs: switchUseCounters) =
         switchUseCountrs
@@ -74,10 +70,8 @@ module SwitchUseCounters =
         |> Seq.map (fun t -> (sortr |> Sorter.getSwitches).[(fst t)])
         |> Seq.toArray
 
-
     let fromSorterOpTracker (sorterOpTrackr: sorterOpTracker) =
         sorterOpTrackr |> SorterOpTracker.getSwitchUseCounts |> apply
-
 
     let fromSorterOpOutput (sorterOpRes: sorterOpOutput) =
         sorterOpRes |> SorterOpOutput.getSorterOpTracker |> fromSorterOpTracker
@@ -85,13 +79,17 @@ module SwitchUseCounters =
 
 
 module SorterSpeed =
-    let make (switchCt: switchCount) (stageCt: stageCount) (sorterPhenotypId: sorterPhenotypeId) (sortr: sorter) =
+    let make (switchCt: switchCount) 
+             (stageCt: stageCount) 
+             (sorterPhenotypId: sorterPhenotypeId) 
+             (sortr: sorter) =
         { sorterSpeed.sortr = sortr
           sorterSpeed.sortrPhenotypeId = sorterPhenotypId
           sorterSpeed.usedSwitchCount = switchCt
           sorterSpeed.usedStageCount = stageCt }
 
-    let fromSorterOpOutput (sortr: sorter) (sortrOpResults: sorterOpOutput) =
+    let fromSorterOpOutput (sortr: sorter) 
+                           (sortrOpResults: sorterOpOutput) =
         try
             let usedSwitches =
                 sortrOpResults
@@ -108,7 +106,6 @@ module SorterSpeed =
             (sprintf "error in SorterSpeed.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
 
-
     let getUsedSwitchCount (perf: sorterSpeed) = perf.usedSwitchCount
 
     let getUsedStageCount (perf: sorterSpeed) = perf.usedStageCount
@@ -124,18 +121,19 @@ module SorterPerf =
         (stageCt: stageCount)
         (isSuccessfl: bool)
         (sorterPhenotypId: sorterPhenotypeId)
-        (sortr: sorter)
-        =
-        { sorterPerf.sortr = sortr
+        (sortr: sorter)  =
+        { 
+          sorterPerf.sortr = sortr
           sorterPerf.sortrPhenotypeId = sorterPhenotypId
           sorterPerf.usedSwitchCount = switchCt
           sorterPerf.usedStageCount = stageCt
-          sorterPerf.isSuccessful = isSuccessfl }
+          sorterPerf.isSuccessful = isSuccessfl 
+        }
 
-    let fromSorterOpOutput (sortrOpResults: sorterOpOutput) =
+    let fromSorterOpOutput 
+            (sortrOpResults: sorterOpOutput) =
 
         let sortr = sortrOpResults |> SorterOpOutput.getSorter
-
         try
             let usedSwitches =
                 sortrOpResults
@@ -151,7 +149,6 @@ module SorterPerf =
         with ex ->
             (sprintf "error in SorterPerf.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
-
 
     let getIsSucessful (perf: sorterPerf) = perf.isSuccessful
 
