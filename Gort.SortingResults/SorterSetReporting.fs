@@ -2,45 +2,6 @@
 
 open System
 
-type sorterSpeedBin =
-    private
-        { switchCt: switchCount
-          stageCt: stageCount }
-
-module SorterSpeedBin =
-    let create (switchCt: switchCount) (stageCt: stageCount) =
-        { switchCt = switchCt
-          stageCt = stageCt }
-
-    let getSwitchCount (sorterSpeedBn: sorterSpeedBin) = sorterSpeedBn.switchCt
-
-    let getStageCount (sorterSpeedBn: sorterSpeedBin) = sorterSpeedBn.stageCt
-
-    let getIndexOfBin (sorterSpeedBn: sorterSpeedBin) =
-        let switchCtV = sorterSpeedBn.switchCt |> SwitchCount.value
-        let stageCtV = sorterSpeedBn.stageCt |> StageCount.value
-        ((switchCtV * (switchCtV + 1)) / 2) + stageCtV
-
-    let getBinFromIndex (index: int) =
-        let indexFlt = (index |> float) + 1.0
-        let p = (sqrt (1.0 + 8.0 * indexFlt) - 1.0) / 2.0
-        let pfloor = Math.Floor(p)
-
-        if (p = pfloor) then
-            let stageCt = 1 |> (-) (int pfloor) |> StageCount.create
-            let switchCt = 1 |> (-) (int pfloor) |> SwitchCount.create
-
-            { sorterSpeedBin.switchCt = switchCt
-              stageCt = stageCt }
-        else
-            let stageCt =
-                (float index) - (pfloor * (pfloor + 1.0)) / 2.0 |> int |> StageCount.create
-
-            let switchCt = (int pfloor) |> SwitchCount.create
-
-            { sorterSpeedBin.switchCt = switchCt
-              stageCt = stageCt }
-
 
 
 type sorterSetPerfReportMode =
@@ -57,14 +18,16 @@ type sorterPhenotypeSpeed =
 
 module SorterPhenotypeSpeed =
 
-    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeed>) =
-        let _makeBinFromSamePhenotypes (spId: sorterPhenotypeId) (sorterSpeeds: seq<sorterSpeed>) =
+    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeedEval>) =
+        let _makeBinFromSamePhenotypes 
+                (spId: sorterPhenotypeId) 
+                (sorterSpeeds: seq<sorterSpeedEval>) =
             let memA = sorterSpeeds |> Seq.toArray
-
-            { sorterPhenotypeSpeed.sorterSpeedBn =
-                SorterSpeedBin.create memA.[0].usedSwitchCount memA.[0].usedStageCount
+            { 
+              sorterPhenotypeSpeed.sorterSpeedBn = memA.[0].sorterSpeedBn
               sorterPhenotypeSpeed.sortrs = memA |> Array.map (fun sp -> sp.sortr)
-              sorterPhenotypeSpeed.sortrPhenotypeId = spId }
+              sorterPhenotypeSpeed.sortrPhenotypeId = spId
+            }
 
         sorterSpeeds
         |> Seq.groupBy (fun sp -> sp.sortrPhenotypeId)
@@ -129,7 +92,7 @@ module SorterPhenotypeSpeedsForSpeedBin =
         |> Seq.map (fun gp -> gp |> snd |> Seq.reduce (mergeSimilarBins))
 
 
-    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeed>) =
+    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeedEval>) =
         sorterSpeeds
         |> SorterPhenotypeSpeed.fromSorterSpeeds
         |> fromSorterPhenotpeSpeedBins
@@ -145,10 +108,10 @@ type sorterPhenotypePerf =
 
 module SorterPhenotypePerf =
 
-    let fromSorterPerfs (sorterPerfs: seq<sorterPerf>) =
-        let _makeBinFromSamePhenotypes (spId: sorterPhenotypeId) (sorterPerfs: seq<sorterPerf>) =
+    let fromSorterPerfs (sorterPerfs: seq<sorterPerfEval>) =
+        let _makeBinFromSamePhenotypes (spId: sorterPhenotypeId) (sorterPerfs: seq<sorterPerfEval>) =
             let memA = sorterPerfs |> Seq.toArray
-            { sorterPhenotypePerf.sorterSpeedBn = SorterSpeedBin.create memA.[0].usedSwitchCount memA.[0].usedStageCount
+            { sorterPhenotypePerf.sorterSpeedBn = memA.[0].sorterSpeedBn
               sorterPhenotypePerf.isSuccessful = memA.[0].isSuccessful
               sorterPhenotypePerf.sortrs = memA |> Array.map (fun sp -> sp.sortr)
               sorterPhenotypePerf.sortrPhenotypeId = spId }
@@ -169,7 +132,6 @@ module SorterPhenotypePerf =
     let getSorters (perfBin: sorterPhenotypePerf) = perfBin.sortrs
 
     let getSorterPhenotypeId (perfBin: sorterPhenotypePerf) = perfBin.sortrPhenotypeId
-
 
 
 type sorterPhenotypePerfsForSpeedBin =
@@ -255,7 +217,7 @@ module SorterPhenotypePerfsForSpeedBin =
         |> Seq.map (fun gp -> gp |> snd |> Seq.reduce (mergeSimilarBins))
 
 
-    let fromSorterPerfs (sorterPerfs: seq<sorterPerf>) =
+    let fromSorterPerfs (sorterPerfs: seq<sorterPerfEval>) =
         sorterPerfs
         |> SorterPhenotypePerf.fromSorterPerfs
         |> fromSorterPhenotypePerfBins

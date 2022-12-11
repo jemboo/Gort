@@ -126,7 +126,6 @@ module BooleanRoll =
         while ((i < iMax) && looP) do
             looP <- CollectionProps.isSortedOffset booleanRoll.data i iIncr
             i <- i + iIncr
-
         looP
 
 
@@ -785,8 +784,6 @@ module Bs64Roll =
 
 
     let isSorted (bs64Roll: bs64Roll) =
-        let yab = bs64Roll |> toBoolArrays |> Seq.toArray
-
         bs64Roll
         |> toBoolArrays
         |> Seq.forall (fun ia -> (CollectionProps.isSorted ia))
@@ -990,7 +987,6 @@ module Rollout =
         | I32 _intRoll -> _intRoll |> IntRoll.uniqueMembers |> Result.map I32
         | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.uniqueMembers |> Result.map U64
         | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.uniqueMembers |> Result.map Bs64
-
 
 
     let uniqueUnsortedMembers (rollout: rollout) =

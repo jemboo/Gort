@@ -89,8 +89,6 @@ type BenchmarkSorterOnBp64() =
         SortableSet.makeAllBits sortableSetId sortableSetFormat_RfI32 order
         |> Result.ExtractOrThrow
 
-
-
     let sortableSetFormat_RfU8 = rolloutFormat.RfU8
 
     let sortableSet_RfU8 =

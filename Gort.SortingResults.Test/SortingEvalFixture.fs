@@ -154,6 +154,12 @@ type SortingEvalFixture() =
         let stageCtB = 2 |> StageCount.create
         let stageCtC = 3 |> StageCount.create
 
+
+        let sorterSpeedBnAA = SorterSpeedBin.create switchCtA stageCtA
+        let sorterSpeedBnAB = SorterSpeedBin.create switchCtA stageCtB
+        let sorterSpeedBnBA = SorterSpeedBin.create switchCtB stageCtA
+
+
         let switchSeqA = [| 1; 2; 3; 4; 5 |] |> Switch.fromSwitchIndexes |> Seq.toArray
 
         let switchSeqB = [| 11; 12; 13; 14; 15 |] |> Switch.fromSwitchIndexes |> Seq.toArray
@@ -173,22 +179,22 @@ type SortingEvalFixture() =
 
 
         let sorterPrfAAA1 =
-            SorterPerf.make switchCtA stageCtA successflA srtrPhenoTypeIdA sortrA
+            SorterPerfEval.make sorterSpeedBnAA successflA srtrPhenoTypeIdA sortrA
 
         let sorterPrfAAA2 =
-            SorterPerf.make switchCtA stageCtA successflA srtrPhenoTypeIdA sortrA
+            SorterPerfEval.make sorterSpeedBnAA successflA srtrPhenoTypeIdA sortrA
 
         let sorterPrfABB =
-            SorterPerf.make switchCtA stageCtB successflA srtrPhenoTypeIdB sortrA
+            SorterPerfEval.make sorterSpeedBnAB successflA srtrPhenoTypeIdB sortrA
 
         let sorterPrfABC =
-            SorterPerf.make switchCtA stageCtB successflA srtrPhenoTypeIdC sortrA
+            SorterPerfEval.make sorterSpeedBnAB successflA srtrPhenoTypeIdC sortrA
 
         let sorterPrfBAD =
-            SorterPerf.make switchCtB stageCtA successflA srtrPhenoTypeIdD sortrA
+            SorterPerfEval.make sorterSpeedBnBA successflA srtrPhenoTypeIdD sortrA
 
         let sorterPrfBAE =
-            SorterPerf.make switchCtB stageCtA successflA srtrPhenoTypeIdE sortrA
+            SorterPerfEval.make sorterSpeedBnBA successflA srtrPhenoTypeIdE sortrA
 
         let sorterPrfs =
             seq {
