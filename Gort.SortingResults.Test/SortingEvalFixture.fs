@@ -142,7 +142,7 @@ type SortingEvalFixture() =
         let sorterId = Guid.NewGuid() |> SorterId.create
         let sortrA = RefSorter.goodRefSorterForOrder sorterId order |> Result.ExtractOrThrow
 
-        let successflA = true
+        let sorterPrf = true |> sorterPerf.IsSuccessful
         let unSuccessflA = false
         let switchCtA = 11 |> SwitchCount.create
         let switchCtB = 12 |> SwitchCount.create
@@ -179,22 +179,22 @@ type SortingEvalFixture() =
 
 
         let sorterPrfAAA1 =
-            SorterPerfEval.make sorterSpeedBnAA successflA srtrPhenoTypeIdA sortrA
+            SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
 
         let sorterPrfAAA2 =
-            SorterPerfEval.make sorterSpeedBnAA successflA srtrPhenoTypeIdA sortrA
+            SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
 
         let sorterPrfABB =
-            SorterPerfEval.make sorterSpeedBnAB successflA srtrPhenoTypeIdB sortrA
+            SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdB sortrA
 
         let sorterPrfABC =
-            SorterPerfEval.make sorterSpeedBnAB successflA srtrPhenoTypeIdC sortrA
+            SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdC sortrA
 
         let sorterPrfBAD =
-            SorterPerfEval.make sorterSpeedBnBA successflA srtrPhenoTypeIdD sortrA
+            SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdD sortrA
 
         let sorterPrfBAE =
-            SorterPerfEval.make sorterSpeedBnBA successflA srtrPhenoTypeIdE sortrA
+            SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdE sortrA
 
         let sorterPrfs =
             seq {
@@ -219,9 +219,9 @@ type SortingEvalFixture() =
         Assert.AreEqual(totalSortersInSorterPrfs, totalSortersInBins)
 
 
-        let sorterPerfBinReprt =
-            sorterPerfBns
-            |> Array.map (SorterPhenotypePerfsForSpeedBin.fromSorterPerfBin)
-            |> Seq.toArray
+        //let sorterPerfBinReprt =
+        //    sorterPerfBns
+        //    |> Array.map (SorterPhenotypePerfsForSpeedBin.fromSorterPerfBin)
+        //    |> Seq.toArray
 
-        Assert.AreEqual(totalSortersInSorterPrfs, totalSortersInBins)
+        //Assert.AreEqual(totalSortersInSorterPrfs, totalSortersInBins)

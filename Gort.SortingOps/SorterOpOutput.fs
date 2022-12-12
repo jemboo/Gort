@@ -12,7 +12,10 @@ type sorterOpOutput =
 
 module SorterOpOutput =
 
-    let make (sortr: sorter) (sortableSt: sortableSet) (transRollout: rollout) (sorterOpTracker: sorterOpTracker) =
+    let make (sortr: sorter) 
+             (sortableSt: sortableSet) 
+             (transRollout: rollout) 
+             (sorterOpTracker: sorterOpTracker) =
         { sorterOpOutput.sortr = sortr
           sorterOpOutput.sortableSt = sortableSt
           sorterOpOutput.transformedRollout = transRollout
@@ -32,7 +35,7 @@ module SorterOpOutput =
     let getRefinedSortableSet (sorterOpOutput: sorterOpOutput) =
         sorterOpOutput.transformedRollout |> Rollout.uniqueUnsortedMembers
 
-    let getUnsortedCt (sorterOpOutput: sorterOpOutput) =
-        sorterOpOutput.transformedRollout
-        |> Rollout.uniqueUnsortedMembers
-        |> Result.map Rollout.getArrayCount
+    let getRefinedSortableCount (sorterOpOutput: sorterOpOutput) =
+        sorterOpOutput
+        |> getRefinedSortableSet
+        |> Result.map(Rollout.getArrayCount >> ArrayCount.value >> SortableCount.create)

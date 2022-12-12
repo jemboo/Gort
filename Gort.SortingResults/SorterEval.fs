@@ -101,8 +101,6 @@ module SorterSpeedBin =
             (sprintf "error in SorterSpeedBin.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
 
-type sorterPerf = IsSuccessful of bool | SortedSetSize of sortableCount
-
 type sorterSpeedEval =
     private
         { sorterSpeedBn: sorterSpeedBin
@@ -141,31 +139,54 @@ module SorterSpeedEval =
     let getSortrPhenotypeId (sorterSpeedEvl: sorterSpeedEval) = sorterSpeedEvl.sortrPhenotypeId
 
 
+type sorterPerf = IsSuccessful of bool | SortedSetSize of sortableCount
 
 type sorterPerfEval =
     private
         { sorterSpeedBn: sorterSpeedBin
-          isSuccessful: bool
+          sorterPrf: sorterPerf
           sortrPhenotypeId: sorterPhenotypeId
           sortr: sorter }
+
+
+type sorterPerfEvalMode = | Success | SortedSetCount
+
+
+// Condiser doing:
+// replace sorterSpeedEval, sorterPerfEval wtih
+//type sorterEval =
+//    private
+//        { sorterSpeedBn: sorterSpeedBin
+//          sorterPrf: sorterPerf option
+//          sortrPhenotypeId: sorterPhenotypeId
+//          sortr: sorter }
+
+
+//type sorterPerfEvalMode = None | CheckSuccess | GetSortedSetCount
+
+
+
+type sorterEvalMode =
+    | SorterSpeed
+    | SorterPerf of sorterPerfEvalMode
 
 
 module SorterPerfEval =
     let make
         (sorterSpeedBn: sorterSpeedBin)
-        (isSuccessfl: bool)
+        (sorterPrf: sorterPerf)
         (sorterPhenotypId: sorterPhenotypeId)
         (sortr: sorter)  =
         { 
           sorterPerfEval.sortr = sortr
           sorterPerfEval.sortrPhenotypeId = sorterPhenotypId
           sorterPerfEval.sorterSpeedBn = sorterSpeedBn
-          sorterPerfEval.isSuccessful = isSuccessfl 
+          sorterPerfEval.sorterPrf = sorterPrf 
         }
 
-    let fromSorterOpOutput 
-            (sorterOpOutpt: sorterOpOutput) =
 
+    let fromSorterOpOutput (sorterOpOutpt:sorterOpOutput) 
+                           (sorterPerfEvalMod:sorterPerfEvalMode) =
         let sortr = sorterOpOutpt |> SorterOpOutput.getSorter
         result {
             let usedSwitches =
@@ -176,12 +197,22 @@ module SorterPerfEval =
             let sortrPhenotypId = usedSwitches |> SorterPhenotypeId.create
             let! sorterSpeedBn = sorterOpOutpt 
                                     |> SorterSpeedBin.fromSorterOpOutput
-            let isSuccessfl = sorterOpOutpt |> SorterOpOutput.isSorted
 
-            return make sorterSpeedBn isSuccessfl sortrPhenotypId sortr
+            match sorterPerfEvalMod with
+                  | Success ->
+                    let isSuccessfl = sorterOpOutpt 
+                                        |> SorterOpOutput.isSorted
+                                        |> sorterPerf.IsSuccessful
+                    return make sorterSpeedBn isSuccessfl sortrPhenotypId sortr
+                  | SortedSetCount ->
+                    let! sortedSetCt = sorterOpOutpt 
+                                        |> SorterOpOutput.getRefinedSortableCount
+                                        |> Result.map(sorterPerf.SortedSetSize)
+                    return make sorterSpeedBn sortedSetCt sortrPhenotypId sortr
         }
 
-    let getIsSucessful (perf:sorterPerfEval) = perf.isSuccessful
+
+    let getSorterPerfS (perf:sorterPerfEval) = perf.sorterPrf
 
     let getSorterSpeedBin (perf:sorterPerfEval) = perf.sorterSpeedBn
 
@@ -200,8 +231,7 @@ type sorterOutput =
 type sorterEval =
     | Speed of sorterSpeedEval
     | Perf of sorterPerfEval
-    | Output of sorterOutput
-    | OpOutput of sorterOpOutput
+
 
 module SorterOutput =
 
@@ -223,13 +253,6 @@ module SorterOutput =
                 { sorterOutput.sortr = sorterOpOutpt |> SorterOpOutput.getSorter
                   sorterOutput.refinedSortables = refs }
         }
-
-
-type sorterEvalMode =
-    | SorterSpeed
-    | SorterPerf
-    | SorterOutput
-    | SorterOpOutput
 
 
 module SorterEval =
@@ -256,27 +279,13 @@ module SorterEval =
                                         |> _addSorterToErrorResultCase sortr
                 return sorterSpeed |> sorterEval.Speed
             }
-        | SorterPerf ->
+        | SorterPerf m ->
             result {
                 let! sout = _makeSorterOpOutput
-                let! sorterPerf = sout |> SorterPerfEval.fromSorterOpOutput 
+                let! sorterPerf = sout |> SorterPerfEval.fromSorterOpOutput <| m
                                        |> _addSorterToErrorResultCase sortr
                 return sorterPerf |> sorterEval.Perf
             }
-        | SorterOutput ->
-            result {
-                let! sout = _makeSorterOpOutput
-                let! sorterOutput = sout |> SorterOutput.fromSorterOpOutput 
-                                         |> _addSorterToErrorResultCase sortr
-
-                return sorterOutput |> sorterEval.Output
-            }
-        | SorterOpOutput ->
-            result {
-                let! sorterOpOutput = _makeSorterOpOutput
-                return sorterOpOutput |> sorterEval.OpOutput
-            }
-
 
     let getSorterSpeed (sorterEvl: sorterEval) =
         match sorterEvl with
@@ -288,15 +297,3 @@ module SorterEval =
         match sorterEvl with
         | Perf ss -> ss |> Ok
         | _ -> "a sorterPerf is required" |> Error
-
-
-    let getSorterOutput (sorterEvl: sorterEval) =
-        match sorterEvl with
-        | Output ss -> ss |> Ok
-        | _ -> "a sorterOutput is required" |> Error
-
-
-    let getSorterOpOutput (sorterEvl: sorterEval) =
-        match sorterEvl with
-        | OpOutput ss -> ss |> Ok
-        | _ -> "a sorterOpOutput is required" |> Error

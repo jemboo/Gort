@@ -43,7 +43,7 @@ type BenchSorterSet() =
     let sortableSetId = 123 |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
     let sortableSetFormat_RfI32 = rolloutFormat.RfI32
-    let sorterSetEvalMod = sorterEvalMode.SorterOpOutput
+    let sorterSetEvalMod = sorterPerfEvalMode.Success |> sorterEvalMode.SorterPerf
     let sorterSetId = Guid.NewGuid() |> SorterSetId.create
     let sortableSet_RfBs64 =
         SortableSet.makeAllBits sortableSetId sortableSetFormat_RfBs64 order
