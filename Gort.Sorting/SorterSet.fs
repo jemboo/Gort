@@ -31,6 +31,8 @@ module SorterSet =
           order = order
           sorterMap = sorterMap }
 
+    let createEmpty = 
+        load (Guid.Empty |> SorterSetId.create) (0 |> Order.createNr) (Seq.empty)
 
     let createRandom
         (sorterStId:sorterSetId)

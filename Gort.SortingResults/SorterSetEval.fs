@@ -3,11 +3,10 @@
 module SorterSetEval =
 
     let eval
-        (sorterEvalMod: sorterEvalMode)
+        (sorterEvalMod: sorterPerfEvalMode)
         (sortableSt: sortableSet)
         (sorterSt: sorterSet)
-        (useParallel: useParallel)
-        =
+        (useParallel: useParallel) =
 
         let _splitOutErrors (rs: Result<'a, 'b>[]) =
             (rs |> Array.filter (Result.isOk) |> Array.map (Result.ExtractOrThrow),
@@ -21,14 +20,11 @@ module SorterSetEval =
             //|> Async.Parallel
             //|> Async.RunSynchronously
             //|> _splitOutErrors
-
             sorterSt
             |> SorterSet.getSorters
             |> Seq.toArray
             |> Array.Parallel.map (SorterEval.evalSorterWithSortableSet sorterEvalMod sortableSt)
             |> _splitOutErrors
-
-
 
         else
             sorterSt

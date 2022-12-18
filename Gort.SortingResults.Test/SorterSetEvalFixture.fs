@@ -19,7 +19,7 @@ type SorterSetEvalFixture() =
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
-        let sorterEvalMod = sorterEvalMode.SorterSpeed
+        let sorterEvalMod = sorterPerfEvalMode.DontCheckSuccess
         let useParalll = true |> UseParallel.create
 
         let sorterEvls, errs =

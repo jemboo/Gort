@@ -136,87 +136,87 @@ type SortingEvalFixture() =
 
 
 
-    [<TestMethod>]
-    member this.SorterPerfBinReport_fromSorterPerfBins() =
-        let order = 8 |> Order.createNr
-        let sorterId = Guid.NewGuid() |> SorterId.create
-        let sortrA = RefSorter.goodRefSorterForOrder sorterId order |> Result.ExtractOrThrow
+    //[<TestMethod>]
+    //member this.SorterPerfBinReport_fromSorterPerfBins() =
+    //    let order = 8 |> Order.createNr
+    //    let sorterId = Guid.NewGuid() |> SorterId.create
+    //    let sortrA = RefSorter.goodRefSorterForOrder sorterId order |> Result.ExtractOrThrow
 
-        let sorterPrf = true |> sorterPerf.IsSuccessful
-        let unSuccessflA = false
-        let switchCtA = 11 |> SwitchCount.create
-        let switchCtB = 12 |> SwitchCount.create
-        let switchCtC = 13 |> SwitchCount.create
-        let switchCtD = 14 |> SwitchCount.create
-        let switchCtE = 15 |> SwitchCount.create
+    //    let sorterPrf = true |> sorterPerf.IsSuccessful
+    //    let unSuccessflA = false
+    //    let switchCtA = 11 |> SwitchCount.create
+    //    let switchCtB = 12 |> SwitchCount.create
+    //    let switchCtC = 13 |> SwitchCount.create
+    //    let switchCtD = 14 |> SwitchCount.create
+    //    let switchCtE = 15 |> SwitchCount.create
 
-        let stageCtA = 1 |> StageCount.create
-        let stageCtB = 2 |> StageCount.create
-        let stageCtC = 3 |> StageCount.create
-
-
-        let sorterSpeedBnAA = SorterSpeedBin.create switchCtA stageCtA
-        let sorterSpeedBnAB = SorterSpeedBin.create switchCtA stageCtB
-        let sorterSpeedBnBA = SorterSpeedBin.create switchCtB stageCtA
+    //    let stageCtA = 1 |> StageCount.create
+    //    let stageCtB = 2 |> StageCount.create
+    //    let stageCtC = 3 |> StageCount.create
 
 
-        let switchSeqA = [| 1; 2; 3; 4; 5 |] |> Switch.fromSwitchIndexes |> Seq.toArray
-
-        let switchSeqB = [| 11; 12; 13; 14; 15 |] |> Switch.fromSwitchIndexes |> Seq.toArray
-
-        let switchSeqC = [| 21; 22; 23; 24; 25 |] |> Switch.fromSwitchIndexes |> Seq.toArray
-
-        let switchSeqD = [| 31; 12; 13; 14; 15 |] |> Switch.fromSwitchIndexes |> Seq.toArray
-
-        let switchSeqE = [| 41; 22; 23; 24; 25 |] |> Switch.fromSwitchIndexes |> Seq.toArray
+    //    let sorterSpeedBnAA = SorterSpeedBin.create switchCtA stageCtA
+    //    let sorterSpeedBnAB = SorterSpeedBin.create switchCtA stageCtB
+    //    let sorterSpeedBnBA = SorterSpeedBin.create switchCtB stageCtA
 
 
-        let srtrPhenoTypeIdA = SorterPhenotypeId.create switchSeqA
-        let srtrPhenoTypeIdB = SorterPhenotypeId.create switchSeqB
-        let srtrPhenoTypeIdC = SorterPhenotypeId.create switchSeqC
-        let srtrPhenoTypeIdD = SorterPhenotypeId.create switchSeqD
-        let srtrPhenoTypeIdE = SorterPhenotypeId.create switchSeqE
+    //    let switchSeqA = [| 1; 2; 3; 4; 5 |] |> Switch.fromSwitchIndexes |> Seq.toArray
+
+    //    let switchSeqB = [| 11; 12; 13; 14; 15 |] |> Switch.fromSwitchIndexes |> Seq.toArray
+
+    //    let switchSeqC = [| 21; 22; 23; 24; 25 |] |> Switch.fromSwitchIndexes |> Seq.toArray
+
+    //    let switchSeqD = [| 31; 12; 13; 14; 15 |] |> Switch.fromSwitchIndexes |> Seq.toArray
+
+    //    let switchSeqE = [| 41; 22; 23; 24; 25 |] |> Switch.fromSwitchIndexes |> Seq.toArray
 
 
-        let sorterPrfAAA1 =
-            SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
+    //    let srtrPhenoTypeIdA = SorterPhenotypeId.create switchSeqA
+    //    let srtrPhenoTypeIdB = SorterPhenotypeId.create switchSeqB
+    //    let srtrPhenoTypeIdC = SorterPhenotypeId.create switchSeqC
+    //    let srtrPhenoTypeIdD = SorterPhenotypeId.create switchSeqD
+    //    let srtrPhenoTypeIdE = SorterPhenotypeId.create switchSeqE
 
-        let sorterPrfAAA2 =
-            SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
 
-        let sorterPrfABB =
-            SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdB sortrA
+    //    let sorterPrfAAA1 =
+    //        SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
 
-        let sorterPrfABC =
-            SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdC sortrA
+    //    let sorterPrfAAA2 =
+    //        SorterPerfEval.make sorterSpeedBnAA sorterPrf srtrPhenoTypeIdA sortrA
 
-        let sorterPrfBAD =
-            SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdD sortrA
+    //    let sorterPrfABB =
+    //        SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdB sortrA
 
-        let sorterPrfBAE =
-            SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdE sortrA
+    //    let sorterPrfABC =
+    //        SorterPerfEval.make sorterSpeedBnAB sorterPrf srtrPhenoTypeIdC sortrA
 
-        let sorterPrfs =
-            seq {
-                sorterPrfAAA1
-                sorterPrfAAA2
-                sorterPrfABB
-                sorterPrfABC
-                sorterPrfBAD
-                sorterPrfBAE
-            }
+    //    let sorterPrfBAD =
+    //        SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdD sortrA
 
-        let totalSortersInSorterPrfs = sorterPrfs |> Seq.length
+    //    let sorterPrfBAE =
+    //        SorterPerfEval.make sorterSpeedBnBA sorterPrf srtrPhenoTypeIdE sortrA
 
-        let sorterPerfBns = sorterPrfs |> SorterPhenotypePerf.fromSorterPerfs |> Seq.toArray
+    //    let sorterPrfs =
+    //        seq {
+    //            sorterPrfAAA1
+    //            sorterPrfAAA2
+    //            sorterPrfABB
+    //            sorterPrfABC
+    //            sorterPrfBAD
+    //            sorterPrfBAE
+    //        }
 
-        let totalSortersInBins =
-            sorterPerfBns
-            |> Array.map (fun spb -> spb |> SorterPhenotypePerf.getSorters)
-            |> Array.concat
-            |> Array.length
+    //    let totalSortersInSorterPrfs = sorterPrfs |> Seq.length
 
-        Assert.AreEqual(totalSortersInSorterPrfs, totalSortersInBins)
+    //    let sorterPerfBns = sorterPrfs |> SorterPhenotypePerf.fromSorterPerfs |> Seq.toArray
+
+    //    let totalSortersInBins =
+    //        sorterPerfBns
+    //        |> Array.map (fun spb -> spb |> SorterPhenotypePerf.getSorters)
+    //        |> Array.concat
+    //        |> Array.length
+
+    //    Assert.AreEqual(totalSortersInSorterPrfs, totalSortersInBins)
 
 
         //let sorterPerfBinReprt =

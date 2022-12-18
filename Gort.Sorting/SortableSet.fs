@@ -1,4 +1,5 @@
 ﻿namespace global
+open System
 
 type sortableSet =
     private
@@ -31,6 +32,9 @@ module SortableSet =
         { sortableSetId = sortableSetRId
           rollout = rollout
           symbolSetSize = symbolSetSize }
+
+    let createEmpty = 
+        make (0 |> SortableSetId.create) (0UL |> SymbolSetSize.createNr) Rollout.createEmpty
 
     let fromSortableBoolArrays
         (sortableSetId: sortableSetId)

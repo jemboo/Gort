@@ -19,6 +19,11 @@ module BooleanRoll =
           arrayLength = arrayLength
           data = Array.zeroCreate<bool> dataLength }
 
+    let createEmpty =
+        { arrayCount = (0 |> ArrayCount.createNr)
+          arrayLength = (0 |> ArrayLength.createNr)
+          data = Array.zeroCreate<bool> 0 }
+
     let getArrayCount (booleanRoll: booleanRoll) = booleanRoll.arrayCount
 
     let getArrayLength (booleanRoll: booleanRoll) = booleanRoll.arrayLength
@@ -948,6 +953,9 @@ module Rollout =
             }
 
 
+    let createEmpty =
+        BooleanRoll.createEmpty |> rollout.B
+
 
     let isSorted (rollout: rollout) =
         match rollout with
@@ -1038,7 +1046,9 @@ module Rollout =
 
 
 
-    let fromBitPack (rolloutFormat: rolloutFormat) (arrayLength: arrayLength) (bitPack: bitPack) =
+    let fromBitPack (rolloutFormat: rolloutFormat) 
+                    (arrayLength: arrayLength) 
+                    (bitPack: bitPack) =
 
         match rolloutFormat with
         | RfB ->
