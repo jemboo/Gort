@@ -1,101 +1,103 @@
 ﻿namespace global
 
-open System
-
-
-
 type sorterSetPerfReportMode =
     | Speed
     | Perf
 
 
-type sorterPhenotypeSpeed =
+type sorterPhenotypeBin =
     private
-        { sorterSpeedBn: sorterSpeedBin
-          sortrs: sorter[]
+        { sorterSpeed: sorterSpeed
+          sortrIds: sorterId[]
           sortrPhenotypeId: sorterPhenotypeId }
 
 
-//module SorterPhenotypeSpeed =
+module SorterPhenotypeBin =
 
-//    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeedEval>) =
-//        let _makeBinFromSamePhenotypes 
-//                (spId: sorterPhenotypeId) 
-//                (sorterSpeeds: seq<sorterSpeedEval>) =
-//            let memA = sorterSpeeds |> Seq.toArray
-//            { 
-//              sorterPhenotypeSpeed.sorterSpeedBn = memA.[0].sorterSpeedBn
-//              sorterPhenotypeSpeed.sortrs = memA |> Array.map (fun sp -> sp.sortr)
-//              sorterPhenotypeSpeed.sortrPhenotypeId = spId
-//            }
+    let fromSorterSpeeds (sorterSpeeds: seq<sorterEval>) =
+        let _makeBinFromSamePhenotypes 
+                (spId: sorterPhenotypeId) 
+                (sorterSpeeds: seq<sorterEval>) =
+            let memA = sorterSpeeds |> Seq.toArray
+            { 
+              sorterPhenotypeBin.sorterSpeed = memA.[0].sorterSpeed
+              sorterPhenotypeBin.sortrIds = memA |> Array.map (fun sp -> sp.sortrId)
+              sorterPhenotypeBin.sortrPhenotypeId = spId
+            }
 
-//        sorterSpeeds
-//        |> Seq.groupBy (fun sp -> sp.sortrPhenotypeId)
-//        |> Seq.map (fun (spId, mbrs) -> _makeBinFromSamePhenotypes spId mbrs)
-
-
-//    let getSorterSpeedBin (sorterSpeedBn: sorterPhenotypeSpeed) = sorterSpeedBn.sorterSpeedBn
-
-//    let getUsedSwitchCount (sorterSpeedBn: sorterPhenotypeSpeed) =
-//        sorterSpeedBn.sorterSpeedBn |> SorterSpeedBin.getSwitchCount
-
-//    let getUsedStageCount (sorterSpeedBn: sorterPhenotypeSpeed) =
-//        sorterSpeedBn.sorterSpeedBn |> SorterSpeedBin.getStageCount
-
-//    let getSorters (sorterSpeedBn: sorterPhenotypeSpeed) = sorterSpeedBn.sortrs
-
-//    let getSorterPhenotypeId (sorterSpeedBn: sorterPhenotypeSpeed) = sorterSpeedBn.sortrPhenotypeId
+        sorterSpeeds
+        |> Seq.groupBy (fun sp -> sp.sortrPhenotypeId)
+        |> Seq.map (fun (spId, mbrs) -> _makeBinFromSamePhenotypes spId mbrs)
 
 
+    let getSorterSpeed (sorterPhenotypeBin: sorterPhenotypeBin) = 
+            sorterPhenotypeBin.sorterSpeed
 
-//type sorterPhenotypeSpeedsForSpeedBin =
-//    private
-//        { sorterSpeedBn: sorterSpeedBin
-//          sorterPhenotypeSpeedBn: sorterPhenotypeSpeed[] }
+    let getUsedSwitchCount (sorterPhenotypeBin: sorterPhenotypeBin) =
+        sorterPhenotypeBin.sorterSpeed |> SorterSpeed.getSwitchCount
 
+    let getUsedStageCount (sorterPhenotypeBin: sorterPhenotypeBin) =
+        sorterPhenotypeBin.sorterSpeed |> SorterSpeed.getStageCount
 
-//module SorterPhenotypeSpeedsForSpeedBin =
+    let getSorterIds (sorterPhenotypeBin: sorterPhenotypeBin) =
+        sorterPhenotypeBin.sortrIds
 
-//    let getSpeedBin (perfR: sorterPhenotypeSpeedsForSpeedBin) = perfR.sorterSpeedBn
-
-//    let getUsedSwitchCount (perfR: sorterPhenotypeSpeedsForSpeedBin) =
-//        perfR.sorterSpeedBn |> SorterSpeedBin.getSwitchCount
-
-//    let getUsedStageCount (perfR: sorterPhenotypeSpeedsForSpeedBin) =
-//        perfR.sorterSpeedBn |> SorterSpeedBin.getStageCount
-
-//    let getSorterCount (perfR: sorterPhenotypeSpeedsForSpeedBin) =
-//        perfR.sorterPhenotypeSpeedBn
-//        |> Array.sumBy (fun spsb -> spsb.sortrs.Length)
-//        |> SorterCount.create
-
-//    let getPhenotypeCount (perfR: sorterPhenotypeSpeedsForSpeedBin) = perfR.sorterPhenotypeSpeedBn.Length
-
-//    // Similar bins have the same switch and stage counts
-//    let mergeSimilarBins
-//        (sorterSpeedBinReprtA: sorterPhenotypeSpeedsForSpeedBin)
-//        (sorterSpeedBinReprtB: sorterPhenotypeSpeedsForSpeedBin)  
-//        : sorterPhenotypeSpeedsForSpeedBin =
-//        { sorterPhenotypeSpeedsForSpeedBin.sorterSpeedBn = sorterSpeedBinReprtA.sorterSpeedBn
-//          sorterPhenotypeSpeedsForSpeedBin.sorterPhenotypeSpeedBn =
-//            Array.append sorterSpeedBinReprtA.sorterPhenotypeSpeedBn sorterSpeedBinReprtB.sorterPhenotypeSpeedBn }
-
-//    let fromSorterPhenotypeSpeedBin (sorterPhenotypeSpeedBn: sorterPhenotypeSpeed) =
-//        { sorterPhenotypeSpeedsForSpeedBin.sorterSpeedBn = sorterPhenotypeSpeedBn.sorterSpeedBn
-//          sorterPhenotypeSpeedsForSpeedBin.sorterPhenotypeSpeedBn = [| sorterPhenotypeSpeedBn |] }
+    let getSorterPhenotypeId (sorterPhenotypeBin: sorterPhenotypeBin) = 
+            sorterPhenotypeBin.sortrPhenotypeId
 
 
-//    let fromSorterPhenotpeSpeedBins (sorterSpeedBns: seq<sorterPhenotypeSpeed>) =
-//        sorterSpeedBns
-//        |> Seq.map (fromSorterPhenotypeSpeedBin)
-//        |> Seq.groupBy (fun spb -> spb |> getSpeedBin)
-//        |> Seq.map (fun gp -> gp |> snd |> Seq.reduce (mergeSimilarBins))
+
+type sorterSpeedBin =
+    private
+        { sorterSpeed: sorterSpeed
+          sorterPhenotypeSpeedBn: sorterPhenotypeBin[] }
 
 
-//    let fromSorterSpeeds (sorterSpeeds: seq<sorterSpeedEval>) =
-//        sorterSpeeds
-//        |> SorterPhenotypeSpeed.fromSorterSpeeds
-//        |> fromSorterPhenotpeSpeedBins
+module SorterSpeedBin =
+
+    let getSorterSpeed (sorterSpeedBn: sorterSpeedBin) = 
+            sorterSpeedBn.sorterSpeed
+
+    let getUsedSwitchCount (sorterSpeedBn: sorterSpeedBin) =
+            sorterSpeedBn.sorterSpeed |> SorterSpeed.getSwitchCount
+
+    let getUsedStageCount (sorterSpeedBn: sorterSpeedBin) =
+            sorterSpeedBn.sorterSpeed |> SorterSpeed.getStageCount
+
+    let getSorterCount (sorterSpeedBn: sorterSpeedBin) =
+        sorterSpeedBn.sorterPhenotypeSpeedBn
+        |> Array.sumBy (fun spsb -> spsb.sortrIds.Length)
+        |> SorterCount.create
+
+    let getPhenotypeCount (sorterSpeedBn: sorterSpeedBin) = 
+            sorterSpeedBn.sorterPhenotypeSpeedBn.Length
+
+    // Similar bins have the same switch and stage counts
+    let mergeSimilarBins
+        (sorterSpeedBinA: sorterSpeedBin)
+        (sorterSpeedBinB: sorterSpeedBin)  
+        : sorterSpeedBin =
+        { sorterSpeedBin.sorterSpeed = sorterSpeedBinA.sorterSpeed
+          sorterSpeedBin.sorterPhenotypeSpeedBn =
+            Array.append sorterSpeedBinA.sorterPhenotypeSpeedBn sorterSpeedBinB.sorterPhenotypeSpeedBn }
+
+
+    let fromSorterPhenotypeBin (sorterPhenotypeBn: sorterPhenotypeBin) =
+        { sorterSpeedBin.sorterSpeed = sorterPhenotypeBn.sorterSpeed
+          sorterSpeedBin.sorterPhenotypeSpeedBn = [| sorterPhenotypeBn |] }
+
+
+    let fromSorterPhenotpeBins (sorterPhenotypeBn: seq<sorterPhenotypeBin>) =
+        sorterPhenotypeBn
+        |> Seq.map (fromSorterPhenotypeBin)
+        |> Seq.groupBy (fun spb -> spb |> getSorterSpeed)
+        |> Seq.map (fun gp -> gp |> snd |> Seq.reduce (mergeSimilarBins))
+
+
+    let fromSorterEvals (sorterSpeeds: seq<sorterEval>) =
+        sorterSpeeds
+        |> SorterPhenotypeBin.fromSorterSpeeds
+        |> fromSorterPhenotpeBins
 
 
 

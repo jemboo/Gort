@@ -7,7 +7,7 @@ type SorterSetReportingFixture() =
 
 
     [<TestMethod>]
-    member this.sorterSpeedBins() =
+    member this.sorterSpeedIndexes() =
         let mutable i = 0
         let maxW = 60
         let rndy = Rando.fromRngGen (RngGen.createLcg (4213 |> RandomSeed.create))
@@ -20,11 +20,11 @@ type SorterSetReportingFixture() =
                 |> (%) rndy.NextPositiveInt
                 |> StageCount.create
 
-            let sorterSpeedBn = SorterSpeedBin.create switchCt stageCt
+            let sorterSpeedBn = SorterSpeed.create switchCt stageCt
 
-            let sorterSpeedBnIndex = SorterSpeedBin.getIndexOfBin sorterSpeedBn
+            let sorterSpeedBnIndex = SorterSpeed.toIndex sorterSpeedBn
 
-            let sorterSpeedBnBack = SorterSpeedBin.getBinFromIndex sorterSpeedBnIndex
+            let sorterSpeedBnBack = SorterSpeed.fromIndex sorterSpeedBnIndex
             Assert.AreEqual(sorterSpeedBn, sorterSpeedBnBack)
             i <- i + 1
 
