@@ -137,7 +137,7 @@ module SorterEval =
           sortrPhenotypeId = sortrPhenotypeId
           sortrId = sortrId }
 
-    let getSorterSpeedBin (sorterEvl:sorterEval) =
+    let getSorterSpeed (sorterEvl:sorterEval) =
         sorterEvl.sorterSpeed
     let getSorterPerf (sorterEvl:sorterEval) =
         sorterEvl.sorterPrf
@@ -163,24 +163,24 @@ module SorterEval =
 
         result {
             let! sorterOpOutpt = _makeSorterOpOutput
-            let! sorterSpeedBn, sorterPhenotypId = 
+            let! sorterSpeed, sorterPhenotypId = 
                  sorterOpOutpt |> SorterSpeed.fromSorterOpOutput
 
             match sorterPerfEvalMod with
                   | DontCheckSuccess -> 
-                     return make sorterSpeedBn None sorterPhenotypId sortrId
+                     return make sorterSpeed None sorterPhenotypId sortrId
                   | CheckSuccess -> 
                      let isSuccessfl = 
                         sorterOpOutpt 
                           |> SorterOpOutput.isSorted
                           |> sorterPerf.IsSuccessful
                           |> Option.Some
-                     return make sorterSpeedBn isSuccessfl sorterPhenotypId sortrId
+                     return make sorterSpeed isSuccessfl sorterPhenotypId sortrId
                   | GetSortedSetCount ->
                      let! sortedSetCt = 
                         sorterOpOutpt 
                          |> SorterOpOutput.getRefinedSortableCount
                          |> Result.map(sorterPerf.SortedSetSize)
                          |> Result.map(Option.Some)
-                     return make sorterSpeedBn sortedSetCt sorterPhenotypId sortrId
+                     return make sorterSpeed sortedSetCt sorterPhenotypId sortrId
         }

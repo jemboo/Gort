@@ -66,7 +66,7 @@ module Sorter =
         let newSwitches = switchesToAppend |> Seq.append sorter.switches |> Seq.toArray
         fromSwitches sorterD (sorter |> getOrder) newSwitches
 
-
+    // creates a longer sorter with the switches added to the beginning.
     let prependSwitches 
             (sorterD:sorterId)
             (newSwitches: seq<switch>) 
@@ -143,6 +143,29 @@ module Sorter =
 
     //***********  IRando dependent  *********************************
 
+    //cross two sorters, and pad with random switches, if necessary
+    let crossOver (pfxLength:switchCount)
+                  (finalLength:switchCount)
+                  (sortrPfx:sorter) 
+                  (sortrSfx:sorter)
+                  (finalId: sorterId)
+                  (rnd: IRando) =
+
+            let switchesPfx = (Switch.rndNonDegenSwitchesOfOrder (sortrPfx |> getOrder) rnd) 
+                              |> Seq.append sortrPfx.switches
+                              |> Seq.take (pfxLength |> SwitchCount.value)
+
+            let switchesSfx = (Switch.rndNonDegenSwitchesOfOrder (sortrSfx |> getOrder) rnd) 
+                              |> Seq.append sortrSfx.switches
+                              |> Seq.skip (pfxLength |> SwitchCount.value)
+
+            let finalSwitches = switchesSfx 
+                                |> Seq.append switchesPfx
+                                |> Seq.take (finalLength |> SwitchCount.value)
+            
+            fromSwitches finalId (sortrPfx |> getOrder) finalSwitches
+
+
     let randomSwitches
             (sorterD:sorterId)
             (order: order) 
@@ -206,22 +229,35 @@ type sorterUniformMutatorType =
 
 type sorterUniformMutator =
     private
-        { sumType: sorterUniformMutatorType
+        { 
+          sumType: sorterUniformMutatorType
           mutationRate: mutationRate
-          mFunc: sorter -> sorterId -> IRando -> Result<sorter, string> }
+          switchCountPfx: switchCount Option
+          switchCountFinal: switchCount Option
+          mFunc: sorter -> sorterId -> IRando -> Result<sorter, string> 
+        }
 
 module SorterUniformMutator =
 
-    let create sorterUniformMutatorTyp mutationRat mutationFun =
-        { sorterUniformMutator.sumType = sorterUniformMutatorTyp
+    let private _create sorterUniformMutatorTyp mutationRat
+                        switchCtPfx switchCtFinal mutationFun =
+        { 
+          sorterUniformMutator.sumType = sorterUniformMutatorTyp
           mutationRate = mutationRat
-          mFunc = mutationFun }
+          mFunc = mutationFun
+          switchCountPfx = switchCtPfx
+          switchCountFinal = switchCtFinal
+        }
 
     let getSorterUniformMutatorType (sum: sorterUniformMutator) = sum.sumType
 
     let getMutationRate (sum: sorterUniformMutator) = sum.mutationRate
 
     let getSorterMutator (sum: sorterUniformMutator) = sum.mFunc
+    
+    let getPrefixSwitchCount (sum: sorterUniformMutator) = sum.switchCountPfx
+    
+    let getFinalSwitchCount (sum: sorterUniformMutator) = sum.switchCountFinal
 
     let _switchMutator
             (mutRate:mutationRate) 
@@ -235,11 +271,6 @@ module SorterUniformMutator =
 
             return Sorter.fromSwitches sorterD (sorter |> Sorter.getOrder) newSwitches
           }
-
-    let mutateBySwitch
-            (mutRate: mutationRate) =
-        create sorterUniformMutatorType.Switch mutRate (_switchMutator mutRate)
-
 
     let _stageMutator
             (mutRate:mutationRate) 
@@ -261,11 +292,7 @@ module SorterUniformMutator =
             return Sorter.fromSwitches sorterD (sorter |> Sorter.getOrder) newSwitches
           }
 
-    let mutateByStage
-            (mutRate: mutationRate) =
-        create sorterUniformMutatorType.Stage mutRate (_stageMutator mutRate )
-
-    let _stageRflMutator
+    let _stageRflMutator            
             (mutRate:mutationRate) 
             (sorter: sorter)          
             (sorterD:sorterId)  
@@ -285,9 +312,43 @@ module SorterUniformMutator =
             return Sorter.fromSwitches sorterD (sorter |> Sorter.getOrder) newSwitches
           }
 
-    let mutateByStageRfl
-            (mutRate: mutationRate) =
-        create sorterUniformMutatorType.StageRfl mutRate (_stageRflMutator mutRate)
+
+    let _makeMutant
+            (mFunc: sorter -> sorterId -> IRando -> Result<sorter, string>)
+            (switchCtPrefix: switchCount Option)
+            (switchCtTarget: switchCount Option)
+            (sorter: sorter)          
+            (sorterD:sorterId)  
+            (randy: IRando)  =
+        result {
+          let! mutantSortr = mFunc sorter sorterD randy
+          let targetSwitchCt = 
+            match switchCtTarget with
+            | Some swct -> swct
+            | None -> sorter |> Sorter.getSwitches 
+                      |> Array.length |> SwitchCount.create
+
+          let prefixSwitchCt = 
+            match switchCtPrefix with
+            | Some swct -> swct
+            | None -> sorter |> Sorter.getSwitches 
+                      |> Array.length |> SwitchCount.create
+
+          return Sorter.crossOver prefixSwitchCt targetSwitchCt sorter mutantSortr sorterD randy
+        }
+
+
+    let create (switchCtPrefix: switchCount Option)
+               (switchCtTarget: switchCount Option)
+               (sorterUniformMutatorTyp:sorterUniformMutatorType)  
+               (mutRate: mutationRate) =
+        match sorterUniformMutatorTyp with
+        | Switch ->
+            _create sorterUniformMutatorTyp mutRate switchCtPrefix switchCtTarget (_makeMutant (_switchMutator mutRate) switchCtPrefix switchCtTarget)
+        | Stage ->
+            _create sorterUniformMutatorTyp mutRate switchCtPrefix switchCtTarget (_makeMutant (_stageMutator mutRate) switchCtPrefix switchCtTarget)
+        | StageRfl ->
+            _create sorterUniformMutatorTyp mutRate switchCtPrefix switchCtTarget (_makeMutant (_stageRflMutator mutRate) switchCtPrefix switchCtTarget)
 
 
 type sorterMutator = Uniform of sorterUniformMutator

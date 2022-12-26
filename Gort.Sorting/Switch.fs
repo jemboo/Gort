@@ -32,6 +32,9 @@ module Switch =
     let toIndex (switch: switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
 
+    let toIndexes (switches: seq<switch>) =
+        switches |> Seq.map(toIndex)
+
     let maxIndexForOrder (ordr:order) =
         let ov = ordr |> Order.value 
         (ov * (ov + 3)) / 2

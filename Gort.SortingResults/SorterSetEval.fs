@@ -3,7 +3,7 @@
 module SorterSetEval =
 
     let eval
-        (sorterEvalMod: sorterPerfEvalMode)
+        (sorterPerfEvalMode: sorterPerfEvalMode)
         (sortableSt: sortableSet)
         (sorterSt: sorterSet)
         (useParallel: useParallel) =
@@ -16,19 +16,19 @@ module SorterSetEval =
         if (useParallel |> UseParallel.value) then
             //sorterSt
             //|> SorterSet.getSorters
-            //|> Seq.map(fun x -> async { return SorterEval.evalSorterWithSortableSet sorterEvalMod sortableSt x })
+            //|> Seq.map(fun x -> async { return SorterEval.evalSorterWithSortableSet sorterPerfEvalMode sortableSt x })
             //|> Async.Parallel
             //|> Async.RunSynchronously
             //|> _splitOutErrors
             sorterSt
             |> SorterSet.getSorters
             |> Seq.toArray
-            |> Array.Parallel.map (SorterEval.evalSorterWithSortableSet sorterEvalMod sortableSt)
+            |> Array.Parallel.map (SorterEval.evalSorterWithSortableSet sorterPerfEvalMode sortableSt)
             |> _splitOutErrors
 
         else
             sorterSt
             |> SorterSet.getSorters
             |> Seq.toArray
-            |> Array.map (SorterEval.evalSorterWithSortableSet sorterEvalMod sortableSt)
+            |> Array.map (SorterEval.evalSorterWithSortableSet sorterPerfEvalMode sortableSt)
             |> _splitOutErrors

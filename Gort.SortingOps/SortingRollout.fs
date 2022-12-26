@@ -22,7 +22,6 @@ module SortingRollout =
 
         // loop over sortables, then over switches
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
             let mutable looP = true
             let sortableSetRolloutOffset = sortableIndex * orderV
@@ -71,7 +70,6 @@ module SortingRollout =
 
         // loop over sortables, then over switches
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
             let mutable looP = true
@@ -120,7 +118,6 @@ module SortingRollout =
 
         // loop over sortables, then over switches
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
             let mutable looP = true
@@ -187,9 +184,9 @@ module SortingRollout =
 
 
 
-    // Uses the sorter to sort a copy of the rollingSorableData
-    // returns the transformed copy of the rollingSorableData
-    // along with a bool[sorter.switchcount] to store each switch use.
+    // Uses the sorter to sort a copy of the rollingSorableData.
+    // returns the transformed copy of the rollingSorableData along with 
+    // a bool[sorter.switchcount * sortableCount] to store each switch use.
     let applySorterAndMakeSwitchTrack (sortr: sorter) (sortableSt: sortableSet) =
 
         let rolloutCopy = sortableSt |> SortableSet.getRollout |> Rollout.copy
@@ -231,7 +228,6 @@ module SortingRollout =
         let useCounts = (SwitchUseTrackerStandard.getUseCounters switchUses)
 
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
             let mutable looP = true
@@ -275,7 +271,6 @@ module SortingRollout =
         let switchCountV = sortr |> Sorter.getSwitchCount |> SwitchCount.value
 
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
             let mutable looP = true
@@ -306,10 +301,9 @@ module SortingRollout =
     // uses an int[sorter.switchcount] array to accumulate
     // the counts of each switch use
     let private sortAndMakeSwitchUsesForUInt16Roll
-        (sortr: sorter)
-        (uInt8Roll: uInt16Roll)
-        (sortableCount: sortableCount)
-        =
+                    (sortr: sorter)
+                    (uInt8Roll: uInt16Roll)
+                    (sortableCount: sortableCount) =
 
         let switches = sortr |> Sorter.getSwitches
         let rollArray = uInt8Roll |> Uint16Roll.getData
@@ -319,7 +313,6 @@ module SortingRollout =
         let switchCountV = sortr |> Sorter.getSwitchCount |> SwitchCount.value
 
         let mutable sortableIndex = 0
-
         while (sortableIndex < (SortableCount.value sortableCount)) do
 
             let mutable looP = true
@@ -413,9 +406,7 @@ module SortingRollout =
     // count of each switch use
     let applySorterAndMakeSwitchUses (sortr: sorter) (sortableSt: sortableSet) =
 
-
         let rolloutCopy = sortableSt |> SortableSet.getRollout |> Rollout.copy
-
         let sortableCount =
             rolloutCopy |> Rollout.getArrayCount |> ArrayCount.value |> SortableCount.create
 
@@ -432,7 +423,6 @@ module SortingRollout =
             | U64 _uInt64Roll -> failwith "not implemented"
 
             | Bs64 _bs644Roll -> sortAndMakeSwitchUsesForBs64Roll sortr _bs644Roll
-
 
         SorterOpOutput.make sortr sortableSt rolloutCopy (switchUseTracker |> sorterOpTracker.SwitchTrack)
 

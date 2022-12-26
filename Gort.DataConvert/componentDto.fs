@@ -46,26 +46,32 @@ module RngGenDto =
 
 
 type sorterUniformMutatorDto =
-    { mutFuncType: string; mutationRate: float }
+    { mutFuncType: string; mutationRate: float; switchCountPfx:int; switchCountFinal:int }
 
 module SorterUniformMutatorDto =
 
     let fromDto (dto: sorterUniformMutatorDto) =
+        let switchCtPfx = 
+            if (dto.switchCountPfx > 0) then
+                dto.switchCountPfx |> SwitchCount.create|> Some
+            else None
+        let switchCtFinal = 
+            if (dto.switchCountFinal > 0) then
+                dto.switchCountFinal |> SwitchCount.create|> Some
+            else None
         result {
-            let! res =
+            let srtrMutRat = dto.mutationRate |> MutationRate.create
+            let! sumt =
                 match dto.mutFuncType with
                 | (nameof sorterUniformMutatorType.Switch) ->
-                    let swMr = dto.mutationRate |> MutationRate.create
-                    SorterUniformMutator.mutateBySwitch swMr |> Ok
+                    sorterUniformMutatorType.Switch|> Ok
                 | (nameof sorterUniformMutatorType.Stage) ->
-                    let stMr = dto.mutationRate |> MutationRate.create
-                    SorterUniformMutator.mutateByStage stMr |> Ok
+                    sorterUniformMutatorType.Stage |> Ok
                 | (nameof sorterUniformMutatorType.StageRfl) ->
-                    let stMr = dto.mutationRate |> MutationRate.create
-                    SorterUniformMutator.mutateByStageRfl stMr |> Ok
+                    sorterUniformMutatorType.StageRfl |> Ok
                 | _ -> sprintf "%s not matched" dto.mutFuncType |> Error
 
-            return res
+            return SorterUniformMutator.create switchCtPfx switchCtFinal sumt srtrMutRat
         }
 
 
@@ -80,8 +86,16 @@ module SorterUniformMutatorDto =
         let sumType = sum |> SorterUniformMutator.getSorterUniformMutatorType
         let mutRateVal = sum |> SorterUniformMutator.getMutationRate
                              |> MutationRate.value
-        { sorterUniformMutatorDto.mutFuncType = string sumType
-          mutationRate = mutRateVal }
+        { 
+          sorterUniformMutatorDto.mutFuncType = string sumType
+          mutationRate = mutRateVal 
+          switchCountPfx = match (sum |> SorterUniformMutator.getPrefixSwitchCount) with
+                           | Some ct -> ct |> SwitchCount.value
+                           | None -> 0
+          switchCountFinal = match (sum |> SorterUniformMutator.getFinalSwitchCount) with
+                           | Some ct -> ct |> SwitchCount.value
+                           | None -> 0
+        }
 
 
     let toJson (sorterUniformMutato: sorterUniformMutator) = 

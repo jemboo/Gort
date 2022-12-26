@@ -101,3 +101,6 @@ module SorterSet =
             sorterStId 
             sorterCt 
             order wPfx switchCount (Sorter.randomBuddies stageWindowSz) rnGen
+
+
+    let createMutationSet = None

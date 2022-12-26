@@ -29,64 +29,42 @@ type SorterSetReportingFixture() =
             i <- i + 1
 
 
+
     [<TestMethod>]
     member this.getBins() =
-        //let sorterSetId = Guid.NewGuid() |> SorterSetId.create
-        //let useParalll = true |> UseParallel.create
-        //let ordr = 16 |> Order.createNr
-        //let switchCt = SwitchCount.orderTo900SwitchCount ordr
-        //let sorterCt = SorterCount.create 500
-        //let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
+        let sorterSetId = Guid.NewGuid() |> SorterSetId.create
+        let useParalll = true |> UseParallel.create
+        let ordr = 16 |> Order.createNr
+        let switchCt = SwitchCount.orderTo900SwitchCount ordr
+        let sorterCt = SorterCount.create 500
+        let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
 
-        //let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
-        //let rolloutFormt = rolloutFormat.RfBs64
-        //let sortableStId = SortableSetId.create 123
+        let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
+        let rolloutFormt = rolloutFormat.RfBs64
+        let sortableStId = SortableSetId.create 123
 
-        //let sortableSt =
-        //    SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
+        let sortableSt =
+            SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
-        //let sorterSpeedEvls, errs =
-        //    SorterSetEval.eval sorterEvalMode.SorterSpeed sortableSt sorterSt useParalll
+        let sorterEvls, errs =
+            SorterSetEval.eval sorterPerfEvalMode.DontCheckSuccess sortableSt sorterSt useParalll
 
-        //let sorterSpeedRs =
-        //    sorterSpeedEvls |> Array.map (SorterEval.getSorterSpeed) |> Array.toList
 
-        //let sorterSpeeds = sorterSpeedRs |> Result.sequence |> Result.ExtractOrThrow
+        let sorterPhenotypeBins = sorterEvls 
+                                    |> SorterPhenotypeBin.fromSorterEvals
+                                    |> Seq.sortBy(SorterPhenotypeBin.getSorterPhenotypeId)
+                                    |> Seq.toList
 
-        //let spsfsbs =
-        //    sorterSpeeds
-        //    |> SorterPhenotypeSpeedsForSpeedBin.fromSorterSpeeds
-        //    |> Seq.toArray
-        //    |> Array.sortBy (fun sp ->
-        //        sp
-        //        |> SorterPhenotypeSpeedsForSpeedBin.getSpeedBin
-        //        |> SorterSpeedBin.getIndexOfBin)
+        let sorterSpeedBins = sorterEvls 
+                                    |> SorterSpeedBin.fromSorterEvals
+                                    |> Seq.toArray
 
-        ////////////////
-        //let sorterPerfEvls, errs =
-        //    SorterSetEval.eval sorterEvalMode.SorterPerf sortableSt sorterSt useParalll
+        let sorterPhenotypeBinsBack = 
+                            sorterSpeedBins 
+                                    |> SorterSpeedBin.toSorterPhenotypeBins
+                                    |> Seq.sortBy(SorterPhenotypeBin.getSorterPhenotypeId)
+                                    |> Seq.toList
 
-        //let sorterPerfRs =
-        //    sorterPerfEvls |> Array.map (SorterEval.getSorterPerf) |> Array.toList
+        Assert.IsTrue(CollectionProps.areEqual sorterPhenotypeBins sorterPhenotypeBinsBack)
 
-        //let sorterPerfs = sorterPerfRs |> Result.sequence |> Result.ExtractOrThrow
-
-        //let sppfsbs =
-        //    sorterPerfs
-        //    |> SorterPhenotypePerfsForSpeedBin.fromSorterPerfs
-        //    |> Seq.toArray
-        //    |> Array.sortBy (fun sp ->
-        //        sp
-        //        |> SorterPhenotypePerfsForSpeedBin.getSpeedBin
-        //        |> SorterSpeedBin.getIndexOfBin)
-
-        //let mutable dex = 0
-        //while dex < sppfsbs.Length do
-        //    let res = SorterPhenotypePerfsForSpeedBin.couldBeTheSame sppfsbs.[dex] spsfsbs.[dex]
-        //    Assert.IsTrue(res)
-        //    dex <- dex + 1
-
-        //let hasAFailure = sppfsbs |> Array.exists(fun spps -> spps |> SorterPhenotypePerfsForSpeedBin.hasAFailure)
-
-        //Assert.IsTrue(hasAFailure)
         Assert.IsTrue(true)
