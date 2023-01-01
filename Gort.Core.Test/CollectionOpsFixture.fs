@@ -29,6 +29,15 @@ type CollectionOpsFixture() =
 
 
     [<TestMethod>]
+    member this.infinteLoop() =
+        let a1 = [| 1; 2; 3; |]
+        let yab = a1 |> CollectionOps.infinteLoop
+                     |> Seq.take(8)
+                     |> Seq.toArray
+        Assert.IsTrue(yab.Length = 8)
+
+
+    [<TestMethod>]
     member this.arrayProductInt() =
         let aA = [| 2; 0; 4; 1; 3 |]
         let aB = [| 4; 3; 1; 2; 0 |]

@@ -28,12 +28,16 @@ module CollectionOps =
                 dex <- dex + 1
         }
 
-
+    //takes up to maxCt items from the sequence, returns less if it runs out
     let takeUpto<'a> (maxCt: int) (source: seq<'a>) =
         source
         |> Seq.mapi (fun dex v -> (dex, v))
         |> Seq.takeWhile (fun tup -> (fst tup) < maxCt)
         |> Seq.map (snd)
+
+
+    let infinteLoop (robbin:seq<'a>) = 
+        seq {while true do yield! robbin}
 
 
     // product map composition: a(b()).

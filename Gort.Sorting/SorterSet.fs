@@ -16,12 +16,16 @@ module SorterSet =
 
     let getSorterCount (sorterSet: sorterSet) = sorterSet.sorterMap.Count
 
-    let getSorters (sorterSet: sorterSet) = sorterSet.sorterMap.Values
+    let getSorters (sorterSet: sorterSet) = sorterSet.sorterMap |> Map.values |> Seq.cast
 
-    let generateSorterIds (sorterStId:sorterSetId) (sorterCt:sorterCount) =
+    let getSortersById (maxCt:sorterCount) (ids: sorterId seq) (sorterSet: sorterSet) =
+        ids |> Seq.map(fun d -> sorterSet.sorterMap.TryFind d)
+            |> Seq.filter(fun ov -> ov |> Option.isSome)
+            |> CollectionOps.takeUpto (maxCt |> SorterCount.value)
+
+    let generateSorterIds (sorterStId:sorterSetId) =
         RandVars.rndGuidsLcg (sorterStId |> SorterSetId.value)
         |> Seq.map(SorterId.create)
-        |> Seq.take(sorterCt |> SorterCount.value)
 
     let load (id:sorterSetId) (order: order) (sorters: seq<sorter>) =
         let sorterMap =
@@ -42,10 +46,9 @@ module SorterSet =
         (switchCount: switchCount)
         (sorterRndGen: sorterId -> order -> switch seq -> switchCount -> IRando -> sorter)
         (rnGen: rngGen) =
-        let randy = rnGen |> Rando.fromRngGen
-
-        generateSorterIds sorterStId sorterCt
-        |> Seq.map (fun sId -> sorterRndGen sId order wPfx switchCount randy)
+        generateSorterIds sorterStId
+        |> Seq.map (fun sId -> sorterRndGen sId order wPfx switchCount (rnGen |> Rando.fromRngGen))
+        |> Seq.take(sorterCt |> SorterCount.value)
         |> load sorterStId order 
 
 
@@ -103,4 +106,29 @@ module SorterSet =
             order wPfx switchCount (Sorter.randomBuddies stageWindowSz) rnGen
 
 
-    let createMutationSet = None
+    let createMutationSet 
+        (sorterBase: sorter[]) 
+        (sorterCt:sorterCount)
+        (order: order) 
+        (sorterMutatr: sorterUniformMutator) 
+        (sorterStId:sorterSetId)
+        (rnGen: rngGen) =
+        let randy = rnGen |> Rando.fromRngGen
+        
+        //let newSorters = 
+        //    sorterBase |> CollectionOps.infinteLoop
+        //               |> Seq.take(sorterCt |> SorterCount.value)
+        
+        //load sorterStId order newSorters
+        let _mutato dex id =
+            let sortr = sorterBase.[dex % sorterBase.Length]
+            sorterMutatr.mFunc sortr id randy
+            
+        generateSorterIds sorterStId
+        |> Seq.mapi(_mutato)
+        |> Seq.filter(Result.isOk)
+        |> Seq.map(Result.ExtractOrThrow)
+        |> Seq.take(sorterCt |> SorterCount.value)
+        
+        //(fun sId -> sorterRndGen sId order wPfx switchCount randy)
+        //|> load sorterStId order 

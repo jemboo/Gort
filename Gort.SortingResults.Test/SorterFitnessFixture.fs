@@ -67,4 +67,17 @@ type SorterSetReportingFixture() =
 
         Assert.IsTrue(CollectionProps.areEqual sorterPhenotypeBins sorterPhenotypeBinsBack)
 
-        Assert.IsTrue(true)
+        let standings = sorterSpeedBins |> SorterPopulationContext.fromSorterSpeedBins
+
+        let stageWgth = 0.2 |> StageWeight.create
+        let ranker ss = ss |> SorterFitness.fromSpeed stageWgth
+        let ranky = sorterSpeedBins 
+                        |> SorterSpeedBin.orderSorterPhenotypesBySliceAndSpeed ranker
+                        |> Seq.toArray
+        let bestRanks = ranky |> Seq.take(10) |> Seq.map(fst)
+        let testIds = seq { Guid.NewGuid() |> SorterId.create } |> Seq.append bestRanks
+
+        let winningSorters = sorterSt 
+                                |> SorterSet.getSortersById (20 |> SorterCount.create) testIds
+                                |> Seq.toArray
+        Assert.AreEqual(standings.Length, sorterCt |> SorterCount.value)

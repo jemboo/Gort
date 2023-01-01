@@ -9,6 +9,7 @@ type sorter =
           switches: array<switch> }
 
 module Sorter =
+
     let getSorterId (sortr: sorter) = sortr.sortrId
 
     let getOrder (sortr: sorter) = sortr.order
@@ -211,8 +212,7 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
-        =
+        (rando: IRando)  =
         let switches =
             (Stage.rndBuddyStages stageWindowSz SwitchFrequency.max order rando List.empty)
             |> Seq.collect (fun st -> st.switches |> List.toSeq)

@@ -1,17 +1,19 @@
 ﻿namespace global
 
-type sorterSetPerfReportMode =
-    | Speed
-    | Perf
+
+type sorterPhenotypeCount = private SorterPhenotypeCount of int
+module SorterPhenotypeCount =
+    let value (SorterPhenotypeCount v) = v
+    let create (spbCt: int) =
+        spbCt |> SorterPhenotypeCount
 
 
 type sorterPhenotypeBin =
     private
         { sorterSpeed: sorterSpeed
           sortrIds: sorterId[]
-          sortrPhenotypeId: sorterPhenotypeId }
-
-
+          sortrPhenotypeId: sorterPhenotypeId 
+        }
 module SorterPhenotypeBin =
 
     let fromSorterEvals (sorterEvals: seq<sorterEval>) =
@@ -45,14 +47,25 @@ module SorterPhenotypeBin =
     let getSorterPhenotypeId (sorterPhenotypeBin: sorterPhenotypeBin) = 
             sorterPhenotypeBin.sortrPhenotypeId
 
+    let unRoll (sorterPhenotypeCt:sorterPhenotypeCount) 
+               (sorterPhenotypeBn:sorterPhenotypeBin) = 
+            sorterPhenotypeBn 
+            |> getSorterIds
+            |> Array.map(fun srtrId -> 
+                (
+                 sorterPhenotypeBn.sorterSpeed, 
+                 srtrId, 
+                 sorterPhenotypeBn.sortrPhenotypeId, 
+                 sorterPhenotypeBn.sortrIds.Length |> SorterCount.create,
+                 sorterPhenotypeCt
+                )       )
 
 
 type sorterSpeedBin =
     private
         { sorterSpeed: sorterSpeed
-          sorterPhenotypeBn: sorterPhenotypeBin[] }
-
-
+          sorterPhenotypeBns: sorterPhenotypeBin[]
+        }
 module SorterSpeedBin =
 
     let getSorterSpeed (sorterSpeedBn: sorterSpeedBin) = 
@@ -65,12 +78,12 @@ module SorterSpeedBin =
             sorterSpeedBn.sorterSpeed |> SorterSpeed.getStageCount
 
     let getSorterCount (sorterSpeedBn: sorterSpeedBin) =
-        sorterSpeedBn.sorterPhenotypeBn
+        sorterSpeedBn.sorterPhenotypeBns
         |> Array.sumBy (fun spsb -> spsb.sortrIds.Length)
         |> SorterCount.create
 
     let getPhenotypeBins (sorterSpeedBn: sorterSpeedBin) = 
-            sorterSpeedBn.sorterPhenotypeBn
+            sorterSpeedBn.sorterPhenotypeBns
 
     // Similar bins have the same switch and stage counts
     let mergeSimilarBins
@@ -78,30 +91,120 @@ module SorterSpeedBin =
         (sorterSpeedBinB: sorterSpeedBin)  
         : sorterSpeedBin =
         { sorterSpeedBin.sorterSpeed = sorterSpeedBinA.sorterSpeed
-          sorterSpeedBin.sorterPhenotypeBn =
-            Array.append sorterSpeedBinA.sorterPhenotypeBn sorterSpeedBinB.sorterPhenotypeBn }
+          sorterSpeedBin.sorterPhenotypeBns =
+            Array.append sorterSpeedBinA.sorterPhenotypeBns sorterSpeedBinB.sorterPhenotypeBns }
 
 
     let fromSorterPhenotypeBin (sorterPhenotypeBn: sorterPhenotypeBin) =
         { sorterSpeedBin.sorterSpeed = sorterPhenotypeBn.sorterSpeed
-          sorterSpeedBin.sorterPhenotypeBn = [| sorterPhenotypeBn |] }
+          sorterSpeedBin.sorterPhenotypeBns = [| sorterPhenotypeBn |] }
 
 
-    let fromSorterPhenotpeBins (sorterPhenotypeBn: seq<sorterPhenotypeBin>) =
-        sorterPhenotypeBn
+    let fromSorterPhenotpeBins (sorterPhenotypeBns: seq<sorterPhenotypeBin>) =
+        sorterPhenotypeBns
         |> Seq.map (fromSorterPhenotypeBin)
         |> Seq.groupBy (fun spb -> spb |> getSorterSpeed)
         |> Seq.map (fun gp -> gp |> snd |> Seq.reduce (mergeSimilarBins))
+
 
     let toSorterPhenotypeBins (sorterSpeedBins: seq<sorterSpeedBin>) =
         sorterSpeedBins |> Seq.map(fun ssb -> getPhenotypeBins ssb)
                         |> Seq.concat
         
+    let orderSorterPhenotypesBySliceAndSpeed 
+                    (speedRanker: sorterSpeed -> float)
+                    (sorterSpeedBins: seq<sorterSpeedBin>) =
+        let orderedPhenotypeBins =
+            sorterSpeedBins 
+            |> Seq.sortByDescending(fun sb -> sb.sorterSpeed |> speedRanker)
+            |> toSorterPhenotypeBins
+            |> Seq.toArray
+
+        let maxBinSz = orderedPhenotypeBins
+                        |> Seq.map(fun pb -> pb.sortrIds.Length)
+                        |> Seq.max
+        seq {
+            let mutable sizeDex = 0
+            for sizeDex = 0 to (maxBinSz - 1) do
+                let mutable binDex = 0
+                for binDex = 0 to (orderedPhenotypeBins.Length - 1) do
+                    if orderedPhenotypeBins.[binDex].sortrIds.Length >= sizeDex then
+                        yield orderedPhenotypeBins.[binDex].sortrIds.[sizeDex], orderedPhenotypeBins.[binDex].sorterSpeed
+                binDex <- binDex + 1
+            sizeDex <- sizeDex + 1
+        }
+
 
     let fromSorterEvals (sorterSpeeds: seq<sorterEval>) =
         sorterSpeeds
         |> SorterPhenotypeBin.fromSorterEvals
         |> fromSorterPhenotpeBins
+
+
+type sorterPopulationContext =
+    private
+        { 
+          sorterSpeed: sorterSpeed
+          sorterPrf: sorterPerf option
+          sortrId: sorterId
+          sortrPhenotypeId: sorterPhenotypeId 
+          sorterCountForPhenotype: sorterCount
+          phenotypeCountForSorterSpeed: sorterPhenotypeCount
+        }
+
+
+module SorterPopulationContext =
+
+    let makeNoPerf (qt:sorterSpeed*sorterId*sorterPhenotypeId*sorterCount*sorterPhenotypeCount) =
+        let ss, sid, spid, scfp, pcfss = qt
+        {
+            sorterPopulationContext.sorterSpeed = ss
+            sorterPrf = None
+            sortrId = sid
+            sortrPhenotypeId = spid
+            sorterCountForPhenotype = scfp
+            phenotypeCountForSorterSpeed = pcfss
+        }
+
+
+    let fromSorterSpeedBins (sorterSpeedBns:sorterSpeedBin[]) =
+        let _unRoll (bin:sorterSpeedBin) =
+            bin |> SorterSpeedBin.getPhenotypeBins
+                |> Array.map(SorterPhenotypeBin.unRoll 
+                     (bin.sorterPhenotypeBns.Length |> SorterPhenotypeCount.create))
+                |> Array.concat
+                |> Array.map(makeNoPerf)
+
+        sorterSpeedBns |> Array.map(_unRoll)
+                       |> Array.concat
+
+
+type stageWeight = private StageWeight of float
+module StageWeight =
+    let value (StageWeight v) = v
+    let create vl = StageWeight vl
+
+
+// larger fitness numbers are better
+type sorterFitness = private SorterFitness of float
+module SorterFitness =
+    let value (SorterFitness v) = v
+    let create (spbCt: float) =
+        spbCt |> SorterFitness
+
+    let fromSpeed (stageWght:stageWeight) (sorterSpd:sorterSpeed) = 
+        (stageWght |> StageWeight.value) /
+        (sorterSpd |> SorterSpeed.getStageCount |> StageCount.value |> float)
+        +
+        1.0 /
+        (sorterSpd |> SorterSpeed.getSwitchCount |> SwitchCount.value |> float)
+
+
+
+type selectionFraction = private SelectionFraction of float
+module SelectionFraction =
+    let value (SelectionFraction v) = v
+    let create vl = SelectionFraction vl
 
 
 
@@ -373,56 +476,3 @@ module SorterSpeedBin =
 //    let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
 //    let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
 //    (bR, wR)
-
-
-
-type stageWeight = private StageWeight of float
-
-module StageWeight =
-    let value (StageWeight v) = v
-    let create id = Ok(StageWeight id)
-    let fromFloat (id: float) = create id |> Result.ExtractOrThrow
-
-
-type sorterSaving =
-    | NotAny
-    | All
-    | Successful
-    | Perf of stageWeight * sorterCount
-
-
-module SorterFitness =
-
-    let switchBased (order: order) (switchCount: switchCount) =
-        let bestSwitch =
-            SwitchCount.orderToRecordSwitchCount order |> SwitchCount.value |> float
-
-        let scv = switchCount |> SwitchCount.value |> float
-        (scv) / (bestSwitch) |> Energy.create
-
-
-    let stageBased (order: order) (stageCount: stageCount) =
-        let bestStage =
-            StageCount.orderToRecordStageCount order |> StageCount.value |> float
-
-        let scv = stageCount |> StageCount.value |> float
-        (scv) / (bestStage) |> Energy.create
-
-    let weighted (order: order) (stageWeight: stageWeight) (wCt: switchCount) (tCt: stageCount) =
-        let wV = switchBased order wCt |> Energy.value
-        let tV = stageBased order tCt |> Energy.value
-        let tw = StageWeight.value stageWeight
-        ((wV + tV * tw) / (tw + 1.0)) |> Energy.create
-
-
-//let fromSorterPerf (order:order)
-//                   (stageWeight:stageWeight)
-//                   (perf:sorterPerf) =
-//    let pv =
-//        weighted order stageWeight
-//                 perf.usedSwitchCount perf.usedStageCount
-
-//    match perf.failCount with
-//    | Some v -> if (SortableCount.value v) = 0
-//                    then pv else Energy.failure
-//    | None -> pv

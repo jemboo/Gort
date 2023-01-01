@@ -23,7 +23,8 @@ type componentDtoFixture() =
     [<TestMethod>]
     member this.SorterUniformMutatorDto() =
         let mutationRat = 0.55 |> MutationRate.create
-        let stageRflMutato = SorterUniformMutator.mutateByStageRfl mutationRat
+        let sorterUniformMutatorTyp = sorterUniformMutatorType.StageRfl
+        let stageRflMutato = SorterUniformMutator.create None None sorterUniformMutatorTyp  mutationRat
         let stageRflMutatorCereal = stageRflMutato |> SorterUniformMutatorDto.toJson
         let stageRflMutatoBack = stageRflMutatorCereal 
                                     |> SorterUniformMutatorDto.fromJson
