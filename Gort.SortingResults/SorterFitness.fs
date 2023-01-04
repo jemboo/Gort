@@ -22,14 +22,14 @@ module SorterPhenotypeBin =
                 (sorterSpeeds: seq<sorterEval>) =
             let memA = sorterSpeeds |> Seq.toArray
             { 
-              sorterPhenotypeBin.sorterSpeed = memA.[0].sorterSpeed
+              sorterPhenotypeBin.sorterSpeed = memA.[0].sorterSpeed |> Option.get
               sorterPhenotypeBin.sortrIds = memA |> Array.map (fun sp -> sp.sortrId)
               sorterPhenotypeBin.sortrPhenotypeId = spId
             }
 
         sorterEvals
         |> Seq.groupBy (fun sp -> sp.sortrPhenotypeId)
-        |> Seq.map (fun (spId, mbrs) -> _makeBinFromSamePhenotypes spId mbrs)
+        |> Seq.map (fun (spId, mbrs) -> _makeBinFromSamePhenotypes (spId |> Option.get) mbrs)
 
 
     let getSorterSpeed (sorterPhenotypeBin: sorterPhenotypeBin) = 
@@ -59,6 +59,16 @@ module SorterPhenotypeBin =
                  sorterPhenotypeBn.sortrIds.Length |> SorterCount.create,
                  sorterPhenotypeCt
                 )       )
+
+
+    let report (pfx:string) (sorterPhenotypeBn:sorterPhenotypeBin) =
+        sprintf "%s\t%d\t%s\t%d\t%d" 
+                    pfx 
+                    sorterPhenotypeBn.sortrIds.Length
+                    (sorterPhenotypeBn.sortrPhenotypeId |> SorterPhenotypeId.value |> string)
+                    (sorterPhenotypeBn |> getSorterSpeed |> SorterSpeed.getStageCount |> StageCount.value) 
+                    (sorterPhenotypeBn |> getSorterSpeed |> SorterSpeed.getSwitchCount |> SwitchCount.value)  
+                    
 
 
 type sorterSpeedBin =
@@ -128,7 +138,7 @@ module SorterSpeedBin =
             for sizeDex = 0 to (maxBinSz - 1) do
                 let mutable binDex = 0
                 for binDex = 0 to (orderedPhenotypeBins.Length - 1) do
-                    if orderedPhenotypeBins.[binDex].sortrIds.Length >= sizeDex then
+                    if orderedPhenotypeBins.[binDex].sortrIds.Length > sizeDex then
                         yield orderedPhenotypeBins.[binDex].sortrIds.[sizeDex], orderedPhenotypeBins.[binDex].sorterSpeed
                 binDex <- binDex + 1
             sizeDex <- sizeDex + 1
@@ -151,7 +161,6 @@ type sorterPopulationContext =
           sorterCountForPhenotype: sorterCount
           phenotypeCountForSorterSpeed: sorterPhenotypeCount
         }
-
 
 module SorterPopulationContext =
 

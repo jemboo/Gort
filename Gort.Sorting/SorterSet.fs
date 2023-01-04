@@ -21,6 +21,7 @@ module SorterSet =
     let getSortersById (maxCt:sorterCount) (ids: sorterId seq) (sorterSet: sorterSet) =
         ids |> Seq.map(fun d -> sorterSet.sorterMap.TryFind d)
             |> Seq.filter(fun ov -> ov |> Option.isSome)
+            |> Seq.map(fun ov -> ov |> Option.get)
             |> CollectionOps.takeUpto (maxCt |> SorterCount.value)
 
     let generateSorterIds (sorterStId:sorterSetId) =
@@ -46,8 +47,9 @@ module SorterSet =
         (switchCount: switchCount)
         (sorterRndGen: sorterId -> order -> switch seq -> switchCount -> IRando -> sorter)
         (rnGen: rngGen) =
+        let randy = rnGen |> Rando.fromRngGen
         generateSorterIds sorterStId
-        |> Seq.map (fun sId -> sorterRndGen sId order wPfx switchCount (rnGen |> Rando.fromRngGen))
+        |> Seq.map (fun sId -> sorterRndGen sId order wPfx switchCount randy)
         |> Seq.take(sorterCt |> SorterCount.value)
         |> load sorterStId order 
 
@@ -112,23 +114,43 @@ module SorterSet =
         (order: order) 
         (sorterMutatr: sorterUniformMutator) 
         (sorterStId:sorterSetId)
-        (rnGen: rngGen) =
-        let randy = rnGen |> Rando.fromRngGen
-        
-        //let newSorters = 
-        //    sorterBase |> CollectionOps.infinteLoop
-        //               |> Seq.take(sorterCt |> SorterCount.value)
-        
-        //load sorterStId order newSorters
+        (randy: IRando) =
         let _mutato dex id =
             let sortr = sorterBase.[dex % sorterBase.Length]
-            sorterMutatr.mFunc sortr id randy
-            
+            let muty = sorterMutatr.mFunc sortr id randy
+            muty
+
         generateSorterIds sorterStId
         |> Seq.mapi(_mutato)
         |> Seq.filter(Result.isOk)
         |> Seq.map(Result.ExtractOrThrow)
         |> Seq.take(sorterCt |> SorterCount.value)
-        
-        //(fun sId -> sorterRndGen sId order wPfx switchCount randy)
-        //|> load sorterStId order 
+        |> load sorterStId order
+
+
+    
+    //let createMutationSet 
+    //    (sorterBase: sorter[]) 
+    //    (sorterCt:sorterCount)
+    //    (order: order) 
+    //    (sorterMutatr: sorterUniformMutator) 
+    //    (sorterStId:sorterSetId)
+    //    (randy: IRando) =
+    //    let _mutato dex id =
+    //        let sortr = sorterBase.[dex % sorterBase.Length]
+    //        let muty = sorterMutatr.mFunc sortr id randy
+    //        muty
+
+    //    let mutantCount = (sorterCt |> SorterCount.value) - sorterBase.Length
+    //                      |> SorterCount.create
+
+    //    let mutants = 
+    //        generateSorterIds sorterStId
+    //        |> Seq.mapi(_mutato)
+    //        |> Seq.filter(Result.isOk)
+    //        |> Seq.map(Result.ExtractOrThrow)
+    //        |> Seq.take(mutantCount |> SorterCount.value)
+    //        |> Seq.toArray
+
+    //    mutants |> Seq.append sorterBase
+    //    |> load sorterStId order

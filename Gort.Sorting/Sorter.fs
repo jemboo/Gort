@@ -331,8 +331,7 @@ module SorterUniformMutator =
           let prefixSwitchCt = 
             match switchCtPrefix with
             | Some swct -> swct
-            | None -> sorter |> Sorter.getSwitches 
-                      |> Array.length |> SwitchCount.create
+            | None -> 0 |> SwitchCount.create
 
           return Sorter.crossOver prefixSwitchCt targetSwitchCt sorter mutantSortr sorterD randy
         }

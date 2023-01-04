@@ -428,7 +428,6 @@ module SortingRollout =
 
 
     let makeSorterOpOutput (sorterOpTrackMod: sorterOpTrackMode) (sortableSt: sortableSet) (sortr: sorter) =
-
         let _wrapo f sorter sortableSet =
             try
                 f sorter sortableSet |> Ok

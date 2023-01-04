@@ -22,7 +22,7 @@ type SorterSetEvalFixture() =
         let sorterEvalMod = sorterPerfEvalMode.DontCheckSuccess
         let useParalll = true |> UseParallel.create
 
-        let sorterEvls, errs =
+        let sorterEvls =
             SorterSetEval.eval sorterEvalMod sortableSt sorterSt useParalll
 
         Assert.AreEqual(sorterEvls.Length, (sorterCt |> SorterCount.value))

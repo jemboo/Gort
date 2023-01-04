@@ -90,7 +90,7 @@ module SwitchCount =
 
         let ct =
             match d with
-            | 6
+            | 6 -> 10
             | 7 -> 100
             | 8
             | 9 -> 160

@@ -49,7 +49,7 @@ type SorterSetFixture() =
                         |> Seq.toArray
 
       let mutants = SorterSet.createMutationSet 
-                        baseSorters sorterCt ordr sorterMutator sorterSetId rndGn
-                        |> Seq.toArray
+                        baseSorters sorterCt ordr sorterMutator sorterSetId (rndGn |> Rando.fromRngGen)
+
        
-      Assert.AreEqual(sorterCt |> SorterCount.value, mutants.Length)
+      Assert.AreEqual(sorterCt |> SorterCount.value, mutants |> SorterSet.getSorters |> Seq.length)

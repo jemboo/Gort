@@ -24,11 +24,9 @@ module SorterSetEval =
             |> SorterSet.getSorters
             |> Seq.toArray
             |> Array.Parallel.map (SorterEval.evalSorterWithSortableSet sorterPerfEvalMode sortableSt)
-            |> _splitOutErrors
 
         else
             sorterSt
             |> SorterSet.getSorters
             |> Seq.toArray
             |> Array.map (SorterEval.evalSorterWithSortableSet sorterPerfEvalMode sortableSt)
-            |> _splitOutErrors
