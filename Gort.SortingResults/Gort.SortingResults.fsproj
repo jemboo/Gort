@@ -9,6 +9,7 @@
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
     <Compile Include="SorterFitness.fs" />
+    <Compile Include="SorterReporting.fs" />
     <Compile Include="Workflows.fs" />
   </ItemGroup>
 

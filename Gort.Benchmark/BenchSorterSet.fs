@@ -35,7 +35,7 @@ type BenchSorterSet() =
 
     member val sorterSet = SorterSet.createEmpty with get, set
 
-    member val perfEvalMode = sorterPerfEvalMode.CheckSuccess with get, set
+    member val perfEvalMode = sorterEvalMode.CheckSuccess with get, set
 
     member val sortableFormat = rolloutFormat.RfI32 with get, set
 
@@ -47,9 +47,9 @@ type BenchSorterSet() =
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
 
         if this.evalMode = "check" then
-            this.perfEvalMode <- sorterPerfEvalMode.CheckSuccess
+            this.perfEvalMode <- sorterEvalMode.CheckSuccess
         else
-            this.perfEvalMode <- sorterPerfEvalMode.DontCheckSuccess
+            this.perfEvalMode <- sorterEvalMode.DontCheckSuccess
 
         if this.srtablFormat = "BP64" then
             this.sortableFormat <- rolloutFormat.RfBs64 
@@ -75,19 +75,19 @@ type BenchSorterSet() =
 
     [<Benchmark>]
     member this.paral() =
-        let res = SorterSetEval.eval 
+        let res = SorterSetEval.evalSorters 
                     this.perfEvalMode
                     this.sortableSet
-                    this.sorterSet 
+                    (this.sorterSet |> SorterSet.getSorters) 
                     (true |> UseParallel.create)
         res
 
 
     [<Benchmark>]
     member this.serial() =
-        let res = SorterSetEval.eval 
+        let res = SorterSetEval.evalSorters 
                     this.perfEvalMode
                     this.sortableSet
-                    this.sorterSet 
+                    (this.sorterSet |> SorterSet.getSorters)
                     (false |> UseParallel.create)
         res

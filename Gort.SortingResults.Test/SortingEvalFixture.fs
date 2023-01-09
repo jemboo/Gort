@@ -60,20 +60,20 @@ type SortingEvalFixture() =
         let srtr, res_RfU8_su = getResultsFromAllBits sotmSwitchUses sortableSetFormat_RfU8
         Assert.IsTrue(res_RfU8_su |> SorterOpOutput.isSorted)
         let sot_RfU8_su = res_RfU8_su |> SorterOpOutput.getSorterOpTracker
-        let suCt_RfU8_su = sot_RfU8_su |> SwitchUseCounters.fromSorterOpTracker
+        let suCt_RfU8_su = sot_RfU8_su |> SorterOpTracker.getSwitchUseCounts
 
         let switches_RfU8_su =
-            suCt_RfU8_su |> SwitchUseCounters.getUsedSwitchesFromSorter srtr
+            suCt_RfU8_su |> SwitchUseCounts.getUsedSwitchesFromSorter srtr
 
         let srtr, res_RfU16_su =
             getResultsFromAllBits sotmSwitchUses sortableSetFormat_RfU16
 
         Assert.IsTrue(res_RfU16_su |> SorterOpOutput.isSorted)
         let sot_RfU16_su = res_RfU16_su |> SorterOpOutput.getSorterOpTracker
-        let suCt_RfU16_su = sot_RfU16_su |> SwitchUseCounters.fromSorterOpTracker
+        let suCt_RfU16_su = sot_RfU16_su |> SorterOpTracker.getSwitchUseCounts
 
         let switches_RfU16_su =
-            suCt_RfU16_su |> SwitchUseCounters.getUsedSwitchesFromSorter srtr
+            suCt_RfU16_su |> SwitchUseCounts.getUsedSwitchesFromSorter srtr
 
         Assert.IsTrue(CollectionProps.areEqual switches_RfU8_su switches_RfU16_su)
 
@@ -83,10 +83,10 @@ type SortingEvalFixture() =
 
         Assert.IsTrue(res_RfI32_su |> SorterOpOutput.isSorted)
         let sot_RfI32_su = res_RfI32_su |> SorterOpOutput.getSorterOpTracker
-        let suCt_RfI32_su = sot_RfI32_su |> SwitchUseCounters.fromSorterOpTracker
+        let suCt_RfI32_su = sot_RfI32_su |> SorterOpTracker.getSwitchUseCounts
 
         let switches_RfI32_su =
-            suCt_RfI32_su |> SwitchUseCounters.getUsedSwitchesFromSorter srtr
+            suCt_RfI32_su |> SwitchUseCounts.getUsedSwitchesFromSorter srtr
 
         Assert.IsTrue(CollectionProps.areEqual switches_RfU8_su switches_RfI32_su)
 
@@ -96,10 +96,10 @@ type SortingEvalFixture() =
 
         Assert.IsTrue(res_RfBs64_su |> SorterOpOutput.isSorted)
         let sot_RfBs64_su = res_RfBs64_su |> SorterOpOutput.getSorterOpTracker
-        let suCt_RfBs64_su = sot_RfBs64_su |> SwitchUseCounters.fromSorterOpTracker
+        let suCt_RfBs64_su = sot_RfBs64_su |> SorterOpTracker.getSwitchUseCounts
 
         let switches_RfBs64_su =
-            suCt_RfBs64_su |> SwitchUseCounters.getUsedSwitchesFromSorter srtr
+            suCt_RfBs64_su |> SwitchUseCounts.getUsedSwitchesFromSorter srtr
 
         Assert.IsTrue(CollectionProps.areEqual switches_RfU8_su switches_RfBs64_su)
         Assert.AreEqual(1, 1)

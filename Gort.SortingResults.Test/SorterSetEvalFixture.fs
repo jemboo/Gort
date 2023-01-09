@@ -19,11 +19,15 @@ type SorterSetEvalFixture() =
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
-        let sorterEvalMod = sorterPerfEvalMode.DontCheckSuccess
+        let sorterEvalMod = sorterEvalMode.DontCheckSuccess
         let useParalll = true |> UseParallel.create
 
         let sorterEvls =
-            SorterSetEval.eval sorterEvalMod sortableSt sorterSt useParalll
+            SorterSetEval.evalSorters 
+                sorterEvalMod 
+                sortableSt 
+                (sorterSt |> SorterSet.getSorters)
+                useParalll
 
         Assert.AreEqual(sorterEvls.Length, (sorterCt |> SorterCount.value))
 

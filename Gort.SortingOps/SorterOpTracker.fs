@@ -13,4 +13,6 @@ module SorterOpTracker =
         match sorterOpTracker with
         | sorterOpTracker.SwitchUses sortableBySwitchTracker ->
             sortableBySwitchTracker |> SortableBySwitchTracker.getSwitchUseCounts
-        | sorterOpTracker.SwitchTrack switchUseTracker -> switchUseTracker |> SwitchUseTracker.getSwitchUseCounts
+        | sorterOpTracker.SwitchTrack switchUseTracker ->
+            switchUseTracker 
+               |> SwitchUseTracker.getSwitchUseCounts

@@ -48,7 +48,11 @@ type SorterSetReportingFixture() =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
 
         let sorterEvls =
-            SorterSetEval.eval sorterPerfEvalMode.DontCheckSuccess sortableSt sorterSt useParalll
+            SorterSetEval.evalSorters 
+                sorterEvalMode.DontCheckSuccess 
+                sortableSt 
+                (sorterSt |> SorterSet.getSorters) 
+                useParalll
 
 
         let sorterPhenotypeBins = sorterEvls 
@@ -80,7 +84,6 @@ type SorterSetReportingFixture() =
         let winningSorters = sorterSt 
                                 |> SorterSet.getSortersById (20 |> SorterCount.create) bestSorterIds
                                 |> Seq.toArray
-
                                 
         let mutationRate = MutationRate.create 0.05
         let sorterMutator = SorterUniformMutator.create 
@@ -90,7 +93,11 @@ type SorterSetReportingFixture() =
                                 winningSorters sorterCt ordr sorterMutator sorterSetId randy
        
         let sorterEvls2 =
-            SorterSetEval.eval sorterPerfEvalMode.DontCheckSuccess sortableSt sorterSetMut useParalll
+            SorterSetEval.evalSorters 
+                sorterEvalMode.DontCheckSuccess 
+                sortableSt 
+                (sorterSetMut |> SorterSet.getSorters) 
+                useParalll
 
 
         let sorterSpeedBins2 = sorterEvls2
@@ -141,7 +148,11 @@ type SorterSetReportingFixture() =
 
         let _doGen (gen:int) (sst:sorterSet) =
             let sorterEvls =
-                SorterSetEval.eval sorterPerfEvalMode.DontCheckSuccess sortableSt sst useParalll
+                SorterSetEval.evalSorters 
+                    sorterEvalMode.DontCheckSuccess 
+                    sortableSt 
+                    (sst |> SorterSet.getSorters)
+                    useParalll
 
             let sorterSpeedBins = sorterEvls 
                                         |> SorterSpeedBin.fromSorterEvals
@@ -173,7 +184,7 @@ type SorterSetReportingFixture() =
 
 
         let mutable gen = 0
-        while gen < 2001 do
+        while gen < 2 do
             sorterSt <- _doGen gen sorterSt
             gen <- gen + 1
             

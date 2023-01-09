@@ -167,6 +167,8 @@ module SortableBySwitchTracker =
         | ArrayRoll switchBySortableTrackerStandard ->
             switchBySortableTrackerStandard
             |> SortableBySwitchTrackerStandard.getSwitchUseCounts
+            |> SwitchUseCounts.make
         | BitStriped switchBySortableTrackerBitStriped ->
             switchBySortableTrackerBitStriped
             |> SortableBySwitchTrackerBitStriped.getSwitchUseCounts
+            |> SwitchUseCounts.make

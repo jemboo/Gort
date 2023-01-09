@@ -138,10 +138,11 @@ type BenchmarkSorterOnBp64() =
 
         let usedSwitchCt =
             sorterOpOutput
-            |> SwitchUseCounters.fromSorterOpOutput
-            |> SwitchUseCounters.getUsedSwitchCount
+            |> SorterOpOutput.getSorterOpTracker
+            |> SorterOpTracker.getSwitchUseCounts
 
         sorterOpOutput, usedSwitchCt
+
 
     [<Benchmark>]
     member this.evalSorterWithSortableSetR_getUsedSwitchCount_RfBs64() =
@@ -153,8 +154,8 @@ type BenchmarkSorterOnBp64() =
 
         let usedSwitchCt =
             sorterOpOutput
-            |> SwitchUseCounters.fromSorterOpOutput
-            |> SwitchUseCounters.getUsedSwitchCount
+            |> SorterOpOutput.getSorterOpTracker
+            |> SorterOpTracker.getSwitchUseCounts
 
         sorterOpOutput, usedSwitchCt
 

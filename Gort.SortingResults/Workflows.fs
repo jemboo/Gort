@@ -44,7 +44,8 @@ let evo () =
 
     let _doGen (gen:int) (sst:sorterSet) =
         let sorterEvls =
-            SorterSetEval.eval sorterPerfEvalMode.DontCheckSuccess sortableSt sst useParalll
+            SorterSetEval.evalSorters sorterEvalMode.DontCheckSuccess 
+                sortableSt (sst |> SorterSet.getSorters) useParalll
 
         let newSorterSetId = Guid.NewGuid() |> SorterSetId.create
 

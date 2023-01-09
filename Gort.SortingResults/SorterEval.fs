@@ -14,40 +14,6 @@ module SorterPhenotypeId =
         |> SorterPhenotypeId
 
     
-
-type switchUseCounters = private { useCounts: int[] }
-
-module SwitchUseCounters =
-
-    let makeEmpty (switchCount: switchCount) =
-        { switchUseCounters.useCounts = Array.zeroCreate (switchCount |> SwitchCount.value) }
-
-    let make (useCounts: int[]) =
-        { switchUseCounters.useCounts = useCounts }
-
-    let getUseCounters (switchUseCountrs: switchUseCounters) = switchUseCountrs.useCounts
-
-    let getUsedSwitchCount (switchUseCountrs: switchUseCounters) =
-        switchUseCountrs.useCounts
-        |> Seq.filter ((<) 0)
-        |> Seq.length
-        |> SwitchCount.create
-
-    let getUsedSwitchesFromSorter (sortr: sorter) (switchUseCountrs: switchUseCounters) =
-        switchUseCountrs
-        |> getUseCounters
-        |> Seq.mapi (fun i w -> i, w)
-        |> Seq.filter (fun t -> (snd t) > 0)
-        |> Seq.map (fun t -> (sortr |> Sorter.getSwitches).[(fst t)])
-        |> Seq.toArray
-
-    let fromSorterOpTracker (sorterOpTrackr: sorterOpTracker) =
-        sorterOpTrackr |> SorterOpTracker.getSwitchUseCounts |> make
-
-    let fromSorterOpOutput (sorterOpRes: sorterOpOutput) =
-        sorterOpRes |> SorterOpOutput.getSorterOpTracker |> fromSorterOpTracker
-
-
 type switchesUsed = private SwitchesUsed of switch[]
 module SwitchesUsed = 
     let make (switches: switch[]) =
@@ -97,15 +63,19 @@ module SorterSpeed =
     let fromSorterOpOutput (sorterOpOutpt: sorterOpOutput) =
         let sortr = sorterOpOutpt |> SorterOpOutput.getSorter
         try
+            let switchUseCts = 
+                   sorterOpOutpt
+                   |> SorterOpOutput.getSorterOpTracker
+                   |> SorterOpTracker.getSwitchUseCounts
+
             let switchesUsd =
-                sorterOpOutpt
-                |> SwitchUseCounters.fromSorterOpOutput
-                |> SwitchUseCounters.getUsedSwitchesFromSorter sortr
+                    switchUseCts
+                    |> SwitchUseCounts.getUsedSwitchesFromSorter sortr
                 
             let usedSwitchCt = switchesUsd.Length |> SwitchCount.create
             let usedStageCt = (switchesUsd |> StageCover.getStageCount)
             let sortrPhenotypId = switchesUsd |> SorterPhenotypeId.create
-            (create usedSwitchCt usedStageCt, sortrPhenotypId, switchesUsd |> SwitchesUsed.make) |> Ok
+            (create usedSwitchCt usedStageCt, sortrPhenotypId, switchUseCts) |> Ok
         with ex ->
             (sprintf "error in SorterSpeedBin.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
@@ -121,29 +91,35 @@ module SorterPerf =
         | SortedSetSize ssz -> (SortableCount.value ssz) < (Order.value ordr) + 1
 
 
-type sorterPerfEvalMode = | DontCheckSuccess
-                          | CheckSuccess 
-                          | GetSortedSetCount
+type sorterEvalMode = | DontCheckSuccess
+                      | CheckSuccess 
+                      | GetSortedSetCount
 
 type sorterEval =
     private
         { errorMessage: string option
+          switchUseCts: switchUseCounts option
           sorterSpeed: sorterSpeed option
           sorterPrf: sorterPerf option
           sortrPhenotypeId: sorterPhenotypeId option
+          sortableSetId: sortableSetId
           sortrId: sorterId }
 
 
 module SorterEval =
     let make (errorMsg:string option)
+             (switchUseCts: switchUseCounts option) 
              (sorterSpeed: sorterSpeed option) 
              (sorterPrf: sorterPerf option) 
-             (sortrPhenotypeId: sorterPhenotypeId option) 
+             (sortrPhenotypeId: sorterPhenotypeId option)
+             (sortableStId: sortableSetId)
              (sortrId: sorterId) =
         { errorMessage = errorMsg
+          switchUseCts = switchUseCts
           sorterSpeed = sorterSpeed
           sorterPrf = sorterPrf
           sortrPhenotypeId = sortrPhenotypeId
+          sortableSetId = sortableStId
           sortrId = sortrId }
 
     let getSorterSpeed (sorterEvl:sorterEval) =
@@ -155,8 +131,25 @@ module SorterEval =
     let getSorterId (sorterEvl:sorterEval) =
         sorterEvl.sortrId
 
+    let shouldRetest 
+        (sorterEvalMod:sorterEvalMode) 
+        (sorterEvl:sorterEval)
+        : bool =
+        if (sorterEvl.errorMessage |> Option.isSome)
+            then false else
+        match sorterEvalMod with
+        | CheckSuccess -> (sorterEvl.sorterPrf |> Option.isNone)
+        | DontCheckSuccess -> (sorterEvl.sorterSpeed |> Option.isNone)
+        | GetSortedSetCount -> 
+                match sorterEvl.sorterPrf with  
+                | None -> true
+                | Some perf -> match perf with
+                               | IsSuccessful _ -> true
+                               | SortedSetSize _ -> false
+
+
     let evalSorterWithSortableSet 
-            (sorterPerfEvalMod: sorterPerfEvalMode) 
+            (sorterPerfEvalMod: sorterEvalMode) 
             (sortableSt: sortableSet) 
             (sortr: sorter) =
 
@@ -167,6 +160,7 @@ module SorterEval =
 
         
         let sortrId = (sortr |> Sorter.getSorterId)
+        let sortableStId = (sortableSt |> SortableSet.getSortableSetId)
         let sorterOpOutput =
             SortingRollout.makeSorterOpOutput sorterOpTrackMode.SwitchUses sortableSt sortr
 
@@ -174,52 +168,28 @@ module SorterEval =
         | Ok output ->
             let res = output |> SorterSpeed.fromSorterOpOutput
             match res with
-            | Ok (sorterSpeed, sorterPhenotypId, switchesUsd) ->
+            | Ok (sorterSpeed, sorterPhenotypId, switchUseCts) ->
                 match sorterPerfEvalMod with
                 | DontCheckSuccess -> 
-                    make None (Some sorterSpeed) None (Some sorterPhenotypId) sortrId
+                    make None (Some switchUseCts) (Some sorterSpeed) None (Some sorterPhenotypId) sortableStId sortrId
                 | CheckSuccess -> 
                     let isSuccessfl = 
                         output 
                             |> SorterOpOutput.isSorted
                             |> sorterPerf.IsSuccessful
                             |> Option.Some
-                    make None (Some sorterSpeed) isSuccessfl (Some sorterPhenotypId) sortrId
+                    make None (Some switchUseCts) (Some sorterSpeed) isSuccessfl (Some sorterPhenotypId) sortableStId sortrId
                 | GetSortedSetCount ->
                     let sortedSetCt = output |> SorterOpOutput.getRefinedSortableCount
                     match sortedSetCt with
                     | Ok ct ->
                         let sct = ct |> sorterPerf.SortedSetSize |> Some
-                        make None (Some sorterSpeed) sct (Some sorterPhenotypId) sortrId
+                        make None (Some switchUseCts) (Some sorterSpeed) sct (Some sorterPhenotypId) sortableStId sortrId
                     | Error msg ->
-                        make (Some msg) (Some sorterSpeed) None (Some sorterPhenotypId) sortrId
+                        make (Some msg) (Some switchUseCts) (Some sorterSpeed) None (Some sorterPhenotypId) sortableStId sortrId
 
-            | Error msg -> make (Some msg) None None None sortrId
+            | Error msg -> make (Some msg) None None None None sortableStId sortrId
 
-        | Error msg -> make (Some msg) None None None sortrId
-
-        //result {
-        //    let! sorterOpOutpt = _makeSorterOpOutput
-        //    let! sorterSpeed, sorterPhenotypId, switchesUsd = 
-        //         sorterOpOutpt |> SorterSpeed.fromSorterOpOutput
-
-        //    match sorterPerfEvalMod with
-        //          | DontCheckSuccess -> 
-        //             return make None (Some sorterSpeed) None (Some sorterPhenotypId) sortrId
-        //          | CheckSuccess -> 
-        //             let isSuccessfl = 
-        //                sorterOpOutpt 
-        //                  |> SorterOpOutput.isSorted
-        //                  |> sorterPerf.IsSuccessful
-        //                  |> Option.Some
-        //             return make sorterSpeed isSuccessfl sorterPhenotypId sortrId
-        //          | GetSortedSetCount ->
-        //             let! sortedSetCt = 
-        //                sorterOpOutpt 
-        //                 |> SorterOpOutput.getRefinedSortableCount
-        //                 |> Result.map(sorterPerf.SortedSetSize)
-        //                 |> Result.map(Option.Some)
-        //             return make sorterSpeed sortedSetCt sorterPhenotypId sortrId
-        //}
+        | Error msg -> make  (Some msg) None None None None sortableStId sortrId
 
 

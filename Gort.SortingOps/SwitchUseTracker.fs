@@ -2,37 +2,50 @@
 
 open SysExt
 
-type switchUseTrackerStandard = private { useCounts: int[] }
+type switchUseCounts = private { useCounts: int[] }
 
-module SwitchUseTrackerStandard =
+module SwitchUseCounts =
 
-    let getUseCounters (switchUses: switchUseTrackerStandard) = switchUses.useCounts
+    let getUseCounters (switchUses: switchUseCounts) = switchUses.useCounts
 
-    let make (switchCount: switchCount) =
-        { switchUseTrackerStandard.useCounts = Array.zeroCreate<int> (switchCount |> SwitchCount.value) }
+    let init (switchCount: switchCount) =
+        { switchUseCounts.useCounts = Array.zeroCreate<int> (switchCount |> SwitchCount.value) }
 
-    let apply (useCounts: int[]) = { useCounts = useCounts }
+    let make (useCounts: int[]) = { useCounts = useCounts }
 
-    let getUsedSwitchCount (switchUseTrackStandard: switchUseTrackerStandard) =
+    let getUsedSwitchCount (switchUseTrackStandard: switchUseCounts) =
         switchUseTrackStandard.useCounts
         |> Seq.filter ((<) 0)
         |> Seq.length
         |> SwitchCount.create
 
 
+    let getUsedSwitchesFromSorter 
+            (sortr: sorter) 
+            (switchUseCnts: switchUseCounts) =
+        switchUseCnts
+        |> getUseCounters
+        |> Seq.mapi (fun i w -> i, w)
+        |> Seq.filter (fun t -> (snd t) > 0)
+        |> Seq.map (fun t -> (sortr |> Sorter.getSwitches).[(fst t)])
+        |> Seq.toArray
+
+
+
 type switchUseTrackerBitStriped = private { useFlags: uint64[] }
 
 module SwitchUseTrackerBitStriped =
 
-    let make (switchCount: switchCount) =
+    let init (switchCount: switchCount) =
         { switchUseTrackerBitStriped.useFlags = Array.zeroCreate<uint64> (switchCount |> SwitchCount.value) }
 
-    let apply (useFlags: uint64[]) = { useFlags = useFlags }
+    let make (useFlags: uint64[]) = { useFlags = useFlags }
 
     let getUseFlags (switchUseTrackBitStriped: switchUseTrackerBitStriped) = switchUseTrackBitStriped.useFlags
 
     let getSwitchUseCounts (switchUseTrackBitStriped: switchUseTrackerBitStriped) =
         switchUseTrackBitStriped |> getUseFlags |> Array.map (fun l -> l.count |> int)
+        |> SwitchUseCounts.make
 
     let getUsedSwitchCount (switchUseTrackBitStriped: switchUseTrackerBitStriped) =
         switchUseTrackBitStriped.useFlags
@@ -43,24 +56,23 @@ module SwitchUseTrackerBitStriped =
 
 
 type switchUseTracker =
-    | Standard of switchUseTrackerStandard
+    | Standard of switchUseCounts
     | BitStriped of switchUseTrackerBitStriped
 
 module SwitchUseTracker =
 
     let init (switchOpMod: switchOpMode) (switchCount: switchCount) =
         match switchOpMod with
-        | switchOpMode.Standard -> switchCount |> SwitchUseTrackerStandard.make |> switchUseTracker.Standard
-        | switchOpMode.BitStriped -> SwitchUseTrackerBitStriped.make switchCount |> switchUseTracker.BitStriped
+        | switchOpMode.Standard -> switchCount |> SwitchUseCounts.init |> switchUseTracker.Standard
+        | switchOpMode.BitStriped -> SwitchUseTrackerBitStriped.init switchCount |> switchUseTracker.BitStriped
 
 
     let getUseFlags (switchUses: switchUseTrackerBitStriped) = switchUses.useFlags
 
-
     let getSwitchUseCounts (switchUs: switchUseTracker) =
         match switchUs with
         | switchUseTracker.Standard switchUseTrackerStandard ->
-            switchUseTrackerStandard |> SwitchUseTrackerStandard.getUseCounters
+            switchUseTrackerStandard
         | switchUseTracker.BitStriped switchUseTrackerBitStriped ->
             switchUseTrackerBitStriped |> SwitchUseTrackerBitStriped.getSwitchUseCounts
 
