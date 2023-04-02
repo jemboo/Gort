@@ -53,11 +53,17 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Gort.Run.Test", "Gort.Run.T
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Gort.SortingOps.Test", "Gort.SortingOps.Test\Gort.SortingOps.Test.fsproj", "{D0B081A4-E865-4AAB-B3C9-4A179B2AE0A7}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Gort.SortingResults.Test", "Gort.SortingResults.Test\Gort.SortingResults.Test.fsproj", "{A5B6BC57-ABB1-407C-AC81-8E37DF5726B2}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Gort.SortingResults.Test", "Gort.SortingResults.Test\Gort.SortingResults.Test.fsproj", "{A5B6BC57-ABB1-407C-AC81-8E37DF5726B2}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Gort.SortingResults", "Gort.SortingResults\Gort.SortingResults.fsproj", "{34D3F851-E387-4A75-867C-5E91F4AAA650}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Gort.SortingResults", "Gort.SortingResults\Gort.SortingResults.fsproj", "{34D3F851-E387-4A75-867C-5E91F4AAA650}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SortingResults", "SortingResults", "{F9210572-9217-4A8E-BA9F-6B59DF254D5B}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Gort.Genome", "Gort.Genome\Gort.Genome.fsproj", "{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Genome", "Genome", "{E1D59AFF-BEBF-4D10-9CE4-5AB156A316CC}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Gort.Genome.Test", "Gort.Genome.Test\Gort.Genome.Test.fsproj", "{FD214A0F-B101-48A7-9078-234B43FA3788}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -227,6 +233,22 @@ Global
 		{34D3F851-E387-4A75-867C-5E91F4AAA650}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34D3F851-E387-4A75-867C-5E91F4AAA650}.Release|x64.ActiveCfg = Release|Any CPU
 		{34D3F851-E387-4A75-867C-5E91F4AAA650}.Release|x64.Build.0 = Release|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Debug|x64.Build.0 = Debug|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Release|x64.ActiveCfg = Release|Any CPU
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7}.Release|x64.Build.0 = Release|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Debug|x64.Build.0 = Debug|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Release|x64.ActiveCfg = Release|Any CPU
+		{FD214A0F-B101-48A7-9078-234B43FA3788}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,6 +272,8 @@ Global
 		{D0B081A4-E865-4AAB-B3C9-4A179B2AE0A7} = {4DA85C61-3CB2-4B90-A441-FA32B5797731}
 		{A5B6BC57-ABB1-407C-AC81-8E37DF5726B2} = {F9210572-9217-4A8E-BA9F-6B59DF254D5B}
 		{34D3F851-E387-4A75-867C-5E91F4AAA650} = {F9210572-9217-4A8E-BA9F-6B59DF254D5B}
+		{AA8BF7C7-71C5-4667-A6B1-3507AC6BABC7} = {E1D59AFF-BEBF-4D10-9CE4-5AB156A316CC}
+		{FD214A0F-B101-48A7-9078-234B43FA3788} = {E1D59AFF-BEBF-4D10-9CE4-5AB156A316CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {625C8EA5-BBAB-4541-8CA9-F4714AAB8DE5}

@@ -6,6 +6,42 @@ open ByteUtils
 
 [<TestClass>]
 type ByteUtilsFixture() =
+        
+    [<TestMethod>]
+    member this.rotateRightAndLeft() =
+        let startVal = 20
+        let windowSize = 5
+
+        let l1 = ByteUtils.rotateLeft startVal windowSize
+        let l2 = ByteUtils.rotateLeft l1 windowSize
+        let l3 = ByteUtils.rotateLeft l2 windowSize
+        let l4 = ByteUtils.rotateLeft l3 windowSize
+        let r1 = ByteUtils.rotateRight startVal windowSize
+        let r2 = ByteUtils.rotateRight r1 windowSize
+        let r3 = ByteUtils.rotateRight r2 windowSize
+
+        Assert.AreEqual (l1, 10)
+        Assert.AreEqual (l2, 5)
+        Assert.AreEqual (l3, 18)
+        Assert.AreEqual (l4, 9)
+        Assert.AreEqual (r1, 9)
+        Assert.AreEqual (r2, 18)
+        Assert.AreEqual (r3, 5)
+
+
+    [<TestMethod>]
+    member this.allRotations() =
+        let startVal = 20
+        let windowSize = 5
+
+        let rA = ByteUtils.allRotations startVal windowSize
+                 |> Seq.toArray
+
+        Assert.AreEqual (rA.Length, windowSize)
+
+
+
+
 
     [<TestMethod>]
     member this.allSorted_uL() =

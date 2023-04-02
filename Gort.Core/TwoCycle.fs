@@ -1,5 +1,7 @@
 ﻿namespace global
 
+open System
+
 // a permutation of the set {0, 1,.. (order-1)}, that is it's own inverse
 type twoCycle = private { values: int[] }
 
@@ -15,6 +17,9 @@ module TwoCycle =
         else
             "not a two cycle" |> Error
 
+    let createNr (vals: int[]) =
+        { twoCycle.values = vals }
+
     let fromPerm (perm: permutation) = create perm.values
 
     let toPerm (tc: twoCycle) = { permutation.values = tc.values }
@@ -25,10 +30,10 @@ module TwoCycle =
 
     let getArray (tc: twoCycle) = tc.values
 
-    let getDegree (tc: twoCycle) = Order.createNr tc.values.Length
+    let getOrder (tc: twoCycle) = Order.createNr tc.values.Length
 
-    let identity (order: int) =
-        { twoCycle.values = [| 0 .. order - 1 |] }
+    let identity  (ord: order) =
+        { twoCycle.values = [| 0 .. (Order.value ord) - 1 |] }
 
     let isSorted (tc: twoCycle) =
         CollectionProps.isSorted tc.values
@@ -48,8 +53,32 @@ module TwoCycle =
         }
 
     let makeReflection (tc: twoCycle) =
-        let _ref pos = Order.reflect (getDegree tc) pos
+        let _ref pos = Order.reflect (getOrder tc) pos
         { values = Array.init (tc.values.Length) (fun dex -> tc.values.[_ref dex] |> _ref) }
+
+
+
+    //*************************************************************
+    //*******************  operators  *****************************
+    //*************************************************************
+
+    let conjugate (perm: permutation) (tc: twoCycle) =
+        { twoCycle.values =
+            CollectionOps.conjIntArrays
+                (Permutation.getArray perm)
+                (getArray tc)
+                (Array.zeroCreate perm.values.Length) }
+
+
+    let reflect (tcp: twoCycle) =
+        let _refV pos =
+            Order.reflect (Order.createNr tcp.values.Length) pos
+
+        let _refl =
+            Array.init (tcp.values.Length) (fun dex -> tcp.values.[_refV dex] |> _refV)
+
+        { twoCycle.values = _refl }
+
 
 
 
@@ -69,28 +98,14 @@ module TwoCycle =
     let isRflSymmetric (tcp: twoCycle) = tcp = (makeReflection tcp)
 
 
+    let totalSwitchBarLengths (tcp: twoCycle) =
+        tcp.values |> Array.mapi(fun dex v -> Math.Abs(dex - v))
+                   |> Array.sum
+                   |> (/) <| 2
 
     //*************************************************************
     //*******************  mutators  ******************************
     //*************************************************************
-
-    let conjugate (tc: twoCycle) (perm: permutation) =
-        { twoCycle.values =
-            CollectionOps.conjIntArrays
-                (Permutation.getArray perm)
-                (getArray tc)
-                (Array.zeroCreate perm.values.Length) }
-
-
-    let reflect (tcp: twoCycle) =
-        let _refV pos =
-            Order.reflect (Order.createNr tcp.values.Length) pos
-
-        let _refl =
-            Array.init (tcp.values.Length) (fun dex -> tcp.values.[_refV dex] |> _refV)
-
-        { twoCycle.values = _refl }
-
 
     let mutateByPair (pair: int * int) (tcp: twoCycle) =
         let tcpA = tcp |> getArray |> Array.copy
@@ -185,53 +200,6 @@ module TwoCycle =
 
 
 
-    //*************************************************************
-    //***************    IRando dependent   ***********************
-    //*************************************************************
-
-    let makeRndMonoCycle (order: order) (rnd: IRando) =
-        let sc = order |> Order.value |> uint64 |> SymbolSetSize.createNr
-        let tup = RandVars.drawTwoWithoutRep sc rnd
-        makeMonoCycle order (fst tup) (snd tup)
-
-
-    let rndPartialTwoCycle (order: order) (cycleCount: int) (rnd: IRando) =
-        { twoCycle.values = RandVars.rndPartialTwoCycle rnd order cycleCount }
-
-
-    let rndFullTwoCycle (order: order) (rnd: IRando) =
-        { values = RandVars.rndFullTwoCycle rnd order }
-
-
-    let rndSymmetric (ord: order) (rnd: IRando) =
-        let deg = (Order.value ord)
-        let aRet = Array.init deg (id)
-
-        let chunkRi (rfls: switchRfl) =
-            match rfls with
-            | Single (i, j, d) ->
-                aRet.[i] <- j
-                aRet.[j] <- i
-
-            | Unreflectable (i, j, d) ->
-                aRet.[i] <- j
-                aRet.[j] <- i
-
-            | Pair ((h, i), (j, k), d) ->
-                aRet.[i] <- h
-                aRet.[h] <- i
-                aRet.[j] <- k
-                aRet.[k] <- j
-
-            | LeftOver (i, j, d) ->
-                aRet.[i] <- j
-                aRet.[j] <- i
-
-        SwitchRfl.rndReflectivePairs ord rnd |> Seq.iter (chunkRi)
-
-        { twoCycle.values = aRet }
-
-
     let evenMode (order: order) =
         let d = (Order.value order)
         let dm = if (d % 2 > 0) then d - 1 else d
@@ -281,27 +249,74 @@ module TwoCycle =
     let makeAltEvenOdd (order: order) (conj: permutation) =
         seq {
             while true do
-                yield conjugate (evenMode order) conj
-                yield conjugate (oddModeWithCap order) conj
+                yield conjugate conj (evenMode order)
+                yield conjugate conj (oddModeWithCap order)
         }
 
-
-    let makeCoConjugateEvenOdd (conj: permutation list) =
-        let order = Order.createNr conj.[0].values.Length
-
-        let coes (conj: permutation) =
-            result {
-                let eve = conjugate (evenMode order) conj
-                let odd = conjugate (oddModeWithCap order) conj
-
-                return
-                    seq {
-                        yield eve
-                        yield odd
-                    }
-            }
-
-        result {
-            let! rOf = conj |> List.map (fun c -> coes c) |> Result.sequence
-            return rOf |> Seq.concat
+    let coConjugate (perm: permutation) =
+        let order = Order.createNr perm.values.Length 
+        seq {
+            yield conjugate perm (evenMode order) 
+            yield conjugate perm (oddModeWithCap order)
         }
+
+    //*************************************************************
+    //***************    IRando dependent   ***********************
+    //*************************************************************
+
+    let makeRndMonoCycle (order: order) (rnd: IRando) =
+        let sc = order |> Order.value |> uint64 |> SymbolSetSize.createNr
+        let tup = RandVars.drawTwoWithoutRep sc rnd
+        makeMonoCycle order (fst tup) (snd tup)
+
+
+    let rndPartialTwoCycle (order: order) (cycleCount: int) (rnd: IRando) =
+        { twoCycle.values = RandVars.rndPartialTwoCycle rnd order cycleCount }
+
+
+    let rndFullTwoCycle (order: order) (rnd: IRando) =
+        { values = RandVars.rndFullTwoCycle rnd order }
+
+
+    let rndConj (tc: twoCycle) (rnd:IRando) = 
+        let bread = Permutation.createNr (RandVars.randomPermutation rnd (tc |> getOrder))
+        conjugate bread tc
+
+
+    let rndCoConj (order: order) (rnd:IRando) = 
+        let bread = Permutation.createNr (RandVars.randomPermutation rnd order)
+        coConjugate bread
+
+    let rndSeqSeparated (order: order) (tc: twoCycle) 
+                    (minSeparation: int) (maxSeparation: int) (rnd:IRando) = 
+        Permutation.getRandomSeparated order minSeparation maxSeparation rnd
+        |> Seq.map(fun perm -> conjugate perm tc)
+
+
+    let rndSymmetric (ord: order) (rnd: IRando) =
+        let deg = (Order.value ord)
+        let aRet = Array.init deg (id)
+
+        let chunkRi (rfls: switchRfl) =
+            match rfls with
+            | Single (i, j, d) ->
+                aRet.[i] <- j
+                aRet.[j] <- i
+
+            | Unreflectable (i, j, d) ->
+                aRet.[i] <- j
+                aRet.[j] <- i
+
+            | Pair ((h, i), (j, k), d) ->
+                aRet.[i] <- h
+                aRet.[h] <- i
+                aRet.[j] <- k
+                aRet.[k] <- j
+
+            | LeftOver (i, j, d) ->
+                aRet.[i] <- j
+                aRet.[j] <- i
+
+        SwitchRfl.rndReflectivePairs ord rnd |> Seq.iter (chunkRi)
+        { twoCycle.values = aRet }
+

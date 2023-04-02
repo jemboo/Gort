@@ -9,6 +9,37 @@ open System.IO
 
 module ByteUtils =
 
+    let toInt (bv: bool) =
+        if bv then 1 else 0
+
+    let setBit (offset:int) (bitVal:bool) (theBits:int)  =
+        if bitVal then theBits.set offset else theBits.unset offset
+
+    let rotateLeft (toRotate:int) (windowSize:int) =
+        let hiFlag = 1 <<< (windowSize - 1)
+        let lowVal = toRotate &&& 1
+        let newHiVal =  hiFlag * lowVal
+        (toRotate >>> 1) + newHiVal
+
+
+    let rotateRight (toRotate:int) (windowSize:int) =
+        let carryFlag = 1 <<< windowSize
+        let rightShifted =  (toRotate <<< 1)
+        let newLowVal = if ((carryFlag &&& rightShifted) > 0) then 1 else 0
+        let mask = carryFlag - 1
+        (rightShifted &&& mask ) + newLowVal
+
+
+    let allRotations (toRotate:int) (windowSize:int) =
+        seq {
+                yield toRotate
+                let mutable rNext = toRotate
+                for i = 1 to (windowSize - 1) do
+                    rNext <- rotateLeft rNext windowSize
+                    yield rNext
+        }
+
+
     let structHash (o: obj) =
         let s = sprintf "%A" o
         let inputBytes = System.Text.Encoding.ASCII.GetBytes(s)

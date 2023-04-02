@@ -64,10 +64,10 @@ module SorterSetEval =
                         |> Map.ofSeq
 
         let round1Evals = evalSorters sorterEvalMode1 sortableSt1 (sorterMap |> Map.values) useParallel
-        let round1Selected = round1Evals 
+        let round1SelectedIds = round1Evals 
                                 |> (sorterEvalsSelectr |> SorterEvalsSelector.getSelector)
                                 |> getSorterIdsForUpgrade sorterEvalMode2
 
-        let sortersRound2 = round1Selected |> Array.map(fun srtrId -> sorterMap |> Map.find srtrId)
+        let sortersRound2 = round1SelectedIds |> Array.map(fun srtrId -> sorterMap |> Map.find srtrId)
         let round2Evals = evalSorters sorterEvalMode2 sortableSt2 sortersRound2 useParallel
         round2Evals

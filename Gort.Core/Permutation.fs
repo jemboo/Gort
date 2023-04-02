@@ -1,5 +1,10 @@
 ﻿namespace global
 
+open SysExt
+open Microsoft.FSharp.Core
+open System
+
+
 // a permutation of the set {0, 1,.. (order-1)}
 type permutation = private { values: int[] }
 
@@ -10,6 +15,9 @@ module Permutation =
             { permutation.values = vals } |> Ok
         else
             "not a permutation" |> Error
+
+    let createNr (vals: int[]) =
+        { permutation.values = vals }
 
     let create8 (b: uint8[]) = create (b |> Array.map (int))
 
@@ -32,10 +40,8 @@ module Permutation =
         permSeq |> Seq.map (fun vs -> { permutation.values = vs })
 
     let conjugate (conj: permutation) (pA: permutation) =
-        result {
-            let! res = CollectionOps.conjIntArraysR (pA |> getArray) (conj |> getArray)
-            return create res
-        }
+        let a_out = Array.zeroCreate (conj|> getOrder |> Order.value)
+        CollectionOps.conjIntArrays (pA |> getArray) (conj |> getArray) a_out
 
     let cyclicGroup (order: order) =
         let r1 = rotate order 1
@@ -66,7 +72,6 @@ module Permutation =
         { permutation.values =
             CollectionOps.arrayProduct (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
 
-
     let product (lhs: permutation) (rhs: permutation) =
         if (lhs.values.Length <> rhs.values.Length) then
             "permuation orders dont match" |> Error
@@ -74,6 +79,15 @@ module Permutation =
             { permutation.values =
                 CollectionOps.arrayProduct (lhs.values) (rhs.values) (Array.zeroCreate lhs.values.Length) }
             |> Ok
+
+    let getWeight (perm:permutation) =
+        perm |> getArray |> Array.mapi(fun i v -> Math.Abs(i - v))
+                         |> Array.sum
+
+    let getDistance (lhs:permutation) (rhs:permutation) = 
+        let delta = (inverse lhs ) |> productNr rhs
+        delta |> getWeight
+
 
 
     //*************************************************************
@@ -108,3 +122,18 @@ module Permutation =
 
     let createRandoms (order: order) (rnd: IRando) =
         Seq.initInfinite (fun _ -> createRandom order rnd)
+
+    let getRandomSeparated (order: order) 
+            (minSeparation:int) 
+            (maxSeparation: int)
+            (rnd: IRando) =
+        let mutable curPerm = createRandom order rnd 
+        seq {
+            yield curPerm
+            while true do
+               let nextPerm = createRandom order rnd
+               let dist = getDistance curPerm nextPerm
+               if (dist > minSeparation) && (dist < maxSeparation) then
+                  yield nextPerm
+                  curPerm <- nextPerm
+        }

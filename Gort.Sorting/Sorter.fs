@@ -192,6 +192,52 @@ module Sorter =
         fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
 
 
+    let randomStages2
+        (sorterD:sorterId)
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rando: IRando)  =
+        let _switches =
+            (Stage.rndSeq2 order rando)
+            |> Seq.map (fun st -> st.switches)
+            |> Seq.concat
+
+        fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
+
+
+    let randomStagesCoConj
+        (sorterD:sorterId)
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rando: IRando)  =
+        let _switches =
+            (Stage.rndSeqCoConj order rando)
+            |> Seq.concat
+            |> Seq.map (fun st -> st.switches)
+            |> Seq.concat
+
+        fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
+
+
+    let randomStagesSeparated
+        (minSeparation: int)
+        (maxSeparation: int)
+        (sorterD:sorterId)
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rando: IRando)  =
+        let _switches =
+            (Stage.rndSeqSeparated order minSeparation maxSeparation rando)
+            |> Seq.concat
+            |> Seq.map (fun st -> st.switches)
+            |> Seq.concat
+
+        fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
+
+
     let randomSymmetric
             (sorterD:sorterId)
             (order: order) 

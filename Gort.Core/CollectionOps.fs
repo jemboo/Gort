@@ -86,21 +86,6 @@ module CollectionOps =
                 dex <- dex + 1
         }
 
-    let conjIntArrays (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
-        for i = 0 to a_conj.Length - 1 do
-            a_out.[a_conj.[i]] <- a_conj.[a_core.[i]]
-        a_out
-
-
-    // a_conj * a_core * (a_conj ^ -1)
-    let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
-        try
-            let a_out = Array.zeroCreate a_conj.Length
-            conjIntArrays a_conj a_core a_out |> Ok
-        with ex ->
-            ("error in conjIntArrays: " + ex.Message) |> Result.Error
-
-
     let filterByPickList (data: 'a[]) (picks: bool[]) =
         try
             let pickCount = picks |> Array.map (fun v -> if v then 1 else 0) |> Array.sum
@@ -148,6 +133,29 @@ module CollectionOps =
                 else
                     Map.add kk 1 acc)
             Map.empty
+
+
+
+    //let conjIntArrays (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
+    //    for i = 0 to a_conj.Length - 1 do
+    //        a_out.[a_conj.[i]] <- a_conj.[a_core.[i]]
+    //    a_out
+    let conjIntArrays (a_bread: array<int>) (a_core: array<int>) (a_out: array<int>) =
+        let breadInv = Array.zeroCreate a_bread.Length |> invertArray a_bread
+        let step1 = Array.zeroCreate a_bread.Length |> arrayProduct a_core breadInv
+        Array.zeroCreate a_bread.Length |> arrayProduct a_bread step1
+
+
+    // a_conj * a_core * (a_conj ^ -1)
+    let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
+        try
+            let a_out = Array.zeroCreate a_conj.Length
+            conjIntArrays a_conj a_core a_out |> Ok
+        with ex ->
+            ("error in conjIntArrays: " + ex.Message) |> Result.Error
+
+
+
 
 
 

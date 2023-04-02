@@ -19,10 +19,12 @@
     <Compile Include="RndVarsFixture.fs" />
     <Compile Include="IntSeriesFixture.fs" />
     <Compile Include="PermutationFixture.fs" />
+    <Compile Include="GroupFixture.fs" />
     <Compile Include="SwitchRflFixture.fs" />
     <Compile Include="TwoCycleFixture.fs" />
     <Compile Include="BitPackFixture.fs" />
     <Compile Include="RolloutFixture.fs" />
+    <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="IntSetFixture.fs" />
     <Compile Include="FileFixture.fs" />
     <Compile Include="Tests.fs" />

@@ -105,17 +105,17 @@ type DistanceTest() =
 
     [<Benchmark>]
     member this.distanceSquaredG() =
-        let yow = CollectionProps.distanceSquared_generic this.arrayA this.arrayB
+        let yow = CollectionProps.distanceSquared this.arrayA this.arrayB
         yow
 
     [<Benchmark>]
     member this.distanceSquaredGr() =
-        let yow = CollectionProps.distanceSquared_genericR this.arrayA this.arrayB
+        let yow = CollectionProps.distanceSquaredR this.arrayA this.arrayB
         yow
 
     [<Benchmark>]
     member this.distanceSquaredGrE() =
-        let yow = CollectionProps.distanceSquared_genericR this.arrayA this.arrayC
+        let yow = CollectionProps.distanceSquaredR this.arrayA this.arrayC
         yow
 
 
@@ -157,17 +157,17 @@ type DistanceTest2() =
 
     [<Benchmark>]
     member this.distanceSquaredG_us() =
-        let yow = CollectionProps.distanceSquared_generic this.arrayA_us this.arrayB_us
+        let yow = CollectionProps.distanceSquared this.arrayA_us this.arrayB_us
         yow
 
     [<Benchmark>]
     member this.distanceSquaredG_uL() =
-        let yow = CollectionProps.distanceSquared_generic this.arrayA_uL this.arrayB_uL
+        let yow = CollectionProps.distanceSquared this.arrayA_uL this.arrayB_uL
         yow
 
     [<Benchmark>]
     member this.distanceSquaredG() =
-        let yow = CollectionProps.distanceSquared_generic this.arrayA this.arrayB
+        let yow = CollectionProps.distanceSquared this.arrayA this.arrayB
         yow
 
 

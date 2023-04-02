@@ -81,6 +81,62 @@ module SorterSet =
             order wPfx switchCount (Sorter.randomStages switchFreq) rnGen
 
 
+    let createRandomStages2
+        (sorterStId:sorterSetId)
+        (sorterCt: sorterCount)
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rnGen: rngGen)  =
+        createRandom 
+            sorterStId 
+            sorterCt 
+            order wPfx switchCount Sorter.randomStages2 rnGen
+
+
+    let createRandomStagesCoConj
+        (sorterStId:sorterSetId)
+        (sorterCt: sorterCount)
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rnGen: rngGen)  =
+        createRandom 
+            sorterStId 
+            sorterCt 
+            order wPfx switchCount Sorter.randomStagesCoConj rnGen
+
+
+    let createRandomStagesSeparated
+        (sorterStId:sorterSetId)
+        (sorterCt: sorterCount)
+        (order: order)
+        (minSeparation: int)
+        (maxSeparation: int)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rnGen: rngGen)  =
+        createRandom 
+            sorterStId 
+            sorterCt 
+            order 
+            wPfx 
+            switchCount 
+            (Sorter.randomStagesSeparated minSeparation maxSeparation) 
+            rnGen
+
+
+    
+    let createRandomOrbitDraws
+            (sorterStId:sorterSetId)
+            (sorterCt: sorterCount)
+            (coreTc:twoCycle) 
+            (permSeed:permutation)
+            (wPfx: switch seq)
+            (switchCount: switchCount)
+            (rnGen: rngGen)  =
+        None
+
     let createRandomSymmetric
         (sorterStId:sorterSetId)
         (sorterCt: sorterCount)

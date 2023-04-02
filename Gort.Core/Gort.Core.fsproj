@@ -21,8 +21,10 @@
     <Compile Include="Rando.fs" />
     <Compile Include="RandVars.fs" />
     <Compile Include="DiscreteSets.fs" />
+    <Compile Include="Group.fs" />
     <Compile Include="BitPack.fs" />
     <Compile Include="Rollout.fs" />
+    <Compile Include="Combinatorics.fs" />
     <Compile Include="IntSeries.fs" />
     <Compile Include="Permutation.fs" />
     <Compile Include="SwitchRfl.fs" />

@@ -59,11 +59,15 @@ type TwoCycleFixture() =
 
     [<TestMethod>]
     member this.TwoCyclePerm_makeCoConjugateEvenOdd() =
-        let ord = Order.createNr 16
-        let permLst1 = [ Permutation.identity ord; Permutation.identity ord ]
-        let aa = TwoCycle.makeCoConjugateEvenOdd permLst1 |> Result.ExtractOrThrow
-        let al = aa |> Seq.toList
-        Assert.IsTrue(al.Length > 0)
+        let ordV = 6
+        let ord = Order.createNr ordV
+        let permI = Permutation.identity ord
+        let permC = Permutation.create  [|1;2;3;4;5;0|]
+                    |> Result.ExtractOrThrow
+        let conjI = TwoCycle.coConjugate permI |> Seq.toArray
+        let conjC = TwoCycle.coConjugate permC |> Seq.toArray
+        Assert.AreEqual(conjI.[0], conjC.[1])
+        Assert.AreEqual(conjI.[1], conjC.[0])
 
 
     [<TestMethod>]
@@ -122,6 +126,20 @@ type TwoCycleFixture() =
         Assert.IsTrue((TwoCycle.getArray resO).Length = (Order.value oddDegree))
 
 
+        
+
+    [<TestMethod>]
+    member this.totalSwitchBarLengths() = 
+        let ordr = 16 |> Order.createNr
+        let sbItentity = TwoCycle.identity ordr
+        let tsblIdent = TwoCycle.totalSwitchBarLengths sbItentity
+        Assert.AreEqual(tsblIdent, 0)
+
+        let sbEvenMod = TwoCycle.evenMode ordr
+        let tsblevenM = TwoCycle.totalSwitchBarLengths sbEvenMod
+        Assert.AreEqual(tsblevenM, 8)
+
+        Assert.IsTrue(true)
 
     [<TestMethod>]
     member this.TestMethodPassing() = Assert.IsTrue(true)

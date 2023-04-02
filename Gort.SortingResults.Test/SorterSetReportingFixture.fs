@@ -117,7 +117,7 @@ type SorterSetReportingFixture() =
     member this.evo() =
         let sorterSetId = Guid.NewGuid() |> SorterSetId.create
         let useParalll = true |> UseParallel.create
-        let ordr = 16 |> Order.createNr
+        let ordr = 12 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 500
         let rndGn = RngGen.createLcg (123 |> RandomSeed.create)
@@ -157,7 +157,7 @@ type SorterSetReportingFixture() =
             let sorterSpeedBins = sorterEvls 
                                         |> SorterSpeedBin.fromSorterEvals
                                         |> Seq.toArray
-            if gen % 200 = 0 then
+            if gen % 2 = 0 then
                 _repo gen sorterSpeedBins
 
             let ranky = sorterSpeedBins 
@@ -184,7 +184,7 @@ type SorterSetReportingFixture() =
 
 
         let mutable gen = 0
-        while gen < 2 do
+        while gen < 20 do
             sorterSt <- _doGen gen sorterSt
             gen <- gen + 1
             

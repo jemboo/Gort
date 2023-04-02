@@ -118,13 +118,18 @@ type System.Int32 with // x=this
     member x.toHex = sprintf "0x%x" x // to hexadecimal
     member x.toBits = System.Convert.ToString(x, 2).PadLeft(32, '0') // to binary
 
+    member x.toBoolArray (length:int) =
+        let aRet = Array.create length false
+        for i = 0 to (length - 1) do
+            if x.isset i then
+                aRet.[i] <- true
+        aRet
+
     member x.toResizeArray = // to Resizable array of positions set to 1
         let array = ResizeArray()
-
         for i = 0 to 31 do
             if x.isset i then
                 array.Add(i)
-
         array
 
     member x.toArray = // to array of positions set to 1

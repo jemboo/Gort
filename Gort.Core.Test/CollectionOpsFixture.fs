@@ -134,7 +134,7 @@ type CollectionOpsFixture() =
 
 
     [<TestMethod>]
-    member this.conjIntArrays() =
+    member this.conjIntArrays1() =
         let order = Order.createNr 16
         let randy = Rando.fromRngGen (RngGen.lcgFromNow ())
         let mutable i = 0
@@ -164,6 +164,21 @@ type CollectionOpsFixture() =
 
             Assert.IsTrue((coreProdConj = prodOfConj))
             i <- i + 1
+
+
+    [<TestMethod>]
+    member this.conjIntArrays() =
+        let coreArray = [|1;2;3;4;5;0|]
+        //let breadArray = [|3;4;2;1;0;5|]
+        let breadArray = [|4;3;2;0;1;5|]
+        let expectedConjedArray = [|1;5;0;2;3;4|]
+
+        let resultArray = 
+            CollectionOps.conjIntArraysR breadArray coreArray
+            |> Result.ExtractOrThrow
+
+        Assert.AreEqual(resultArray, expectedConjedArray)
+
 
 
     [<TestMethod>]

@@ -173,6 +173,74 @@ module Stage =
         }
 
 
+    let rndSeq2 (order: order) (rnd: IRando) =
+        let coreTc = TwoCycle.evenMode order
+        let _aa (rnd: IRando) =
+            { switches =
+                TwoCycle.rndConj coreTc rnd
+                |> Switch.fromTwoCycle
+                |> Seq.toList
+              order = order }
+
+        seq {
+            while true do
+                yield (_aa rnd)
+        }
+
+    let rndSeqCoConj (order: order) (rnd: IRando) =
+        let _aa (rnd: IRando) =
+            TwoCycle.rndCoConj order rnd
+            |> Seq.map(fun tc -> 
+            { switches =
+                tc
+                |> Switch.fromTwoCycle
+                |> Seq.toList
+              order = order })
+
+        seq {
+            while true do
+                yield (_aa rnd)
+        }
+
+
+    let rndSeqSeparated 
+                (order: order)
+                (minSeparation: int)
+                (maxSeparation: int)
+                (rnd: IRando) =
+        let coreTc = TwoCycle.evenMode order
+        let _aa (rnd: IRando) =
+            TwoCycle.rndSeqSeparated order coreTc minSeparation maxSeparation rnd
+            |> Seq.map(fun tc -> 
+            { switches =
+                tc
+                |> Switch.fromTwoCycle
+                |> Seq.toList
+              order = order })
+
+        seq {
+            while true do
+                yield (_aa rnd)
+        }
+
+
+    let rndPermDraw (coreTc:twoCycle) 
+                    (perms:permutation[]) 
+                    (rnd: IRando) =
+        
+        seq {
+            while true do
+                let bread = perms.[rnd.NextPositiveInt %  perms.Length]
+                yield { switches = 
+                            TwoCycle.conjugate bread coreTc
+                            |> Switch.fromTwoCycle
+                            |> Seq.toList
+
+                        order = coreTc |> TwoCycle.getOrder
+                }
+        }
+
+
     let rndSymmetric (order: order) (rnd: IRando) =
         let _aa (rnd: IRando) =
             { stage.switches = TwoCycle.rndSymmetric order rnd |> Switch.fromTwoCycle |> Seq.toList

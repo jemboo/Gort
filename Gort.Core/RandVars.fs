@@ -133,3 +133,55 @@ module RandVars =
                 successCount <- successCount + _draw rnd
                 i <- i + 1
             successCount
+
+
+type rndChoice = private RndChoice of float
+module RndChoice =
+
+    let value (RndChoice v) = v
+
+    let create (value: float) =
+        value |> RndChoice
+
+    let choose (randy:IRando) 
+               (rndChoic:rndChoice) 
+               (a:'a) 
+               (b:'a) =
+        if (value rndChoic) > randy.NextFloat then a else b
+
+
+    let delta (rndChoic:rndChoice) (amt:float) =
+        let inc = (value rndChoic) + amt
+        if (inc > 1.0) then 1.0 else
+            if (inc < 0.0) then 0.0 else
+                inc
+
+
+    let mutate (randy:IRando) 
+               (rndChoic:rndChoice) 
+               (amt:float) =
+        if (0.5) > randy.NextFloat then (delta rndChoic amt) else 
+            (delta rndChoic ( -1.0 * amt))
+
+
+    let randomSeq (randy:IRando) =
+        Seq.initInfinite (fun _ -> create randy.NextFloat)
+
+
+   
+type rndChooser<'a> = private { rndChoic: rndChoice; choiceA:'a;  choiceB:'a}
+    
+module RndChooser =
+
+    let choice (rndChoosr:rndChooser<'a>) = 
+        rndChoosr.rndChoic
+
+    let choiceA (rndChoosr:rndChooser<'a>) = 
+        rndChoosr.choiceA
+
+    let choiceB (rndChoosr:rndChooser<'a>) = 
+        rndChoosr.choiceA
+
+    let chooseSeq (randy:IRando) 
+                  (rndChoosers:rndChooser<'a> seq) =
+        rndChoosers |> Seq.map(fun rc -> RndChoice.choose randy rc.rndChoic rc.choiceA rc.choiceB)

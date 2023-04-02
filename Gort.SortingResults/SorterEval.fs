@@ -81,6 +81,15 @@ module SorterSpeed =
             |> Result.Error
 
 
+    let report (sorterSpd : sorterSpeed option) =
+        match sorterSpd with
+        | Some ss -> sprintf "%d\t%d"
+                         (ss |> getStageCount |> StageCount.value)
+                         (ss |> getSwitchCount |> SwitchCount.value)
+        | None -> "None\tNone"
+
+
+
 type sorterPerf = | IsSuccessful of bool 
                   | SortedSetSize of sortableCount
 
@@ -191,5 +200,3 @@ module SorterEval =
             | Error msg -> make (Some msg) None None None None sortableStId sortrId
 
         | Error msg -> make  (Some msg) None None None None sortableStId sortrId
-
-

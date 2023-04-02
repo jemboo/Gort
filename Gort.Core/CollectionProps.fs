@@ -71,7 +71,7 @@ module CollectionProps =
             |> Error
 
 
-    let inline distanceSquared_generic  (a: ^a[]) (b: ^a[]) =
+    let inline distanceSquared  (a: ^a[]) (b: ^a[]) =
         let mutable i = 0
         let mutable acc = zero_of a.[0]
         while (i < a.Length) do
@@ -80,7 +80,7 @@ module CollectionProps =
         acc
 
 
-    let inline distanceSquared_genericR  (a: ^a[]) (b: ^a[]) =
+    let inline distanceSquaredR  (a: ^a[]) (b: ^a[]) =
         try
             let mutable i = 0
             let mutable acc = zero_of a.[0]
@@ -106,7 +106,7 @@ module CollectionProps =
 
     let inline isDistanceGtZeroC  (a: ^a[]) (b: ^a[]) =
         result {
-            let! dist = distanceSquared_genericR a b
+            let! dist = distanceSquaredR a b
             return (dist > (zero_of a.[0]) )
         }
 

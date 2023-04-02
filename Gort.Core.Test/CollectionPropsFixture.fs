@@ -109,7 +109,7 @@ type CollectionPropsFixture() =
     member this.isSorted2() =
         let aa = [|2;3;4;5;6;|]
         let ba = [|0;1;2;3;4;|]
-        let yab = CollectionProps.distanceSquared_generic aa ba
+        let yab = CollectionProps.distanceSquared aa ba
         Assert.IsTrue(true)
 
 
@@ -160,6 +160,19 @@ type CollectionPropsFixture() =
     //                    |> Result.ExtractOrThrow
     //        Assert.IsTrue(isTc)
             i <- i+1
+
+
+
+    [<TestMethod>]
+    member this.distanceSquared() =
+        let aa = [| 0; 1; 2; 3; 4; 6; 5 |]
+        let bb = [| 0; 1; 2; 3; 4; 5; 6 |]
+
+        let distAB = CollectionProps.distanceSquared aa bb
+        Assert.AreEqual(distAB, 2)
+
+        let distAA = CollectionProps.distanceSquared aa aa
+        Assert.AreEqual(distAA, 0)
 
 
 
