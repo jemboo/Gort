@@ -14,7 +14,7 @@ type SorterSetEvalFixture() =
         let sorterSetId = Guid.NewGuid() |> SorterSetId.create
         let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
         let rolloutFormt = rolloutFormat.RfBs64
-        let sortableStId = SortableSetId.create 123
+        let sortableStId = SortableSetId.create (Guid.NewGuid())
 
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow

@@ -29,6 +29,11 @@ module SwitchUseCounts =
         |> Seq.filter (fun t -> (snd t) > 0)
         |> Seq.map (fun t -> (sortr |> Sorter.getSwitches).[(fst t)])
         |> Seq.toArray
+        
+    let ofOption (switchUseCts: switchUseCounts option) =
+        match switchUseCts with
+        | Some suc -> suc |> getUseCounters
+        | None -> [||]
 
 
 

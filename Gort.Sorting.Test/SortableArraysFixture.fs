@@ -19,7 +19,7 @@ type SortableArraysFixture() =
         let symbolSetSize = 255 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
         let rolloutFormt = rolloutFormat.RfU8
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
@@ -47,7 +47,7 @@ type SortableArraysFixture() =
         let symbolSetSize = 5553 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
         let rolloutFormt = rolloutFormat.RfI32
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
@@ -75,7 +75,7 @@ type SortableArraysFixture() =
         let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
         let rolloutFormt = rolloutFormat.RfI32
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
@@ -103,7 +103,7 @@ type SortableArraysFixture() =
         let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
         let rolloutFormt = rolloutFormat.RfU64
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
@@ -125,7 +125,7 @@ type SortableArraysFixture() =
         let symbolSetSize = 2 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
         let rolloutFormt = rolloutFormat.RfBs64
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
@@ -161,7 +161,7 @@ type SortableArraysFixture() =
             sortableBools |> Seq.map (SortableBoolArray.getValues) |> Seq.toArray
 
         let rolloutFormt = rolloutFormat.RfBs64
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
             SortableSet.fromSortableBoolArrays sortableSetId rolloutFormt order sortableBools
@@ -169,7 +169,7 @@ type SortableArraysFixture() =
 
         let sortableBoolsArrayBack =
             sortableSet
-            |> SortableSet.toSortableBoolSets
+            |> SortableSet.toSortableBoolArrays
             |> Seq.map (SortableBoolArray.getValues)
             |> Seq.take (sortableBoolsArray.Length)
             |> Seq.toArray

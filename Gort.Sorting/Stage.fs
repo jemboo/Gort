@@ -173,14 +173,14 @@ module Stage =
         }
 
 
-    let rndSeq2 (order: order) (rnd: IRando) =
-        let coreTc = TwoCycle.evenMode order
+    let rndSeq2 (coreTc: twoCycle) (rnd: IRando) =
+        //let coreTc = TwoCycle.evenMode order
         let _aa (rnd: IRando) =
             { switches =
                 TwoCycle.rndConj coreTc rnd
                 |> Switch.fromTwoCycle
                 |> Seq.toList
-              order = order }
+              order = (coreTc |> TwoCycle.getOrder) }
 
         seq {
             while true do

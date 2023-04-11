@@ -76,7 +76,7 @@ type BenchmarkSorterOnBp64() =
     let sortrId = (Guid.NewGuid()) |> SorterId.create
     let sorter16 = RefSorter.createRefSorter sortrId RefSorter.Green16 |> Result.ExtractOrThrow
 
-    let sortableSetId = 123 |> SortableSetId.create
+    let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
     let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
 
     let sortableSet_RfBs64 =

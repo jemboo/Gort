@@ -168,22 +168,24 @@ module Sorter =
 
 
     let randomSwitches
-            (sorterD:sorterId)
-            (order: order) 
-            (wPfx: switch seq) 
+            (order: order)
+            (wPfx: switch seq)
             (switchCount: switchCount) 
-            (rnd: IRando) =
+            (rnd: IRando)
+            (sorterD:sorterId)
+            =
         let switches = Switch.rndNonDegenSwitchesOfOrder order rnd
         fromSwitchesWithPrefix sorterD order switchCount wPfx switches
 
 
     let randomStages
-        (switchFreq: switchFrequency)
-        (sorterD:sorterId)
         (order: order)
+        (switchFreq: switchFrequency)
         (wPfx: switch seq)
-        (switchCount: switchCount)
-        (rando: IRando)  =
+        (switchCount: switchCount) 
+        (rando: IRando)
+        (sorterD:sorterId)
+        =
         let _switches =
             (Stage.rndSeq order switchFreq rando)
             |> Seq.map (fun st -> st.switches)
@@ -193,13 +195,15 @@ module Sorter =
 
 
     let randomStages2
-        (sorterD:sorterId)
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)  =
+        (rando: IRando)
+        (sorterD:sorterId)
+        =
+        let coreTc = TwoCycle.evenMode order
         let _switches =
-            (Stage.rndSeq2 order rando)
+            (Stage.rndSeq2 coreTc rando)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
 
@@ -207,11 +211,12 @@ module Sorter =
 
 
     let randomStagesCoConj
-        (sorterD:sorterId)
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)  =
+        (rando: IRando)  
+        (sorterD:sorterId)
+        =
         let _switches =
             (Stage.rndSeqCoConj order rando)
             |> Seq.concat
@@ -224,11 +229,12 @@ module Sorter =
     let randomStagesSeparated
         (minSeparation: int)
         (maxSeparation: int)
-        (sorterD:sorterId)
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)  =
+        (rando: IRando)
+        (sorterD:sorterId)
+        =
         let _switches =
             (Stage.rndSeqSeparated order minSeparation maxSeparation rando)
             |> Seq.concat
@@ -238,12 +244,30 @@ module Sorter =
         fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
 
 
+    let randomPermutaionChoice
+        (coreTc:twoCycle)
+        (perms: permutation[])
+        (order: order)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rando: IRando)
+        (sorterD:sorterId)
+        =
+        let _switches =
+            (Stage.rndPermDraw coreTc perms rando)
+            |> Seq.map (fun st -> st.switches)
+            |> Seq.concat
+
+        fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
+
+
     let randomSymmetric
+            (order: order)
+            (wPfx: switch seq)
+            (switchCount: switchCount)
+            (rando: IRando)
             (sorterD:sorterId)
-            (order: order) 
-            (wPfx: switch seq) 
-            (switchCount: switchCount) 
-            (rando: IRando) =
+            =
         let switches =
             (Stage.rndSymmetric order rando)
             |> Seq.map (fun st -> st.switches)
@@ -254,17 +278,17 @@ module Sorter =
 
     let randomBuddies
         (stageWindowSz: stageWindowSize)
-        (sorterD:sorterId)
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)  =
+        (rando: IRando)
+        (sorterD:sorterId)
+        =
         let switches =
             (Stage.rndBuddyStages stageWindowSz SwitchFrequency.max order rando List.empty)
             |> Seq.collect (fun st -> st.switches |> List.toSeq)
 
         fromSwitchesWithPrefix sorterD order switchCount wPfx switches
-
 
 
 

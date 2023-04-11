@@ -7,7 +7,7 @@ type SortingRolloutFixture() =
 
     let getGoodRefResults (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = Guid.NewGuid() |> SortableSetId.create
         let sortrId = Guid.NewGuid() |> SorterId.create
         let goodSorter = RefSorter.goodRefSorterForOrder sortrId order |> Result.ExtractOrThrow
 
@@ -24,11 +24,11 @@ type SortingRolloutFixture() =
 
     let getIncompleteSortResults (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = Guid.NewGuid() |> SortableSetId.create
         let switchCount = SwitchCount.orderToRecordSwitchCount order
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
         let sortrId = Guid.NewGuid() |> SorterId.create
-        let failingSorter = Sorter.randomSwitches sortrId order (Seq.empty) switchCount rando
+        let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sortrId 
 
         let sortableSet =
             SortableSet.makeAllBits sortableSetId rolloutFormat order

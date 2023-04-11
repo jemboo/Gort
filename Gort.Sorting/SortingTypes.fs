@@ -5,7 +5,9 @@ open System
 
 type sorterId = private SorterId of Guid
 type sortableCount = private SortableCount of int
-type sortableSetId = private SortableSetId of int
+type sortableSetId = private SortableSetId of Guid
+type sortableSetCount = private SortableSetCount of int
+type setOfSortableSetId = private SetOfSortableSetId of Guid
 type sorterCount = private SorterCount of int
 type sorterSetId = private SorterSetId of Guid
 type stageCount = private StageCount of int
@@ -40,6 +42,14 @@ module SorterCount =
 module SortableSetId =
     let value (SortableSetId v) = v
     let create id = (SortableSetId id)
+
+module SortableSetCount =
+    let value (SortableSetCount v) = v
+    let create id = (SortableSetCount id)
+
+module SetOfSortableSetId =
+    let value (SetOfSortableSetId v) = v
+    let create id = (SetOfSortableSetId id)
 
 module SwitchCount =
     let value (SwitchCount v) = v

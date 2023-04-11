@@ -9,7 +9,7 @@ type SortableSetFixture() =
     [<TestMethod>]
     member this.makeAllBits() =
         let order = Order.createNr 10
-        let ssRecId = 123 |> SortableSetId.create
+        let ssRecId = Guid.NewGuid() |> SortableSetId.create
         let ssFmtRu8 = rolloutFormat.RfU8
         let ssFmtRu16 = rolloutFormat.RfU16
         let ssFmtRI32 = rolloutFormat.RfI32
@@ -43,7 +43,7 @@ type SortableSetFixture() =
 
     [<TestMethod>]
     member this.makeOrbit() =
-        let ssRecId = 123 |> SortableSetId.create
+        let ssRecId = Guid.NewGuid() |> SortableSetId.create
         let order = Order.createNr 10
         let seed = RandomSeed.create 1123
         let randy = Rando.create rngType.Lcg (seed)
@@ -57,19 +57,19 @@ type SortableSetFixture() =
         let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 =
-            SortableSet.makeOrbits ssRecId ssFmtRu8 maxCount perm |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssFmtRu8 maxCount perm ssRecId |> Result.ExtractOrThrow
 
         let ssRu16 =
-            SortableSet.makeOrbits ssRecId ssFmtRu16 maxCount perm |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssFmtRu16 maxCount perm ssRecId |> Result.ExtractOrThrow
 
         let ssRI32 =
-            SortableSet.makeOrbits ssRecId ssFmtRI32 maxCount perm |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssFmtRI32 maxCount perm ssRecId |> Result.ExtractOrThrow
 
         let ssRu64 =
-            SortableSet.makeOrbits ssRecId ssFmtRu64 maxCount perm |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssFmtRu64 maxCount perm ssRecId |> Result.ExtractOrThrow
 
         let ssBs =
-            SortableSet.makeOrbits ssRecId ssFmtBs maxCount perm |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssFmtBs maxCount perm ssRecId |> Result.ExtractOrThrow
 
         let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
         let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
@@ -82,10 +82,11 @@ type SortableSetFixture() =
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64)
         Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length)
 
+
     [<TestMethod>]
     member this.makeSortedStacks() =
         let ord = Order.createNr 16
-        let ssRecId = 123 |> SortableSetId.create
+        let ssRecId = Guid.NewGuid() |> SortableSetId.create
 
         let orderStack =
             [ Order.create 8; Order.create 4; Order.create 2; Order.create 2 ]
@@ -133,7 +134,7 @@ type SortableSetFixture() =
     [<TestMethod>]
     member this.makeRandom() =
         let order = Order.createNr 16
-        let ssRecId = 123 |> SortableSetId.create
+        let ssRecId = Guid.NewGuid() |> SortableSetId.create
         let sortableCount = SortableCount.create 10
 
         let _randy () =
@@ -147,23 +148,23 @@ type SortableSetFixture() =
         let ssFmtBs = rolloutFormat.RfBs64
 
         let ssRu8 =
-            SortableSet.makeRandomPermutation ssRecId ssFmtRu8 order sortableCount (_randy ())
+            SortableSet.makeRandomPermutation ssFmtRu8 order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
         let ssRu16 =
-            SortableSet.makeRandomPermutation ssRecId ssFmtRu16 order sortableCount (_randy ())
+            SortableSet.makeRandomPermutation ssFmtRu16 order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
         let ssRI32 =
-            SortableSet.makeRandomPermutation ssRecId ssFmtRI32 order sortableCount (_randy ())
+            SortableSet.makeRandomPermutation ssFmtRI32 order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
         let ssRu64 =
-            SortableSet.makeRandomPermutation ssRecId ssFmtRu64 order sortableCount (_randy ())
+            SortableSet.makeRandomPermutation ssFmtRu64 order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
         let ssBs =
-            SortableSet.makeRandomPermutation ssRecId ssFmtBs order sortableCount (_randy ())
+            SortableSet.makeRandomPermutation ssFmtBs order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
         let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
@@ -176,3 +177,27 @@ type SortableSetFixture() =
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32)
         Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64)
         Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length)
+
+
+    [<TestMethod>]
+    member this.makeSetOfSortableSetOrbit() =
+        let order = Order.createNr 32
+        let sOfSortableSetId = Guid.NewGuid() |> SetOfSortableSetId.create
+        let sortableSetCount = SortableSetCount.create 100
+        let maxSortableCount = None // SortableCount.create 10 |> Some
+        let ssFmtRu8 = rolloutFormat.RfU8
+        let rngGn = RngGen.create rngType.Lcg (67123 |> RandomSeed.create)
+
+        let orbis = 
+            SetOfSortableSet.makeRandomOrbits
+              sOfSortableSetId
+              sortableSetCount
+              order
+              ssFmtRu8
+              maxSortableCount
+              rngGn
+
+        orbis |> SetOfSortableSet.getSummaryReports
+              |> Seq.iter(Console.WriteLine)
+
+        Assert.IsTrue(11 = 11)

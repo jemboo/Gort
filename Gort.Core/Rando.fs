@@ -104,8 +104,11 @@ module Rando =
 
     let fromRngGen (rg: rngGen) = create rg.rngType rg.seed
 
-    let nextRngGen (randy: IRando) =
+    let nextRando (randy: IRando) =
         create randy.rngType (RandomSeed.create randy.NextPositiveInt)
+
+    let nextRngGen (randy: IRando) =
+        RngGen.create randy.rngType (RandomSeed.create randy.NextPositiveInt)
 
 
 type rndGuid = private { r1:IRando; r2:IRando; r3:IRando; r4:IRando }

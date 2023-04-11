@@ -42,7 +42,7 @@ type SorterSetReportingFixture() =
 
         let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rndGn
         let rolloutFormt = rolloutFormat.RfBs64
-        let sortableStId = SortableSetId.create 123
+        let sortableStId = SortableSetId.create (Guid.NewGuid())
 
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow
@@ -123,7 +123,7 @@ type SorterSetReportingFixture() =
         let rndGn = RngGen.createLcg (123 |> RandomSeed.create)
         let randy = rndGn |> Rando.fromRngGen
         let rolloutFormt = rolloutFormat.RfBs64
-        let sortableStId = SortableSetId.create 123
+        let sortableStId = SortableSetId.create (Guid.NewGuid())
         let stageWgt = 0.2 |> StageWeight.create
         let ranker ss = ss |> SorterFitness.fromSpeed stageWgt
         let mutationRate = MutationRate.create 0.01

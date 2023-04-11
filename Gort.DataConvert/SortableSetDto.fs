@@ -3,7 +3,7 @@ open System
 open Microsoft.FSharp.Core
 
 type sortableSetAllBitsDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       order: int
       fmt: string }
 
@@ -33,7 +33,7 @@ module SortableSetAllBitsDto =
 
 
 type sortableSetOrbitDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       maxCount: int
       permutation: int[]
       fmt: string }
@@ -49,7 +49,7 @@ module SortableSetOrbitDto =
 
             let! perm = dto.permutation |> Permutation.create
             let! ssFormat = dto.fmt |> RolloutFormat.fromString
-            return! SortableSet.makeOrbits (dto.sortableSetRId |> SortableSetId.create) ssFormat maxCt perm
+            return! SortableSet.makeOrbits ssFormat maxCt perm (dto.sortableSetRId |> SortableSetId.create) 
         }
 
     let fromJson (jstr: string) =
@@ -70,7 +70,7 @@ module SortableSetOrbitDto =
 
 
 type sortableSetSortedStacksDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       orderStack: int[]
       fmt: string }
 
@@ -105,7 +105,7 @@ module SortableSetSortedStacksDto =
 
 
 type sortableSetRandomPermutationDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       order: int
       sortableCount: int
       rngGenId: int
@@ -123,11 +123,11 @@ module SortableSetRandomPermutationDto =
 
             return!
                 SortableSet.makeRandomPermutation
-                    (dto.sortableSetRId |> SortableSetId.create)
                     ssFormat
                     order
                     sortableCt
                     randy
+                    (dto.sortableSetRId |> SortableSetId.create)
         }
 
     let fromJson (jstr: string) (rnGenLookup: int -> Result<rngGen, string>) =
@@ -161,7 +161,7 @@ module SortableSetRandomPermutationDto =
 
 
 type sortableSetRandomBitsDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       order: int
       pctOnes: float
       sortableCount: int
@@ -180,12 +180,12 @@ module SortableSetRandomBitsDto =
 
             return!
                 SortableSet.makeRandomBits
-                    (dto.sortableSetRId |> SortableSetId.create)
                     ssFormat
                     order
                     dto.pctOnes
                     sortableCt
                     randy
+                    (dto.sortableSetRId |> SortableSetId.create)
         }
 
     let fromJson (jstr: string) (rnGenLookup: int -> Result<rngGen, string>) =
@@ -224,7 +224,7 @@ module SortableSetRandomBitsDto =
 
 
 type sortableSetRandomSymbolsDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       order: int
       symbolSetSize: int
       sortableCount: int
@@ -244,12 +244,12 @@ module SortableSetRandomSymbolsDto =
 
             return!
                 SortableSet.makeRandomSymbols
-                    (dto.sortableSetRId |> SortableSetId.create)
                     ssFormat
                     order
                     symbolSetSize
                     sortableCt
                     randy
+                    (dto.sortableSetRId |> SortableSetId.create)
         }
 
     let fromJson (jstr: string) (rnGenLookup: int -> Result<rngGen, string>) =
@@ -286,7 +286,7 @@ module SortableSetRandomSymbolsDto =
 
 
 type sortableSetExplicitDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       order: int
       symbolSetSize: int
       bitPackRId: int
@@ -337,7 +337,7 @@ module SortableSetExplicitDto =
 
 
 type sortableSetSwitchReducedDto =
-    { sortableSetRId: int
+    { sortableSetRId: Guid
       sorterId: int
       sortableSetSourceId: int
       fmt: string }

@@ -4,15 +4,15 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SortingEvalFixture() =
+type SorterEvalFixture() =
 
     let getResultsFromAllBits (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 8 |> Result.ExtractOrThrow
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
         let switchCount = SwitchCount.orderTo900SwitchCount order
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
         let sorterId = Guid.NewGuid() |> SorterId.create
-        let goodSorter = Sorter.randomSwitches sorterId order (Seq.empty) switchCount rando
+        let goodSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sorterId
 
         let sortableSet =
             SortableSet.makeAllBits sortableSetId rolloutFormat order
@@ -27,16 +27,16 @@ type SortingEvalFixture() =
 
     let getResultsOfRandomPermutations (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
         let order = Order.create 16 |> Result.ExtractOrThrow
-        let sortableSetId = 123 |> SortableSetId.create
+        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
         let switchCount = SwitchCount.orderToRecordSwitchCount order
         let sortableCount = 4000 |> SortableCount.create
         let sorterId = Guid.NewGuid() |> SorterId.create
 
         let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
-        let failingSorter = Sorter.randomSwitches sorterId order (Seq.empty) switchCount rando
+        let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sorterId
 
         let sortableSet =
-            SortableSet.makeRandomPermutation sortableSetId rolloutFormat order sortableCount rando
+            SortableSet.makeRandomPermutation rolloutFormat order sortableCount rando sortableSetId
             |> Result.ExtractOrThrow
 
         let sorterOpOutput =

@@ -89,7 +89,7 @@ module DomainTables =
                 return! componentRToRngGen rndGenR
             }
 
-        let _sortableSetLookup (ctxt: IGortContext2) (sortableSetRId: int) =
+        let _sortableSetLookup (ctxt: IGortContext2) (sortableSetRId: Guid) =
             result {
                 let! order = 8 |> Order.create
                 let fmt = rolloutFormat.RfI32

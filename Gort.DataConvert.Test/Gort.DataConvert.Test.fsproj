@@ -13,6 +13,7 @@
     <Compile Include="sorterDtoFixture.fs" />
     <Compile Include="sorterSetDtoFixture.fs" />
     <Compile Include="sortableSetDtoFixture.fs" />
+    <Compile Include="sorterEvalDtoFixture.fs" />
     <Compile Include="recordVersionsFixture.fs" />
     <Compile Include="domainTablesFixture.fs" />
     <Compile Include="Program.fs" />

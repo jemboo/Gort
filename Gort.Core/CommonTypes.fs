@@ -1,6 +1,13 @@
 ﻿namespace global
 open SysExt
 
+module StringUtil =
+    let OrNull (sV:string option) =
+        match sV with
+        |Some sv -> sv
+        |None -> null
+
+
 type useParallel = private UseParallel of bool
 
 module UseParallel =

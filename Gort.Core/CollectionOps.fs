@@ -40,6 +40,14 @@ module CollectionOps =
         seq {while true do yield! robbin}
 
 
+    let cartesianProduct (seq_a: seq<'a>) (seq_b: seq<'b>) =
+        seq {  
+            for ae in seq_a do
+               for be in seq_b do
+                  yield (ae, be)
+        }
+
+
     // product map composition: a(b()).
     let inline arrayProduct< ^a when ^a:(static member op_Explicit:^a->int)>
                     (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
@@ -136,10 +144,6 @@ module CollectionOps =
 
 
 
-    //let conjIntArrays (a_conj: array<int>) (a_core: array<int>) (a_out: array<int>) =
-    //    for i = 0 to a_conj.Length - 1 do
-    //        a_out.[a_conj.[i]] <- a_conj.[a_core.[i]]
-    //    a_out
     let conjIntArrays (a_bread: array<int>) (a_core: array<int>) (a_out: array<int>) =
         let breadInv = Array.zeroCreate a_bread.Length |> invertArray a_bread
         let step1 = Array.zeroCreate a_bread.Length |> arrayProduct a_core breadInv

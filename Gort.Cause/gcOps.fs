@@ -26,7 +26,12 @@ module gcOps =
             ("error in MakeRndGenRecord: " + ex.Message) |> Error
 
 
-    let MakeRandGenSetRecordsAndTable (randy: IRando) (rgCount: int) (causeId: Guid) (ctxt: IGortContext) =
+    let MakeRandGenSetRecordsAndTable 
+            (randy: IRando) 
+            (rgCount: int) 
+            (causeId: Guid) 
+            (ctxt: IGortContext) 
+            =
         let getSeed (tup: string * IRando) = (snd tup).Seed |> RandomSeed.value
 
         try
@@ -35,7 +40,7 @@ module gcOps =
 
                 let rgs =
                     { 0 .. (rgCount - 1) }
-                    |> Seq.map (fun dex -> (dex.ToString(), Rando.nextRngGen randy))
+                    |> Seq.map (fun dex -> (dex.ToString(), Rando.nextRando randy))
                     |> Seq.toList
 
                 let! res =

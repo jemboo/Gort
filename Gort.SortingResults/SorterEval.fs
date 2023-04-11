@@ -7,7 +7,10 @@ type sorterPhenotypeId = private SorterPhenotypeId of Guid
 module SorterPhenotypeId =
     let value (SorterPhenotypeId v) = v
 
-    let create (switches: seq<switch>) =
+    let create (id: Guid) =
+        id |> SorterPhenotypeId
+
+    let createFromSwitches (switches: seq<switch>) =
         switches
         |> Seq.map (fun sw -> sw :> obj)
         |> GuidUtils.guidFromObjs
@@ -74,10 +77,9 @@ module SorterSpeed =
                 
             let usedSwitchCt = switchesUsd.Length |> SwitchCount.create
             let usedStageCt = (switchesUsd |> StageCover.getStageCount)
-            let sortrPhenotypId = switchesUsd |> SorterPhenotypeId.create
-            (create usedSwitchCt usedStageCt, sortrPhenotypId, switchUseCts) |> Ok
+            (create usedSwitchCt usedStageCt) |> Ok
         with ex ->
-            (sprintf "error in SorterSpeedBin.fromSorterOpOutput: %s" ex.Message)
+            (sprintf "error in SorterSpeed.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
 
 
@@ -88,6 +90,17 @@ module SorterSpeed =
                          (ss |> getSwitchCount |> SwitchCount.value)
         | None -> "None\tNone"
 
+
+    let getStageCount0 (sorterSpd : sorterSpeed option) =
+        match sorterSpd with
+        | Some ss -> (ss |> getStageCount |> StageCount.value)
+        | None -> 0
+
+
+    let getSwitchCount0 (sorterSpd : sorterSpeed option) =
+        match sorterSpd with
+        | Some ss -> (ss |> getSwitchCount |> SwitchCount.value)
+        | None -> 0
 
 
 type sorterPerf = | IsSuccessful of bool 
@@ -131,12 +144,18 @@ module SorterEval =
           sortableSetId = sortableStId
           sortrId = sortrId }
 
+    let getErrorMessage (sorterEvl:sorterEval) =
+        sorterEvl.errorMessage
+    let getSwitchUseCounts (sorterEvl:sorterEval) =
+        sorterEvl.switchUseCts
     let getSorterSpeed (sorterEvl:sorterEval) =
         sorterEvl.sorterSpeed
     let getSorterPerf (sorterEvl:sorterEval) =
         sorterEvl.sorterPrf
     let getSortrPhenotypeId (sorterEvl:sorterEval) =
         sorterEvl.sortrPhenotypeId
+    let getSortableSetId (sorterEvl:sorterEval) =
+        sorterEvl.sortableSetId
     let getSorterId (sorterEvl:sorterEval) =
         sorterEvl.sortrId
 
@@ -160,7 +179,8 @@ module SorterEval =
     let evalSorterWithSortableSet 
             (sorterPerfEvalMod: sorterEvalMode) 
             (sortableSt: sortableSet) 
-            (sortr: sorter) =
+            (sortr: sorter) 
+            : sorterEval =
 
         let _addSorterToErrorResultCase sortr resA =
             match resA with
@@ -172,6 +192,14 @@ module SorterEval =
         let sortableStId = (sortableSt |> SortableSet.getSortableSetId)
         let sorterOpOutput =
             SortingRollout.makeSorterOpOutput sorterOpTrackMode.SwitchUses sortableSt sortr
+
+        //match sorterOpOutput with
+        //| Ok output -> 
+        //    let sorterSpeedRes = output |> SorterSpeed.fromSorterOpOutput
+
+        //    make None None None None None sortableStId sortrId
+        //| Error msg ->
+        //    make  (Some msg) None None None None sortableStId sortrId
 
         match sorterOpOutput with
         | Ok output ->

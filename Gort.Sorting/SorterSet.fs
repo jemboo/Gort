@@ -18,17 +18,28 @@ module SorterSet =
 
     let getSorters (sorterSet: sorterSet) = sorterSet.sorterMap |> Map.values |> Seq.cast
 
-    let getSortersById (maxCt:sorterCount) (ids: sorterId seq) (sorterSet: sorterSet) =
+    let getSortersById 
+        (maxCt:sorterCount) 
+        (ids: sorterId seq) 
+        (sorterSet: sorterSet)
+        =
         ids |> Seq.map(fun d -> sorterSet.sorterMap.TryFind d)
             |> Seq.filter(fun ov -> ov |> Option.isSome)
             |> Seq.map(fun ov -> ov |> Option.get)
             |> CollectionOps.takeUpto (maxCt |> SorterCount.value)
 
-    let generateSorterIds (sorterStId:sorterSetId) =
+
+    let generateSorterIds 
+        (sorterStId:sorterSetId) 
+        =
         RandVars.rndGuidsLcg (sorterStId |> SorterSetId.value)
         |> Seq.map(SorterId.create)
 
-    let load (id:sorterSetId) (order: order) (sorters: seq<sorter>) =
+
+    let load (id:sorterSetId) 
+             (order: order) 
+             (sorters: seq<sorter>) 
+             =
         let sorterMap =
             sorters |> Seq.map (fun s -> (s |> Sorter.getSorterId, s)) |> Map.ofSeq
 
@@ -39,19 +50,29 @@ module SorterSet =
     let createEmpty = 
         load (Guid.Empty |> SorterSetId.create) (0 |> Order.createNr) (Seq.empty)
 
+
+    let create
+        (sorterStId:sorterSetId)
+        (sorterCt: sorterCount)
+        (order: order)
+        (sorterGen: sorterId -> sorter)
+        =
+        generateSorterIds sorterStId
+        |> Seq.map (fun sId -> sorterGen sId)
+        |> Seq.take(sorterCt |> SorterCount.value)
+        |> load sorterStId order 
+
+
     let createRandom
         (sorterStId:sorterSetId)
         (sorterCt: sorterCount)
         (order: order)
-        (wPfx: switch seq)
-        (switchCount: switchCount)
-        (sorterRndGen: sorterId -> order -> switch seq -> switchCount -> IRando -> sorter)
-        (rnGen: rngGen) =
+        (rnGen: rngGen) 
+        (sorterRndGen: IRando -> sorterId -> sorter)
+        =
         let randy = rnGen |> Rando.fromRngGen
-        generateSorterIds sorterStId
-        |> Seq.map (fun sId -> sorterRndGen sId order wPfx switchCount randy)
-        |> Seq.take(sorterCt |> SorterCount.value)
-        |> load sorterStId order 
+        let sorterGen = sorterRndGen randy
+        create sorterStId sorterCt order sorterGen
 
 
     let createRandomSwitches
@@ -60,11 +81,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)  
+        =
         createRandom 
-            sorterStId 
-            sorterCt 
-            order wPfx switchCount Sorter.randomSwitches rnGen
+            sorterStId
+            sorterCt
+            order
+            rnGen
+            (Sorter.randomSwitches order wPfx switchCount)
 
 
     let createRandomStages
@@ -74,11 +98,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)  
+        =
         createRandom 
-            sorterStId 
-            sorterCt 
-            order wPfx switchCount (Sorter.randomStages switchFreq) rnGen
+            sorterStId
+            sorterCt
+            order
+            rnGen
+            (Sorter.randomStages order switchFreq wPfx switchCount)
 
 
     let createRandomStages2
@@ -87,11 +114,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)  
+        =
         createRandom 
             sorterStId 
             sorterCt 
-            order wPfx switchCount Sorter.randomStages2 rnGen
+            order 
+            rnGen  
+            (Sorter.randomStages2 order wPfx switchCount)
 
 
     let createRandomStagesCoConj
@@ -100,11 +130,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)
+        =
         createRandom 
             sorterStId 
             sorterCt 
-            order wPfx switchCount Sorter.randomStagesCoConj rnGen
+            order
+            rnGen
+            (Sorter.randomStagesCoConj order wPfx switchCount)
 
 
     let createRandomStagesSeparated
@@ -115,27 +148,36 @@ module SorterSet =
         (maxSeparation: int)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)  
+        =
         createRandom 
-            sorterStId 
-            sorterCt 
-            order 
-            wPfx 
-            switchCount 
-            (Sorter.randomStagesSeparated minSeparation maxSeparation) 
-            rnGen
-
-
+            sorterStId
+            sorterCt
+            order
+            rnGen 
+            (Sorter.randomStagesSeparated minSeparation maxSeparation order wPfx switchCount)
+            
     
     let createRandomOrbitDraws
-            (sorterStId:sorterSetId)
-            (sorterCt: sorterCount)
-            (coreTc:twoCycle) 
-            (permSeed:permutation)
-            (wPfx: switch seq)
-            (switchCount: switchCount)
-            (rnGen: rngGen)  =
-        None
+        (sorterStId:sorterSetId)
+        (sorterCt: sorterCount)
+        (coreTc:twoCycle) 
+        (permSeed:permutation)
+        (wPfx: switch seq)
+        (switchCount: switchCount)
+        (rnGen: rngGen)  
+        =
+        let perms = permSeed 
+                    |> Permutation.powers None
+                    |> Seq.toArray
+        let order = (coreTc |> TwoCycle.getOrder)
+        createRandom 
+            sorterStId
+            sorterCt
+            order
+            rnGen
+            (Sorter.randomPermutaionChoice coreTc perms order wPfx switchCount)
+
 
     let createRandomSymmetric
         (sorterStId:sorterSetId)
@@ -143,11 +185,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen) =
+        (rnGen: rngGen) 
+        =
         createRandom 
             sorterStId 
             sorterCt 
-            order wPfx switchCount Sorter.randomSymmetric rnGen
+            order
+            rnGen
+            (Sorter.randomSymmetric order wPfx switchCount)
 
 
     let createRandomBuddies
@@ -157,11 +202,14 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  =
+        (rnGen: rngGen)  
+        =
         createRandom 
-            sorterStId 
-            sorterCt 
-            order wPfx switchCount (Sorter.randomBuddies stageWindowSz) rnGen
+            sorterStId
+            sorterCt
+            order
+            rnGen
+            (Sorter.randomBuddies stageWindowSz order wPfx switchCount) 
 
 
     let createMutationSet 
@@ -170,7 +218,8 @@ module SorterSet =
         (order: order) 
         (sorterMutatr: sorterUniformMutator) 
         (sorterStId:sorterSetId)
-        (randy: IRando) =
+        (randy: IRando) 
+        =
         let _mutato dex id =
             let sortr = sorterBase.[dex % sorterBase.Length]
             let muty = sorterMutatr.mFunc sortr id randy
@@ -182,31 +231,3 @@ module SorterSet =
         |> Seq.map(Result.ExtractOrThrow)
         |> Seq.take(sorterCt |> SorterCount.value)
         |> load sorterStId order
-
-
-    
-    //let createMutationSet 
-    //    (sorterBase: sorter[]) 
-    //    (sorterCt:sorterCount)
-    //    (order: order) 
-    //    (sorterMutatr: sorterUniformMutator) 
-    //    (sorterStId:sorterSetId)
-    //    (randy: IRando) =
-    //    let _mutato dex id =
-    //        let sortr = sorterBase.[dex % sorterBase.Length]
-    //        let muty = sorterMutatr.mFunc sortr id randy
-    //        muty
-
-    //    let mutantCount = (sorterCt |> SorterCount.value) - sorterBase.Length
-    //                      |> SorterCount.create
-
-    //    let mutants = 
-    //        generateSorterIds sorterStId
-    //        |> Seq.mapi(_mutato)
-    //        |> Seq.filter(Result.isOk)
-    //        |> Seq.map(Result.ExtractOrThrow)
-    //        |> Seq.take(mutantCount |> SorterCount.value)
-    //        |> Seq.toArray
-
-    //    mutants |> Seq.append sorterBase
-    //    |> load sorterStId order

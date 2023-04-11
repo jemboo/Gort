@@ -58,7 +58,7 @@ type BenchSorterSet() =
 
 
         this.sortableSet <- SortableSet.makeAllBits 
-                                (123 |> SortableSetId.create) 
+                                (Guid.NewGuid() |> SortableSetId.create) 
                                 this.sortableFormat 
                                 ordr
                             |> Result.ExtractOrThrow
