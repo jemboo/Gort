@@ -31,5 +31,7 @@ type sorterEvalDtoFixture() =
              sorterId
 
         let sorterEvalJson = sorterEval |> SorterEvalDto.toJson
-        let sorterEvalBack = sorterEvalJson |> SorterEvalDto.fromJson
+        let sorterEvalBack = sorterEvalJson 
+                             |> SorterEvalDto.fromJson
+                             |> Result.ExtractOrThrow
         Assert.IsTrue(CollectionProps.areEqual sorterEval sorterEvalBack)

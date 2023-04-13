@@ -77,7 +77,8 @@ module SorterSpeed =
                 
             let usedSwitchCt = switchesUsd.Length |> SwitchCount.create
             let usedStageCt = (switchesUsd |> StageCover.getStageCount)
-            (create usedSwitchCt usedStageCt) |> Ok
+            let sortrPhenotypId = switchesUsd |> SorterPhenotypeId.createFromSwitches
+            (create usedSwitchCt usedStageCt, sortrPhenotypId, switchUseCts) |> Ok
         with ex ->
             (sprintf "error in SorterSpeed.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
@@ -192,14 +193,6 @@ module SorterEval =
         let sortableStId = (sortableSt |> SortableSet.getSortableSetId)
         let sorterOpOutput =
             SortingRollout.makeSorterOpOutput sorterOpTrackMode.SwitchUses sortableSt sortr
-
-        //match sorterOpOutput with
-        //| Ok output -> 
-        //    let sorterSpeedRes = output |> SorterSpeed.fromSorterOpOutput
-
-        //    make None None None None None sortableStId sortrId
-        //| Error msg ->
-        //    make  (Some msg) None None None None sortableStId sortrId
 
         match sorterOpOutput with
         | Ok output ->

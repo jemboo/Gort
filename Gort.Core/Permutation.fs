@@ -27,6 +27,33 @@ module Permutation =
 
     let getOrder (perm: permutation) = Order.createNr perm.values.Length
 
+    let makeMonoCycle (order: order) (aDex: int) (bDex: int) =
+        { values =
+            Array.init (Order.value order) (fun i ->
+                if (i = aDex) then bDex
+                elif (i = bDex) then aDex
+                else i) }
+
+    let makeAllMonoCycles (ord: order) =
+        seq {
+            for i = 0 to (Order.value (ord) - 1) do
+                for j = 0 to i - 1 do
+                    yield makeMonoCycle ord i j
+        }
+
+    let switchVals aVal bVal (perm:permutation)  
+        =
+        let ov = perm |> getOrder |> Order.value
+        let oA = perm |> getArray
+        { values =
+            Array.init 
+                ov
+                (fun i ->
+                    if (oA.[i] = aVal) then bVal
+                    elif (oA.[i] = bVal) then aVal
+                    else oA.[i] )
+        }
+
     let rotate (order: order) (dir: int) =
         let d = (Order.value order)
         { values = Array.init d (fun i -> (i + dir) % d) }
@@ -137,3 +164,10 @@ module Permutation =
                   yield nextPerm
                   curPerm <- nextPerm
         }
+
+    let mutate (rnd: IRando) (perm:permutation) 
+        =
+        let ov = perm |> getOrder |> Order.value
+        let sc =  ov |> uint64 |> SymbolSetSize.createNr
+        let aDex, bDex = RandVars.drawTwoWithoutRep sc rnd
+        switchVals aDex bDex perm

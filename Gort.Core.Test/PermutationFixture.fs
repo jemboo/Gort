@@ -15,6 +15,15 @@ type PermutationFixture() =
         Assert.AreEqual(expectedLen, permutes |> Permutation.getArray |> Array.length)
         Assert.AreEqual(expectedSum, permutes |> Permutation.getArray |> Array.sum)
 
+    [<TestMethod>]
+    member this.Permutation_switchVals() =
+        let origPerm = [|2;1;3;0;4|] |> Permutation.createNr
+        let aVal, bVal = 1, 3
+        let expected = [2;3;1;0;4]
+        let swPerm = origPerm |> Permutation.switchVals aVal bVal
+        let aOut = swPerm |> Permutation.getArray |> Array.toList
+        Assert.AreEqual(expected, aOut)
+
 
     [<TestMethod>]
     member this.Permutation_powers() =
@@ -122,8 +131,6 @@ type PermutationFixture() =
                                 |> Seq.map(fun w -> (v,w, (Permutation.getDistance sepPerms.[v] sepPerms.[w]))))
             |> Seq.concat |> Seq.toArray
         aHay |> Array.iter(fun v -> Console.WriteLine(sprintf "%A" v))
-
-
 
         Assert.IsTrue(true)
 

@@ -39,23 +39,17 @@ module TwoCycle =
         CollectionProps.isSorted tc.values
 
     let makeMonoCycle (order: order) (aDex: int) (bDex: int) =
-        { values =
-            Array.init (Order.value order) (fun i ->
-                if (i = aDex) then bDex
-                elif (i = bDex) then aDex
-                else i) }
+        { values = 
+            Permutation.makeMonoCycle order aDex bDex
+                   |> Permutation.getArray }
 
     let makeAllMonoCycles (ord: order) =
-        seq {
-            for i = 0 to (Order.value (ord) - 1) do
-                for j = 0 to i - 1 do
-                    yield makeMonoCycle ord i j
-        }
+        Permutation.makeAllMonoCycles ord
+        |> Seq.map(Permutation.getArray >> createNr)
 
     let makeReflection (tc: twoCycle) =
         let _ref pos = Order.reflect (getOrder tc) pos
         { values = Array.init (tc.values.Length) (fun dex -> tc.values.[_ref dex] |> _ref) }
-
 
 
     //*************************************************************
