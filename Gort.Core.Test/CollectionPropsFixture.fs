@@ -38,15 +38,6 @@ type CollectionPropsFixture() =
 
 
     [<TestMethod>]
-    member this.enumNchooseM() =
-        let n = 8
-        let m = 5
-        let res = CollectionProps.enumNchooseM n m |> Seq.map (List.toArray) |> Seq.toList
-        Assert.IsTrue(res |> Seq.forall (CollectionProps.isSorted))
-        Assert.AreEqual(res.Length, 56)
-
-
-    [<TestMethod>]
     member this.isIdentity() =
         let testArray = [| 2; 3; 4; 5 |]
         let testArray2 = [| 0; 1; 2; 3; 4; 5 |]

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Include="Script1.fsx" />
+    <Compile Include="FileUtils.fs" />
     <Compile Include="InlineScraps.fs" />
     <Compile Include="SysExt.fs" />
     <Compile Include="Result.fs" />
@@ -29,7 +30,6 @@
     <Compile Include="Permutation.fs" />
     <Compile Include="SwitchRfl.fs" />
     <Compile Include="TwoCycle.fs" />
-    <Compile Include="File.fs" />
   </ItemGroup>
 
   <ItemGroup>

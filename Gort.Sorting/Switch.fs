@@ -178,21 +178,25 @@ module Switch =
 
     // returns a sequence containing all the possible
     // order reductions of the switch array
-    let allMasks (orderSource: order) (orderDest: order) (swa: switch array) =
-        let sd = (Order.value orderSource)
-        let dd = (Order.value orderDest)
+    let allMasks 
+        (orderSource: order) 
+        (orderDest: order) 
+        (swa: switch array) 
+        =
+        let sd, dd = (Order.value orderSource), (Order.value orderDest)
         if sd < dd then
             failwith "source order cannot be smaller than dest"
-
-        CollectionProps.enumNchooseM sd dd |> Seq.map (rebufo orderSource swa)
+        Combinatorics.enumNchooseM sd dd |> Seq.map (rebufo orderSource swa)
 
     // returns a sequence containing random
     // order reductions of the switch array
-    let rndMasks (orderSource: order) (orderDest: order) (swa: switch array) (rnd: IRando) =
-        let sd = (Order.value orderSource)
-        let dd = (Order.value orderDest)
-
+    let rndMasks 
+        (orderSource: order) 
+        (orderDest: order) 
+        (swa: switch array) 
+        (rnd: IRando) 
+        =
+        let sd, dd = (Order.value orderSource), (Order.value orderDest)
         if sd < dd then
             failwith "source order cannot be smaller than dest"
-
         RandVars.rndNchooseM sd dd rnd |> Seq.map (rebufo orderSource swa)

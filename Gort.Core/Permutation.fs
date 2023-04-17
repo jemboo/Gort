@@ -153,7 +153,8 @@ module Permutation =
     let getRandomSeparated (order: order) 
             (minSeparation:int) 
             (maxSeparation: int)
-            (rnd: IRando) =
+            (rnd: IRando)
+        =
         let mutable curPerm = createRandom order rnd 
         seq {
             yield curPerm

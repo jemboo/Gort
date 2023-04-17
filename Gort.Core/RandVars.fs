@@ -40,7 +40,10 @@ module RandVars =
         Seq.init len (fun _ -> (rnd.NextPositiveInt % sc))
 
 
-    let drawTwoWithoutRep (symbolCount: symbolSetSize) (rnd: IRando) =
+    let drawTwoWithoutRep 
+        (symbolCount: symbolSetSize) 
+        (rnd: IRando) 
+        =
         let sc = symbolCount |> SymbolSetSize.value |> int
         let aBit = rnd.NextPositiveInt % sc
         let mutable bBit = rnd.NextPositiveInt % sc
@@ -85,6 +88,45 @@ module RandVars =
 
         seq { (initialList.Length) .. -1 .. 1 } // Going from the length of the list down to 1
         |> Seq.map (fun i -> nextItem (uint32 i)) // yield the next item
+
+
+
+    // returns a sequence of draws from initialList without replacement.
+    // Does not change initialList
+    let fisherYatesReflShuffle (rnd: IRando) (initialList: array<int>) =
+        let len = initialList.Length
+        let order = len |> Order.createNr
+
+        let rndmx max = rnd.NextUInt % max
+        let availableFlags = Array.init initialList.Length (fun i -> (i, true))
+
+        let nextItem nLeft =
+            let nItem = (rndmx nLeft) // Index out of available items
+
+            let index = // Index in original deck
+                availableFlags // Go through available array
+                |> Seq.filter (fun (ndx, f) -> f) // and pick out only the available tuples
+                |> Seq.item (int nItem) // Get the one at our chosen index
+                |> fst // and retrieve it's index into the original array
+
+            availableFlags.[index] <- (index, false) // Mark that index as unavailable
+            let retVal = initialList.[index] // and return the original item
+            let reflVal = Order.reflect order retVal
+            availableFlags.[reflVal] <- (reflVal, false) // Mark that index as unavailable
+            retVal 
+
+        let firstHalf = 
+            seq { (len) .. -2 .. 1 } // Going from the length of the list down to 1
+            |> Seq.map (fun i -> nextItem (uint32 i)) // yield the next item
+            |> Seq.toArray
+
+        let aRet = Array.zeroCreate initialList.Length
+        for dex = 0 to (initialList.Length / 2 - 1) do
+            aRet.[dex] <- firstHalf.[dex]
+            aRet.[len - 1 - dex] <- Order.reflect order (firstHalf.[dex])
+        aRet
+
+
 
 
     let randomPermutation (rnd: IRando) (order: order) =

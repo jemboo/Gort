@@ -61,3 +61,23 @@ type RndGenFixture() =
             |> Array.map (fun tup -> (fst tup, tup |> snd |> Array.length))
 
         Assert.IsTrue(res.Length = 10)
+
+
+    [<TestMethod>]
+    member this.fisherYatesReflShuffle() =
+        let arrayLen = 8
+        let rndy = Rando.fromRngGen (RngGen.lcgFromNow ())
+
+        let initialList = Array.init arrayLen id
+
+        for dex = 0 to 10 do
+            let perm =
+                RandVars.fisherYatesReflShuffle rndy initialList
+                |> Permutation.createNr
+            
+
+
+            Assert.IsTrue(8 = 8)
+
+
+

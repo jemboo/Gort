@@ -13,3 +13,12 @@ type CombinatoricsFixture() =
                     |> Seq.toArray
         Assert.AreEqual(yab.Length, expectedLen)
 
+
+    [<TestMethod>]
+    member this.enumNchooseM() =
+        let n = 8
+        let m = 5
+        let res = Combinatorics.enumNchooseM n m |> Seq.map (List.toArray) |> Seq.toList
+        Assert.IsTrue(res |> Seq.forall (CollectionProps.isSorted))
+        Assert.AreEqual(res.Length, 56)
+

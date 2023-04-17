@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="FileUtilsFixture.fs" />
     <Compile Include="SysExtFixture.fs" />
     <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CollectionPropsFixture.fs" />
@@ -26,7 +27,6 @@
     <Compile Include="RolloutFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="IntSetFixture.fs" />
-    <Compile Include="FileFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

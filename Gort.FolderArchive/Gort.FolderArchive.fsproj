@@ -6,16 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SorterGenome.fs" />
-    <Compile Include="GA.fs" />
-    <Compile Include="WsSample.fs" />
+    <Compile Include="FolderWrite.fs" />
+    <Compile Include="FolderRead.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gort.Core\Gort.Core.fsproj" />
-    <ProjectReference Include="..\Gort.SortingOps\Gort.SortingOps.fsproj" />
-    <ProjectReference Include="..\Gort.Sorting\Gort.Sorting.fsproj" />
   </ItemGroup>
 
 </Project>

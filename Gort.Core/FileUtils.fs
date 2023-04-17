@@ -153,3 +153,20 @@ module FileUtils =
                 appendToFile fp data
             with ex ->
                 ("error in archiver: " + ex.Message) |> Result.Error
+
+
+type csvFile = { header:string; records:string[]; directory:fileDir; fileName:string; }
+
+module CsvFile =
+
+    let writeCsvFile (csv:csvFile) =
+        try
+            Directory.CreateDirectory(FileDir.value(csv.directory)) |> ignore
+            let FileDir = sprintf "%s\\%s" (FileDir.value(csv.directory)) csv.fileName
+            use sw = new StreamWriter(FileDir, false)
+            fprintfn sw "%s" csv.header
+            csv.records |> Array.iter(fprintfn sw "%s")
+            sw.Dispose()
+            true |> Ok
+        with
+            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
