@@ -26,7 +26,9 @@ type SortingRolloutFixture() =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = Guid.NewGuid() |> SortableSetId.create
         let switchCount = SwitchCount.orderToRecordSwitchCount order
-        let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
+        let rando () = 
+            RngGen.createLcg (1233 |> RandomSeed.create)
+
         let sortrId = Guid.NewGuid() |> SorterId.create
         let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sortrId 
 
@@ -149,8 +151,9 @@ type SortingRolloutFixture() =
 
         let refinedSet_RfU8_su =
             res_RfU8_su
-            |> SorterOpOutput.getRefinedSortableSet
+            |> SorterOpOutput.getRefinedSortableSet (Guid.Empty |> SortableSetId.create)
             |> Result.ExtractOrThrow
+            |> SortableSet.getRollout
             |> Rollout.toBoolArrays
             |> Seq.toArray
 
@@ -160,8 +163,9 @@ type SortingRolloutFixture() =
 
         let refinedSet_RfU16_su =
             res_RfU16_su
-            |> SorterOpOutput.getRefinedSortableSet
+            |> SorterOpOutput.getRefinedSortableSet (Guid.Empty |> SortableSetId.create)
             |> Result.ExtractOrThrow
+            |> SortableSet.getRollout
             |> Rollout.toBoolArrays
             |> Seq.toArray
 
@@ -173,8 +177,9 @@ type SortingRolloutFixture() =
 
         let refinedSet_RfU64_su =
             res_RfU64_su
-            |> SorterOpOutput.getRefinedSortableSet
+            |> SorterOpOutput.getRefinedSortableSet (Guid.Empty |> SortableSetId.create)
             |> Result.ExtractOrThrow
+            |> SortableSet.getRollout
             |> Rollout.toBoolArrays
             |> Seq.toArray
 

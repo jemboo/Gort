@@ -13,7 +13,9 @@ type SorterSetFixture() =
       let wPfx = Seq.empty<switch>
       let switchCt = 100 |> SwitchCount.create
       let sorterCt = 10 |> SorterCount.create
-      let rndGn = RngGen.lcgFromNow ()
+      let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+      let rndGn () = 
+        randy |> Rando.nextRngGen
 
       let sorterSt = SorterSet.createRandomSwitches 
                         sorterSetId sorterCt ordr wPfx switchCt rndGn
@@ -35,7 +37,9 @@ type SorterSetFixture() =
       let switchCt = 100 |> SwitchCount.create
       let baseSorterCt = 3 |> SorterCount.create
       let sorterCt = 20 |> SorterCount.create
-      let rndGn = RngGen.lcgFromNow ()
+      let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+      let rndGn () = 
+        randy |> Rando.nextRngGen
       let mutationRate = MutationRate.create 0.5
 
       let sorterStBase = SorterSet.createRandomSwitches 
@@ -49,7 +53,7 @@ type SorterSetFixture() =
                         |> Seq.toArray
 
       let mutants = SorterSet.createMutationSet 
-                        baseSorters sorterCt ordr sorterMutator sorterSetId (rndGn |> Rando.fromRngGen)
+                        baseSorters sorterCt ordr sorterMutator sorterSetId randy
 
        
       Assert.AreEqual(sorterCt |> SorterCount.value, mutants |> SorterSet.getSorters |> Seq.length)

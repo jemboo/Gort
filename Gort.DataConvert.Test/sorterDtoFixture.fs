@@ -11,7 +11,8 @@ type sorterDtoFixture() =
       let ordr = 64 |> Order.createNr
       let wPfx = Seq.empty<switch>
       let switchCt = 100 |> SwitchCount.create
-      let rndGn = RngGen.lcgFromNow () |> Rando.fromRngGen
+      let rndGn () = 
+        RngGen.lcgFromNow ()
       let sortr = Sorter.randomSwitches ordr wPfx switchCt rndGn sorterId 
       let cereal = sortr |> SorterDto.toJson
       let sortrBack = cereal |> SorterDto.fromJson |> Result.ExtractOrThrow

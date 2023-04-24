@@ -172,9 +172,10 @@ module SorterEval =
         | GetSortedSetCount -> 
                 match sorterEvl.sorterPrf with  
                 | None -> true
-                | Some perf -> match perf with
-                               | IsSuccessful _ -> true
-                               | SortedSetSize _ -> false
+                | Some perf -> 
+                    match perf with
+                    | IsSuccessful _ -> true
+                    | SortedSetSize _ -> false
 
 
     let evalSorterWithSortableSet 
@@ -205,9 +206,9 @@ module SorterEval =
                 | CheckSuccess -> 
                     let isSuccessfl = 
                         output 
-                            |> SorterOpOutput.isSorted
-                            |> sorterPerf.IsSuccessful
-                            |> Option.Some
+                        |> SorterOpOutput.isSorted
+                        |> sorterPerf.IsSuccessful
+                        |> Option.Some
                     make None (Some switchUseCts) (Some sorterSpeed) isSuccessfl (Some sorterPhenotypId) sortableStId sortrId
                 | GetSortedSetCount ->
                     let sortedSetCt = output |> SorterOpOutput.getRefinedSortableCount

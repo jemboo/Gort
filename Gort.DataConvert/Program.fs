@@ -47,11 +47,12 @@ let randomSorterSetEvalsFileB = "randomSorterSetEval_B.txt"
 let randomSorterSetEvalsFileC = "randomSorterSetEval_C.txt"
 
 
-let permSortableSetA = SortableSet.makeOrbits rolloutFormat.RfU8 None permA permSortableSetId_A
+let permSortableSetA = 
+    SortableSet.makeOrbits permSortableSetId_A None permA 
                         |> Result.ExtractOrThrow
-let permSortableSetB = SortableSet.makeOrbits rolloutFormat.RfU8 None permB permSortableSetId_B
+let permSortableSetB = SortableSet.makeOrbits permSortableSetId_B None permB 
                         |> Result.ExtractOrThrow
-let permSortableSetC = SortableSet.makeOrbits rolloutFormat.RfU8 None permC permSortableSetId_C
+let permSortableSetC = SortableSet.makeOrbits permSortableSetId_C None permC 
                         |> Result.ExtractOrThrow
 
 
@@ -64,7 +65,9 @@ let randomSorterSetFullEvalsFile = "randomSorterSetFullEval.txt"
 let wPfx = Seq.empty<switch>
 let switchCt = SwitchCount.orderTo999SwitchCount order
 let randomSorterSetSize = SorterCount.create 100
-let rngGenRandomSorterSet = RngGen.create rngType.Lcg (11288 |> RandomSeed.create)
+let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+let rndGn () = 
+        randy |> Rando.nextRngGen
 let randomSorterSetFile = "randomSorterSet.txt"
 
 
@@ -78,7 +81,7 @@ let makeRandomSorterSet() =
                     order 
                     wPfx 
                     switchCt 
-                    rngGenRandomSorterSet
+                    rndGn
 
    let cereal = sorterSt |> SorterSetDto.toJson
    use streamW = new StreamWriter(fileP)

@@ -54,7 +54,9 @@ module GuidUtils =
         System.Guid(md5.ComputeHash(objs |> Seq.toArray))
 
 
-    let guidFromObjs (objs: seq<obj>) = System.Guid(ByteUtils.hashObjs objs)
+    // structural equality
+    let guidFromObjs (objs: seq<obj>) = 
+        System.Guid(ByteUtils.hashObjs objs)
 
 
     let guidFromStringR (gstr: string) =

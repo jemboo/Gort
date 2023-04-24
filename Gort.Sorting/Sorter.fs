@@ -171,10 +171,11 @@ module Sorter =
             (order: order)
             (wPfx: switch seq)
             (switchCount: switchCount) 
-            (rnd: IRando)
+            (rnGen: unit -> rngGen)
             (sorterD:sorterId)
             =
-        let switches = Switch.rndNonDegenSwitchesOfOrder order rnd
+        let randy = (rnGen()) |> Rando.fromRngGen
+        let switches = Switch.rndNonDegenSwitchesOfOrder order randy
         fromSwitchesWithPrefix sorterD order switchCount wPfx switches
 
 
@@ -183,14 +184,14 @@ module Sorter =
         (switchFreq: switchFrequency)
         (wPfx: switch seq)
         (switchCount: switchCount) 
-        (rando: IRando)
+        (rnGen: unit -> rngGen)
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let _switches =
-            (Stage.rndSeq order switchFreq rando)
+            (Stage.rndSeq order switchFreq randy)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
-
         fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
 
 
@@ -198,15 +199,15 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
+        (rnGen: unit -> rngGen)
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let coreTc = TwoCycle.evenMode order
         let _switches =
-            (Stage.rndSeq2 coreTc rando)
+            (Stage.rndSeq2 coreTc randy)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
-
         fromSwitchesWithPrefix sorterD order switchCount wPfx _switches
 
 
@@ -214,11 +215,12 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)  
+        (rnGen: unit -> rngGen) 
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let _switches =
-            (Stage.rndSeqCoConj order rando)
+            (Stage.rndSeqCoConj order randy)
             |> Seq.concat
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
@@ -232,11 +234,12 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
+        (rnGen: unit -> rngGen)
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let _switches =
-            (Stage.rndSeqSeparated order minSeparation maxSeparation rando)
+            (Stage.rndSeqSeparated order minSeparation maxSeparation randy)
             |> Seq.concat
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
@@ -250,11 +253,12 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
+        (rnGen: unit -> rngGen)
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let _switches =
-            (Stage.rndPermDraw coreTc perms rando)
+            (Stage.rndPermDraw coreTc perms randy)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
 
@@ -265,11 +269,12 @@ module Sorter =
             (order: order)
             (wPfx: switch seq)
             (switchCount: switchCount)
-            (rando: IRando)
+            (rnGen: unit -> rngGen)
             (sorterD:sorterId)
             =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let switches =
-            (Stage.rndSymmetric order rando)
+            (Stage.rndSymmetric order randy)
             |> Seq.map (fun st -> st.switches)
             |> Seq.concat
 
@@ -281,11 +286,12 @@ module Sorter =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rando: IRando)
+        (rnGen: unit -> rngGen)
         (sorterD:sorterId)
         =
+        let randy = (rnGen()) |> Rando.fromRngGen
         let switches =
-            (Stage.rndBuddyStages stageWindowSz SwitchFrequency.max order rando List.empty)
+            (Stage.rndBuddyStages stageWindowSz SwitchFrequency.max order randy List.empty)
             |> Seq.collect (fun st -> st.switches |> List.toSeq)
 
         fromSwitchesWithPrefix sorterD order switchCount wPfx switches

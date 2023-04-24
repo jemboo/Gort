@@ -5,7 +5,9 @@ open System
 
 module CollectionOps =
 
-    let bookMarkArrays<'a> (arrs:'a[][]) =
+    let bookMarkArrays<'a> 
+            (arrs:'a[][]) 
+            =
         let mutable acc = 0
         let mutable j = 0
         let bookMarks = Array.zeroCreate (arrs.GetLength 0)
@@ -16,7 +18,10 @@ module CollectionOps =
         bookMarks, (arrs |> Array.concat)
 
 
-    let deBookMarkArray<'a> (bookMarks:int[]) (arr:'a[]) =
+    let deBookMarkArray<'a> 
+            (bookMarks:int[]) 
+            (arr:'a[]) 
+            =
         seq {
             let mutable dex = 0
             let mutable lastEnd = 0
@@ -29,18 +34,26 @@ module CollectionOps =
         }
 
     //takes up to maxCt items from the sequence, returns less if it runs out
-    let takeUpto<'a> (maxCt: int) (source: seq<'a>) =
+    let takeUpto<'a> 
+            (maxCt: int) 
+            (source: seq<'a>) 
+            =
         source
         |> Seq.mapi (fun dex v -> (dex, v))
         |> Seq.takeWhile (fun tup -> (fst tup) < maxCt)
         |> Seq.map (snd)
 
 
-    let infinteLoop (robbin:seq<'a>) = 
+    let infinteLoop 
+            (robbin:seq<'a>) 
+            = 
         seq {while true do yield! robbin}
 
 
-    let cartesianProduct (seq_a: seq<'a>) (seq_b: seq<'b>) =
+    let cartesianProduct 
+            (seq_a: seq<'a>) 
+            (seq_b: seq<'b>) 
+            =
         seq {  
             for ae in seq_a do
                for be in seq_b do
@@ -50,7 +63,10 @@ module CollectionOps =
 
     // product map composition: a(b()).
     let inline arrayProduct< ^a when ^a:(static member op_Explicit:^a->int)>
-                    (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
+                    (lhs: array<^a>) 
+                    (rhs: array<^a>) 
+                    (prod: array<^a>) 
+                    =
         let dmax = lhs.Length
         let mutable curdex = 0
         while curdex < dmax do
@@ -67,7 +83,9 @@ module CollectionOps =
             ("error in arrayProductR: " + ex.Message) |> Result.Error
 
 
-    let allPowers (a_core: array<int>) =
+    let allPowers   
+            (a_core: array<int>) 
+            =
         seq {
             let mutable _continue = true
             let mutable a_cur = Array.copy a_core
@@ -80,7 +98,10 @@ module CollectionOps =
                 yield a_cur
         }
 
-    let allPowersCapped (maxCount: int) (a_core: array<int>) =
+    let allPowersCapped 
+            (maxCount: int) 
+            (a_core: array<int>) 
+            =
         seq {
             let mutable _continue = true
             let mutable dex = 0
@@ -94,7 +115,10 @@ module CollectionOps =
                 dex <- dex + 1
         }
 
-    let filterByPickList (data: 'a[]) (picks: bool[]) =
+    let filterByPickList 
+            (data: 'a[]) 
+            (picks: bool[]) 
+            =
         try
             let pickCount = picks |> Array.map (fun v -> if v then 1 else 0) |> Array.sum
             let filtAr = Array.zeroCreate pickCount
@@ -114,7 +138,9 @@ module CollectionOps =
                                     ^a:(static member One:^a) and  
                                     ^a:(static member (+):^a* ^a -> ^a) and 
                                     ^a:(static member op_Explicit:^a->int)>
-                    (ar: array<^a>) (inv_out: array<^a>) =
+                    (ar: array<^a>) 
+                    (inv_out: array<^a>) 
+                    =
         let mutable iv = zero_of ar.[0]
         let incr = one_of ar.[0]          
         for i = 0 to ar.Length - 1 do
@@ -123,14 +149,20 @@ module CollectionOps =
         inv_out
 
 
-    let invertArrayR (a: array<int>) (inv_out: array<int>) =
+    let invertArrayR 
+            (a: array<int>) 
+            (inv_out: array<int>) 
+            =
         try
             invertArray a inv_out |> Ok
         with ex ->
             ("error in inverseMapArray: " + ex.Message) |> Result.Error
 
 
-    let histogram<'d, 'r when 'r: comparison> (keymaker: 'd -> 'r) (qua: seq<'d>) =
+    let histogram<'d, 'r when 'r: comparison> 
+            (keymaker: 'd -> 'r) 
+            (qua: seq<'d>) 
+            =
         qua
         |> Seq.fold
             (fun acc fv ->
@@ -144,14 +176,21 @@ module CollectionOps =
 
 
 
-    let conjIntArrays (a_bread: array<int>) (a_core: array<int>) (a_out: array<int>) =
+    let conjIntArrays 
+            (a_bread: array<int>)
+            (a_core: array<int>)
+            (a_out: array<int>)
+            =
         let breadInv = Array.zeroCreate a_bread.Length |> invertArray a_bread
         let step1 = Array.zeroCreate a_bread.Length |> arrayProduct a_core breadInv
         Array.zeroCreate a_bread.Length |> arrayProduct a_bread step1
 
 
     // a_conj * a_core * (a_conj ^ -1)
-    let conjIntArraysR (a_conj: array<int>) (a_core: array<int>) =
+    let conjIntArraysR
+            (a_conj: array<int>)
+            (a_core: array<int>)
+            =
         try
             let a_out = Array.zeroCreate a_conj.Length
             conjIntArrays a_conj a_core a_out |> Ok
@@ -168,7 +207,9 @@ module CollectionOps =
     let stack (lowTohi: 'a[] seq) = lowTohi |> Seq.concat |> Seq.toArray
 
 
-    let comboStack (subSeqs: 'a[][] seq) =
+    let comboStack
+            (subSeqs: 'a[][] seq)
+            =
         let rec _cart LL =
             match LL with
             | [] -> Seq.singleton []
@@ -181,14 +222,20 @@ module CollectionOps =
         _cart (subSeqs |> Seq.toList) |> Seq.map (stack)
 
 
-    let stackSortedBlocksOfTwoSymbols (blockSizes: order seq) (hival: 'a) (lowval: 'a) =
+    let stackSortedBlocksOfTwoSymbols 
+            (blockSizes: order seq)
+            (hival: 'a)
+            (lowval: 'a)
+            =
         let _allSorted (deg: order) =
             Order.allTwoSymbolOrderedArrays deg hival lowval
 
         blockSizes |> Seq.map (_allSorted >> Seq.toArray) |> comboStack
 
 
-    let stackSortedBlocks (blockSizes: order seq) =
+    let stackSortedBlocks 
+            (blockSizes: order seq) 
+            =
         let _allSorted (deg: order) =
             Order.allTwoSymbolOrderedArrays deg true false
 
@@ -200,7 +247,10 @@ module CollectionOps =
     //************    Split Sequence   ****************************
     //*************************************************************
 
-    let chunkByDelimiter<'a> (strm: seq<'a>) (delim: 'a -> bool) =
+    let chunkByDelimiter<'a> 
+            (strm: seq<'a>)
+            (delim: 'a -> bool)
+            =
         let swEnumer = strm.GetEnumerator()
         let mutable rz = ResizeArray()
 
@@ -216,7 +266,10 @@ module CollectionOps =
 
     // returns an array of length chunkSz, which is made by converting vals to a
     // 2d array with chunkSz columns, and then summing over each column.
-    let wrapAndSumCols (chunkSz: int) (vals: seq<int>) =
+    let wrapAndSumCols
+            (chunkSz: int)
+            (vals: seq<int>)
+            =
         let addArrays (a: int[]) (b: int[]) =
             Array.init a.Length (fun dex -> a.[dex] + b.[dex])
 

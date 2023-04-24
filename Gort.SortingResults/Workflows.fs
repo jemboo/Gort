@@ -16,8 +16,9 @@ let evo () =
     let ordr = 16 |> Order.createNr
     let switchCt = SwitchCount.orderTo900SwitchCount ordr
     let sorterCt = SorterCount.create 10
-    let rndGn = RngGen.createLcg (123 |> RandomSeed.create)
-    let randy = rndGn |> Rando.fromRngGen
+    let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+    let rndGn () = 
+        randy |> Rando.nextRngGen
     let rolloutFormt = rolloutFormat.RfBs64
     let sortableStId = SortableSetId.create (Guid.NewGuid())
     let stageWgt = 0.2 |> StageWeight.create

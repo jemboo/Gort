@@ -37,8 +37,9 @@ type SorterSetReportingFixture() =
         let ordr = 16 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 50
-        let rndGn = RngGen.createLcg (123 |> RandomSeed.create)
-        let randy = rndGn |> Rando.fromRngGen
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let rndGn () = 
+            randy |> Rando.nextRngGen
 
         let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rndGn
         let rolloutFormt = rolloutFormat.RfBs64
@@ -120,8 +121,6 @@ type SorterSetReportingFixture() =
         let ordr = 12 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 500
-        let rndGn = RngGen.createLcg (123 |> RandomSeed.create)
-        let randy = rndGn |> Rando.fromRngGen
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create (Guid.NewGuid())
         let stageWgt = 0.2 |> StageWeight.create
@@ -129,6 +128,10 @@ type SorterSetReportingFixture() =
         let mutationRate = MutationRate.create 0.01
         let sorterMutator = SorterUniformMutator.create 
                                  None None sorterUniformMutatorType.Switch mutationRate
+
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let rndGn () = 
+            randy |> Rando.nextRngGen
 
         let sortableSt =
             SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow

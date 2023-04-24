@@ -1,6 +1,7 @@
 ﻿namespace global
 
 open SysExt
+open System
 
 
 type sorterOpOutput =
@@ -32,10 +33,24 @@ module SorterOpOutput =
     let isSorted (sorterOpOutput: sorterOpOutput) =
         sorterOpOutput.transformedRollout |> Rollout.isSorted
 
-    let getRefinedSortableSet (sorterOpOutput: sorterOpOutput) =
-        sorterOpOutput.transformedRollout |> Rollout.uniqueUnsortedMembers
+    let getRefinedSortableSet 
+            (sortableSetId:sortableSetId) 
+            (sorterOpOutput: sorterOpOutput) 
+            =
+        result {
+            let! refinedRollout =
+                    sorterOpOutput.transformedRollout 
+                    |> Rollout.uniqueUnsortedMembers
+            
+            let symbolSetSetSize = 
+                sorterOpOutput.sortableSt
+                |> SortableSet.getSymbolSetSize                    
+
+            return SortableSet.make sortableSetId symbolSetSetSize refinedRollout
+        }
 
     let getRefinedSortableCount (sorterOpOutput: sorterOpOutput) =
         sorterOpOutput
-        |> getRefinedSortableSet
-        |> Result.map(Rollout.getArrayCount >> ArrayCount.value >> SortableCount.create)
+        |> getRefinedSortableSet (Guid.Empty |> SortableSetId.create) 
+        |> Result.map(SortableSet.getRollout >> Rollout.getArrayCount >> 
+                        ArrayCount.value >> SortableCount.create)

@@ -40,7 +40,9 @@ module BooleanRoll =
                 |> ArrayCount.create
 
             let data =
-                bitPack |> BitPack.getData |> ByteUtils.getAllBitsFromByteSeq |> Seq.toArray
+                bitPack |> BitPack.getData 
+                |> ByteUtils.getAllBitsFromByteSeq 
+                |> Seq.toArray
 
             return
                 { booleanRoll.arrayCount = arrayCount
@@ -57,14 +59,20 @@ module BooleanRoll =
                  * (booleanRoll.arrayLength |> ArrayLength.value))
                 |> SymbolCount.create
 
-            let byteSeq, bitCt = booleanRoll.data |> ByteUtils.storeBitSeqInBytes
+            let byteSeq, bitCt = 
+                booleanRoll.data 
+                |> ByteUtils.storeBitSeqInBytes
+
             let data = byteSeq |> Seq.toArray
 
             return BitPack.create bitsPerSymbl symbolCt 0 data
         }
 
 
-    let fromBoolArrays (arrayLength: arrayLength) (boolAs: seq<bool[]>) =
+    let fromBoolArrays 
+            (arrayLength: arrayLength) 
+            (boolAs: seq<bool[]>) 
+            =
         result {
             let bools = boolAs |> Seq.concat |> Seq.toArray
 
@@ -78,22 +86,25 @@ module BooleanRoll =
         }
 
 
-    let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
-        result {
-            let boolA =
-                aas
-                |> Seq.concat
-                |> Seq.map (fun bv -> if (bv > 0) then true else false)
-                |> Seq.toArray
+    //let fromIntArrays 
+    //        (arrayLength: arrayLength) 
+    //        (aas: seq<int[]>)
+    //        =
+    //    result {
+    //        let boolA =
+    //            aas
+    //            |> Seq.concat
+    //            |> Seq.map (fun bv -> if (bv > 0) then true else false)
+    //            |> Seq.toArray
 
-            let arrayCount =
-                (boolA.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+    //        let arrayCount =
+    //            (boolA.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
 
-            return
-                { booleanRoll.arrayCount = arrayCount
-                  arrayLength = arrayLength
-                  data = boolA }
-        }
+    //        return
+    //            { booleanRoll.arrayCount = arrayCount
+    //              arrayLength = arrayLength
+    //              data = boolA }
+    //    }
 
 
     let toIntArrays (booleanRoll: booleanRoll) =
@@ -135,11 +146,11 @@ module BooleanRoll =
 
 
 
-
 type uInt8Roll =
     private
         { arrayCount: arrayCount
           arrayLength: arrayLength
+          bitsPerSymbol: bitsPerSymbol
           data: uint8[] }
 
 module Uint8Roll =
@@ -153,10 +164,14 @@ module Uint8Roll =
     let copy (uInt8Roll: uInt8Roll) =
         { arrayCount = uInt8Roll.arrayCount
           arrayLength = uInt8Roll.arrayLength
+          bitsPerSymbol = uInt8Roll.bitsPerSymbol
           data = uInt8Roll.data |> Array.copy }
 
 
-    let fromBitPack (arrayLength: arrayLength) (bitPack: bitPack) =
+    let fromBitPack 
+            (arrayLength: arrayLength) 
+            (bitPack: bitPack) 
+            =
         result {
             let! arrayCount =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
@@ -173,13 +188,15 @@ module Uint8Roll =
             return
                 { uInt8Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitPack.bitsPerSymbol
                   data = data }
         }
 
 
-    let toBitPack (symbolSetSize: symbolSetSize) (uInt8Roll: uInt8Roll) =
+    let toBitPack 
+            (uInt8Roll: uInt8Roll) 
+            =
         result {
-            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
             let! symbolCt =
                 ((uInt8Roll.arrayCount |> ArrayCount.value)
                  * (uInt8Roll.arrayLength |> ArrayLength.value))
@@ -187,43 +204,68 @@ module Uint8Roll =
 
             let byteSeq, bitCt =
                 uInt8Roll.data
-                |> ByteUtils.bitsFromSpBytePositions bitsPerSymbl
+                |> ByteUtils.bitsFromSpBytePositions uInt8Roll.bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
+
             let data = byteSeq |> Seq.toArray
-            return BitPack.create bitsPerSymbl symbolCt 0 data
+
+            return BitPack.create uInt8Roll.bitsPerSymbol symbolCt 0 data
         }
 
 
-    let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
+    let fromBoolArrays 
+            (arrayLength: arrayLength) 
+            (aas: seq<bool[]>) 
+            =
         result {
             let uint8s =
-                aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1uy else 0uy) |> Seq.toArray
+                aas |> Seq.concat 
+                |> Seq.map (fun tf -> if tf then 1uy else 0uy) 
+                |> Seq.toArray
 
-            let arrayCount =
-                (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            let! arrayCount =
+                (uint8s.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.create
 
+            let! bitsPerSymbol =  1 |> BitsPerSymbol.create
+                                
             return
                 { uInt8Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = uint8s }
         }
 
 
-    let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
+    let fromArrays 
+            (arrayLength: arrayLength)
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<uint8[]>) 
+            =
         result {
-            let uint8s = aas |> Seq.concat |> Seq.map (uint8) |> Seq.toArray
+            let uint8s = 
+                aas |> Seq.concat 
+                |> Seq.map (uint8) 
+                |> Seq.toArray
 
-            let arrayCount =
-                (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            let! arrayCount =
+                (uint8s.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.create
 
             let! bigA = uint8s |> ByteArray.convertUint8sToBytes
 
             return
                 { uInt8Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = bigA }
         }
 
+
+    let toArrays (uInt8Roll: uInt8Roll) =
+        uInt8Roll.data
+        |> Seq.map (uint8)
+        |> Seq.chunkBySize (uInt8Roll.arrayLength |> ArrayLength.value)
 
     let toBoolArrays (uInt8Roll: uInt8Roll) =
         uInt8Roll.data
@@ -239,17 +281,21 @@ module Uint8Roll =
 
     let uniqueMembers (uInt8Roll: uInt8Roll) =
         uInt8Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.distinct
-        |> fromIntArrays (uInt8Roll |> getArrayLength)
+        |> fromArrays 
+                (uInt8Roll |> getArrayLength)
+                uInt8Roll.bitsPerSymbol
 
 
     let uniqueUnsortedMembers (uInt8Roll: uInt8Roll) =
         uInt8Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
-        |> fromIntArrays (uInt8Roll |> getArrayLength)
+        |> fromArrays 
+            (uInt8Roll |> getArrayLength)
+            uInt8Roll.bitsPerSymbol
 
 
     let isSorted (uInt8Roll: uInt8Roll) =
@@ -270,6 +316,7 @@ type uInt16Roll =
     private
         { arrayCount: arrayCount
           arrayLength: arrayLength
+          bitsPerSymbol: bitsPerSymbol
           data: uint16[] }
 
 module Uint16Roll =
@@ -280,12 +327,18 @@ module Uint16Roll =
 
     let getData (uInt16Roll: uInt16Roll) = uInt16Roll.data
 
-    let copy (uInt16Roll: uInt16Roll) =
+    let copy 
+            (uInt16Roll: uInt16Roll) 
+            =
         { arrayCount = uInt16Roll.arrayCount
           arrayLength = uInt16Roll.arrayLength
+          bitsPerSymbol = uInt16Roll.bitsPerSymbol
           data = uInt16Roll.data |> Array.copy }
 
-    let fromBitPack (arrayLength: arrayLength) (bitPack: bitPack) =
+    let fromBitPack 
+            (arrayLength: arrayLength) 
+            (bitPack: bitPack) 
+            =
         result {
             let! arrayCount =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
@@ -296,20 +349,22 @@ module Uint16Roll =
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
                 |> ByteUtils.bitsToSpUint16Positions 
-                                (bitPack |> BitPack.getBitsPerSymbol)
-                                (bitPack |> BitPack.getSymbolCount)
+                        (bitPack |> BitPack.getBitsPerSymbol)
+                        (bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
                 { uInt16Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitPack.bitsPerSymbol
                   data = data }
         }
 
 
-    let toBitPack (symbolSetSize: symbolSetSize) (uInt16Roll: uInt16Roll) =
+    let toBitPack
+            (uInt16Roll: uInt16Roll) 
+            =
         result {
-            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
             let! symbolCt =
                 ((uInt16Roll.arrayCount |> ArrayCount.value)
                  * (uInt16Roll.arrayLength |> ArrayLength.value))
@@ -317,41 +372,64 @@ module Uint16Roll =
 
             let byteSeq, bitCt =
                 uInt16Roll.data
-                |> ByteUtils.bitsFromSpUint16Positions bitsPerSymbl
+                |> ByteUtils.bitsFromSpUint16Positions uInt16Roll.bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
+
             let data = byteSeq |> Seq.toArray
             
-            return BitPack.create bitsPerSymbl symbolCt 0 data
+            return BitPack.create uInt16Roll.bitsPerSymbol symbolCt 0 data
         }
 
 
-    let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
+    let fromBoolArrays 
+            (arrayLength: arrayLength) 
+            (aas: seq<bool[]>) 
+            =
         result {
             let uint16s =
-                aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1us else 0us) |> Seq.toArray
+                aas |> Seq.concat 
+                |> Seq.map (fun tf -> if tf then 1us else 0us) 
+                |> Seq.toArray
 
             let arrayCount =
                 (uint16s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            
+            let! bitsPerSymbol =  1 |> BitsPerSymbol.create
 
             return
                 { uInt16Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = uint16s }
         }
 
 
-    let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
+    let fromArrays 
+            (arrayLength: arrayLength)
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<uint16[]>) 
+            =
         result {
-            let uint16s = aas |> Seq.concat |> Seq.map (uint16) |> Seq.toArray
+            let uint16s = 
+                aas |> Seq.concat 
+                    |> Seq.map (uint16) 
+                    |> Seq.toArray
 
-            let arrayCount =
-                (uint16s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            let! arrayCount =
+                (uint16s.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.create
 
             return
                 { uInt16Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = uint16s }
         }
+
+    let toArrays (uInt16Roll: uInt16Roll) =
+        uInt16Roll.data
+        |> Seq.map (uint16)
+        |> Seq.chunkBySize (uInt16Roll.arrayLength |> ArrayLength.value)
 
 
     let toBoolArrays (uInt16Roll: uInt16Roll) =
@@ -368,17 +446,21 @@ module Uint16Roll =
 
     let uniqueMembers (uInt16Roll: uInt16Roll) =
         uInt16Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.distinct
-        |> fromIntArrays (uInt16Roll |> getArrayLength)
+        |> fromArrays
+                (uInt16Roll |> getArrayLength)
+                uInt16Roll.bitsPerSymbol
 
 
     let uniqueUnsortedMembers (uInt16Roll: uInt16Roll) =
         uInt16Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
-        |> fromIntArrays (uInt16Roll |> getArrayLength)
+        |> fromArrays
+                (uInt16Roll |> getArrayLength)
+                uInt16Roll.bitsPerSymbol
 
 
     let isSorted (uInt16Roll: uInt16Roll) =
@@ -399,6 +481,7 @@ type intRoll =
     private
         { arrayCount: arrayCount
           arrayLength: arrayLength
+          bitsPerSymbol: bitsPerSymbol
           data: int[] }
 
 module IntRoll =
@@ -406,9 +489,11 @@ module IntRoll =
     let copy (intRoll: intRoll) =
         { arrayCount = intRoll.arrayCount
           arrayLength = intRoll.arrayLength
+          bitsPerSymbol = intRoll.bitsPerSymbol
           data = intRoll.data |> Array.copy }
 
-    let updateData (data: int[]) (intRoll: intRoll) = { intRoll with data = data }
+    let updateData (data: int[]) (intRoll: intRoll) = 
+            { intRoll with data = data }
 
     let getArrayCount (uInt8Roll: intRoll) = uInt8Roll.arrayCount
 
@@ -420,30 +505,35 @@ module IntRoll =
 
     let getData (uInt8Roll: intRoll) = uInt8Roll.data
 
-    let fromBitPack (arrayLength: arrayLength) (bitPack: bitPack) =
+    let fromBitPack 
+            (arrayLength: arrayLength) 
+            (bitPack: bitPack) 
+            =
         result {
             let! arrayCount =
                 ((bitPack.symbolCount |> SymbolCount.value) / (arrayLength |> ArrayLength.value))
                 |> ArrayCount.create
+
             let data =
                 bitPack
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
                 |> ByteUtils.bitsToSpIntPositions 
-                                (bitPack |> BitPack.getBitsPerSymbol)
-                                (bitPack |> BitPack.getSymbolCount)
+                        (bitPack |> BitPack.getBitsPerSymbol)
+                        (bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
                 { intRoll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitPack.bitsPerSymbol
                   data = data }
         }
 
-    let toBitPack (symbolSetSize: symbolSetSize) (intRoll: intRoll) =
+    let toBitPack
+            (intRoll: intRoll) 
+            =
         result {
-            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-
             let! symbolCt =
                 ((intRoll.arrayCount |> ArrayCount.value)
                  * (intRoll.arrayLength |> ArrayLength.value))
@@ -451,35 +541,59 @@ module IntRoll =
 
             let byteSeq, bitCt =
                 intRoll.data
-                |> ByteUtils.bitsFromSpIntPositions bitsPerSymbl
+                |> ByteUtils.bitsFromSpIntPositions 
+                        intRoll.bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-            return BitPack.create bitsPerSymbl symbolCt 0 data
+            return BitPack.create intRoll.bitsPerSymbol symbolCt 0 data
         }
 
-    let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
+    let fromBoolArrays 
+            (arrayLength: arrayLength) 
+            (aas: seq<bool[]>) 
+            =
         result {
             let uint8s =
-                aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1 else 0) |> Seq.toArray
+                aas |> Seq.concat 
+                |> Seq.map (fun tf -> if tf then 1 else 0) 
+                |> Seq.toArray
+
             let arrayCount =
-                (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+                (uint8s.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.createNr
+            
+            let! bitsPerSymbol =  1 |> BitsPerSymbol.create
+
             return
                 { intRoll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = uint8s }
         }
 
-    let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
+    let fromArrays 
+            (arrayLength: arrayLength)
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<int[]>) 
+            =
         result {
             let intA = aas |> Seq.concat |> Seq.toArray
-            let arrayCount =
-                (intA.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            let! arrayCount =
+                (intA.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.create
             return
                 { intRoll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = intA }
         }
+
+
+    let toArrays (intRoll: intRoll) =
+        intRoll.data 
+            |> Seq.chunkBySize (intRoll.arrayLength 
+            |> ArrayLength.value)
 
 
     let toBoolArrays (intRoll: intRoll) =
@@ -488,23 +602,23 @@ module IntRoll =
         |> Seq.chunkBySize (intRoll.arrayLength |> ArrayLength.value)
 
 
-    let toIntArrays (intRoll: intRoll) =
-        intRoll.data |> Seq.chunkBySize (intRoll.arrayLength |> ArrayLength.value)
-
-
     let uniqueMembers (intRoll: intRoll) =
         intRoll
-        |> toIntArrays
+        |> toArrays
         |> Seq.distinct
-        |> fromIntArrays (intRoll |> getArrayLength)
+        |> fromArrays 
+            (intRoll |> getArrayLength)
+            (32 |> BitsPerSymbol)
 
 
     let uniqueUnsortedMembers (intRoll: intRoll) =
         intRoll
-        |> toIntArrays
+        |> toArrays
         |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
-        |> fromIntArrays (intRoll |> getArrayLength)
+        |> fromArrays
+            (intRoll |> getArrayLength)
+            (31 |> BitsPerSymbol)
 
 
     let isSorted (intRoll: intRoll) =
@@ -520,11 +634,11 @@ module IntRoll =
         looP
 
 
-
 type uint64Roll =
     private
         { arrayCount: arrayCount
           arrayLength: arrayLength
+          bitsPerSymbol: bitsPerSymbol
           data: uint64[] }
 
 module Uint64Roll =
@@ -541,6 +655,7 @@ module Uint64Roll =
     let copy (uint64Roll: uint64Roll) =
         { arrayCount = uint64Roll.arrayCount
           arrayLength = uint64Roll.arrayLength
+          bitsPerSymbol = uint64Roll.bitsPerSymbol
           data = uint64Roll.data |> Array.copy }
 
     let fromBitPack (arrayLength: arrayLength) (bitPack: bitPack) =
@@ -554,22 +669,21 @@ module Uint64Roll =
                 |> BitPack.getData
                 |> ByteUtils.getAllBitsFromByteSeq
                 |> ByteUtils.bitsToSpUint64Positions 
-                                    ( bitPack |> BitPack.getBitsPerSymbol)
-                                    ( bitPack |> BitPack.getSymbolCount)
+                        ( bitPack |> BitPack.getBitsPerSymbol)
+                        ( bitPack |> BitPack.getSymbolCount)
                 |> Seq.toArray
 
             return
                 { uint64Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitPack.bitsPerSymbol
                   data = data }
         }
 
 
-    let toBitPack (symbolSetSize: symbolSetSize) 
-                  (uint64Roll: uint64Roll) =
+    let toBitPack
+        (uint64Roll: uint64Roll) =
         result {
-            let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
-
             let! symbolCt =
                 uint64Roll.arrayCount
                 |> ArrayCount.value
@@ -578,56 +692,20 @@ module Uint64Roll =
 
             let byteSeq, bitCt =
                 uint64Roll.data
-                |> ByteUtils.bitsFromSpUint64Positions bitsPerSymbl
+                |> ByteUtils.bitsFromSpUint64Positions 
+                        uint64Roll.bitsPerSymbol
                 |> ByteUtils.storeBitSeqInBytes
 
             let data = byteSeq |> Seq.toArray
-            return BitPack.create bitsPerSymbl symbolCt 0 data
+            return BitPack.create uint64Roll.bitsPerSymbol symbolCt 0 data
         }
 
 
-    let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
-        result {
-            let uint8s =
-                aas |> Seq.concat |> Seq.map (fun tf -> if tf then 1uL else 0uL) |> Seq.toArray
-            let arrayCount =
-                (uint8s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-            return
-                { uint64Roll.arrayCount = arrayCount
-                  arrayLength = arrayLength
-                  data = uint8s }
-        }
-
-
-    let toBoolArrays (uint64Roll: uint64Roll) =
-        uint64Roll.data
-        |> Seq.map (fun bv -> bv > 0uL)
-        |> Seq.chunkBySize (uint64Roll.arrayLength |> ArrayLength.value)
-
-
-    let fromIntArrays (arrayLength: arrayLength) (aas: seq<int[]>) =
-        result {
-            let uint64s = aas |> Seq.concat |> Seq.map (uint64) |> Seq.toArray
-            let arrayCount =
-                (uint64s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
-            return
-                { uint64Roll.arrayCount = arrayCount
-                  arrayLength = arrayLength
-                  data = uint64s }
-        }
-
-
-    let toIntArrays (uint64Roll: uint64Roll) =
-        uint64Roll.data
-        |> Seq.map (int)
-        |> Seq.chunkBySize (uint64Roll.arrayLength |> ArrayLength.value)
-
-
-    let toUint64Arrays (uint64Roll: uint64Roll) =
-        uint64Roll.data |> Seq.chunkBySize (uint64Roll.arrayLength |> ArrayLength.value)
-
-
-    let fromUint64Arrays (arrayLength: arrayLength) (aas: seq<uint64[]>) =
+    let fromArrays 
+            (arrayLength: arrayLength)
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<uint64[]>) 
+            =
         result {
             let uint64s = aas |> Seq.concat |> Seq.toArray
             let arrayCount =
@@ -635,23 +713,92 @@ module Uint64Roll =
             return
                 { uint64Roll.arrayCount = arrayCount
                   arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
                   data = uint64s }
         }
 
 
-    let uniqueMembers (uint64Roll: uint64Roll) =
+    let fromBoolArrays 
+            (arrayLength: arrayLength) 
+            (aas: seq<bool[]>) 
+            =
+        result {
+            let uint8s =
+                aas |> Seq.concat 
+                |> Seq.map (fun tf -> if tf then 1uL else 0uL) 
+                |> Seq.toArray
+
+            let arrayCount =
+                (uint8s.Length / (ArrayLength.value arrayLength)) 
+                |> ArrayCount.createNr
+
+            let! bitsPerSymbol =  1 |> BitsPerSymbol.create
+
+            return
+                { uint64Roll.arrayCount = arrayCount
+                  arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
+                  data = uint8s }
+        }
+
+    let fromIntArrays 
+            (arrayLength: arrayLength)
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<int[]>) 
+            =
+        result {
+            let uint64s = aas |> Seq.concat |> Seq.map (uint64) |> Seq.toArray
+            let arrayCount =
+                (uint64s.Length / (ArrayLength.value arrayLength)) |> ArrayCount.createNr
+            return
+                { uint64Roll.arrayCount = arrayCount
+                  arrayLength = arrayLength
+                  bitsPerSymbol = bitsPerSymbol
+                  data = uint64s }
+        }
+
+    let toArrays 
+            (uint64Roll: uint64Roll) 
+            =
+        uint64Roll.data
+        |> Seq.chunkBySize 
+                (uint64Roll.arrayLength |> ArrayLength.value)
+
+    let toBoolArrays 
+            (uint64Roll: uint64Roll) 
+            =
+        uint64Roll.data
+        |> Seq.map (fun bv -> bv > 0uL)
+        |> Seq.chunkBySize (uint64Roll.arrayLength |> ArrayLength.value)
+
+
+    let toIntArrays 
+            (uint64Roll: uint64Roll) 
+            =
+        uint64Roll.data
+        |> Seq.map (int)
+        |> Seq.chunkBySize (uint64Roll.arrayLength |> ArrayLength.value)
+
+
+    let uniqueMembers 
+            (uint64Roll: uint64Roll) 
+            =
         uint64Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.distinct
-        |> fromIntArrays (uint64Roll |> getArrayLength)
+        |> fromArrays
+            (uint64Roll |> getArrayLength) 
+            (64 |> BitsPerSymbol.createNr)
 
 
     let uniqueUnsortedMembers (uint64Roll: uint64Roll) =
         uint64Roll
-        |> toIntArrays
+        |> toArrays
         |> Seq.filter (fun ia -> not (CollectionProps.isSorted ia))
         |> Seq.distinct
-        |> fromIntArrays (uint64Roll |> getArrayLength)
+        |> fromArrays 
+            (uint64Roll |> getArrayLength) 
+            (64 |> BitsPerSymbol.createNr)
 
 
     let isSorted (uint64Roll: uint64Roll) =
@@ -710,9 +857,16 @@ module Bs64Roll =
 
     let fromBoolArrays (arrayLength: arrayLength) (aas: seq<bool[]>) =
         result {
-            let! order = arrayLength |> ArrayLength.value |> Order.create
-            let! data, arrayCountV = ByteUtils.makeStripedArraysFromBoolArrays order aas
-            let! arrayCount = arrayCountV |> ArrayCount.create
+            let! order = 
+                arrayLength 
+                |> ArrayLength.value 
+                |> Order.create
+
+            let! data, arrayCountV = 
+                ByteUtils.makeStripedArraysFromBoolArrays order aas
+
+            let! arrayCount = 
+                arrayCountV |> ArrayCount.create
 
             return
                 { bs64Roll.arrayCount = arrayCount
@@ -814,6 +968,7 @@ type rolloutFormat =
     | RfU64
     | RfBs64
 
+
 module RolloutFormat =
 
     let toString (rf: rolloutFormat) =
@@ -884,7 +1039,11 @@ module Rollout =
         * (rollout |> getArrayLength |> ArrayLength.value)
 
 
-    let fromBoolArrays (rolloutFormat: rolloutFormat) (arrayLength: arrayLength) (aas: seq<bool[]>) =
+    let fromBoolArrays 
+            (rolloutFormat: rolloutFormat) 
+            (arrayLength: arrayLength)
+            (aas: seq<bool[]>) 
+            =
         match rolloutFormat with
         | RfB ->
             result {
@@ -919,37 +1078,66 @@ module Rollout =
             }
 
 
-    let fromIntArrays (rolloutFormat: rolloutFormat) (arrayLength: arrayLength) (aas: seq<int[]>) =
+    let fromIntArrays 
+            (rolloutFormat: rolloutFormat) 
+            (arrayLength: arrayLength) 
+            (bitsPerSymbol:bitsPerSymbol)
+            (aas: seq<int[]>) 
+            =
         match rolloutFormat with
         | RfB ->
             result {
-                let! roll = BooleanRoll.fromIntArrays arrayLength aas
-                return roll |> rollout.B
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 1 then
+                  return! ("1 bit per symbol max for bool" |> Error)
+                else
+                    let seq = aas |> Seq.map(fun ia -> ia |> Array.map(fun v -> v>0))
+                    let! roll = BooleanRoll.fromBoolArrays arrayLength seq
+                    return! roll |> rollout.B |> Ok
             }
         | RfU8 ->
             result {
-                let! roll = Uint8Roll.fromIntArrays arrayLength aas
-                return roll |> rollout.U8
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 8 then
+                  return! ("8 bits per symbol max for uint8" |> Error)
+                else
+                    let seq = aas |> Seq.map(fun ia -> ia |> Array.map(uint8))
+                    let! roll = Uint8Roll.fromArrays arrayLength bitsPerSymbol seq
+                    return! roll |> rollout.U8 |> Ok
             }
         | RfU16 ->
             result {
-                let! roll = Uint16Roll.fromIntArrays arrayLength aas
-                return roll |> rollout.U16
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 16 then
+                  return! ("16 bits per symbol max for bool" |> Error)
+                else
+                    let seq = aas |> Seq.map(fun ia -> ia |> Array.map(uint16))
+                    let! roll = Uint16Roll.fromArrays arrayLength bitsPerSymbol seq
+                    return! roll |> rollout.U16 |> Ok
             }
         | RfI32 ->
             result {
-                let! roll = IntRoll.fromIntArrays arrayLength aas
-                return roll |> rollout.I32
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 31 then
+                  return! ("31 bits per symbol max for Int32" |> Error)
+                else
+                    let! roll = IntRoll.fromArrays arrayLength bitsPerSymbol aas
+                    return! roll |> rollout.I32 |> Ok
             }
+
         | RfU64 ->
             result {
-                let! roll = Uint64Roll.fromIntArrays arrayLength aas
-                return roll |> rollout.U64
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 64 then
+                  return! ("64 bits per symbol max for uint64" |> Error)
+                else
+                    let seq = aas |> Seq.map(fun ia -> ia |> Array.map(uint64))
+                    let! roll = Uint64Roll.fromArrays arrayLength bitsPerSymbol seq
+                    return! roll |> rollout.U64 |> Ok
             }
         | RfBs64 ->
             result {
-                let! roll = Bs64Roll.fromIntArrays arrayLength aas
-                return roll |> rollout.Bs64
+                if (bitsPerSymbol |> BitsPerSymbol.value) > 1 then
+                  return! ("1 bits per symbol max for Bs64" |> Error)
+                else
+                    let seq = aas |> Seq.map(fun ia -> ia |> Array.map(fun v -> v>0))
+                    let! roll = Bs64Roll.fromBoolArrays arrayLength seq
+                    return! roll |> rollout.Bs64 |> Ok
             }
 
 
@@ -972,7 +1160,7 @@ module Rollout =
         | B _uBRoll -> _uBRoll |> BooleanRoll.toIntArrays
         | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toIntArrays
         | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toIntArrays
-        | I32 _intRoll -> _intRoll |> IntRoll.toIntArrays
+        | I32 _intRoll -> _intRoll |> IntRoll.toArrays
         | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toIntArrays
         | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.toIntArrays
 
@@ -1008,48 +1196,52 @@ module Rollout =
 
 
 
-    let fromUInt64ArraySeq (rolloutFormat: rolloutFormat) (arrayLength: arrayLength) (aas: seq<uint64[]>) =
+    //let fromUInt64ArraySeq 
+    //        (rolloutFormat: rolloutFormat)
+    //        (arrayLength: arrayLength) 
+    //        (aas: seq<uint64[]>) 
+    //        =
+    //    let intSeq =
+    //        aas
+    //        |> Seq.concat
+    //        |> Seq.map (int)
+    //        |> Seq.chunkBySize (arrayLength |> ArrayLength.value)
 
-        let intSeq =
-            aas
-            |> Seq.concat
-            |> Seq.map (int)
-            |> Seq.chunkBySize (arrayLength |> ArrayLength.value)
-
-        match rolloutFormat with
-        | RfB ->
-            result {
-                let! roll = BooleanRoll.fromIntArrays arrayLength intSeq
-                return roll |> rollout.B
-            }
-        | RfU8 ->
-            result {
-                let! roll = Uint8Roll.fromIntArrays arrayLength intSeq
-                return roll |> rollout.U8
-            }
-        | RfU16 ->
-            result {
-                let! roll = Uint16Roll.fromIntArrays arrayLength intSeq
-                return roll |> rollout.U16
-            }
-        | RfI32 ->
-            result {
-                let! roll = IntRoll.fromIntArrays arrayLength intSeq
-                return roll |> rollout.I32
-            }
-        | RfU64 ->
-            result {
-                let! roll = Uint64Roll.fromUint64Arrays arrayLength aas
-                return roll |> rollout.U64
-            }
-        | RfBs64 -> failwith "not implemented"
+    //    match rolloutFormat with
+    //    | RfB ->
+    //        result {
+    //            let! roll = BooleanRoll.fromIntArrays arrayLength intSeq
+    //            return roll |> rollout.B
+    //        }
+    //    | RfU8 ->
+    //        result {
+    //            let! roll = Uint8Roll.fromIntArrays arrayLength intSeq
+    //            return roll |> rollout.U8
+    //        }
+    //    | RfU16 ->
+    //        result {
+    //            let! roll = Uint16Roll.fromIntArrays arrayLength intSeq
+    //            return roll |> rollout.U16
+    //        }
+    //    | RfI32 ->
+    //        result {
+    //            let! roll = IntRoll.fromIntArrays arrayLength intSeq
+    //            return roll |> rollout.I32
+    //        }
+    //    | RfU64 ->
+    //        result {
+    //            let! roll = Uint64Roll.fromUint64Arrays arrayLength aas
+    //            return roll |> rollout.U64
+    //        }
+    //    | RfBs64 -> failwith "not implemented"
 
 
 
-    let fromBitPack (rolloutFormat: rolloutFormat) 
-                    (arrayLength: arrayLength) 
-                    (bitPack: bitPack) =
-
+    let fromBitPack 
+        (rolloutFormat: rolloutFormat) 
+        (arrayLength: arrayLength) 
+        (bitPack: bitPack) 
+        =
         match rolloutFormat with
         | RfB ->
             result {
@@ -1083,11 +1275,14 @@ module Rollout =
             }
 
 
-    let toBitPack (symbolSetSize: symbolSetSize) (rollout: rollout) =
+    let toBitPack 
+        (bitsPerSymbl: bitsPerSymbol) 
+        (rollout: rollout) 
+        =
         match rollout with
         | B _uBRoll -> _uBRoll |> BooleanRoll.toBitPack
-        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toBitPack symbolSetSize
-        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toBitPack symbolSetSize
-        | I32 _intRoll -> _intRoll |> IntRoll.toBitPack symbolSetSize
-        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toBitPack symbolSetSize
+        | U8 _uInt8Roll -> _uInt8Roll |> Uint8Roll.toBitPack
+        | U16 _uInt16Roll -> _uInt16Roll |> Uint16Roll.toBitPack
+        | I32 _intRoll -> _intRoll |> IntRoll.toBitPack
+        | U64 _uInt64Roll -> _uInt64Roll |> Uint64Roll.toBitPack
         | Bs64 _bs64Roll -> _bs64Roll |> Bs64Roll.toBitPack

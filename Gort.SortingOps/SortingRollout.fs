@@ -8,8 +8,11 @@ module SortingRollout =
 
     // uses a bool[sorter.switchcount * sortableCount]
     // array to store each switch use
-    let private sortAndMakeSwitchTrackForIntRoll (sortr: sorter) (intRoll: intRoll) (sortableCount: sortableCount) =
-
+    let private sortAndMakeSwitchTrackForIntRoll 
+            (sortr: sorter) 
+            (intRoll: intRoll) 
+            (sortableCount: sortableCount) 
+            =
         let rollArray = intRoll |> IntRoll.getData
         let orderV = sortr |> Sorter.getOrder |> Order.value
         let switchCountV = sortr |> Sorter.getSwitchCount |> SwitchCount.value
@@ -57,7 +60,6 @@ module SortingRollout =
         (uInt8Roll: uInt8Roll)
         (sortableCount: sortableCount)
         =
-
         let rollArray = uInt8Roll |> Uint8Roll.getData
         let orderV = sortr |> Sorter.getOrder |> Order.value
         let switchCountV = sortr |> Sorter.getSwitchCount |> SwitchCount.value
@@ -96,7 +98,6 @@ module SortingRollout =
             sortableIndex <- sortableIndex + 1
 
         switchingLg |> sortableBySwitchTracker.ArrayRoll
-
 
 
     // uses a bool[sorter.switchcount * sortableCount]
@@ -148,14 +149,20 @@ module SortingRollout =
 
     // uses a bool[sorter.switchcount * sortableCount]
     // array to store each switch use
-    let sortAndMakeSwitchTrackForBs64Roll (sortr: sorter) (bs64Roll: bs64Roll) (sortableCount: sortableCount) =
+    let sortAndMakeSwitchTrackForBs64Roll 
+            (sortr: sorter) 
+            (bs64Roll: bs64Roll) 
+            (sortableCount: sortableCount) 
+            =
         let rollArray = bs64Roll |> Bs64Roll.getData
         let orderV = sortr |> Sorter.getOrder |> Order.value
         let switchCountV = sortr |> Sorter.getSwitchCount |> SwitchCount.value
         let switches = sortr |> Sorter.getSwitches
 
         let switchingLg =
-            SortableBySwitchTrackerBitStriped.create (sortr |> Sorter.getSwitchCount) sortableCount
+            SortableBySwitchTrackerBitStriped.create 
+                (sortr |> Sorter.getSwitchCount) 
+                sortableCount
 
         let switchUseArray = switchingLg |> SortableBySwitchTrackerBitStriped.getData
 
@@ -187,8 +194,10 @@ module SortingRollout =
     // Uses the sorter to sort a copy of the rollingSorableData.
     // returns the transformed copy of the rollingSorableData along with 
     // a bool[sorter.switchcount * sortableCount] to store each switch use.
-    let applySorterAndMakeSwitchTrack (sortr: sorter) (sortableSt: sortableSet) =
-
+    let applySorterAndMakeSwitchTrack 
+            (sortr: sorter) 
+            (sortableSt: sortableSet) 
+            =
         let rolloutCopy = sortableSt |> SortableSet.getRollout |> Rollout.copy
 
         let sortableCount =
@@ -218,8 +227,11 @@ module SortingRollout =
 
     // uses an int[sorter.switchcount] array to accumulate
     // the counts of each switch use
-    let private sortAndMakeSwitchUsesForIntRoll (sortr: sorter) (intRoll: intRoll) (sortableCount: sortableCount) =
-
+    let private sortAndMakeSwitchUsesForIntRoll 
+                    (sortr: sorter) 
+                    (intRoll: intRoll) 
+                    (sortableCount: sortableCount) 
+                    =
         let rollArray = intRoll |> IntRoll.getData
         let orderV = sortr |> Sorter.getOrder |> Order.value
         let switches = sortr |> Sorter.getSwitches
@@ -262,7 +274,6 @@ module SortingRollout =
         (uInt8Roll: uInt8Roll)
         (sortableCount: sortableCount)
         =
-
         let switches = sortr |> Sorter.getSwitches
         let rollArray = uInt8Roll |> Uint8Roll.getData
         let orderV = sortr |> Sorter.getOrder |> Order.value
@@ -303,8 +314,8 @@ module SortingRollout =
     let private sortAndMakeSwitchUsesForUInt16Roll
                     (sortr: sorter)
                     (uInt8Roll: uInt16Roll)
-                    (sortableCount: sortableCount) =
-
+                    (sortableCount: sortableCount) 
+                    =
         let switches = sortr |> Sorter.getSwitches
         let rollArray = uInt8Roll |> Uint16Roll.getData
         let switchUses = SwitchUseCounts.init (sortr |> Sorter.getSwitchCount)
@@ -340,8 +351,10 @@ module SortingRollout =
         switchUses |> switchUseTracker.Standard
 
 
-    let sortAndMakeSwitchUsesForBs64Roll (sortr: sorter) (bs64Roll: bs64Roll) =
-
+    let sortAndMakeSwitchUsesForBs64Roll 
+                (sortr: sorter) 
+                (bs64Roll: bs64Roll) 
+                =
         let switches = sortr |> Sorter.getSwitches
         let switchUses = SwitchUseTrackerBitStriped.init (sortr |> Sorter.getSwitchCount)
         let rollArray = bs64Roll |> Bs64Roll.getData
@@ -374,8 +387,10 @@ module SortingRollout =
     // returns the transformed copy of the rollingSorableData
     // along with an int[sorter.switchcount] to accumulate the
     // count of each switch use
-    let applySorterAndMakeSwitchUses (sortr: sorter) (sortableSt: sortableSet) =
-
+    let applySorterAndMakeSwitchUses 
+                (sortr: sorter) 
+                (sortableSt: sortableSet) 
+                =
         let rolloutCopy = sortableSt |> SortableSet.getRollout |> Rollout.copy
         let sortableCount =
             rolloutCopy |> Rollout.getArrayCount |> ArrayCount.value |> SortableCount.create
@@ -399,7 +414,8 @@ module SortingRollout =
 
     let makeSorterOpOutput (sorterOpTrackMod: sorterOpTrackMode) 
                            (sortableSt: sortableSet) 
-                           (sortr: sorter) =
+                           (sortr: sorter) 
+                           =
         let _wrapo f sorter sortableSet =
             try
                 f sorter sortableSet |> Ok

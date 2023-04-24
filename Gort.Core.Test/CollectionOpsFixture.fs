@@ -169,7 +169,6 @@ type CollectionOpsFixture() =
     [<TestMethod>]
     member this.conjIntArrays() =
         let coreArray = [|1;2;3;4;5;0|]
-        //let breadArray = [|3;4;2;1;0;5|]
         let breadArray = [|4;3;2;0;1;5|]
         let expectedConjedArray = [|1;5;0;2;3;4|]
 
@@ -177,7 +176,7 @@ type CollectionOpsFixture() =
             CollectionOps.conjIntArraysR breadArray coreArray
             |> Result.ExtractOrThrow
 
-        Assert.AreEqual(resultArray, expectedConjedArray)
+        Assert.IsTrue(CollectionProps.areEqual resultArray expectedConjedArray)
 
 
 

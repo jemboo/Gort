@@ -122,7 +122,7 @@ module DomainTables =
                 | RandomPermutation -> SortableSetRandomPermutationDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
                 | RandomBits -> SortableSetRandomBitsDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
                 | RandomSymbols -> SortableSetRandomSymbolsDto.fromJson sortableSetR.Json (_rngGenLookup ctxt)
-                | Explicit -> SortableSetExplicitDto.fromJson sortableSetR.Json (_bitpackLookup ctxt)
+                | Explicit -> SortableSetExplicitTableDto.fromJson sortableSetR.Json (_bitpackLookup ctxt)
                 | SwitchReduced ->
                     SortableSetSwitchReducedDto.fromJson
                         sortableSetR.Json

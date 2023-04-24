@@ -9,6 +9,16 @@ open System.IO
 
 module ByteUtils =
 
+    let toBase64 (bites: byte seq) =
+        Convert.ToBase64String(bites |> Seq.toArray)
+
+    let fromBase64 (s:string) =
+        try
+            Convert.FromBase64String(s) |> Ok
+        with ex ->
+            ("error in fromBase64: " + ex.Message) |> Result.Error
+
+
     let toInt (bv: bool) =
         if bv then 1 else 0
 
@@ -46,7 +56,7 @@ module ByteUtils =
         let md5 = MD5.Create()
         md5.ComputeHash(inputBytes)
 
-
+    // structural equality
     let hashObjs (oes: obj seq) =
         use stream = new MemoryStream()
         use writer = new BinaryWriter(stream)
@@ -309,7 +319,7 @@ module ByteUtils =
 
             stripedArray |> Ok
         with ex ->
-            ("error in bitPackedtoBitStriped: " + ex.Message) |> Result.Error
+            ("error in uint64ArraytoBitStriped: " + ex.Message) |> Result.Error
 
 
     let uint64ArraytoBitStriped2D (ord: order) (packedArray: uint64[]) =

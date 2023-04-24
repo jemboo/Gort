@@ -13,7 +13,10 @@ type sorterSetDtoFixture() =
       let wPfx = Seq.empty<switch>
       let switchCt = 100 |> SwitchCount.create
       let sorterCt = 10 |> SorterCount.create
-      let rndGn = RngGen.lcgFromNow ()
+      let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+      let rndGn () = 
+            randy |> Rando.nextRngGen
+
 
       let sorterSt = SorterSet.createRandomSwitches 
                         sorterSetId sorterCt ordr wPfx switchCt rndGn

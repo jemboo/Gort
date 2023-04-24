@@ -8,6 +8,7 @@ type SortableSetFixture() =
 
     [<TestMethod>]
     member this.makeAllBits() =
+
         let order = Order.createNr 10
         let ssRecId = Guid.NewGuid() |> SortableSetId.create
         let ssFmtRu8 = rolloutFormat.RfU8
@@ -27,7 +28,8 @@ type SortableSetFixture() =
         let ssRu64 =
             SortableSet.makeAllBits ssRecId ssFmtRu64 order |> Result.ExtractOrThrow
 
-        let ssBs = SortableSet.makeAllBits ssRecId ssFmtBs order |> Result.ExtractOrThrow
+        let ssBs = 
+            SortableSet.makeAllBits ssRecId ssFmtBs order |> Result.ExtractOrThrow
 
         let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
         let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
@@ -50,37 +52,12 @@ type SortableSetFixture() =
         let perm = Permutation.createRandom order randy
         let maxCount = Some(SortableCount.create 12)
 
-        let ssFmtRu8 = rolloutFormat.RfU8
-        let ssFmtRu16 = rolloutFormat.RfU16
-        let ssFmtRI32 = rolloutFormat.RfI32
-        let ssFmtRu64 = rolloutFormat.RfU64
-        let ssFmtBs = rolloutFormat.RfBs64
-
-        let ssRu8 =
-            SortableSet.makeOrbits ssFmtRu8 maxCount perm ssRecId |> Result.ExtractOrThrow
-
-        let ssRu16 =
-            SortableSet.makeOrbits ssFmtRu16 maxCount perm ssRecId |> Result.ExtractOrThrow
-
         let ssRI32 =
-            SortableSet.makeOrbits ssFmtRI32 maxCount perm ssRecId |> Result.ExtractOrThrow
+            SortableSet.makeOrbits ssRecId maxCount perm |> Result.ExtractOrThrow
 
-        let ssRu64 =
-            SortableSet.makeOrbits ssFmtRu64 maxCount perm ssRecId |> Result.ExtractOrThrow
-
-        let ssBs =
-            SortableSet.makeOrbits ssFmtBs maxCount perm ssRecId |> Result.ExtractOrThrow
-
-        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
         let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
 
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16)
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32)
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64)
-        Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length)
+        Assert.IsTrue(srtIntsRI32.Length > 0)
 
 
     [<TestMethod>]
@@ -140,43 +117,14 @@ type SortableSetFixture() =
         let _randy () =
             Rando.create rngType.Lcg (123 |> RandomSeed.create)
 
-
-        let ssFmtRu8 = rolloutFormat.RfU8
-        let ssFmtRu16 = rolloutFormat.RfU16
-        let ssFmtRI32 = rolloutFormat.RfI32
-        let ssFmtRu64 = rolloutFormat.RfU64
-        let ssFmtBs = rolloutFormat.RfBs64
-
-        let ssRu8 =
-            SortableSet.makeRandomPermutation ssFmtRu8 order sortableCount (_randy ()) ssRecId
-            |> Result.ExtractOrThrow
-
-        let ssRu16 =
-            SortableSet.makeRandomPermutation ssFmtRu16 order sortableCount (_randy ()) ssRecId
-            |> Result.ExtractOrThrow
-
         let ssRI32 =
-            SortableSet.makeRandomPermutation ssFmtRI32 order sortableCount (_randy ()) ssRecId
+            SortableSet.makeRandomPermutation order sortableCount (_randy ()) ssRecId
             |> Result.ExtractOrThrow
 
-        let ssRu64 =
-            SortableSet.makeRandomPermutation ssFmtRu64 order sortableCount (_randy ()) ssRecId
-            |> Result.ExtractOrThrow
 
-        let ssBs =
-            SortableSet.makeRandomPermutation ssFmtBs order sortableCount (_randy ()) ssRecId
-            |> Result.ExtractOrThrow
-
-        let srtIntsRu8 = ssRu8 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsRu16 = ssRu16 |> SortableSet.toSortableIntsArrays |> Seq.toArray
         let srtIntsRI32 = ssRI32 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsRu64 = ssRu64 |> SortableSet.toSortableIntsArrays |> Seq.toArray
-        let srtIntsBs = ssBs |> SortableSet.toSortableIntsArrays |> Seq.toArray
 
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu16)
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRI32)
-        Assert.IsTrue(CollectionProps.areEqual srtIntsRu8 srtIntsRu64)
-        Assert.IsTrue(srtIntsBs.Length = srtIntsRu8.Length)
+        Assert.IsTrue(srtIntsRI32.Length > 0)
 
 
     [<TestMethod>]
@@ -193,7 +141,6 @@ type SortableSetFixture() =
               sOfSortableSetId
               sortableSetCount
               order
-              ssFmtRu8
               maxSortableCount
               rngGn
 

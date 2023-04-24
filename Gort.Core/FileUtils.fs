@@ -144,12 +144,13 @@ module FileUtils =
         with ex ->
             ("error in writeFile: " + ex.Message) |> Result.Error
 
-    let makeArchiver (dir: fileDir) =
+    let makeArchiver (root: fileDir) =
         fun (folder: fileFolder) (file: fileName) (ext: fileExt) (data: seq<string>) ->
             try
                 let fne = sprintf "%s.%s" (FileName.value file) (FileExt.value ext)
-                let fp = Path.Combine(FileDir.value dir, fne) |> FilePath.create
-                let dirInfo = System.IO.Directory.CreateDirectory(FileDir.value dir)
+                let fdir = Path.Combine(FileDir.value root, FileFolder.value folder) |> FileDir.create
+                let fp = Path.Combine(FileDir.value fdir, fne) |> FilePath.create
+                System.IO.Directory.CreateDirectory(FileDir.value fdir) |> ignore
                 appendToFile fp data
             with ex ->
                 ("error in archiver: " + ex.Message) |> Result.Error

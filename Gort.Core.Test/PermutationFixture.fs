@@ -38,7 +38,7 @@ type PermutationFixture() =
         let seed = RandomSeed.fromNow ()
         let iRando = Rando.fromRngGen (RngGen.createNet seed)
         let ord = Order.createNr 32
-        let permCount = 100000
+        let permCount = 1000
 
         let randPerms =
             Permutation.createRandoms ord iRando
@@ -50,6 +50,28 @@ type PermutationFixture() =
 
         yabs
         |> Array.iter (fun tup -> Console.WriteLine(sprintf "%d\t%d" (fst tup) (snd tup)))
+
+        Assert.IsTrue(randPerms.Length > 0)
+
+
+    [<TestMethod>]
+    member this.Permutation_PowerMemberDist() =
+        let seed = RandomSeed.fromNow ()
+        let iRando = Rando.fromRngGen (RngGen.createNet seed)
+        let ord = Order.createNr 32
+        let permCount = 10
+
+        let randPerms =
+            Permutation.createRandoms ord iRando
+            |> CollectionOps.takeUpto permCount
+            |> Seq.map ((Permutation.powers None) >> Seq.toArray)
+            |> Seq.map(fun ap -> ap |> Array.map(fun perm -> perm |> Permutation.powers None |> Seq.length))
+            |> Seq.toArray
+
+
+        //yabs
+        //|> Array.iter (fun tup -> Console.WriteLine(sprintf "%d\t%d" (fst tup) (snd tup)))
+
 
         Assert.IsTrue(randPerms.Length > 0)
 

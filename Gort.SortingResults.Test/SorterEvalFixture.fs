@@ -10,7 +10,8 @@ type SorterEvalFixture() =
         let order = Order.create 8 |> Result.ExtractOrThrow
         let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
         let switchCount = SwitchCount.orderTo900SwitchCount order
-        let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
+        let rando () = 
+            RngGen.createLcg (1233 |> RandomSeed.create)
         let sorterId = Guid.NewGuid() |> SorterId.create
         let goodSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sorterId
 
@@ -25,18 +26,22 @@ type SorterEvalFixture() =
         goodSorter, sorterOpOutput
 
 
-    let getResultsOfRandomPermutations (sorterOpTrackMode: sorterOpTrackMode) (rolloutFormat: rolloutFormat) =
+    let getResultsOfRandomPermutations 
+            (sorterOpTrackMode: sorterOpTrackMode) 
+             =
         let order = Order.create 16 |> Result.ExtractOrThrow
         let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
         let switchCount = SwitchCount.orderToRecordSwitchCount order
         let sortableCount = 4000 |> SortableCount.create
         let sorterId = Guid.NewGuid() |> SorterId.create
-
-        let rando = Rando.create rngType.Lcg (1233 |> RandomSeed.create)
+        
+        let rando() = 
+            RngGen.createLcg (1233 |> RandomSeed.create)
         let failingSorter = Sorter.randomSwitches order (Seq.empty) switchCount rando sorterId
 
+        let rrr = (rando()) |> Rando.fromRngGen
         let sortableSet =
-            SortableSet.makeRandomPermutation rolloutFormat order sortableCount rando sortableSetId
+            SortableSet.makeRandomPermutation order sortableCount rrr sortableSetId
             |> Result.ExtractOrThrow
 
         let sorterOpOutput =
@@ -116,7 +121,7 @@ type SorterEvalFixture() =
         let sortableSetFormat_RfBs64 = rolloutFormat.RfBs64
 
         let sortr, res_RfU8_su =
-            getResultsOfRandomPermutations sotmSwitchUses sortableSetFormat_RfU8
+            getResultsOfRandomPermutations sotmSwitchUses
 
         let origSet_RfU8_su =
             res_RfU8_su
@@ -127,8 +132,9 @@ type SorterEvalFixture() =
 
         let refinedSet_RfU8_su =
             res_RfU8_su
-            |> SorterOpOutput.getRefinedSortableSet
+            |> SorterOpOutput.getRefinedSortableSet (Guid.Empty |> SortableSetId.create)
             |> Result.ExtractOrThrow
+            |> SortableSet.getRollout
             |> Rollout.toIntArrays
             |> Seq.toArray
 

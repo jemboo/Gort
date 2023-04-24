@@ -26,6 +26,10 @@ module Program =
        // let sorterSt = SorterSet.createRandomStagesCoConj sorterSetId sorterCt ordr [||] switchCt rndGn
        // let sorterSt = SorterSet.createRandomSymmetric sorterSetId sorterCt ordr [||] switchCt rndGn
        // let sorterSt = SorterSet.createRandomStagesSeparated sorterSetId sorterCt ordr 86 90 [||] switchCt rndGn
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let rndGn () = 
+            randy |> Rando.nextRngGen
+
         let sorterSt = SorterSet.createRandomOrbitDraws sorterSetId sorterCt coreTwoCyc permSeed [||] switchCt rndGn
 
         let rolloutFormt = rolloutFormat.RfBs64
@@ -72,6 +76,12 @@ module Program =
         let sorterSetTag = forSorters |> SortableSet.makeTag
         let sortableSetTag = forSortables |> SortableSet.makeTag
         let sortableSetCt = forSortables |> SortableSet.getSortableCount
+
+        let randy = Rando.fromRngGen rngen
+        let rndGn2 () = 
+            randy |> Rando.nextRngGen
+
+
         let sorterSt = SorterSet.createRandomOrbitDraws 
                             sorterSetId 
                             sorterBatchCt 
@@ -79,7 +89,7 @@ module Program =
                             sorterPermRoot 
                             [||] 
                             switchCt 
-                            rngen
+                            rndGn2
 
 
         let sorterEvls =
@@ -121,7 +131,9 @@ module Program =
         let sortableSetCount = SortableSetCount.create 30
         let maxSortableCount = None // SortableCount.create 10 |> Some
         let ssFmtRu8 = rolloutFormat.RfU8
-        let rngGnSorterSeeds = RngGen.create rngType.Lcg (11288 |> RandomSeed.create)
+        let rngGnSorterSeeds = 
+            (11288 |> RandomSeed.create)
+            |> RngGen.create rngType.Lcg 
         //let rngGnSortableSeeds = RngGen.create rngType.Lcg (11236 |> RandomSeed.create)
 
         let sorterPermSeeds = 
@@ -135,14 +147,15 @@ module Program =
         //        |> Seq.toArray
 
 
-        let randySampler = RngGen.create rngType.Lcg (61123 |> RandomSeed.create)
-                           |> Rando.fromRngGen
+        let randySampler = 
+            (61123 |> RandomSeed.create)
+            |> RngGen.create rngType.Lcg 
+            |> Rando.fromRngGen
 
         let sorterOrbis = 
             SetOfSortableSet.makeOrbits
               sOfSortableSetId
               sortableSetCount
-              ssFmtRu8
               maxSortableCount
               sorterPermSeeds
 

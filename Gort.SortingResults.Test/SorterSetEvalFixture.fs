@@ -10,9 +10,13 @@ type SorterSetEvalFixture() =
         let ordr = 16 |> Order.createNr
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
         let sorterCt = SorterCount.create 2000
-        let rnGn = RngGen.createLcg (123 |> RandomSeed.create)
+
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let rndGn () = 
+                randy |> Rando.nextRngGen
+
         let sorterSetId = Guid.NewGuid() |> SorterSetId.create
-        let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rnGn
+        let sorterSt = SorterSet.createRandomSwitches sorterSetId sorterCt ordr [||] switchCt rndGn
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create (Guid.NewGuid())
 

@@ -39,13 +39,13 @@ module SortableSet =
             ((sortableSet |> getRollout |> Rollout.getArrayCount |> ArrayCount.value).ToString("D4"))
             ((sortableSet |> getSortableSetId |> SortableSetId.value |> string).Substring(0,8))
 
+    // returns the first sortable, which would be the permutaion root of an orbit type sortable set
     let getIdAndPermRoot 
         (sortableSet:sortableSet)
         =
         ( sortableSet |> getSortableSetId 
           ,
-          sortableSet
-          |> getRollout
+          sortableSet.rollout
           |> Rollout.toIntArrays
           |> Seq.head
           |> Permutation.createNr
@@ -53,17 +53,20 @@ module SortableSet =
 
 
     let make
-        (sortableSetRId: sortableSetId) 
+        (sortableSetId: sortableSetId) 
         (symbolSetSize: symbolSetSize) 
         (rollout: rollout) 
         =
-        { sortableSetId = sortableSetRId
+        { sortableSetId = sortableSetId
           rollout = rollout
           symbolSetSize = symbolSetSize }
 
 
     let createEmpty = 
-        make (Guid.Empty |> SortableSetId.create) (0UL |> SymbolSetSize.createNr) Rollout.createEmpty
+        make 
+            (Guid.Empty |> SortableSetId.create) 
+            (0UL |> SymbolSetSize.createNr) 
+            Rollout.createEmpty
 
 
     let fromSortableBoolArrays
@@ -81,9 +84,10 @@ module SortableSet =
         }
 
 
-    let toSortableBoolArrays (sortableSet: sortableSet) =
+    let toSortableBoolArrays 
+            (sortableSet: sortableSet)
+            =
         let order = sortableSet |> getOrder
-
         sortableSet
         |> getRollout
         |> Rollout.toBoolArrays
@@ -91,8 +95,8 @@ module SortableSet =
 
 
     let toSortableIntsArrays 
-        (sortableSet: sortableSet) 
-        =
+            (sortableSet: sortableSet) 
+            =
         let order = sortableSet |> getOrder
         let symbolSetSize = getSymbolSetSize sortableSet
         sortableSet
@@ -102,21 +106,20 @@ module SortableSet =
 
 
     let fromSortableIntArrays
-        (sortableSetId: sortableSetId)
-        (rolloutFormat: rolloutFormat)
-        (order: order)
-        (symbolSetSize: symbolSetSize)
-        (sortableInts: seq<sortableIntArray>)
-        =
+            (sortableSetId: sortableSetId)
+            (order: order)
+            (symbolSetSize: symbolSetSize)
+            (sortableInts: seq<sortableIntArray>)
+            =
         result {
             let arrayLength = order |> Order.value |> ArrayLength.createNr
-
-            let! rollout =
+            let bitsPerSymbol = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+            let! rolly =
                 sortableInts
                 |> Seq.map (fun sints -> sints.values)
-                |> Rollout.fromIntArrays rolloutFormat arrayLength
+                |> IntRoll.fromArrays arrayLength bitsPerSymbol
 
-            return make sortableSetId symbolSetSize rollout
+            return make sortableSetId symbolSetSize (rolly |> rollout.I32)
         }
 
 
@@ -134,36 +137,45 @@ module SortableSet =
         }
 
 
-    let toBitPack (sortableSet: sortableSet) =
+    let toBitPack 
+        (sortableSet: sortableSet) 
+        =
         let symbolSetSize = sortableSet |> getSymbolSetSize
-        sortableSet.rollout |> Rollout.toBitPack symbolSetSize
+        let bitsPerSymbl = symbolSetSize |> BitsPerSymbol.fromSymbolSetSize
+        sortableSet.rollout |> Rollout.toBitPack bitsPerSymbl
 
 
-    let makeAllBits (sortableSetId: sortableSetId) (rolloutFormat: rolloutFormat) (order: order) =
+    let makeAllBits 
+            (sortableSetId: sortableSetId) 
+            (rolloutFormat: rolloutFormat) 
+            (order: order) 
+            =
         let sortableBits = SortableBoolArray.makeAllBits order
         fromSortableBoolArrays sortableSetId rolloutFormat order sortableBits
 
 
     let makeOrbits
-        (rolloutFormat: rolloutFormat)
+        (sortableSetId: sortableSetId)
         (maxCount: sortableCount option)
         (perm: permutation)
-        (sortableSetId: sortableSetId)
         =
         let order = perm |> Permutation.getOrder
         let symbolSetSize = order |> Order.value |> uint64 |> SymbolSetSize.createNr
         let sortableInts = SortableIntArray.makeOrbits maxCount perm
-        fromSortableIntArrays sortableSetId rolloutFormat order symbolSetSize sortableInts
+        fromSortableIntArrays sortableSetId order symbolSetSize sortableInts
 
 
-    let makeSortedStacks (sortableSetId: sortableSetId) (rolloutFormat: rolloutFormat) (orderStack: order[]) =
+    let makeSortedStacks 
+            (sortableSetId: sortableSetId) 
+            (rolloutFormat: rolloutFormat) 
+            (orderStack: order[]) 
+            =
         let stackedOrder = Order.add orderStack
         let sortableBits = SortableBoolArray.makeSortedStacks orderStack
         fromSortableBoolArrays sortableSetId rolloutFormat stackedOrder sortableBits
 
 
     let makeRandomPermutation
-        (rolloutFormat: rolloutFormat)
         (order: order)
         (sortableCount: sortableCount)
         (rando: IRando)
@@ -175,7 +187,7 @@ module SortableSet =
             SortableCount.makeSeq sortableCount
             |> Seq.map (fun _ -> SortableIntArray.makeRandomPermutation order rando)
 
-        fromSortableIntArrays sortableSetId rolloutFormat order symbolSetSize sortableInts
+        fromSortableIntArrays sortableSetId order symbolSetSize sortableInts
 
 
     let makeRandomBits
@@ -194,7 +206,6 @@ module SortableSet =
 
 
     let makeRandomSymbols
-        (rolloutFormat: rolloutFormat)
         (order: order)
         (symbolSetSize: symbolSetSize)
         (sortableCount: sortableCount)
@@ -205,19 +216,18 @@ module SortableSet =
             SortableCount.makeSeq sortableCount
             |> Seq.map (fun _ -> SortableIntArray.makeRandomSymbol order symbolSetSize rando)
 
-        fromSortableIntArrays sortableSetId rolloutFormat order symbolSetSize sortableInts
+        fromSortableIntArrays sortableSetId order symbolSetSize sortableInts
 
-
+    // Not finished
     let switchReduce
         (sortableSetId: sortableSetId)
-        (rolloutFormat: rolloutFormat)
         (sortableSet: sortableSet)
         (sorter: sorter)
         =
         let sortableInts = Seq.empty<sortableIntArray>
         let order = sortableSet |> getOrder
         let symbolSetSize = sortableSet |> getSymbolSetSize
-        fromSortableIntArrays sortableSetId rolloutFormat order symbolSetSize sortableInts
+        fromSortableIntArrays sortableSetId order symbolSetSize sortableInts
 
 
 
@@ -289,7 +299,6 @@ module SetOfSortableSet =
     let makeOrbits
         (setOfSortableSetId:setOfSortableSetId)
         (sortableSetCount: sortableSetCount)
-        (rolloutFormat: rolloutFormat)
         (maxSortableCount: sortableCount option)
         (perms: permutation array)
         =
@@ -299,7 +308,7 @@ module SetOfSortableSet =
             perms.[dex]
 
         let sortableSetGen (id:sortableSetId) = 
-            SortableSet.makeOrbits rolloutFormat maxSortableCount (getPerm ()) id
+            SortableSet.makeOrbits id maxSortableCount (getPerm ()) 
             |> Result.toOption
         create setOfSortableSetId sortableSetCount sortableSetGen
 
@@ -308,7 +317,6 @@ module SetOfSortableSet =
         (setOfSortableSetId:setOfSortableSetId)
         (sortableSetCount: sortableSetCount)
         (order:order)
-        (rolloutFormat: rolloutFormat)
         (maxSortableCount: sortableCount option)
         (rnGen: rngGen)
         =
@@ -319,6 +327,5 @@ module SetOfSortableSet =
         makeOrbits
             setOfSortableSetId
             sortableSetCount
-            rolloutFormat
             maxSortableCount
             perms

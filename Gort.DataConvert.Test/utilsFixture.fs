@@ -10,3 +10,9 @@ type utilsFixture() =
     member this.sb() =
         let qua = nameof sortableSetVersion.Orbit
         Assert.IsTrue(true)
+
+
+    [<TestMethod>]
+    member this.doBytes() =
+        let qua = nameof sortableSetVersion.Orbit
+        Assert.IsTrue(true)

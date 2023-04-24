@@ -49,7 +49,10 @@ module SortableSetOrbitDto =
 
             let! perm = dto.permutation |> Permutation.create
             let! ssFormat = dto.fmt |> RolloutFormat.fromString
-            return! SortableSet.makeOrbits ssFormat maxCt perm (dto.sortableSetRId |> SortableSetId.create) 
+            return! SortableSet.makeOrbits
+                        (dto.sortableSetRId |> SortableSetId.create)
+                        maxCt
+                        perm
         }
 
     let fromJson (jstr: string) =
@@ -123,7 +126,6 @@ module SortableSetRandomPermutationDto =
 
             return!
                 SortableSet.makeRandomPermutation
-                    ssFormat
                     order
                     sortableCt
                     randy
@@ -244,7 +246,6 @@ module SortableSetRandomSymbolsDto =
 
             return!
                 SortableSet.makeRandomSymbols
-                    ssFormat
                     order
                     symbolSetSize
                     sortableCt
@@ -285,28 +286,28 @@ module SortableSetRandomSymbolsDto =
 
 
 
-type sortableSetExplicitDto =
-    { sortableSetRId: Guid
+type sortableSetExplicitTableDto =
+    { sortableSetId: Guid
       order: int
       symbolSetSize: int
       bitPackRId: int
       fmt: string }
 
-module SortableSetExplicitDto =
+module SortableSetExplicitTableDto =
 
-    let fromDto (dto: sortableSetExplicitDto) (bitPackLookup: int -> Result<bitPack, string>) =
+    let fromDto (dto: sortableSetExplicitTableDto) (bitPackLookup: int -> Result<bitPack, string>) =
         result {
             let! bitPack = bitPackLookup dto.bitPackRId
             let! order = dto.order |> Order.create
             let! ssFormat = dto.fmt |> RolloutFormat.fromString
             let! symbolSetSize = dto.symbolSetSize |> uint64 |> SymbolSetSize.create
-            let sortableSetId = dto.sortableSetRId |> SortableSetId.create
+            let sortableSetId = dto.sortableSetId |> SortableSetId.create
             return! SortableSet.fromBitPack sortableSetId ssFormat order symbolSetSize bitPack
         }
 
     let fromJson (jstr: string) (bitPackLookup: int -> Result<bitPack, string>) =
         result {
-            let! dto = Json.deserialize<sortableSetExplicitDto> jstr
+            let! dto = Json.deserialize<sortableSetExplicitTableDto> jstr
             return! fromDto dto bitPackLookup
         }
 
@@ -317,7 +318,7 @@ module SortableSetExplicitDto =
         (symbolSetSz: symbolSetSize)
         (sortableCt: sortableCount)
         (bitPackRId: int)  =
-        { sortableSetExplicitDto.sortableSetRId = sortableSetId |> SortableSetId.value
+        { sortableSetExplicitTableDto.sortableSetId = sortableSetId |> SortableSetId.value
           order = order |> Order.value
           symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int
           bitPackRId = bitPackRId
@@ -353,7 +354,9 @@ module SortableSetSwitchReducedDto =
             let! sorter = sorterLookup  (Guid.NewGuid()) //dto.sorterId
             let! ssFormat = dto.fmt |> RolloutFormat.fromString
             return! SortableSet.switchReduce 
-                        (dto.sortableSetRId |> SortableSetId.create) ssFormat sortableSet sorter
+                        (dto.sortableSetRId |> SortableSetId.create) 
+                        sortableSet 
+                        sorter
         }
 
     let fromJson
@@ -368,7 +371,9 @@ module SortableSetSwitchReducedDto =
     let toDto 
             (sortableSetId: sortableSetId) 
             (rolloutFormt: rolloutFormat) 
-            (sorterId: int) (sortableSetSourceId: int) =
+            (sorterId: int) 
+            (sortableSetSourceId: int) 
+            =
         { sortableSetSwitchReducedDto.sorterId = sorterId
           fmt = rolloutFormt |> RolloutFormat.toString
           sortableSetRId = sortableSetId |> SortableSetId.value
@@ -378,3 +383,55 @@ module SortableSetSwitchReducedDto =
             (sortableSetId: sortableSetId) (rolloutFormt: rolloutFormat) 
             (sorterId: int) (sortableSetSourceId: int) =
         toDto sortableSetId rolloutFormt sorterId sortableSetSourceId |> Json.serialize
+
+
+
+//type sortableSetExplicitDto =
+//    { sortableSetId: Guid
+//      order: int
+//      symbolSetSize: int
+//      bitPackRId: int
+//      fmt: string }
+
+//module SortableSetExplicitDto =
+
+//    let fromDto (dto: sortableSetExplicitTableDto) (bitPackLookup: int -> Result<bitPack, string>) =
+//        result {
+//            let! bitPack = bitPackLookup dto.bitPackRId
+//            let! order = dto.order |> Order.create
+//            let! ssFormat = dto.fmt |> RolloutFormat.fromString
+//            let! symbolSetSize = dto.symbolSetSize |> uint64 |> SymbolSetSize.create
+//            let sortableSetId = dto.sortableSetId |> SortableSetId.create
+//            return! SortableSet.fromBitPack sortableSetId ssFormat order symbolSetSize bitPack
+//        }
+
+//    let fromJson (jstr: string) (bitPackLookup: int -> Result<bitPack, string>) =
+//        result {
+//            let! dto = Json.deserialize<sortableSetExplicitTableDto> jstr
+//            return! fromDto dto bitPackLookup
+//        }
+
+//    let toDto
+//        (sortableSetId: sortableSetId)
+//        (rolloutFormt: rolloutFormat)
+//        (order: order)
+//        (symbolSetSz: symbolSetSize)
+//        (sortableCt: sortableCount)
+//        (bitPackRId: int)  =
+//        { sortableSetExplicitTableDto.sortableSetId = sortableSetId |> SortableSetId.value
+//          order = order |> Order.value
+//          symbolSetSize = symbolSetSz |> SymbolSetSize.value |> int
+//          bitPackRId = bitPackRId
+//          fmt = rolloutFormt |> RolloutFormat.toString }
+
+//    let toJson
+//        (sortableSetId: sortableSetId)
+//        (rolloutFormt: rolloutFormat)
+//        (order: order)
+//        (symbolSetSz: symbolSetSize)
+//        (sortableCt: sortableCount)
+//        (rngGenId: int) =
+//        rngGenId
+//        |> toDto sortableSetId rolloutFormt order symbolSetSz sortableCt
+//        |> Json.serialize
+

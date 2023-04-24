@@ -42,6 +42,9 @@ type BenchSorterSet() =
 
     [<GlobalSetup>]
     member this.Setup() =
+        let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
+        let rndGn () = 
+            randy |> Rando.nextRngGen
         let ordr = this.ordr |> Order.createNr
         let sorterCt = this.sorterCt |> SorterCount.create
         let switchCt = SwitchCount.orderTo900SwitchCount ordr
@@ -70,7 +73,7 @@ type BenchSorterSet() =
                             ordr 
                             Seq.empty<switch> 
                             switchCt 
-                            (RngGen.createLcg (123 |> RandomSeed.create))
+                            rndGn
 
 
     [<Benchmark>]

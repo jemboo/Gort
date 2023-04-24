@@ -9,19 +9,20 @@ type RolloutFixture() =
     [<TestMethod>]
     member this.uInt8Roll_toBitPack() =
         let arOfIntAr =
-            [| [| 1; 2; 3 |]; [| 11; 12; 13 |]; [| 21; 22; 23 |]; [| 31; 32; 33 |] |]
+            [| [| 1uy; 2uy; 3uy |]; [| 11uy; 12uy; 13uy |]; [| 21uy; 22uy; 23uy |]; [| 31uy; 32uy; 33uy |] |]
 
         let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 64uL |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = ssSize |> BitsPerSymbol.fromSymbolSetSize
 
-        let br = Uint8Roll.fromIntArrays arrayLen arOfIntAr |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint8Roll.toIntArrays br |> Seq.toArray
+        let br = Uint8Roll.fromArrays arrayLen bitsPerSymbl arOfIntAr |> Result.ExtractOrThrow
+        let arOfIntArBack = Uint8Roll.toArrays br |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
-        let bitPack = br |> Uint8Roll.toBitPack ssSize |> Result.ExtractOrThrow
+        let bitPack = br |> Uint8Roll.toBitPack |> Result.ExtractOrThrow
         let brB = bitPack |> Uint8Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = Uint8Roll.toIntArrays brB |> Seq.toArray
+        let arOfIntArBack2 = Uint8Roll.toArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
         Assert.IsTrue(true)
@@ -62,19 +63,20 @@ type RolloutFixture() =
     [<TestMethod>]
     member this.uInt16Roll() =
         let arOfIntAr =
-            [| [| 1333; 2; 3 |]; [| 11; 12; 13 |]; [| 21; 22; 23 |]; [| 3331; 32; 33 |] |]
+            [| [| 1333us; 2us; 3us |]; [| 11us; 12us; 13us |]; [| 21us; 22us; 23us |]; [| 3331us; 32us; 33us |] |]
 
         let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 4000uL |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = ssSize |> BitsPerSymbol.fromSymbolSetSize
 
-        let br = Uint16Roll.fromIntArrays arrayLen arOfIntAr |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint16Roll.toIntArrays br |> Seq.toArray
+        let br = Uint16Roll.fromArrays arrayLen bitsPerSymbl arOfIntAr |> Result.ExtractOrThrow
+        let arOfIntArBack = Uint16Roll.toArrays br |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
-        let bitPack = br |> Uint16Roll.toBitPack ssSize |> Result.ExtractOrThrow
+        let bitPack = br |> Uint16Roll.toBitPack |> Result.ExtractOrThrow
         let brB = bitPack |> Uint16Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = Uint16Roll.toIntArrays brB |> Seq.toArray
+        let arOfIntArBack2 = Uint16Roll.toArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
         Assert.IsTrue(true)
@@ -92,14 +94,15 @@ type RolloutFixture() =
         let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = ssSize |> BitsPerSymbol.fromSymbolSetSize
 
-        let br = IntRoll.fromIntArrays arrayLen arOfIntAr |> Result.ExtractOrThrow
-        let arOfIntArBack = IntRoll.toIntArrays br |> Seq.toArray
+        let intRoll = IntRoll.fromArrays arrayLen bitsPerSymbl arOfIntAr |> Result.ExtractOrThrow
+        let arOfIntArBack = IntRoll.toArrays intRoll |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
-        let bitPack = br |> IntRoll.toBitPack ssSize |> Result.ExtractOrThrow
+        let bitPack = intRoll |> IntRoll.toBitPack |> Result.ExtractOrThrow
         let brB = bitPack |> IntRoll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = IntRoll.toIntArrays brB |> Seq.toArray
+        let arOfIntArBack2 = IntRoll.toArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
 
@@ -115,12 +118,13 @@ type RolloutFixture() =
         let arrayLen = 3 |> ArrayLength.create |> Result.ExtractOrThrow
         let arrayCt = 4 |> ArrayCount.create |> Result.ExtractOrThrow
         let ssSize = 16555531uL |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = ssSize |> BitsPerSymbol.fromSymbolSetSize
 
-        let roll64 = Uint64Roll.fromIntArrays arrayLen arOfIntAr |> Result.ExtractOrThrow
+        let roll64 = Uint64Roll.fromIntArrays arrayLen bitsPerSymbl arOfIntAr |> Result.ExtractOrThrow
         let arOfIntArBack = Uint64Roll.toIntArrays roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
-        let bitPack = roll64 |> Uint64Roll.toBitPack ssSize |> Result.ExtractOrThrow
+        let bitPack = roll64 |> Uint64Roll.toBitPack |> Result.ExtractOrThrow
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
         let arOfIntArBack2 = Uint64Roll.toIntArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
@@ -139,14 +143,15 @@ type RolloutFixture() =
 
         let ssSize =
             (UInt64.MaxValue - 1uL) |> SymbolSetSize.create |> Result.ExtractOrThrow
+        let bitsPerSymbl = ssSize |> BitsPerSymbol.fromSymbolSetSize
 
-        let roll64 = Uint64Roll.fromUint64Arrays arrayLen arOfIntAr |> Result.ExtractOrThrow
-        let arOfIntArBack = Uint64Roll.toUint64Arrays roll64 |> Seq.toArray
+        let roll64 = Uint64Roll.fromArrays arrayLen bitsPerSymbl arOfIntAr |> Result.ExtractOrThrow
+        let arOfIntArBack = Uint64Roll.toArrays roll64 |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
 
-        let bitPack = roll64 |> Uint64Roll.toBitPack ssSize |> Result.ExtractOrThrow
+        let bitPack = roll64 |> Uint64Roll.toBitPack |> Result.ExtractOrThrow
         let brB = bitPack |> Uint64Roll.fromBitPack arrayLen |> Result.ExtractOrThrow
-        let arOfIntArBack2 = Uint64Roll.toUint64Arrays brB |> Seq.toArray
+        let arOfIntArBack2 = Uint64Roll.toArrays brB |> Seq.toArray
         Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack2)
 
 
@@ -256,40 +261,46 @@ type RolloutFixture() =
                [| 10; 21; 43; 64; 85; 96; 109 |]
                [| 1; 11; 31; 0; 51; 61; 91 |] |]
 
+               
+        let bps1  = (1  |> BitsPerSymbol.createNr)
+        let bps8  = (8  |> BitsPerSymbol.createNr)
+        let bps16 = (16 |> BitsPerSymbol.createNr)
+        let bps31 = (31 |> BitsPerSymbol.createNr)
+        let bps64 = (64 |> BitsPerSymbol.createNr)
+
+        let rolloutB =
+            Rollout.fromIntArrays rfB arrayLen bps1 sortedArrays |> Result.ExtractOrThrow
+
+        let isSortedB = rolloutB |> Rollout.isSorted
+        Assert.IsTrue(isSortedB)
 
         let rolloutU8 =
-            Rollout.fromIntArrays rfU8 arrayLen sortedArrays8 |> Result.ExtractOrThrow
+            Rollout.fromIntArrays rfU8 arrayLen bps8 sortedArrays8 |> Result.ExtractOrThrow
 
         let isSortedU8 = rolloutU8 |> Rollout.isSorted
         Assert.IsTrue(isSortedU8)
 
         let rolloutU16 =
-            Rollout.fromIntArrays rfI16 arrayLen sortedArrays |> Result.ExtractOrThrow
+            Rollout.fromIntArrays rfI16 arrayLen bps16 sortedArrays |> Result.ExtractOrThrow
 
         let isSortedU16 = rolloutU16 |> Rollout.isSorted
         Assert.IsTrue(isSortedU16)
 
-        let rolloutB =
-            Rollout.fromIntArrays rfB arrayLen sortedArrays |> Result.ExtractOrThrow
-
-        let isSortedB = rolloutB |> Rollout.isSorted
-        Assert.IsTrue(isSortedB)
-
-
         let unsortedRI32 =
-            Rollout.fromIntArrays rfI32 arrayLen unSortedArrays |> Result.ExtractOrThrow
+            Rollout.fromIntArrays rfI32 arrayLen bps31 unSortedArrays |> Result.ExtractOrThrow
 
         let isUnSortedI32 = unsortedRI32 |> Rollout.isSorted
         Assert.IsFalse(isUnSortedI32)
 
         let unsortedR8 =
-            Rollout.fromIntArrays rfU8 arrayLen unSortedArrays8 |> Result.ExtractOrThrow
+            Rollout.fromIntArrays rfU8 arrayLen bps8 unSortedArrays8 |> Result.ExtractOrThrow
 
         let isUnSortedU8 = unsortedR8 |> Rollout.isSorted
         Assert.IsFalse(isUnSortedU8)
 
         let unsortedRB =
-            Rollout.fromIntArrays rfB arrayLen unSortedArrays |> Result.ExtractOrThrow
+            Rollout.fromIntArrays rfB arrayLen bps1 unSortedArrays |> Result.ExtractOrThrow
 
         let unSortedB = unsortedRB |> Rollout.isSorted
         Assert.IsFalse(unSortedB)
+

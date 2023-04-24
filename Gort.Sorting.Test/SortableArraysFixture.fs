@@ -7,91 +7,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type SortableArraysFixture() =
 
     [<TestMethod>]
-    member this.fromSortableIntsU8() =
-        let order = Order.create 3 |> Result.ExtractOrThrow
-
-        let arOfIntAr =
-            [| [| 111; 112; 113 |]
-               [| 221; 12; 13 |]
-               [| 222; 22; 23 |]
-               [| 131; 32; 33 |] |]
-
-        let symbolSetSize = 255 |> uint64 |> SymbolSetSize.createNr
-        let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
-        let rolloutFormt = rolloutFormat.RfU8
-        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
-
-        let sortableSet =
-            SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
-            |> Result.ExtractOrThrow
-
-        let arOfIntArBack =
-            sortableSet
-            |> SortableSet.toSortableIntsArrays
-            |> Seq.map (SortableIntArray.getValues)
-            |> Seq.toArray
-
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-
-
-    [<TestMethod>]
-    member this.fromSortableIntsU16() =
-        let order = Order.create 3 |> Result.ExtractOrThrow
-
-        let arOfIntAr =
-            [| [| 1111; 11112; 11113 |]
-               [| 2211; 12; 13 |]
-               [| 2221; 22; 23 |]
-               [| 5531; 32; 33 |] |]
-
-        let symbolSetSize = 5553 |> uint64 |> SymbolSetSize.createNr
-        let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
-        let rolloutFormt = rolloutFormat.RfI32
-        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
-
-        let sortableSet =
-            SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
-            |> Result.ExtractOrThrow
-
-        let arOfIntArBack =
-            sortableSet
-            |> SortableSet.toSortableIntsArrays
-            |> Seq.map (SortableIntArray.getValues)
-            |> Seq.toArray
-
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-
-
-    [<TestMethod>]
-    member this.fromSortableIntsI32() =
-        let order = Order.create 3 |> Result.ExtractOrThrow
-
-        let arOfIntAr =
-            [| [| 1111; 11112; 11113 |]
-               [| 2211; 12; 13 |]
-               [| 2221; 22; 23 |]
-               [| 5555531; 32; 33 |] |]
-
-        let symbolSetSize = 555553133 |> uint64 |> SymbolSetSize.createNr
-        let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
-        let rolloutFormt = rolloutFormat.RfI32
-        let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
-
-        let sortableSet =
-            SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
-            |> Result.ExtractOrThrow
-
-        let arOfIntArBack =
-            sortableSet
-            |> SortableSet.toSortableIntsArrays
-            |> Seq.map (SortableIntArray.getValues)
-            |> Seq.toArray
-
-        Assert.IsTrue(CollectionProps.areEqual arOfIntAr arOfIntArBack)
-
-
-    [<TestMethod>]
-    member this.fromSortableIntsU64() =
+    member this.fromSortableInts() =
         let order = Order.create 3 |> Result.ExtractOrThrow
 
         let arOfIntAr =
@@ -106,7 +22,7 @@ type SortableArraysFixture() =
         let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
-            SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
+            SortableSet.fromSortableIntArrays sortableSetId order symbolSetSize siInt
             |> Result.ExtractOrThrow
 
         let arOfIntArBack =
@@ -124,11 +40,10 @@ type SortableArraysFixture() =
         let arOfIntAr = [| [| 1; 0; 1 |]; [| 1; 0; 0 |]; [| 0; 0; 1 |]; [| 1; 1; 1 |] |]
         let symbolSetSize = 2 |> uint64 |> SymbolSetSize.createNr
         let siInt = arOfIntAr |> Array.map (SortableIntArray.make order symbolSetSize)
-        let rolloutFormt = rolloutFormat.RfBs64
         let sortableSetId = (Guid.NewGuid()) |> SortableSetId.create
 
         let sortableSet =
-            SortableSet.fromSortableIntArrays sortableSetId rolloutFormt order symbolSetSize siInt
+            SortableSet.fromSortableIntArrays sortableSetId order symbolSetSize siInt
             |> Result.ExtractOrThrow
 
         let scFromSs = sortableSet |> SortableSet.getSortableCount |> SortableCount.value

@@ -14,9 +14,11 @@ module SorterSet =
 
     let getOrder (sorterSet: sorterSet) = sorterSet.order
 
-    let getSorterCount (sorterSet: sorterSet) = sorterSet.sorterMap.Count
+    let getSorterCount (sorterSet: sorterSet) =
+            sorterSet.sorterMap.Count
 
-    let getSorters (sorterSet: sorterSet) = sorterSet.sorterMap |> Map.values |> Seq.cast
+    let getSorters (sorterSet: sorterSet) = 
+            sorterSet.sorterMap |> Map.values |> Seq.cast
 
     let getSortersById 
         (maxCt:sorterCount) 
@@ -41,11 +43,14 @@ module SorterSet =
              (sorters: seq<sorter>) 
              =
         let sorterMap =
-            sorters |> Seq.map (fun s -> (s |> Sorter.getSorterId, s)) |> Map.ofSeq
+            sorters 
+            |> Seq.map (fun s -> (s |> Sorter.getSorterId, s)) 
+            |> Map.ofSeq
 
         { sorterSet.id = id
           order = order
           sorterMap = sorterMap }
+
 
     let createEmpty = 
         load (Guid.Empty |> SorterSetId.create) (0 |> Order.createNr) (Seq.empty)
@@ -67,11 +72,10 @@ module SorterSet =
         (sorterStId:sorterSetId)
         (sorterCt: sorterCount)
         (order: order)
-        (rnGen: rngGen) 
-        (sorterRndGen: IRando -> sorterId -> sorter)
+        (rnGen: unit -> rngGen) 
+        (sorterRndGen: (unit -> rngGen) -> sorterId -> sorter)
         =
-        let randy = rnGen |> Rando.fromRngGen
-        let sorterGen = sorterRndGen randy
+        let sorterGen = sorterRndGen rnGen
         create sorterStId sorterCt order sorterGen
 
 
@@ -81,7 +85,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)  
         =
         createRandom 
             sorterStId
@@ -98,7 +102,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)   
         =
         createRandom 
             sorterStId
@@ -114,7 +118,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)  
         =
         createRandom 
             sorterStId 
@@ -130,7 +134,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)
+        (rnGen: unit -> rngGen) 
         =
         createRandom 
             sorterStId 
@@ -148,7 +152,7 @@ module SorterSet =
         (maxSeparation: int)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)   
         =
         createRandom 
             sorterStId
@@ -165,7 +169,7 @@ module SorterSet =
         (permSeed:permutation)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)   
         =
         let perms = permSeed 
                     |> Permutation.powers None
@@ -185,7 +189,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen) 
+        (rnGen: unit -> rngGen) 
         =
         createRandom 
             sorterStId 
@@ -202,7 +206,7 @@ module SorterSet =
         (order: order)
         (wPfx: switch seq)
         (switchCount: switchCount)
-        (rnGen: rngGen)  
+        (rnGen: unit -> rngGen)   
         =
         createRandom 
             sorterStId
