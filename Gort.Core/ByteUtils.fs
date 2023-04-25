@@ -25,14 +25,20 @@ module ByteUtils =
     let setBit (offset:int) (bitVal:bool) (theBits:int)  =
         if bitVal then theBits.set offset else theBits.unset offset
 
-    let rotateLeft (toRotate:int) (windowSize:int) =
+    let rotateLeft 
+            (toRotate:int) 
+            (windowSize:int) 
+        =
         let hiFlag = 1 <<< (windowSize - 1)
         let lowVal = toRotate &&& 1
         let newHiVal =  hiFlag * lowVal
         (toRotate >>> 1) + newHiVal
 
 
-    let rotateRight (toRotate:int) (windowSize:int) =
+    let rotateRight 
+            (toRotate:int) 
+            (windowSize:int) 
+        =
         let carryFlag = 1 <<< windowSize
         let rightShifted =  (toRotate <<< 1)
         let newLowVal = if ((carryFlag &&& rightShifted) > 0) then 1 else 0

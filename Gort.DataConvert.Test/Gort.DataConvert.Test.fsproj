@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="utilsFixture.fs" />
     <Compile Include="componentDtoFixture.fs" />
+    <Compile Include="rolloutDtoFixture.fs" />
     <Compile Include="sorterDtoFixture.fs" />
     <Compile Include="sorterSetDtoFixture.fs" />
     <Compile Include="sortableSetDtoFixture.fs" />

@@ -634,6 +634,7 @@ module IntRoll =
         looP
 
 
+
 type uint64Roll =
     private
         { arrayCount: arrayCount
@@ -1004,6 +1005,15 @@ type rollout =
 
 module Rollout =
 
+    let getRolloutFormat (rollout: rollout) =
+        match rollout with
+        | B _uBRoll -> rolloutFormat.RfB
+        | U8 _uInt8Roll -> rolloutFormat.RfU8
+        | U16 _uInt16Roll -> rolloutFormat.RfU16
+        | I32 _intRoll -> rolloutFormat.RfI32
+        | U64 _uInt64Roll -> rolloutFormat.RfU64
+        | Bs64 _bs64Roll -> rolloutFormat.RfBs64
+
     let getArrayLength (rollout: rollout) =
         match rollout with
         | B _uBRoll -> _uBRoll.arrayLength
@@ -1022,6 +1032,50 @@ module Rollout =
         | I32 _intRoll -> _intRoll.arrayCount
         | U64 _uInt64Roll -> _uInt64Roll.arrayCount
         | Bs64 _bs64Roll -> _bs64Roll.arrayCount
+
+
+    let getBitsPerSymbol (rollout: rollout) =
+        match rollout with
+        | B _uBRoll ->  1 |> BitsPerSymbol.createNr
+        | U8 _uInt8Roll -> _uInt8Roll.bitsPerSymbol
+        | U16 _uInt16Roll -> _uInt16Roll.bitsPerSymbol
+        | I32 _intRoll -> _intRoll.bitsPerSymbol
+        | U64 _uInt64Roll -> _uInt64Roll.bitsPerSymbol
+        | Bs64 _bs64Roll ->  1 |> BitsPerSymbol.createNr
+
+
+    let getDataBytes (rollout: rollout) =
+        match rollout with
+        | B _uBRoll ->  
+            result {
+                let! bp = _uBRoll |> BooleanRoll.toBitPack
+                return bp |> BitPack.getData
+            }
+        | U8 _uInt8Roll -> 
+            result {
+                let! bp = _uInt8Roll |> Uint8Roll.toBitPack
+                return bp |> BitPack.getData
+            }
+        | U16 _uInt16Roll -> 
+            result {
+                let! bp = _uInt16Roll |> Uint16Roll.toBitPack
+                return bp |> BitPack.getData
+            }
+        | I32 _intRoll ->
+            result {
+                let! bp = _intRoll |> IntRoll.toBitPack
+                return bp |> BitPack.getData
+            }
+        | U64 _uInt64Roll -> 
+            result {
+                let! bp = _uInt64Roll |> Uint64Roll.toBitPack
+                return bp |> BitPack.getData
+            }
+        | Bs64 _bs64Roll ->  
+            result {
+                let! bp = _bs64Roll |> Bs64Roll.toBitPack
+                return bp |> BitPack.getData
+            }
 
 
     let copy (rollout: rollout) =
