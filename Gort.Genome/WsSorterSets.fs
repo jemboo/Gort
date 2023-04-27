@@ -4,19 +4,18 @@ open System
 
 module WsStandardSorterSets = 
 
-    let sorterSetDir = "c:\\GortFiles" |> FileDir.create
-    let standardFolder = "StandardSorterSets" |> FileFolder.create
-    let fileExt = "txt" |> FileExt.create
-    let archiver = FileUtils.makeArchiver sorterSetDir
+    let standardFolder = "StandardSorterSets"
 
+    let writeData (fileName:string) (data: string seq) =
+        TextIO.write "txt" (Some WsCommon.wsRootDir) standardFolder fileName data
 
-    let rngGen1 = RngGen.createLcg (12544 |> RandomSeed.create)
-    let rngGen2 = RngGen.createLcg (72574 |> RandomSeed.create)
-    let rngGen3 = RngGen.createLcg (82584 |> RandomSeed.create)
+    let readData (fileName:string) =
+        TextIO.read "txt" (Some WsCommon.wsRootDir) standardFolder fileName
+
 
     let sorterCt1 (order:order) = 
         match (order |> Order.value) with
-        | 16 -> 50 |> SorterCount.create
+        | 16 -> 2 |> SorterCount.create
         | 18 -> 50 |> SorterCount.create
         | 20 -> 50 |> SorterCount.create
         | 22 -> 50 |> SorterCount.create
@@ -41,45 +40,13 @@ module WsStandardSorterSets =
                     
         RndDenovoSorterSetCfg.create 
             order rngGen switchGenMode pfx
-            (SwitchCount.orderTo999SwitchCount order)
+            (24 |> SwitchCount.create)
+            //(SwitchCount.orderTo999SwitchCount order)
             (sorterCt1 order)
 
 
-    let getRdnDenovoId
-            (switchGenMode:switchGenMode)
-            (order:order)
-            (rngGen:rngGen)
-            (usePfx:bool)
-            =
-        makeRdnDenovoCfg 
-            switchGenMode
-            order
-            rngGen
-            usePfx
-        |> RndDenovoSorterSetCfg.makeSorterSetId
-
-
-    let fileNameFromSorterSet (sst:sorterSet) =
-        sst |> SorterSet.getId |> SorterSetId.value 
-            |> string |> FileName.create
-
-
-    let fileNameFromCfg
-            (switchGenMode:switchGenMode)
-            (order:order)
-            (rngGen:rngGen)
-            (usePfx:bool)
-            =
-        getRdnDenovoId 
-                switchGenMode
-                order
-                rngGen
-                usePfx
-        |> string |> FileName.create
-
-
     let allCfgs () =
-        [| for ordr in [16;18;20;22;24] do
+        [| for ordr in [16;18;] do
              for genMode in [switchGenMode.StageSymmetric; 
                              switchGenMode.Switch; 
                              switchGenMode.Stage] do
@@ -87,21 +54,46 @@ module WsStandardSorterSets =
 
                     makeRdnDenovoCfg genMode
                                      (ordr |> Order.createNr)
-                                     rngGen1
+                                     WsCommon.rngGen1
                                      usePfx
         |]
 
 
-    let saveStandardSorterSet (sst:sorterSet) =
-        let fileName = sst |> fileNameFromSorterSet
+    let saveStandardSorterSet
+            (cfg:rndDenovoSorterSetCfg)
+            (sst:sorterSet) 
+        =
+        let fileName = cfg |> RndDenovoSorterSetCfg.getFileName
+
         let jsns = sst |> SorterSet.getSorters
                        |> Seq.map(SorterDto.toJson)
-        archiver standardFolder fileName fileExt jsns
+        writeData       
+            fileName
+            jsns
+
+
+    let getSorterSet 
+            (cfg:rndDenovoSorterSetCfg) 
+        =
+        let sorterFileName = 
+            sprintf "%s.txt"
+                (cfg |> RndDenovoSorterSetCfg.getFileName)
+        try
+            let allLines = readData sorterFileName |> Result.ExtractOrThrow
+            let sorters = allLines |> Array.map(SorterDto.fromJson >> Result.ExtractOrThrow)
+
+            SorterSet.load
+                (cfg |> RndDenovoSorterSetCfg.getSorterSetId)
+                (cfg |> RndDenovoSorterSetCfg.getOrder)
+                sorters
+             |> Ok
+        with ex ->
+            ("error in TextIO.read: " + ex.Message) |> Error
 
 
     let runConfig (cfg) =
-        let sorterSet = RndDenovoSorterSetCfg.makeSorterSet cfg
-        let res = sorterSet |> saveStandardSorterSet 
+        let sorterSet = RndDenovoSorterSetCfg.getSorterSet cfg
+        let res = sorterSet |> saveStandardSorterSet cfg
         ()
 
 

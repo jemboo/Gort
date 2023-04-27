@@ -4,13 +4,15 @@ open System
 
 module WsBinarySortableSets = 
 
-    let sorterSetDir = "c:\\GortFiles" |> FileDir.create
-    let standardFolder = "BinarySortableSets" |> FileFolder.create
-    let fileExt = "txt" |> FileExt.create
-    let archiver = FileUtils.makeArchiver sorterSetDir
-       // let res = archiver folder file ext testData
+    let binaryFolder = "BinarySortableSets"
 
-    let orders = [|16;18;20;22;24|] |> Array.map(Order.createNr)
+    let writeData (fileName:string) (data: string seq) =
+        TextIO.write "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
+
+    let readData (fileName:string) =
+        TextIO.read "txt" (Some WsCommon.wsRootDir) binaryFolder fileName
+
+    let orders = [|16;18;|] |> Array.map(Order.createNr)
 
     let allCfgs () =
         [| 
@@ -25,34 +27,40 @@ module WsBinarySortableSets =
     let getSortableSetId
             (ordr:order)
             (usePfx:bool)
-            =
+        =
         if usePfx then
             SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
-            |> SortableSetCfgCertain.getId
+            |> SortableSetCfgCertain.getSortableSetId
         else
             sortableSetCfgCertain.All_Bits ordr
-            |> SortableSetCfgCertain.getId
+            |> SortableSetCfgCertain.getSortableSetId
 
 
-    let fileNameFromSortableSet (sst:sortableSet) =
+    let fileNameFromSortableSet 
+            (sst:sortableSet) 
+        =
         sst |> SortableSet.getSortableSetId |> SortableSetId.value 
             |> string |> FileName.create
 
 
-    let saveSortableSet (sst:sortableSet) =
-        let fileName = sst |> fileNameFromSortableSet
-        let jsns = []
-        //let jsns = sst |> SortableSet.getRollout
-        //               |> Seq.map(RolloutDto)
-        archiver standardFolder fileName fileExt jsns
+    let saveSortableSet 
+            (cfg:sortableSetCfgCertain)
+            (sst:sortableSet) 
+        =
+        let fileName = cfg |> SortableSetCfgCertain.getFileName 
+
+        let jsns = seq { sst |> SortableSetDto.toJson }
+        writeData fileName jsns
 
 
     let runConfig (cfg) =
-        let sortableSet = SortableSetCfgCertain.getSortableSet cfg
-                            |> Result.ExtractOrThrow
-        let res = sortableSet |> saveSortableSet 
-        ()
+        let sortableSetR = SortableSetCfgCertain.getSortableSet cfg
 
+        let sortableSet = sortableSetR
+                            |> Result.ExtractOrThrow
+
+        let res = sortableSet |> saveSortableSet cfg
+        ()
 
 
     let makeEm () =

@@ -17,7 +17,7 @@ type rndDenovoSorterSetCfg =
           switchPrefix: switch[]
           switchCount: switchCount
           sorterCount: sorterCount
-         }
+        }
 
 
 module RndDenovoSorterSetCfg =
@@ -52,23 +52,37 @@ module RndDenovoSorterSetCfg =
     let getSwitchCount (rdsg: rndDenovoSorterSetCfg) = 
             rdsg.switchCount
 
-    let getSorterCount (rdsg: rndDenovoSorterSetCfg) = 
-            rdsg.sorterCount
-
-    let makeSorterSetId (rdsg: rndDenovoSorterSetCfg) = 
+    let getSorterSetId 
+            (rdsg: rndDenovoSorterSetCfg) 
+        = 
         [|
-          rdsg.order :> obj;
-          rdsg.rngGen;
-          rdsg.switchGenMode;
-          rdsg.switchPrefix;
-          rdsg.switchCount;
-          rdsg.sorterCount;
+          rdsg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
+    let getConfigName 
+            (rdsg:rndDenovoSorterSetCfg) 
+        =
+        sprintf "%d_%s_%d"
+            (rdsg |> getOrder |> Order.value)
+            (rdsg |> getSwitchGenMode |> string)
+            (rdsg |> getSwitchPrefix |> Array.length)
 
-    let makeSorterSet (rdsg: rndDenovoSorterSetCfg) = 
-        let sorterStId = makeSorterSetId rdsg
+
+    let getFileName
+            (rdsg:rndDenovoSorterSetCfg) 
+        =
+        sprintf "%s_%s"
+            (rdsg |> getConfigName)
+            ( [|rdsg :> obj|] |> GuidUtils.guidFromObjs |> string)
+
+
+    let getSorterCount (rdsg: rndDenovoSorterSetCfg) = 
+            rdsg.sorterCount
+
+
+    let getSorterSet (rdsg: rndDenovoSorterSetCfg) = 
+        let sorterStId = getSorterSetId rdsg
         let randy = rdsg.rngGen |> Rando.fromRngGen
         let nextRng () =
             randy |> Rando.nextRngGen
@@ -103,6 +117,41 @@ module RndDenovoSorterSetCfg =
             
 
 
+type sorterSetCfg = 
+     | RndDenovo of rndDenovoSorterSetCfg
 
+
+module SorterSetCfg =
+
+    let getSorterSetId 
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo rdssCfg -> 
+            rdssCfg |> RndDenovoSorterSetCfg.getSorterSetId
+
+
+    let getSorterSet
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> RndDenovoSorterSetCfg.getSorterSet
+
+
+    let getOrder
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> RndDenovoSorterSetCfg.getOrder
+
+
+    let getCfgName
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> RndDenovoSorterSetCfg.getConfigName
 
 

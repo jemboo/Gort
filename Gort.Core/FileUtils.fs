@@ -57,6 +57,54 @@ module FilePath =
             ("error in addFolderName: " + ex.Message) |> Result.Error
 
 
+module TextIO =
+
+    let read 
+            (ext:string) 
+            (root:string option) 
+            (folder:string) 
+            (fileName:string)
+        =
+        try
+            let fne = sprintf "%s.%s" fileName ext
+            let fp = 
+                match root with
+                | Some p ->
+                     Path.Combine(p, folder, fne)
+                | None ->
+                    Path.Combine(folder, fne)
+
+            File.ReadAllLines fp |> Ok
+        with ex ->
+            ("error in TextIO.read: " + ex.Message) |> Result.Error
+
+
+    let write
+            (ext:string) 
+            (root:string option) 
+            (folder:string) 
+            (file:string)
+            (data: seq<string>)
+        =
+        try
+            let fne = sprintf "%s.%s" file ext
+            let fldr = 
+                match root with
+                | Some p ->
+                     Path.Combine(p, folder)
+                | None ->
+                    folder
+
+            Directory.CreateDirectory(fldr) |> ignore
+            let fp = Path.Combine(fldr, fne)
+            File.AppendAllLines(fp, data)
+            true |> Ok
+        with ex ->
+            ("error in TextIO.write: " + ex.Message) |> Result.Error
+
+
+
+
 module FileUtils =
     let makeDirectory (fd: fileDir) =
         try

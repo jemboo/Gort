@@ -42,10 +42,9 @@ module Sorter =
             (switchesPfx: seq<switch>)
             (switches: seq<switch>) =
         let combinedSwitches =
-            switchesPfx
-            |> Seq.append switches
+            switches
+            |> Seq.append switchesPfx
             |> Seq.take (switchCtTarget |> SwitchCount.value)
-
         fromSwitches sorterD order combinedSwitches
 
 

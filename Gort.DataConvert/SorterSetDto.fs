@@ -3,8 +3,12 @@ open System
 open Microsoft.FSharp.Core
 
 type sorterSetDto = { 
-        id: Guid; order:int; sorterIds:Guid[]; 
-        offsets:int[]; symbolCounts:int[]; switches:byte[] }
+        id: Guid; 
+        order:int; 
+        sorterIds:Guid[]; 
+        offsets:int[]; 
+        symbolCounts:int[]; 
+        switches:byte[] }
 
 module SorterSetDto =
 

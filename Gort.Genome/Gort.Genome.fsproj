@@ -8,10 +8,13 @@
   <ItemGroup>
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
+    <Compile Include="SorterSetEvalCfg.fs" />
     <Compile Include="SorterGenome.fs" />
     <Compile Include="GA.fs" />
+    <Compile Include="WsCommon.fs" />
     <Compile Include="WsSorterSets.fs" />
     <Compile Include="WsSortableSets.fs" />
+    <Compile Include="WsSorterPerf.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
