@@ -27,13 +27,28 @@ type sorterSetEval =
             sorterEvals:sorterEval[]
         }
 
-module SorterSetEval =
+module SorterSetEval 
+       =
+    let getSorterSetEvalId (ssEvl:sorterSetEval) =
+            ssEvl.sorterSetEvalId
 
+    let getSorterSetlId (ssEvl:sorterSetEval) =
+            ssEvl.sorterSetId
+
+    let getSortableSetId (ssEvl:sorterSetEval) =
+            ssEvl.sortableSetId
+
+    let getSorterEvals (ssEvl:sorterSetEval) =
+            ssEvl.sorterEvals
+            
+
+
+            
     let evalSorters
-        (sorterEvalMode: sorterEvalMode)
-        (sortableSt: sortableSet)
-        (sorters: sorter seq)
-        (useParallel: useParallel) 
+            (sorterEvalMode: sorterEvalMode)
+            (sortableSt: sortableSet)
+            (sorters: sorter seq)
+            (useParallel: useParallel) 
         : (sorterEval array) =
 
         let _splitOutErrors (rs: Result<'a, 'b>[]) =
@@ -60,8 +75,8 @@ module SorterSetEval =
     let make
             (sorterSetEvalId: sorterSetEvalId)
             (sorterEvalMode: sorterEvalMode)
-            (sortableSt: sortableSet)
             (sorterSet: sorterSet)
+            (sortableSt: sortableSet)
             (useParallel: useParallel) 
         =
           let sorters = sorterSet |> SorterSet.getSorters
@@ -73,10 +88,24 @@ module SorterSetEval =
           }
 
 
+    let load
+            (sorterSetEvalId: sorterSetEvalId)
+            (sorterSetId: sorterSetId)
+            (sortableStId: sortableSetId)
+            (sorterEvals: sorterEval[])
+        =
+          {
+            sorterSetEvalId = sorterSetEvalId
+            sorterSetId = sorterSetId
+            sortableSetId = sortableStId
+            sorterEvals = sorterEvals
+          }
+
+
     let getSorterIdsForUpgrade 
-        (sorterEvalMod: sorterEvalMode)
-        (sorterEvals : sorterEval array)
-        : (sorterId array)  =
+            (sorterEvalMod: sorterEvalMode)
+            (sorterEvals : sorterEval array)
+       : (sorterId array) =
         sorterEvals 
         |> Array.filter(SorterEval.shouldRetest sorterEvalMod)
         |> Array.map(SorterEval.getSorterId)

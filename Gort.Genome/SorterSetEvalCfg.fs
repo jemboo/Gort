@@ -24,10 +24,9 @@ module SorterSetEvalCfg
             sorterEvalMode=sorterEvalMode
         }
 
-
-    let getId (cfg: sorterSetEvalCfg) = 
-            cfg.sortableSetCfg
-
+    let getOrder (cfg: sorterSetEvalCfg) = 
+            cfg.sortableSetCfg 
+            |> SortableSetCfg.getOrder
 
     let getSorterSetEvalId  (cfg: sorterSetEvalCfg) = 
         [|
@@ -56,14 +55,23 @@ module SorterSetEvalCfg
             (cfg |> getSorterSetCfg |> SorterSetCfg.getCfgName)
 
 
-    let getSorterSetPerf 
-            (cfg: sorterSetEvalCfg)
+    let getFileName
+            (cfg:sorterSetEvalCfg) 
+        =
+        sprintf 
+            "%s_%s"
+                (cfg |> getConfigName)
+                ( [|cfg :> obj|] |> GuidUtils.guidFromObjs |> string)
+
+
+    let getSorterSetEval
             (sortableSetCfgRet: sortableSetCfg->sortableSet)
             (sorterSetRet: sorterSetCfg->sorterSet)
+            (cfg: sorterSetEvalCfg)
         =
         SorterSetEval.make
             (getSorterSetEvalId cfg)
             (getSorterEvalMode cfg)
-            (cfg |> getSortableSetCfg |> sortableSetCfgRet)
             (cfg |> getSorterSetCfg |> sorterSetRet)
+            (cfg |> getSortableSetCfg |> sortableSetCfgRet)
         

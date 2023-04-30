@@ -53,7 +53,7 @@ module CollectionOps =
     let cartesianProduct 
             (seq_a: seq<'a>) 
             (seq_b: seq<'b>) 
-            =
+        =
         seq {  
             for ae in seq_a do
                for be in seq_b do
@@ -66,7 +66,7 @@ module CollectionOps =
                     (lhs: array<^a>) 
                     (rhs: array<^a>) 
                     (prod: array<^a>) 
-                    =
+               =
         let dmax = lhs.Length
         let mutable curdex = 0
         while curdex < dmax do
@@ -76,7 +76,10 @@ module CollectionOps =
 
         
     let inline arrayProductR< ^a when ^a:(static member op_Explicit:^a->int)>
-            (lhs: array<^a>) (rhs: array<^a>) (prod: array<^a>) =
+                    (lhs: array<^a>) 
+                    (rhs: array<^a>) 
+                    (prod: array<^a>) 
+                =
         try
             arrayProduct lhs rhs prod |> Ok
         with ex ->
@@ -85,7 +88,7 @@ module CollectionOps =
 
     let allPowers   
             (a_core: array<int>) 
-            =
+        =
         seq {
             let mutable _continue = true
             let mutable a_cur = Array.copy a_core
@@ -101,7 +104,7 @@ module CollectionOps =
     let allPowersCapped 
             (maxCount: int) 
             (a_core: array<int>) 
-            =
+        =
         seq {
             let mutable _continue = true
             let mutable dex = 0
@@ -118,7 +121,7 @@ module CollectionOps =
     let filterByPickList 
             (data: 'a[]) 
             (picks: bool[]) 
-            =
+        =
         try
             let pickCount = picks |> Array.map (fun v -> if v then 1 else 0) |> Array.sum
             let filtAr = Array.zeroCreate pickCount
@@ -138,9 +141,9 @@ module CollectionOps =
                                     ^a:(static member One:^a) and  
                                     ^a:(static member (+):^a* ^a -> ^a) and 
                                     ^a:(static member op_Explicit:^a->int)>
-                    (ar: array<^a>) 
-                    (inv_out: array<^a>) 
-                    =
+                (ar: array<^a>) 
+                (inv_out: array<^a>) 
+        =
         let mutable iv = zero_of ar.[0]
         let incr = one_of ar.[0]          
         for i = 0 to ar.Length - 1 do

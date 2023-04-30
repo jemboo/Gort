@@ -13,7 +13,10 @@ module SorterFitness =
     let create (spbCt: float) =
         spbCt |> SorterFitness
 
-    let fromSpeed (stageWght:stageWeight) (sorterSpd:sorterSpeed) = 
+    let fromSpeed 
+            (stageWght:stageWeight) 
+            (sorterSpd:sorterSpeed) 
+        = 
         (stageWght |> StageWeight.value) /
         (sorterSpd |> SorterSpeed.getStageCount |> StageCount.value |> float)
         +

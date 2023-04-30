@@ -49,10 +49,10 @@ module SortableSetCfgCertain =
     let getFileName
             (sscc:sortableSetCfgCertain) 
         =
-        sprintf "%s_%s"
-                    (sscc |> getConfigName)
-                    ( [|sscc :> obj|] |> GuidUtils.guidFromObjs |> string)
-
+        sprintf 
+            "%s_%s"
+                (sscc |> getConfigName)
+                ( [|sscc :> obj|] |> GuidUtils.guidFromObjs |> string)
 
 
     let switchReduceBits
@@ -155,4 +155,9 @@ module SortableSetCfg =
             cCfg |> SortableSetCfgCertain.getConfigName
 
 
-
+    let getFileName
+            (ssCfg: sortableSetCfg) 
+        =
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCfgCertain.getFileName

@@ -89,7 +89,7 @@ module SorterSpeed =
         | Some ss -> sprintf "%d\t%d"
                          (ss |> getStageCount |> StageCount.value)
                          (ss |> getSwitchCount |> SwitchCount.value)
-        | None -> "None\tNone"
+        | None -> "-\t-"
 
 
     let getStageCount0 (sorterSpd : sorterSpeed option) =
@@ -104,14 +104,26 @@ module SorterSpeed =
         | None -> 0
 
 
-type sorterPerf = | IsSuccessful of bool 
-                  | SortedSetSize of sortableCount
+type sorterPerf = 
+    | IsSuccessful of bool 
+    | SortedSetSize of sortableCount
 
 module SorterPerf =
     let isSuccessful (sorterPrf:sorterPerf) (ordr:order) =
         match sorterPrf with
         | IsSuccessful bv -> bv
         | SortedSetSize ssz -> (SortableCount.value ssz) < (Order.value ordr) + 1
+
+    let report (sp: sorterPerf option)
+        =
+        match sp with
+        | Some perf ->
+            match perf with
+            | IsSuccessful bv ->
+                sprintf "%b" bv
+            | SortedSetSize sz ->
+                sprintf "%d" (SortableCount.value sz)
+        | None -> "-"
 
 
 type sorterEvalMode = | DontCheckSuccess
@@ -182,7 +194,7 @@ module SorterEval =
             (sorterPerfEvalMod: sorterEvalMode) 
             (sortableSt: sortableSet) 
             (sortr: sorter) 
-            : sorterEval =
+        : sorterEval =
 
         let _addSorterToErrorResultCase sortr resA =
             match resA with
@@ -222,3 +234,25 @@ module SorterEval =
             | Error msg -> make (Some msg) None None None None sortableStId sortrId
 
         | Error msg -> make  (Some msg) None None None None sortableStId sortrId
+
+
+
+    let reportHeader
+            (pfx:string)
+        =
+        sprintf "%s\tErr\tStages\tSwitches\tPerf\tPhenotype\tSortable\tSorter\n"
+            pfx
+
+
+    let report 
+            (pfx:string) 
+            (sev:sorterEval) 
+        =
+        sprintf "%s\t%s\t%s\t%s\t%s\t%s\t%s"
+            pfx
+            (sev.errorMessage |> StringUtil.stringOption "-" )
+            (sev.sorterSpeed |> SorterSpeed.report)
+            (sev.sorterPrf |> SorterPerf.report)
+            (sev.sortrPhenotypeId |> Option.map(SorterPhenotypeId.value >> string) |> StringUtil.stringOption "-")
+            (sev.sortableSetId |> SortableSetId.value |> string)
+            (sev.sortrId |> SorterId.value |> string)

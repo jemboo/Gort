@@ -6,11 +6,14 @@ module WsBinarySortableSets =
 
     let binaryFolder = "BinarySortableSets"
 
-    let writeData (fileName:string) (data: string seq) =
-        TextIO.write "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
+    let appendLines (fileName:string) (data: string seq) =
+        TextIO.appendLines "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
 
-    let readData (fileName:string) =
-        TextIO.read "txt" (Some WsCommon.wsRootDir) binaryFolder fileName
+    let writeToFile (fileName:string) (data: string) =
+        TextIO.writeToFile "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
+
+    let readAllText (fileName:string) =
+        TextIO.readAllText "txt" (Some WsCommon.wsRootDir) binaryFolder fileName
 
     let orders = [|16;18;|] |> Array.map(Order.createNr)
 
@@ -18,9 +21,11 @@ module WsBinarySortableSets =
         [| 
           for ordr in orders do
             SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
+            |> sortableSetCfg.Certain
 
           for ordr in orders do
             sortableSetCfgCertain.All_Bits ordr
+            |> sortableSetCfg.Certain
         |]
 
 
@@ -39,22 +44,38 @@ module WsBinarySortableSets =
     let fileNameFromSortableSet 
             (sst:sortableSet) 
         =
-        sst |> SortableSet.getSortableSetId |> SortableSetId.value 
-            |> string |> FileName.create
+        sst |> SortableSet.getSortableSetId 
+            |> SortableSetId.value 
+            |> string
+            |> FileName.create
 
 
     let saveSortableSet 
-            (cfg:sortableSetCfgCertain)
+            (cfg:sortableSetCfg)
             (sst:sortableSet) 
         =
-        let fileName = cfg |> SortableSetCfgCertain.getFileName 
+        let fileName = cfg |> SortableSetCfg.getFileName 
+        writeToFile fileName (sst |> SortableSetDto.toJson )
 
-        let jsns = seq { sst |> SortableSetDto.toJson }
-        writeData fileName jsns
+
+    let getSortableSet 
+            (cfg:sortableSetCfg) 
+        =
+        match cfg with
+        | Certain cfgCert ->
+            let sortableSetFileName =
+                    (cfgCert |> SortableSetCfgCertain.getFileName)
+            try
+                let allText = readAllText sortableSetFileName |> Result.ExtractOrThrow
+                let sortableSet = allText |> SortableSetDto.fromJson
+                sortableSet
+            with ex ->
+                ("error in WsBinarySortableSets.getSortableSet: " + ex.Message) |> Error
+
 
 
     let runConfig (cfg) =
-        let sortableSetR = SortableSetCfgCertain.getSortableSet cfg
+        let sortableSetR = SortableSetCfg.getSortableSet cfg
 
         let sortableSet = sortableSetR
                             |> Result.ExtractOrThrow

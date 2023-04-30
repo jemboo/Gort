@@ -155,3 +155,9 @@ module SorterSetCfg =
             cCfg |> RndDenovoSorterSetCfg.getConfigName
 
 
+    let getFileName
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> RndDenovoSorterSetCfg.getFileName

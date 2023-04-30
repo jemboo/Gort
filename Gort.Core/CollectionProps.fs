@@ -8,7 +8,10 @@ open SysExt
 
 module CollectionProps =
 
-    let rec compareAny (o1: obj) (o2: obj) =
+    let rec compareAny 
+                (o1: obj) 
+                (o2: obj) 
+        =
         match (o1, o2) with
         | (:? IComparable as o1), (:? IComparable as o2) -> Some(compare o1 o2)
         | (:? IEnumerable as arr1), (:? IEnumerable as arr2) ->

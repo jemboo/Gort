@@ -10,13 +10,13 @@
   <ItemGroup>
     <Compile Include="FileUtilsFixture.fs" />
     <Compile Include="SysExtFixture.fs" />
+    <Compile Include="SparseArrayFixture.fs" />
     <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="CollectionPropsFixture.fs" />
     <Compile Include="CollectionOpsFixture.fs" />
     <Compile Include="GuidUtilsFixture.fs" />
     <Compile Include="ByteUtilsFixture.fs" />
     <Compile Include="ByteArrayFixture.fs" />
-    <Compile Include="RandoFixture.fs" />
     <Compile Include="RndVarsFixture.fs" />
     <Compile Include="IntSeriesFixture.fs" />
     <Compile Include="PermutationFixture.fs" />

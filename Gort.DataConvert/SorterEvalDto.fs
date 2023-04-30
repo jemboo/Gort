@@ -101,7 +101,7 @@ module SorterPerfDto =
 
 type sorterEvalDto = { 
         errorMessage: string;
-        switchUseCts:int[]; 
+        switchUseCts:string; 
         sorterSpeed:string; 
         sorterPrf:string; 
         sortrPhenotypeId:Nullable<Guid>; 
@@ -118,13 +118,18 @@ module SorterEvalDto =
                 | null -> None
                 | msg -> msg |> Some
                 
-            let switchUseCts =
-                if dto.switchUseCts.Length = 0 then
-                    None 
-                else
-                    dto.switchUseCts 
-                    |> SwitchUseCounts.make
-                    |> Some
+            let! switchUseCts =
+                result {
+                    if dto.switchUseCts.Length = 0 then
+                        return None 
+                    else
+                        let! sparseA = dto.switchUseCts |> SparseIntArrayDto.fromJson
+
+                        return sparseA
+                                |> SparseArray.toArray
+                                |> SwitchUseCounts.make
+                                |> Some
+                }
 
             let! sorterSpeed =
                 if dto.sorterSpeed = null then
@@ -170,12 +175,12 @@ module SorterEvalDto =
 
     let toDto(sorterEvl:sorterEval) =
         let errorMsg = sorterEvl |> SorterEval.getErrorMessage 
-                                 |> StringUtil.OrNull
+                                 |> StringUtil.nullOption
         let switchUseCts = sorterEvl |> SorterEval.getSwitchUseCounts
                                      |> SwitchUseCounts.ofOption
         {
             errorMessage = errorMsg;
-            switchUseCts = switchUseCts; 
+            switchUseCts = switchUseCts |> SparseArray.fromArray 0 |> SparseIntArrayDto.toJson
             sorterSpeed = sorterEvl |> SorterEval.getSorterSpeed |> SorterSpeedDto.ofOption
             sorterPrf = sorterEvl |> SorterEval.getSorterPerf |> SorterPerfDto.ofOption
             sortrPhenotypeId = sorterEvl |> SorterEval.getSortrPhenotypeId
@@ -188,3 +193,63 @@ module SorterEvalDto =
 
     let toJson (sorterEvl:sorterEval) =
         sorterEvl |> toDto |> Json.serialize
+
+
+
+type sorterSetEvalDto = { 
+        sorterSetEvalId: Guid;
+        sorterSetId:Guid; 
+        sortableSetId:Guid; 
+        sorterEvals:string[]; 
+     }
+
+
+module SorterSetEvalDto =
+
+    let fromDto (dto:sorterSetEvalDto) =
+        result {
+            let sorterSetEvalId = 
+                    dto.sorterSetEvalId
+                    |> SorterSetEvalId.create
+
+            let sorterSetId =
+                    dto.sorterSetId
+                    |> SorterSetId.create
+
+            let sortableSetId =
+                    dto.sortableSetId
+                    |> SortableSetId.create
+
+            let! sorterEvals =
+                    dto.sorterEvals
+                    |> Array.map(SorterEvalDto.fromJson)
+                    |> Array.toList
+                    |> Result.sequence
+
+            return SorterSetEval.load
+                        sorterSetEvalId
+                        sorterSetId
+                        sortableSetId
+                        (sorterEvals |> List.toArray)
+        }
+
+        
+    let fromJson (jstr: string) =
+        result {
+            let! dto = Json.deserialize<sorterSetEvalDto> jstr
+            return! fromDto dto
+        }
+
+
+    let toDto (ssEvl:sorterSetEval) =
+        {
+            sorterSetEvalId = ssEvl |> SorterSetEval.getSorterSetEvalId |> SorterSetEvalId.value
+            sorterSetId = ssEvl |> SorterSetEval.getSorterSetlId |> SorterSetId.value
+            sortableSetId = ssEvl |> SorterSetEval.getSortableSetId |> SortableSetId.value
+            sorterEvals = ssEvl |> SorterSetEval.getSorterEvals |> Array.map(SorterEvalDto.toJson)
+        }
+
+    let toJson (sorterSetEvl:sorterSetEval) =
+        sorterSetEvl |> toDto |> Json.serialize
+
+
