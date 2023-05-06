@@ -18,6 +18,7 @@ module SorterPhenotypeId =
 
     
 type switchesUsed = private SwitchesUsed of switch[]
+
 module SwitchesUsed = 
     let make (switches: switch[]) =
         SwitchesUsed switches
@@ -29,7 +30,10 @@ module SwitchesUsed =
 type sorterSpeed = private { switchCt:switchCount; stageCt:stageCount }
 
 module SorterSpeed =
-    let create (switchCt: switchCount) (stageCt: stageCount) =
+    let create 
+            (switchCt: switchCount) 
+            (stageCt: stageCount) 
+        =
         { switchCt = switchCt
           stageCt = stageCt }
 
@@ -82,6 +86,23 @@ module SorterSpeed =
         with ex ->
             (sprintf "error in SorterSpeed.fromSorterOpOutput: %s" ex.Message)
             |> Result.Error
+
+
+    let modifyForPrefix
+            (ordr:order)
+            (tcAdded:stageCount)
+            (ss:sorterSpeed) 
+        =
+        let wcNew = 
+            tcAdded 
+            |> StageCount.toSwitchCount ordr
+            |> SwitchCount.add (getSwitchCount ss)
+
+        let tcNew = 
+            tcAdded
+            |> StageCount.add (getStageCount ss)
+
+        create wcNew tcNew
 
 
     let report (sorterSpd : sorterSpeed option) =
@@ -148,7 +169,8 @@ module SorterEval =
              (sorterPrf: sorterPerf option) 
              (sortrPhenotypeId: sorterPhenotypeId option)
              (sortableStId: sortableSetId)
-             (sortrId: sorterId) =
+             (sortrId: sorterId) 
+        =
         { errorMessage = errorMsg
           switchUseCts = switchUseCts
           sorterSpeed = sorterSpeed
@@ -242,6 +264,17 @@ module SorterEval =
         =
         sprintf "%s\tErr\tStages\tSwitches\tPerf\tPhenotype\tSortable\tSorter\n"
             pfx
+
+
+    let modifyForPrefix
+            (ordr:order)
+            (tc:stageCount)
+            (sev:sorterEval) 
+        =
+        {sev with 
+           sorterSpeed = 
+           sev.sorterSpeed
+           |> Option.map(SorterSpeed.modifyForPrefix ordr tc)}
 
 
     let report 

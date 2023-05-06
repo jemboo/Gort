@@ -8,7 +8,16 @@ module GaId =
     let value (GaId v) = v
     let create dex = GaId dex
 
-type reporter<'R> = 'R -> unit
+
+type generation = private Generation of int
+
+module Generation =
+    let value (Generation v) = v
+    let create dex = Generation dex
+    let next (Generation v) = Generation (v + 1)
+
+
+//type reporter<'R> = 'R -> unit
 
 type ga<'T> = 
     private
@@ -98,21 +107,94 @@ module Counter =
     let getId (ctr:counter) =
         ctr.id
 
-    let update (maxV:int) (ctr:counter) =
+    let update 
+            (maxV:int) 
+            (ctr:counter) 
+         =
         if ctr.value < maxV then
             {ctr with value = ctr.value + 1} |> Ok
         else
             "too big" |> Error
 
-    let terminate (limit:int) (ctr:counter) =
+    let terminate 
+            (limit:int)
+            (ctr:counter)
+        =
         ctr.value >= limit |> Ok
 
-    let archive (lastId:gaId) (ctr:counter) =
+
+    let archive 
+            (lastId:gaId) 
+            (ctr:counter) 
+        =
         if (ctr.value % 2 = 0) then
             ctr.id |> Ok
         else
             lastId |> Ok
 
 
-module GaTest = 
-    let u = None
+            
+type gaSorterSet = 
+    private 
+        { 
+            id:gaId; 
+            generation:generation; 
+            value:sorterSetEval
+        }
+
+
+module GaSorterSet =
+
+    let create 
+            (value:sorterSetEval) 
+        =
+        {
+          id = Guid.NewGuid() |> GaId.create;
+          generation = 0 |> Generation.create
+          value = value
+        }
+
+    let getValue 
+            (gaSorterSet:gaSorterSet) 
+        =
+        gaSorterSet.value
+
+    let getId 
+            (gaSorterSet:gaSorterSet) 
+        =
+        gaSorterSet.id
+
+    let update
+            (gaSorterSet:gaSorterSet) 
+         =
+         try
+            { gaSorterSet with
+                generation 
+                    = gaSorterSet.generation |> Generation.next
+
+
+            } |> Ok
+
+         with ex ->
+            ("error in update: " + ex.Message) |> Result.Error
+
+    let terminate 
+            (maxGen:generation)
+            (gaSorterSet:gaSorterSet) 
+        =
+        false
+
+
+    let archive
+            (fileAppender: string -> seq<string> -> Result<bool, string>)
+            (fileName:string)
+            (gaSorterSet:gaSorterSet)  
+        =
+        result {
+            if System.IO.File.Exists fileName then
+                fileAppender fileName (seq {"Hi"} ) |> ignore
+            else
+                fileAppender fileName (seq {"Hi"} ) |> ignore
+
+            return gaSorterSet.id
+        }

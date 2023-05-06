@@ -54,6 +54,8 @@ module SetOfSortableSetId =
 module SwitchCount =
     let value (SwitchCount v) = v
     let create id = SwitchCount id
+    let add (scA:switchCount) (scB:switchCount) =
+        (value scA) + (value scB) |> create
 
     let orderToRecordSwitchCount (ord: order) =
         let d = (Order.value ord)
@@ -94,7 +96,6 @@ module SwitchCount =
 
         create ct
 
-
     let orderTo900SwitchCount (ord: order) =
         let d = (Order.value ord)
 
@@ -123,7 +124,6 @@ module SwitchCount =
             | _ -> 0
 
         create ct
-
 
     let orderTo999SwitchCount (ord: order) =
         let d = (Order.value ord)
@@ -162,10 +162,11 @@ module SwitchFrequency =
 module StageCount =
     let value (StageCount v) = v
     let create id = StageCount id
+    let add (scA:stageCount) (scB:stageCount) =
+        (value scA) + (value scB) |> create
 
     let toSwitchCount (ord: order) (tCt: stageCount) =
         SwitchCount.create ((Order.value ord) * (value tCt) / 2)
-
 
     let orderToRecordStageCount (ord: order) =
         let d = (Order.value ord)

@@ -7,6 +7,7 @@ type sorterSetEvalCfg =
         { 
           sortableSetCfg: sortableSetCfg
           sorterSetCfg: sorterSetCfg
+          stagePrefixCount: stageCount
           sorterEvalMode: sorterEvalMode
         }
 
@@ -16,11 +17,13 @@ module SorterSetEvalCfg
     let create 
             (sortableSetCfg:sortableSetCfg)
             (sorterSetCfg:sorterSetCfg)
+            (stagePrefixCount: stageCount)
             (sorterEvalMode: sorterEvalMode)
         =
         {
             sortableSetCfg=sortableSetCfg;
             sorterSetCfg=sorterSetCfg;
+            stagePrefixCount=stagePrefixCount;
             sorterEvalMode=sorterEvalMode
         }
 
@@ -41,6 +44,10 @@ module SorterSetEvalCfg
 
     let getSorterSetCfg  (cfg: sorterSetEvalCfg) = 
             cfg.sorterSetCfg
+
+
+    let getStagePrefixCount  (cfg: sorterSetEvalCfg) = 
+            cfg.stagePrefixCount
 
 
     let getSorterEvalMode  (cfg: sorterSetEvalCfg) = 
@@ -67,11 +74,23 @@ module SorterSetEvalCfg
     let getSorterSetEval
             (sortableSetCfgRet: sortableSetCfg->sortableSet)
             (sorterSetRet: sorterSetCfg->sorterSet)
+            (up:useParallel)
             (cfg: sorterSetEvalCfg)
         =
-        SorterSetEval.make
+        let ssEval = 
+           SorterSetEval.make
             (getSorterSetEvalId cfg)
             (getSorterEvalMode cfg)
             (cfg |> getSorterSetCfg |> sorterSetRet)
             (cfg |> getSortableSetCfg |> sortableSetCfgRet)
-        
+            up
+
+        let ordr = cfg |> getOrder
+        let tCmod = cfg |> getStagePrefixCount
+        SorterSetEval.load
+            (ssEval |> SorterSetEval.getSorterSetEvalId)
+            (ssEval |> SorterSetEval.getSorterSetlId)
+            (ssEval |> SorterSetEval.getSortableSetId)
+            (ssEval |> SorterSetEval.getSorterEvals  
+                |> Array.map(SorterEval.modifyForPrefix ordr tCmod))
+               

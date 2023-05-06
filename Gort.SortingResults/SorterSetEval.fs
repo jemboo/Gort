@@ -41,9 +41,6 @@ module SorterSetEval
     let getSorterEvals (ssEvl:sorterSetEval) =
             ssEvl.sorterEvals
             
-
-
-            
     let evalSorters
             (sorterEvalMode: sorterEvalMode)
             (sortableSt: sortableSet)

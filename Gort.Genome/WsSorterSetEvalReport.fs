@@ -6,32 +6,24 @@ module WsSorterSetEvalReport
        =
     let useParall = true |> UseParallel.create
 
-    let sorterSetEvalReport = "SorterSet_Eval_Report"
-
-    let writeToFile (fileName:string) (data: string) =
-        TextIO.writeToFile "txt" (Some WsCommon.wsRootDir) sorterSetEvalReport fileName data
+    let localFolder = "SorterSet_Eval_Report"
+    let reportFileName = "Summary_Report"
+    let reportHeaderPfx = "eval_id\torder\tsorter_type\tsortable_type"
 
     let appendLines (fileName:string) (data: string seq) =
-        TextIO.appendLines "txt" (Some WsCommon.wsRootDir) sorterSetEvalReport fileName data
+        WsCommon.appendLines localFolder fileName data
+
+    let writeToFile (fileName:string) (data: string) =
+        WsCommon.writeToFile localFolder fileName data
 
     let readAllText (fileName:string) =
-        TextIO.readAllText "txt" (Some WsCommon.wsRootDir) sorterSetEvalReport fileName
+        WsCommon.readAllText localFolder fileName
 
     let readAllLines (fileName:string) =
-        TextIO.readAllLines "txt" (Some WsCommon.wsRootDir) sorterSetEvalReport fileName
+        WsCommon.readAllLines localFolder fileName
 
 
-    let getSortableSet cfg =
-            WsBinarySortableSets.getSortableSet cfg
-            |> Result.ExtractOrThrow
-
-
-    let getSorterSet cfg =
-            WsSorterSets.getSorterSet cfg
-            |> Result.ExtractOrThrow
-
-
-    let runConfig (cfg:sorterSetEvalReportCfg) 
+    let makeReport (cfg:sorterSetEvalReportCfg) 
         =
         let sorterSetEvalCfg = 
             cfg 
@@ -75,27 +67,21 @@ module WsSorterSetEvalReport
             |> SorterSetEval.getSorterEvals
             |> Array.map(SorterEval.report linePfx)
 
-        appendLines (cfg |> SorterSetEvalReportCfg.getReportFileName ) repLines
+        appendLines reportFileName repLines
 
-
-    let orders = [|16; 18|] |> Array.map(Order.createNr)
-    let genModes = [switchGenMode.StageSymmetric; 
-                    switchGenMode.Switch; 
-                    switchGenMode.Stage]
 
     let allCfgs () =
         [| 
             for cfg in WsSorterSetEval.allCfgs() do
                 SorterSetEvalReportCfg.create
                     cfg
-                    sorterSetEvalReport
                     sorterSetEvalReportType.PerfBins
         |]
 
 
     let makeEm () =
-        let okses =
-            writeToFile sorterSetEvalReport (SorterEval.reportHeader "eval_id\torder\tsorter_type\tsortable_type")
+        let okRes =
+            writeToFile reportFileName (SorterEval.reportHeader reportHeaderPfx)
             |> Result.ExtractOrThrow
         allCfgs ()
-        |> Array.map(runConfig)
+        |> Array.map(makeReport)

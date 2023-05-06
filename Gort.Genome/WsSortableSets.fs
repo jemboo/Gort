@@ -4,50 +4,31 @@ open System
 
 module WsBinarySortableSets = 
 
-    let binaryFolder = "BinarySortableSets"
+    let localFolder = "BinarySortableSets"
 
     let appendLines (fileName:string) (data: string seq) =
-        TextIO.appendLines "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
+        WsCommon.appendLines localFolder fileName data
 
     let writeToFile (fileName:string) (data: string) =
-        TextIO.writeToFile "txt" (Some WsCommon.wsRootDir) binaryFolder fileName data
+        WsCommon.writeToFile localFolder fileName data
 
     let readAllText (fileName:string) =
-        TextIO.readAllText "txt" (Some WsCommon.wsRootDir) binaryFolder fileName
+        WsCommon.readAllText localFolder fileName
 
-    let orders = [|16;18;|] |> Array.map(Order.createNr)
+    let readAllLines (fileName:string) =
+        WsCommon.readAllLines localFolder fileName
+
 
     let allCfgs () =
         [| 
-          for ordr in orders do
+          for ordr in WsCommon.orders do
             SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
             |> sortableSetCfg.Certain
 
-          for ordr in orders do
+          for ordr in WsCommon.orders do
             sortableSetCfgCertain.All_Bits ordr
             |> sortableSetCfg.Certain
         |]
-
-
-    let getSortableSetId
-            (ordr:order)
-            (usePfx:bool)
-        =
-        if usePfx then
-            SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
-            |> SortableSetCfgCertain.getSortableSetId
-        else
-            sortableSetCfgCertain.All_Bits ordr
-            |> SortableSetCfgCertain.getSortableSetId
-
-
-    let fileNameFromSortableSet 
-            (sst:sortableSet) 
-        =
-        sst |> SortableSet.getSortableSetId 
-            |> SortableSetId.value 
-            |> string
-            |> FileName.create
 
 
     let saveSortableSet 
@@ -74,7 +55,7 @@ module WsBinarySortableSets =
 
 
 
-    let runConfig (cfg) =
+    let makeSortableSet (cfg) =
         let sortableSetR = SortableSetCfg.getSortableSet cfg
 
         let sortableSet = sortableSetR
@@ -86,4 +67,4 @@ module WsBinarySortableSets =
 
     let makeEm () =
         allCfgs ()
-        |> Array.map(runConfig)
+        |> Array.map(makeSortableSet)

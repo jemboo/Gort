@@ -4,18 +4,20 @@ open System
 
 module WsSorterSetEval 
         =
-    let useParall = true |> UseParallel.create
 
-    let standardEvalOnBinaryFolder = "Eval_Standard_On_Binary"
+    let localFolder = "Eval_Standard_On_Binary"
 
-    let writeData (fileName:string) (data: string) =
-        TextIO.writeToFile "txt" (Some WsCommon.wsRootDir) standardEvalOnBinaryFolder fileName data
+    let appendLines (fileName:string) (data: string seq) =
+        WsCommon.appendLines localFolder fileName data
+
+    let writeToFile (fileName:string) (data: string) =
+        WsCommon.writeToFile localFolder fileName data
 
     let readAllText (fileName:string) =
-        TextIO.readAllText "txt" (Some WsCommon.wsRootDir) standardEvalOnBinaryFolder fileName
+        WsCommon.readAllText localFolder fileName
 
     let readAllLines (fileName:string) =
-        TextIO.readAllLines "txt" (Some WsCommon.wsRootDir) standardEvalOnBinaryFolder fileName
+        WsCommon.readAllLines localFolder fileName
 
 
     let getSortableSet cfg 
@@ -45,32 +47,30 @@ module WsSorterSetEval
 
 
 
-    let runConfig 
+    let makeSorterSetEval 
             (cfg:sorterSetEvalCfg) 
         =
         let sorterSetEval = 
-                (cfg |> SorterSetEvalCfg.getSorterSetEval
+            cfg |> SorterSetEvalCfg.getSorterSetEval
                         getSortableSet
-                        getSorterSet)
-                     useParall
+                        getSorterSet
+                        WsCommon.useParall
 
         let jason = sorterSetEval |> SorterSetEvalDto.toJson
-        writeData (cfg |> SorterSetEvalCfg.getFileName ) jason
+        writeToFile ( cfg |> SorterSetEvalCfg.getFileName ) jason
+        |> ignore
+        sorterSetEval
 
-
-    let orders = [|16; 18|] |> Array.map(Order.createNr)
-    let genModes = [switchGenMode.StageSymmetric; 
-                    switchGenMode.Switch; 
-                    switchGenMode.Stage]
 
     let allCfgs () =
         [| 
-           for ordr in orders do
-              for genMode in genModes do
+           for ordr in WsCommon.orders do
+              for genMode in WsCommon.switchGenModes do
                  let sortableSetCfg =
-                      sortableSetCfgCertain.All_Bits 
+                      SortableSetCfgCertain.getStandardSwitchReducedOneStage 
                             ordr
                       |> sortableSetCfg.Certain
+
                  let sorterSetCfg = 
                         WsSorterSets.makeRdnDenovoCfg
                             genMode
@@ -82,10 +82,11 @@ module WsSorterSetEval
                  SorterSetEvalCfg.create
                     sortableSetCfg
                     sorterSetCfg
+                    (1 |> StageCount.create)
                     sorterEvalMode.DontCheckSuccess
         |]
 
 
     let makeEm () =
         allCfgs ()
-        |> Array.map(runConfig)
+        |> Array.map(makeSorterSetEval)

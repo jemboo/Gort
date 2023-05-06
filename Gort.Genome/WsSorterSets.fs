@@ -4,29 +4,19 @@ open System
 
 module WsSorterSets = 
 
-    let standardFolder = "StandardSorterSets"
-
-    let writeToFile (fileName:string) (data: string) =
-        TextIO.writeToFile "txt" (Some WsCommon.wsRootDir) standardFolder fileName data
+    let localFolder = "StandardSorterSets"
 
     let appendLines (fileName:string) (data: string seq) =
-        TextIO.appendLines "txt" (Some WsCommon.wsRootDir) standardFolder fileName data
+        WsCommon.appendLines localFolder fileName data
+
+    let writeToFile (fileName:string) (data: string) =
+        WsCommon.writeToFile localFolder fileName data
 
     let readAllText (fileName:string) =
-        TextIO.readAllText "txt" (Some WsCommon.wsRootDir) standardFolder fileName
+        WsCommon.readAllText localFolder fileName
 
     let readAllLines (fileName:string) =
-        TextIO.readAllLines "txt" (Some WsCommon.wsRootDir) standardFolder fileName
-
-
-    let sorterCt1 (order:order) = 
-        match (order |> Order.value) with
-        | 16 -> 5000 |> SorterCount.create
-        | 18 -> 1500 |> SorterCount.create
-        | 20 -> 500  |> SorterCount.create
-        | 22 -> 150  |> SorterCount.create
-        | 24 -> 50   |> SorterCount.create
-        | _ -> failwith "not handled"
+        WsCommon.readAllLines localFolder fileName
 
 
     let makeRdnDenovoCfg 
@@ -48,17 +38,12 @@ module WsSorterSets =
             order rngGen switchGenMode pfx
            // (24 |> SwitchCount.create)
             (SwitchCount.orderTo999SwitchCount order)
-            (sorterCt1 order)
+            (WsCommon.sorterCounts order)
 
-
-    let orders = [|16;18|] |> Array.map(Order.createNr)
-    let genModes = [switchGenMode.StageSymmetric; 
-                    switchGenMode.Switch; 
-                    switchGenMode.Stage]
 
     let allCfgs () =
-        [| for ordr in orders do
-             for genMode in genModes do
+        [| for ordr in WsCommon.orders do
+             for genMode in WsCommon.switchGenModes do
                  for usePfx in [true;false] do
                     makeRdnDenovoCfg 
                         genMode
@@ -86,15 +71,15 @@ module WsSorterSets =
             let sorterFileName = 
                     (rdnCfg |> RndDenovoSorterSetCfg.getFileName)
             try
-            result {
-               let! txtD = readAllText sorterFileName
-               return! txtD |> SorterSetDto.fromJson
-            }
+                result {
+                   let! txtD = readAllText sorterFileName
+                   return! txtD |> SorterSetDto.fromJson
+                }
             with ex ->
                 ("error in WsSorterSets.getSorterSet: " + ex.Message) |> Error
 
 
-    let runConfig (cfg) =
+    let makeConfig (cfg) =
         let sorterSet = SorterSetCfg.getSorterSet cfg
         let res = sorterSet |> saveStandardSorterSet cfg
         ()
@@ -102,4 +87,4 @@ module WsSorterSets =
 
     let makeEm () =
         allCfgs ()
-        |> Array.map(runConfig)
+        |> Array.map(makeConfig)

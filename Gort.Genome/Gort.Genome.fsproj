@@ -6,17 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterGenome.fs" />
+    <Compile Include="Ga.fs" />
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SorterSetEvalCfg.fs" />
     <Compile Include="SorterSetEvalReportCfg.fs" />
-    <Compile Include="SorterGenome.fs" />
-    <Compile Include="GA.fs" />
+    <Compile Include="GaSorterSetCfg.fs" />
     <Compile Include="WsCommon.fs" />
     <Compile Include="WsSorterSets.fs" />
     <Compile Include="WsSortableSets.fs" />
     <Compile Include="WsSorterSetEval.fs" />
     <Compile Include="WsSorterSetEvalReport.fs" />
+    <Compile Include="WsGaSorterSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
