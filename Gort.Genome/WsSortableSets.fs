@@ -18,19 +18,6 @@ module WsBinarySortableSets =
     let readAllLines (fileName:string) =
         WsCommon.readAllLines localFolder fileName
 
-
-    let allCfgs () =
-        [| 
-          for ordr in WsCommon.orders do
-            SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
-            |> sortableSetCfg.Certain
-
-          for ordr in WsCommon.orders do
-            sortableSetCfgCertain.All_Bits ordr
-            |> sortableSetCfg.Certain
-        |]
-
-
     let saveSortableSet 
             (cfg:sortableSetCfg)
             (sst:sortableSet) 
@@ -39,32 +26,33 @@ module WsBinarySortableSets =
         writeToFile fileName (sst |> SortableSetDto.toJson )
 
 
-    let getSortableSet 
-            (cfg:sortableSetCfg) 
-        =
-        match cfg with
-        | Certain cfgCert ->
-            let sortableSetFileName =
-                    (cfgCert |> SortableSetCfgCertain.getFileName)
-            try
-                let allText = readAllText sortableSetFileName |> Result.ExtractOrThrow
-                let sortableSet = allText |> SortableSetDto.fromJson
-                sortableSet
-            with ex ->
-                ("error in WsBinarySortableSets.getSortableSet: " + ex.Message) |> Error
+    let loadSortableSet (cfg:sortableSetCfg) =
+          result {
+            let! txtD = readAllText  
+                            (cfg |> SortableSetCfg.getFileName)
+            return! txtD |> SortableSetDto.fromJson
+          }
 
 
+    let makeSortableSet (cfg:sortableSetCfg) =
+        result {
+            let! sortableSet = SortableSetCfg.getSortableSet cfg
+            let res = sortableSet 
+                        |> saveSortableSet cfg
+                        |> Result.map(ignore)
+            return sortableSet
+        }
 
-    let makeSortableSet (cfg) =
-        let sortableSetR = SortableSetCfg.getSortableSet cfg
 
-        let sortableSet = sortableSetR
-                            |> Result.ExtractOrThrow
-
-        let res = sortableSet |> saveSortableSet cfg
-        ()
+    let getSortableSet (cfg:sortableSetCfg) =
+        result {
+            let loadRes = loadSortableSet cfg
+            match loadRes with
+            | Ok ss -> return ss
+            | Error _ -> return! (makeSortableSet cfg)
+        }
 
 
     let makeEm () =
-        allCfgs ()
-        |> Array.map(makeSortableSet)
+        WsCommon.allSortableSetCfgs ()
+        |> Array.map(getSortableSet)

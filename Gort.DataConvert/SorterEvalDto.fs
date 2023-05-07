@@ -226,7 +226,7 @@ module SorterSetEvalDto =
                     |> Array.toList
                     |> Result.sequence
 
-            return SorterSetEval.load
+            return SorterSetEval.create
                         sorterSetEvalId
                         sorterSetId
                         sortableSetId

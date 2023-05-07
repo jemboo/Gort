@@ -20,73 +20,91 @@ module WsSorterSetEval
         WsCommon.readAllLines localFolder fileName
 
 
-    let getSortableSet cfg 
+    let getSortableSet (cfg:sortableSetCfg)
         =
         WsBinarySortableSets.getSortableSet cfg
-        |> Result.ExtractOrThrow
 
 
-    let getSorterSet cfg
+    let getSorterSet (cfg:sorterSetCfg)
         =
         WsSorterSets.getSorterSet cfg
-        |> Result.ExtractOrThrow
+
+
+    //let getSorterSetEval 
+    //        (cfg:sorterSetEvalCfg) 
+    //    =
+    //    let sorterSetEvalFileName = 
+    //            (cfg |> SorterSetEvalCfg.getFileName)
+    //    try
+    //        result {
+    //           let! txtD = readAllText sorterSetEvalFileName
+    //           return! txtD |> SorterSetEvalDto.fromJson
+    //        }
+    //        with ex ->
+    //            ("error in WsSorterSetEval.getSorterSetEval: " + ex.Message) |> Error
+
+
+
+    //let makeSorterSetEval 
+    //        (cfg:sorterSetEvalCfg) 
+    //    =
+    //    result {
+    //        let! sorterSetEval = 
+    //            cfg |> SorterSetEvalCfg.makeSorterSetEval
+    //                        getSortableSet
+    //                        getSorterSet
+    //                        WsCommon.useParall
+
+    //        let jason = sorterSetEval |> SorterSetEvalDto.toJson
+    //        let! res = 
+    //                writeToFile 
+    //                    ( cfg |> SorterSetEvalCfg.getFileName ) 
+    //                    jason
+    //                |> Result.map(ignore)
+    //        return sorterSetEval
+    //    }
+
+    let saveSortableSetEval
+            (cfg:sorterSetEvalCfg)
+            (sst:sorterSetEval) 
+        =
+        let fileName = cfg |> SorterSetEvalCfg.getFileName 
+        writeToFile fileName (sst |> SorterSetEvalDto.toJson )
+
+
+    let loadSortableSetEval (cfg:sorterSetEvalCfg) =
+          result {
+            let! txtD = readAllText  
+                            (cfg |> SorterSetEvalCfg.getFileName)
+            return! txtD |> SorterSetEvalDto.fromJson
+          }
+
+
+    let makeSorterSetEval (cfg:sorterSetEvalCfg) =
+        result {
+            let! sorterSetEval = 
+                           cfg |> SorterSetEvalCfg.makeSorterSetEval
+                            getSortableSet
+                            getSorterSet
+                            WsCommon.useParall
+            let res = sorterSetEval 
+                        |> saveSortableSetEval cfg
+                        |> Result.map(ignore)
+            return sorterSetEval
+        }
 
 
     let getSorterSetEval 
             (cfg:sorterSetEvalCfg) 
         =
-        let sorterSetEvalFileName = 
-                (cfg |> SorterSetEvalCfg.getFileName)
-        try
-            result {
-               let! txtD = readAllText sorterSetEvalFileName
-               return! txtD |> SorterSetEvalDto.fromJson
-            }
-            with ex ->
-                ("error in WsSorterSetEval.getSorterSetEval: " + ex.Message) |> Error
-
-
-
-    let makeSorterSetEval 
-            (cfg:sorterSetEvalCfg) 
-        =
-        let sorterSetEval = 
-            cfg |> SorterSetEvalCfg.getSorterSetEval
-                        getSortableSet
-                        getSorterSet
-                        WsCommon.useParall
-
-        let jason = sorterSetEval |> SorterSetEvalDto.toJson
-        writeToFile ( cfg |> SorterSetEvalCfg.getFileName ) jason
-        |> ignore
-        sorterSetEval
-
-
-    let allCfgs () =
-        [| 
-           for ordr in WsCommon.orders do
-              for genMode in WsCommon.switchGenModes do
-                 let sortableSetCfg =
-                      SortableSetCfgCertain.getStandardSwitchReducedOneStage 
-                            ordr
-                      |> sortableSetCfg.Certain
-
-                 let sorterSetCfg = 
-                        WsSorterSets.makeRdnDenovoCfg
-                            genMode
-                            ordr
-                            WsCommon.rngGen1
-                            true
-                      |> sorterSetCfg.RndDenovo
-
-                 SorterSetEvalCfg.create
-                    sortableSetCfg
-                    sorterSetCfg
-                    (1 |> StageCount.create)
-                    sorterEvalMode.DontCheckSuccess
-        |]
+        result {
+            let loadRes = loadSortableSetEval cfg
+            match loadRes with
+            | Ok ss -> return ss
+            | Error _ -> return! (makeSorterSetEval cfg)
+        }
 
 
     let makeEm () =
-        allCfgs ()
-        |> Array.map(makeSorterSetEval)
+        WsCommon.allSorterSetEvalCfgs ()
+        |> Array.map(getSorterSetEval)

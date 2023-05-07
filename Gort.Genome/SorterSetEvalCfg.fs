@@ -71,26 +71,31 @@ module SorterSetEvalCfg
                 ( [|cfg :> obj|] |> GuidUtils.guidFromObjs |> string)
 
 
-    let getSorterSetEval
-            (sortableSetCfgRet: sortableSetCfg->sortableSet)
-            (sorterSetRet: sorterSetCfg->sorterSet)
+    let makeSorterSetEval
+            (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
+            (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
             (up:useParallel)
             (cfg: sorterSetEvalCfg)
         =
-        let ssEval = 
-           SorterSetEval.make
-            (getSorterSetEvalId cfg)
-            (getSorterEvalMode cfg)
-            (cfg |> getSorterSetCfg |> sorterSetRet)
-            (cfg |> getSortableSetCfg |> sortableSetCfgRet)
-            up
+        result {
+            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)
+            let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCfg)
+            let! ssEval = 
+                   SorterSetEval.make
+                        (getSorterSetEvalId cfg)
+                        (getSorterEvalMode cfg)
+                        sorterSet
+                        sortableSet
+                        up
 
-        let ordr = cfg |> getOrder
-        let tCmod = cfg |> getStagePrefixCount
-        SorterSetEval.load
-            (ssEval |> SorterSetEval.getSorterSetEvalId)
-            (ssEval |> SorterSetEval.getSorterSetlId)
-            (ssEval |> SorterSetEval.getSortableSetId)
-            (ssEval |> SorterSetEval.getSorterEvals  
-                |> Array.map(SorterEval.modifyForPrefix ordr tCmod))
+            let ordr = cfg |> getOrder
+            let tCmod = cfg |> getStagePrefixCount
+            return
+                SorterSetEval.create
+                    (ssEval |> SorterSetEval.getSorterSetEvalId)
+                    (ssEval |> SorterSetEval.getSorterSetlId)
+                    (ssEval |> SorterSetEval.getSortableSetId)
+                    (ssEval |> SorterSetEval.getSorterEvals  
+                        |> Array.map(SorterEval.modifyForPrefix ordr tCmod))
+        }
                

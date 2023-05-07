@@ -72,7 +72,7 @@ module WsSorterSetEvalReport
 
     let allCfgs () =
         [| 
-            for cfg in WsSorterSetEval.allCfgs() do
+            for cfg in WsCommon.allSorterSetEvalCfgs() do
                 SorterSetEvalReportCfg.create
                     cfg
                     sorterSetEvalReportType.PerfBins

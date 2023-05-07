@@ -69,23 +69,9 @@ module SorterSetEval
             |> Array.map (SorterEval.evalSorterWithSortableSet sorterEvalMode sortableSt)
 
 
-    let make
-            (sorterSetEvalId: sorterSetEvalId)
-            (sorterEvalMode: sorterEvalMode)
-            (sorterSet: sorterSet)
-            (sortableSt: sortableSet)
-            (useParallel: useParallel) 
-        =
-          let sorters = sorterSet |> SorterSet.getSorters
-          {
-            sorterSetEvalId = sorterSetEvalId
-            sorterSetId = sorterSet |> SorterSet.getId
-            sortableSetId = sortableSt |> SortableSet.getSortableSetId
-            sorterEvals = evalSorters sorterEvalMode sortableSt sorters useParallel
-          }
 
 
-    let load
+    let create
             (sorterSetEvalId: sorterSetEvalId)
             (sorterSetId: sorterSetId)
             (sortableStId: sortableSetId)
@@ -97,6 +83,27 @@ module SorterSetEval
             sortableSetId = sortableStId
             sorterEvals = sorterEvals
           }
+
+
+    let make
+            (sorterSetEvalId: sorterSetEvalId)
+            (sorterEvalMode: sorterEvalMode)
+            (sorterSet: sorterSet)
+            (sortableSt: sortableSet)
+            (useParallel: useParallel) 
+        =
+        try
+          let sorters = sorterSet |> SorterSet.getSorters
+          let sorterEvals = evalSorters sorterEvalMode sortableSt sorters useParallel
+          create
+                sorterSetEvalId
+                (sorterSet |> SorterSet.getId)
+                (sortableSt |> SortableSet.getSortableSetId)
+                sorterEvals
+          |> Ok
+        with ex ->
+            ("error in SorterSetEval.make: " + ex.Message) 
+            |> Error
 
 
     let getSorterIdsForUpgrade 
