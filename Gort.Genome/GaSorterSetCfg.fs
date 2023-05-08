@@ -1,15 +1,18 @@
 ﻿namespace global
 
-type gaSorterSetCfgType =
-    | PerfBins
+type orgSelector =
+        generation->sorterEval->Energy
 
-
-type gaSorterSetShcCfg = 
+// shc with sorter replicas acting independently
+type gaSorterShcCfg = 
     private
-        { 
-          sorterSetEvalCfg: sorterSetEvalCfg
-          generations:generation
-          mutationRate: mutationRate
+        {
+          sorterSetCfg:sorterSetCfg
+          sortableSetCfg:sortableSetCfg
+          sorterMutator: sorterMutator
+          orgSelector: orgSelector
+          generationCount:generation
+          rngGen: rngGen
           reportFileName: string
           summaryReportFreq: int
           fullReportFreq: int
@@ -19,48 +22,57 @@ type gaSorterSetShcCfg =
 module gaSorterSetShcCfg 
         =
     let create 
-            (sorterSetEvalCfg: sorterSetEvalCfg)
-            (generations: generation)
-            (mutationRate: mutationRate)
+            (sorterSetCfg: sorterSetCfg)
+            (sortableSetCfg: sortableSetCfg)
+            (sorterMutator: sorterMutator)
+            (orgSelector: orgSelector)
+            (generationCount: generation)
+            (rngGen: rngGen)
             (reportFileName:string)
             (summaryReportFreq:int)
             (fullReportFreq:int)
         =
         {
-            sorterSetEvalCfg=sorterSetEvalCfg;
-            generations=generations;
-            mutationRate=mutationRate;
+            sorterSetCfg=sorterSetCfg;
+            sortableSetCfg=sortableSetCfg;
+            sorterMutator=sorterMutator;
+            orgSelector=orgSelector;
+            generationCount=generationCount;
+            rngGen=rngGen
             reportFileName=reportFileName;
             summaryReportFreq=summaryReportFreq;
             fullReportFreq=fullReportFreq;
         }
 
 
-    let getSorterSetEvalCfg  (cfg: gaSorterSetShcCfg) 
+    let getSorterSetCfg  (cfg: gaSorterShcCfg) 
         =
-        cfg.sorterSetEvalCfg
+        cfg.sorterSetCfg
 
-
-    let getGenerations  (cfg: gaSorterSetShcCfg) 
+    let getSortableSetCfg  (cfg: gaSorterShcCfg) 
         =
-        cfg.generations
+        cfg.sortableSetCfg
 
-
-    let getMutationRate  (cfg: gaSorterSetShcCfg) 
+    let getSorterMutator  (cfg: gaSorterShcCfg) 
         =
-        cfg.mutationRate
+        cfg.sorterMutator
 
-
-    let getReportFileName  (cfg: gaSorterSetShcCfg) 
+    let getOrgSelector  (cfg: gaSorterShcCfg) 
         =
-        cfg.reportFileName
+        cfg.orgSelector
 
+    let getGenerationCount  (cfg: gaSorterShcCfg) 
+        =
+        cfg.generationCount
 
-    let getSummaryReportFreq  (cfg: gaSorterSetShcCfg) 
+    let getRndGen  (cfg: gaSorterShcCfg) 
+        =
+        cfg.rngGen
+
+    let getSummaryReportFreq  (cfg: gaSorterShcCfg) 
         =
         cfg.summaryReportFreq
 
-
-    let getFullReportFreq  (cfg: gaSorterSetShcCfg) 
+    let getFullReportFreq  (cfg: gaSorterShcCfg) 
         =
         cfg.fullReportFreq

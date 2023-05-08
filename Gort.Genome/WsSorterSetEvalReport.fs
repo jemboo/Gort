@@ -8,7 +8,6 @@ module WsSorterSetEvalReport
 
     let localFolder = "SorterSet_Eval_Report"
     let reportFileName = "Summary_Report"
-    let reportHeaderPfx = "eval_id\torder\tsorter_type\tsortable_type"
 
     let appendLines (fileName:string) (data: string seq) =
         WsCommon.appendLines localFolder fileName data
@@ -22,66 +21,26 @@ module WsSorterSetEvalReport
     let readAllLines (fileName:string) =
         WsCommon.readAllLines localFolder fileName
 
-
+    let mutable headerWritten = false
     let makeReport (cfg:sorterSetEvalReportCfg) 
         =
+        if not headerWritten then
+            headerWritten <-
+                writeToFile reportFileName (SorterSetEvalReportCfg.getReportHeader cfg)
+                |> Result.ExtractOrThrow
+
         let sorterSetEvalCfg = 
             cfg 
             |> SorterSetEvalReportCfg.getSorterSetEvalCfg
 
-        let eval_id = 
-            sorterSetEvalCfg
-            |> SorterSetEvalCfg.getSorterSetEvalId
-            |> SorterSetEvalId.value
-            |> string
-
-        let order = 
-            sorterSetEvalCfg
-            |> SorterSetEvalCfg.getOrder
-            |> Order.value
-
-        let sorterSetCfgName = 
-            sorterSetEvalCfg 
-            |> SorterSetEvalCfg.getSorterSetCfg
-            |> SorterSetCfg.getCfgName
-
-        let sortableSetCfgName = 
-            sorterSetEvalCfg 
-            |> SorterSetEvalCfg.getSortableSetCfg
-            |> SortableSetCfg.getCfgName
-             
-        let sorterSetEval = 
-            WsSorterSetEval.getSorterSetEval sorterSetEvalCfg
-            |> Result.ExtractOrThrow
-
-
-        let linePfx = 
-            sprintf "%s\t%d\t%s\t%s"
-                eval_id
-                order
-                sorterSetCfgName
-                sortableSetCfgName
-
-        let repLines = 
-            sorterSetEval 
-            |> SorterSetEval.getSorterEvals
-            |> Array.map(SorterEval.report linePfx)
+        let repLines =
+                SorterSetEvalReportCfg.getReportLines 
+                    WsSorterSetEval.getSorterSetEval
+                    cfg
 
         appendLines reportFileName repLines
 
 
-    let allCfgs () =
-        [| 
-            for cfg in WsCommon.allSorterSetEvalCfgs() do
-                SorterSetEvalReportCfg.create
-                    cfg
-                    sorterSetEvalReportType.PerfBins
-        |]
-
-
     let makeEm () =
-        let okRes =
-            writeToFile reportFileName (SorterEval.reportHeader reportHeaderPfx)
-            |> Result.ExtractOrThrow
-        allCfgs ()
+        WsCommon.allSorterSetEvalReportCfgs ()
         |> Array.map(makeReport)

@@ -6,7 +6,7 @@ module WsCommon =
 
     let useParall = true |> UseParallel.create
 
-    let wsRootDir = "c:\\GortFiles2"
+    let wsRootDir = "c:\\GortFilesN"
     let fileExt = "txt"
 
 
@@ -106,7 +106,6 @@ module WsCommon =
     //********  SorterSetEval  ****************
 
 
-
     let allSorterSetEvalCfgs () =
         [| 
            for ordr in orders do
@@ -132,3 +131,13 @@ module WsCommon =
         |]
 
 
+
+    //********  SorterSetEvalReport  ****************
+
+
+    let allSorterSetEvalReportCfgs () =
+        [| 
+            for cfg in allSorterSetEvalCfgs() do
+                SorterSetEvalReportCfg.createFull
+                    cfg
+        |]

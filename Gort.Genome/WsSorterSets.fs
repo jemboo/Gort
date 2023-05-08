@@ -19,7 +19,7 @@ module WsSorterSets =
         WsCommon.readAllLines localFolder fileName
 
 
-    let saveStandardSorterSet
+    let saveSorterSet
             (cfg:sorterSetCfg)
             (sst:sorterSet) 
         =
@@ -35,9 +35,10 @@ module WsSorterSets =
             return! txtD |> SorterSetDto.fromJson
           }
 
+
     let makeSorterSet (cfg) =
         let sorterSet = SorterSetCfg.getSorterSet cfg
-        let res = sorterSet |> saveStandardSorterSet cfg
+        let res = sorterSet |> saveSorterSet cfg
         sorterSet
 
 

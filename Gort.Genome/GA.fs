@@ -1,6 +1,45 @@
 ﻿namespace global
 open System
 
+type energy = private Energy of float
+module Energy =
+    let value (Energy v) = v
+    let create v = Energy v
+    let repStr v = 
+        match v with
+        |Some r -> sprintf "%.4f" (value r)
+        |None -> ""
+
+    let failure = Double.MaxValue |> create
+
+    let betterEnergy (a:energy option) 
+                     (b:energy option) = 
+        match a, b  with
+        | Some av, Some bv -> if (value av) < (value bv) 
+                                then a else b
+        | None, Some e -> Some e
+        | Some e, None -> Some e
+        | _, None -> failwith "energy missing"
+
+    let worst = 
+        create Double.MaxValue
+
+    // a negative delta is an improvement
+    let delta (oldE:energy option) 
+              (newE:energy option) = 
+        match oldE, newE  with
+        | Some (Energy ov), Some (Energy nv) -> 
+            Some (create (nv - ov))
+        | None, Some (Energy nv) ->
+            Some (create Double.MinValue)
+        | _, _ -> None
+    
+    // lower energies are better
+    let isBetterThan (lhs:energy) 
+                     (rhs:energy) = 
+        (value lhs) < (value rhs)
+
+
 
 type gaId = private GaId of Guid
 
@@ -132,69 +171,3 @@ module Counter =
         else
             lastId |> Ok
 
-
-            
-type gaSorterSet = 
-    private 
-        { 
-            id:gaId; 
-            generation:generation; 
-            value:sorterSetEval
-        }
-
-
-module GaSorterSet =
-
-    let create 
-            (value:sorterSetEval) 
-        =
-        {
-          id = Guid.NewGuid() |> GaId.create;
-          generation = 0 |> Generation.create
-          value = value
-        }
-
-    let getValue 
-            (gaSorterSet:gaSorterSet) 
-        =
-        gaSorterSet.value
-
-    let getId 
-            (gaSorterSet:gaSorterSet) 
-        =
-        gaSorterSet.id
-
-    let update
-            (gaSorterSet:gaSorterSet) 
-         =
-         try
-            { gaSorterSet with
-                generation 
-                    = gaSorterSet.generation |> Generation.next
-
-
-            } |> Ok
-
-         with ex ->
-            ("error in update: " + ex.Message) |> Result.Error
-
-    let terminate 
-            (maxGen:generation)
-            (gaSorterSet:gaSorterSet) 
-        =
-        false
-
-
-    let archive
-            (fileAppender: string -> seq<string> -> Result<bool, string>)
-            (fileName:string)
-            (gaSorterSet:gaSorterSet)  
-        =
-        result {
-            if System.IO.File.Exists fileName then
-                fileAppender fileName (seq {"Hi"} ) |> ignore
-            else
-                fileAppender fileName (seq {"Hi"} ) |> ignore
-
-            return gaSorterSet.id
-        }

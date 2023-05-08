@@ -141,10 +141,10 @@ module SorterPerf =
         | Some perf ->
             match perf with
             | IsSuccessful bv ->
-                sprintf "%b" bv
+                sprintf "%b\t-" bv
             | SortedSetSize sz ->
-                sprintf "%d" (SortableCount.value sz)
-        | None -> "-"
+                sprintf "-\t%d" (SortableCount.value sz)
+        | None -> "-\t-"
 
 
 type sorterEvalMode = | DontCheckSuccess
@@ -262,7 +262,7 @@ module SorterEval =
     let reportHeader
             (pfx:string)
         =
-        sprintf "%s\tErr\tStages\tSwitches\tPerf\tPhenotype\tSortable\tSorter\n"
+        sprintf "%s\tErr\tStages\tSwitches\tSuccess\tSortedSetSize\tPhenotype\tSortable\tSorter\n"
             pfx
 
 
