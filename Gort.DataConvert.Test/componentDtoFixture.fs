@@ -18,22 +18,3 @@ type componentDtoFixture() =
         let dto2 = RngGenDto.toDto rngGen2
         let rngGenBack2 = RngGenDto.fromDto dto2 |> Result.ExtractOrThrow
         Assert.AreEqual(rngGen2, rngGenBack2)
-
-
-    [<TestMethod>]
-    member this.SorterUniformMutatorDto() =
-        let mutationRat = 0.55 |> MutationRate.create
-        let sorterUniformMutatorTyp = sorterUniformMutatorType.StageRfl
-        let stageRflMutato = SorterUniformMutator.create None None sorterUniformMutatorTyp  mutationRat
-        let stageRflMutatorCereal = stageRflMutato |> SorterUniformMutatorDto.toJson
-        let stageRflMutatoBack = stageRflMutatorCereal 
-                                    |> SorterUniformMutatorDto.fromJson
-                                    |> Result.ExtractOrThrow
-        Assert.AreEqual(
-            stageRflMutato |> SorterUniformMutator.getMutationRate,
-            stageRflMutatoBack |> SorterUniformMutator.getMutationRate)
-
-        Assert.AreEqual(
-            stageRflMutato |> SorterUniformMutator.getSorterUniformMutatorType,
-            stageRflMutatoBack |> SorterUniformMutator.getSorterUniformMutatorType)
-

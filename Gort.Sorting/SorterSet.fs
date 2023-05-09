@@ -226,7 +226,7 @@ module SorterSet =
         =
         let _mutato dex id =
             let sortr = sorterBase.[dex % sorterBase.Length]
-            let muty = sorterMutatr.mFunc sortr id randy
+            let muty = sorterMutatr.mutatorFunc sortr id randy
             muty
 
         generateSorterIds sorterStId
@@ -235,3 +235,49 @@ module SorterSet =
         |> Seq.map(Result.ExtractOrThrow)
         |> Seq.take(sorterCt |> SorterCount.value)
         |> load sorterStId order
+
+
+
+
+
+type mutantSorterSet = 
+    private {  sorterSet:sorterSet;
+               sorterMutator:sorterMutator;
+               parentMap:Map<sorterId, sorterId> }
+               // maps mutant sorterId's to parent sorterId's
+
+module MutantSorterSet =
+    
+    let create 
+            (sorterMutator:sorterMutator) 
+            (randy:IRando)
+            (sorterCount:sorterCount)
+            (parents:sorter seq)
+        =
+        result {
+            let! tupes = 
+                SorterMutator.makeMutants
+                    sorterMutator
+                    randy
+                    sorterCount
+                    parents
+
+            let sorterSet = 
+                    SorterSet.load
+                        ((Guid.NewGuid()) |> SorterSetId.create)
+                        (parents |> Seq.head |> Sorter.getOrder)
+                        (tupes |> Seq.map(snd))
+
+            let parentMap =
+                tupes 
+                    |> Seq.map(fun (parentId, srtr) -> 
+                        ( srtr |> Sorter.getSorterId), 
+                          parentId )
+                      |> Map.ofSeq
+            return
+                {
+                    sorterSet = sorterSet;
+                    sorterMutator = sorterMutator;
+                    parentMap = parentMap
+                }
+        }

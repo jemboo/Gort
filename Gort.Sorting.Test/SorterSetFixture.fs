@@ -46,7 +46,7 @@ type SorterSetFixture() =
                                 sorterSetId baseSorterCt ordr wPfx switchCt rndGn
 
       let sorterMutator = SorterUniformMutator.create 
-                            None None sorterUniformMutatorType.Switch mutationRate
+                            None None switchGenMode.Switch mutationRate
 
       let baseSorters = sorterStBase |> SorterSet.getSorters 
                         |> Seq.take(baseSorterCt |> SorterCount.value)

@@ -2,12 +2,6 @@
 
 open System
 
-type switchGenMode =
-    | Switch
-    | Stage
-    | StageSymmetric
-
-
 type rndDenovoSorterSetCfg = 
     private
         { 

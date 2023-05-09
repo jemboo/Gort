@@ -12,6 +12,7 @@
     <Compile Include="componentDtoFixture.fs" />
     <Compile Include="rolloutDtoFixture.fs" />
     <Compile Include="sorterDtoFixture.fs" />
+    <Compile Include="sorterMutatorDtoFixture.fs" />
     <Compile Include="sorterSetDtoFixture.fs" />
     <Compile Include="sortableSetDtoFixture.fs" />
     <Compile Include="sorterEvalDtoFixture.fs" />

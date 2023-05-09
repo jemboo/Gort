@@ -10,7 +10,8 @@
     <Compile Include="DbLookup.fs" />
     <Compile Include="ComponentDto.fs" />
     <Compile Include="RolloutDto.fs" />
-    <Compile Include="SortertDto.fs" />
+    <Compile Include="SorterDto.fs" />
+    <Compile Include="SorterMutatorDto.fs" />
     <Compile Include="SorterSetDto.fs" />
     <Compile Include="SortableSetDto.fs" />
     <Compile Include="SorterEvalDto.fs" />

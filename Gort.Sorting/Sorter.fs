@@ -2,6 +2,12 @@
 
 open System
 
+type switchGenMode =
+    | Switch
+    | Stage
+    | StageSymmetric
+
+
 type sorter =
     private
         { sortrId: sorterId

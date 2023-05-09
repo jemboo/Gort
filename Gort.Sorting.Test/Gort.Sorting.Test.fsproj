@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="SorterFixture.fs" />
+    <Compile Include="SorterMutatorFixture.fs" />
     <Compile Include="SortableArraysFixture.fs" />
     <Compile Include="SortableSetFixture.fs" />
     <Compile Include="SwitchFixture.fs" />

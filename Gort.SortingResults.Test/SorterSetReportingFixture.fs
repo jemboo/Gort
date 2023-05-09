@@ -88,7 +88,7 @@ type SorterSetReportingFixture() =
                                 
         let mutationRate = MutationRate.create 0.05
         let sorterMutator = SorterUniformMutator.create 
-                             None None sorterUniformMutatorType.Switch mutationRate
+                             None None switchGenMode.Switch mutationRate
 
         let sorterSetMut = SorterSet.createMutationSet 
                                 winningSorters sorterCt ordr sorterMutator sorterSetId randy
@@ -127,7 +127,7 @@ type SorterSetReportingFixture() =
         let ranker ss = ss |> SorterFitness.fromSpeed stageWgt
         let mutationRate = MutationRate.create 0.01
         let sorterMutator = SorterUniformMutator.create 
-                                 None None sorterUniformMutatorType.Switch mutationRate
+                                 None None switchGenMode.Switch mutationRate
 
         let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
         let rndGn () = 

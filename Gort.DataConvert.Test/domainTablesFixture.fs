@@ -32,7 +32,7 @@ type domainTablesFixture() =
         let causePath = "causePath"
         let stageMutRate = 0.7 |> MutationRate.create
         let sum = SorterUniformMutator.create 
-                    None None sorterUniformMutatorType.Stage stageMutRate 
+                    None None switchGenMode.Stage stageMutRate 
                     |> sorterMutator.Uniform
         let compR = DomainTables.sorterMutatorToComponentR sum causeR causePath
         let sumBackR = compR |> DomainTables.componentRToSorterMutator
