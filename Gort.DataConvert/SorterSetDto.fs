@@ -62,3 +62,57 @@ module SorterSetDto =
 
     let toJson (sorterSt: sorterSet) =
         sorterSt |> toDto |> Json.serialize
+
+
+type mutantSorterSetDto = { 
+        sorterSetDto: sorterSetDto; 
+        sorterMutatorDto:sorterMutatorDto;
+        parentMap:Map<Guid, Guid>; }
+
+module MutantSorterSetDto =
+
+    let fromDto (dto:mutantSorterSetDto) =
+        result {
+            let! sorterSet = dto.sorterSetDto |> SorterSetDto.fromDto
+            let! sorterMutator = dto.sorterMutatorDto |> SorterMutatorDto.fromDto
+            let parentMap = 
+                dto.parentMap
+                |> Map.toSeq
+                |> Seq.map(fun (p,m) -> (p |> SorterId.create, m |> SorterId.create))
+                |> Map.ofSeq
+
+            return MutantSorterSet.load
+                        sorterMutator
+                        sorterSet
+                        parentMap
+        }
+
+    let fromJson (jstr: string) =
+        result {
+            let! dto = Json.deserialize<mutantSorterSetDto> jstr
+            return! fromDto dto
+        }
+
+    let toDto (mutantSorterSet: mutantSorterSet) =
+
+        {
+            sorterSetDto = 
+                mutantSorterSet 
+                |> MutantSorterSet.getSorterSet 
+                |> SorterSetDto.toDto
+            sorterMutatorDto = 
+                mutantSorterSet 
+                |> MutantSorterSet.getSorterMutator 
+                |> SorterMutatorDto.toDto
+            parentMap = 
+                mutantSorterSet 
+                |> MutantSorterSet.getParentMap 
+                |> Map.toSeq
+                |> Seq.map(fun (p,m) -> (p |> SorterId.value, m |> SorterId.value))
+                |> Map.ofSeq
+        }
+
+    let toJson (mutantSorterSet: mutantSorterSet) =
+        mutantSorterSet |> toDto |> Json.serialize
+
+

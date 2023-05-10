@@ -24,8 +24,11 @@ let evo () =
     let stageWgt = 0.2 |> StageWeight.create
     let ranker ss = ss |> SorterFitness.fromSpeed stageWgt
     let mutationRate = MutationRate.create 0.01
-    let sorterMutator = SorterUniformMutator.create 
-                                None None switchGenMode.Stage mutationRate
+    let sorterMutator = 
+            SorterUniformMutator.create 
+                None None switchGenMode.Switch mutationRate
+            |> sorterMutator.Uniform
+
 
     let sortableSt =
         SortableSet.makeAllBits sortableStId rolloutFormt ordr |> Result.ExtractOrThrow

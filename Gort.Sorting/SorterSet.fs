@@ -220,13 +220,14 @@ module SorterSet =
         (sorterBase: sorter[]) 
         (sorterCt:sorterCount)
         (order: order) 
-        (sorterMutatr: sorterUniformMutator) 
+        (sorterMutatr: sorterMutator) 
         (sorterStId:sorterSetId)
         (randy: IRando) 
         =
         let _mutato dex id =
             let sortr = sorterBase.[dex % sorterBase.Length]
-            let muty = sorterMutatr.mutatorFunc sortr id randy
+            let muty = 
+                (sorterMutatr |> SorterMutator.getMutatorFunc) sortr id randy
             muty
 
         generateSorterIds sorterStId
@@ -238,8 +239,6 @@ module SorterSet =
 
 
 
-
-
 type mutantSorterSet = 
     private {  sorterSet:sorterSet;
                sorterMutator:sorterMutator;
@@ -247,8 +246,19 @@ type mutantSorterSet =
                // maps mutant sorterId's to parent sorterId's
 
 module MutantSorterSet =
-    
-    let create 
+
+    let load
+            (sorterMutator:sorterMutator) 
+            (sorterSet:sorterSet)
+            (parentMap:Map<sorterId, sorterId>)
+        =
+        {
+            sorterSet = sorterSet;
+            sorterMutator = sorterMutator;
+            parentMap = parentMap
+        }
+
+    let create
             (sorterMutator:sorterMutator) 
             (randy:IRando)
             (sorterCount:sorterCount)
@@ -274,10 +284,30 @@ module MutantSorterSet =
                         ( srtr |> Sorter.getSorterId), 
                           parentId )
                       |> Map.ofSeq
-            return
-                {
-                    sorterSet = sorterSet;
-                    sorterMutator = sorterMutator;
-                    parentMap = parentMap
-                }
+
+            return load
+                        sorterMutator
+                        sorterSet
+                        parentMap
         }
+
+
+    let getSorterMutator 
+                (mutantSorterSet:mutantSorterSet) 
+         =
+         mutantSorterSet.sorterMutator
+
+
+    let getSorterSet
+                (mutantSorterSet:mutantSorterSet) 
+         =
+         mutantSorterSet.sorterSet
+
+
+    let getParentMap
+                (mutantSorterSet:mutantSorterSet) 
+         =
+         mutantSorterSet.parentMap
+
+
+

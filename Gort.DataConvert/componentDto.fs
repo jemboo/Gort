@@ -1,10 +1,5 @@
 ﻿namespace global
-
 open Microsoft.FSharp.Core
-open System.IO
-open Newtonsoft.Json
-open System
-
 
 type sparseIntArrayDto = 
     { emptyVal:int; 
@@ -14,7 +9,9 @@ type sparseIntArrayDto =
 
 module SparseIntArrayDto =
 
-    let fromDto (dto:sparseIntArrayDto) =
+    let fromDto 
+            (dto:sparseIntArrayDto) 
+        =
         result {
             return 
                 SparseArray.create
@@ -33,15 +30,18 @@ module SparseIntArrayDto =
             indexes = sia |> SparseArray.getIndexes;
             values =  sia |> SparseArray.getValues
         }
-
         
-    let fromJson (cereal:string) =
+    let fromJson 
+            (cereal:string)
+        =
         result {
             let! dto = Json.deserialize<sparseIntArrayDto> cereal
             return! fromDto dto
         }
 
-    let toJson (sia:sparseArray<int>) = 
+    let toJson 
+            (sia:sparseArray<int>) 
+        = 
         sia |> toDto |> Json.serialize
 
 

@@ -32,28 +32,50 @@ type SorterSetFixture() =
     [<TestMethod>]
     member this.createMutationSet() = 
       let sorterSetId = Guid.NewGuid() |> SorterSetId.create
-      let ordr = 64 |> Order.createNr
+      let ordr = 16 |> Order.createNr
       let wPfx = Seq.empty<switch>
-      let switchCt = 100 |> SwitchCount.create
-      let baseSorterCt = 3 |> SorterCount.create
-      let sorterCt = 20 |> SorterCount.create
+      let swFreq = 1.0 |> SwitchFrequency.create
+      let switchCt = 20 |> SwitchCount.create
+      let baseSorterCt = 2 |> SorterCount.create
+      let mutantSorterCt = 6 |> SorterCount.create
       let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
       let rndGn () = 
         randy |> Rando.nextRngGen
-      let mutationRate = MutationRate.create 0.5
+      let mutationRate = MutationRate.create 0.15
 
-      let sorterStBase = SorterSet.createRandomSwitches 
-                                sorterSetId baseSorterCt ordr wPfx switchCt rndGn
+      let sorterStBase = SorterSet.createRandomStages 
+                                sorterSetId baseSorterCt swFreq ordr wPfx switchCt rndGn
 
-      let sorterMutator = SorterUniformMutator.create 
-                            None None switchGenMode.Switch mutationRate
+      let sorterMutator = 
+        SorterUniformMutator.create 
+             None None switchGenMode.Stage mutationRate
+        |> sorterMutator.Uniform
 
       let baseSorters = sorterStBase |> SorterSet.getSorters 
                         |> Seq.take(baseSorterCt |> SorterCount.value)
                         |> Seq.toArray
 
-      let mutants = SorterSet.createMutationSet 
-                        baseSorters sorterCt ordr sorterMutator sorterSetId randy
+      let sorterSetOfMutants =
+        SorterSet.createMutationSet 
+                    baseSorters
+                    mutantSorterCt
+                    ordr
+                    sorterMutator
+                    sorterSetId
+                    randy
+ 
+      Assert.AreEqual(
+        mutantSorterCt |> SorterCount.value, 
+        sorterSetOfMutants |> SorterSet.getSorters |> Seq.length)
 
-       
-      Assert.AreEqual(sorterCt |> SorterCount.value, mutants |> SorterSet.getSorters |> Seq.length)
+
+      let mutantSorterSetR = 
+            MutantSorterSet.create
+                sorterMutator
+                randy
+                mutantSorterCt
+                baseSorters
+
+      let mutantSorterSet = mutantSorterSetR |> Result.ExtractOrThrow
+
+      Assert.AreEqual(1,1)
