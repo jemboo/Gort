@@ -4,11 +4,13 @@ open System
 
 
 type sorterId = private SorterId of Guid
+type sorterParentId = private SorterParentId of Guid
 type sortableCount = private SortableCount of int
 type sortableSetId = private SortableSetId of Guid
 type sortableSetCount = private SortableSetCount of int
 type setOfSortableSetId = private SetOfSortableSetId of Guid
 type sorterCount = private SorterCount of int
+type sorterParentMapId = private SorterParentMapId of Guid
 type sorterSetId = private SorterSetId of Guid
 type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
@@ -26,18 +28,36 @@ module SortableCount =
 
     let makeSeq sc = seq { 0 .. (value sc - 1) }
 
+
 module SorterId =
     let value (SorterId v) = v
     let create v = SorterId v
+
+
+module SorterParentId =
+    let value (SorterParentId v) = v
+    let create v = SorterParentId v
+    let toSorterId (SorterParentId v) = 
+        v |> SorterId.create
+    let toSorterParentId (SorterId v) = 
+        v |> create
+
 
 module SorterSetId =
     let value (SorterSetId v) = v
     let create id = SorterSetId id
 
+
+module SorterParentMapId =
+    let value (SorterParentMapId v) = v
+    let create id = SorterParentMapId id
+
+
 module SorterCount =
     let value (SorterCount v) = v
     let create v = SorterCount v
     let add (a: sorterCount) (b: sorterCount) = create ((value a) + (value b))
+
 
 module SortableSetId =
     let value (SortableSetId v) = v

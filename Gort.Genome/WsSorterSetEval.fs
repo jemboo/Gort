@@ -30,40 +30,6 @@ module WsSorterSetEval
         WsSorterSets.getSorterSet cfg
 
 
-    //let getSorterSetEval 
-    //        (cfg:sorterSetEvalCfg) 
-    //    =
-    //    let sorterSetEvalFileName = 
-    //            (cfg |> SorterSetEvalCfg.getFileName)
-    //    try
-    //        result {
-    //           let! txtD = readAllText sorterSetEvalFileName
-    //           return! txtD |> SorterSetEvalDto.fromJson
-    //        }
-    //        with ex ->
-    //            ("error in WsSorterSetEval.getSorterSetEval: " + ex.Message) |> Error
-
-
-
-    //let makeSorterSetEval 
-    //        (cfg:sorterSetEvalCfg) 
-    //    =
-    //    result {
-    //        let! sorterSetEval = 
-    //            cfg |> SorterSetEvalCfg.makeSorterSetEval
-    //                        getSortableSet
-    //                        getSorterSet
-    //                        WsCommon.useParall
-
-    //        let jason = sorterSetEval |> SorterSetEvalDto.toJson
-    //        let! res = 
-    //                writeToFile 
-    //                    ( cfg |> SorterSetEvalCfg.getFileName ) 
-    //                    jason
-    //                |> Result.map(ignore)
-    //        return sorterSetEval
-    //    }
-
     let saveSortableSetEval
             (cfg:sorterSetEvalCfg)
             (sst:sorterSetEval) 
@@ -82,11 +48,13 @@ module WsSorterSetEval
 
     let makeSorterSetEval (cfg:sorterSetEvalCfg) =
         result {
-            let! sorterSetEval = 
-                           cfg |> SorterSetEvalCfg.makeSorterSetEval
-                            getSortableSet
-                            getSorterSet
-                            WsCommon.useParall
+            let! sorterSetEval =
+                    SorterSetEvalCfg.makeSorterSetEval
+                        WsCommon.useParall
+                        cfg
+                        getSortableSet
+                        getSorterSet
+
             let res = sorterSetEval 
                         |> saveSortableSetEval cfg
                         |> Result.map(ignore)

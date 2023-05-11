@@ -6,7 +6,7 @@ module WsCommon =
 
     let useParall = true |> UseParallel.create
 
-    let wsRootDir = "c:\\GortFilesN"
+    let wsRootDir = "c:\\GortFiles"
     let fileExt = "txt"
 
 
@@ -42,7 +42,7 @@ module WsCommon =
     let allSortableSetCfgs () =
         [| 
           for ordr in orders do
-            SortableSetCfgCertain.getStandardSwitchReducedOneStage ordr
+            SortableSetCfgCertain.makeStandardSwitchReducedOneStage ordr
             |> sortableSetCfg.Certain
 
           //for ordr in orders do
@@ -111,7 +111,7 @@ module WsCommon =
            for ordr in orders do
               for genMode in switchGenModes do
                  let sortableSetCfg =
-                      SortableSetCfgCertain.getStandardSwitchReducedOneStage 
+                      SortableSetCfgCertain.makeStandardSwitchReducedOneStage 
                             ordr
                       |> sortableSetCfg.Certain
 

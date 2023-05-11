@@ -70,11 +70,11 @@ type SorterSetFixture() =
 
 
       let mutantSorterSetR = 
-            MutantSorterSet.create
+            MutantSorterSetMap.create
                 sorterMutator
                 randy
                 mutantSorterCt
-                baseSorters
+                sorterStBase
 
       let mutantSorterSet = mutantSorterSetR |> Result.ExtractOrThrow
 

@@ -65,17 +65,18 @@ module SorterSetEvalCfg
     let getFileName
             (cfg:sorterSetEvalCfg) 
         =
-        sprintf 
-            "%s_%s"
-                (cfg |> getConfigName)
-                ( [|cfg :> obj|] |> GuidUtils.guidFromObjs |> string)
+        cfg |> getSorterSetEvalId |> SorterSetEvalId.value |> string
+        //sprintf 
+        //    "%s_%s"
+        //        (cfg |> getConfigName)
+        //        ( [|cfg :> obj|] |> GuidUtils.guidFromObjs |> string)
 
 
     let makeSorterSetEval
-            (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
-            (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
             (up:useParallel)
             (cfg: sorterSetEvalCfg)
+            (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
+            (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
             let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)

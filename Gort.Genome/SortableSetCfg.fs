@@ -46,13 +46,18 @@ module SortableSetCfgCertain =
                     (perm |> Permutation.powers None |> Seq.length)
 
 
+    //let getFileName
+    //        (sscc:sortableSetCfgCertain) 
+    //    =
+    //    sprintf 
+    //        "%s_%s"
+    //            (sscc |> getConfigName)
+    //            ( [|sscc :> obj|] |> GuidUtils.guidFromObjs |> string)
+
     let getFileName
             (sscc:sortableSetCfgCertain) 
         =
-        sprintf 
-            "%s_%s"
-                (sscc |> getConfigName)
-                ( [|sscc :> obj|] |> GuidUtils.guidFromObjs |> string)
+        sscc |> getSortableSetId |> SortableSetId.value |> string
 
 
     let switchReduceBits
@@ -82,7 +87,7 @@ module SortableSetCfgCertain =
             return refined
         }
 
-    let getSortableSet (sscc:sortableSetCfgCertain) = 
+    let makeSortableSet (sscc:sortableSetCfgCertain) = 
         match sscc with
         | All_Bits o ->
             SortableSet.makeAllBits
@@ -110,7 +115,7 @@ module SortableSetCfgCertain =
                     perm
 
 
-    let getStandardSwitchReducedOneStage (order:order) =
+    let makeStandardSwitchReducedOneStage (order:order) =
         let sws = TwoCycle.evenMode order 
                     |> Switch.fromTwoCycle
                     |> Seq.toArray
@@ -126,9 +131,7 @@ module SortableSetCfg =
     let getSortableSetId 
             (ssCfg: sortableSetCfg) 
         = 
-        match ssCfg with
-        | Certain cCfg -> 
-            cCfg |> SortableSetCfgCertain.getSortableSetId
+        [|ssCfg :> obj|] |> GuidUtils.guidFromObjs
 
 
     let getSortableSet
@@ -136,7 +139,7 @@ module SortableSetCfg =
         = 
         match ssCfg with
         | Certain cCfg -> 
-            cCfg |> SortableSetCfgCertain.getSortableSet
+            cCfg |> SortableSetCfgCertain.makeSortableSet
 
 
     let getOrder

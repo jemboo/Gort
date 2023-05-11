@@ -47,24 +47,19 @@ type sorterSetDtoFixture() =
                                 sorterSetId baseSorterCt swFreq ordr wPfx switchCt rndGn
 
       let sorterMutator = 
-        SorterUniformMutator.create 
-             None None switchGenMode.Stage mutationRate
-        |> sorterMutator.Uniform
+            SorterUniformMutator.create 
+                 None None switchGenMode.Stage mutationRate
+            |> sorterMutator.Uniform
 
-      let baseSorters = 
-            sorterStBase 
-                |> SorterSet.getSorters 
-                |> Seq.take(baseSorterCt |> SorterCount.value)
-                |> Seq.toArray
 
       let mutantSorterSetR = 
-            MutantSorterSet.create
+            MutantSorterSetMap.create
                 sorterMutator
                 randy
                 mutantSorterCt
-                baseSorters
+                sorterStBase
 
-      let mutantSorterSet = mutantSorterSetR |> Result.ExtractOrThrow
+      let mutantSorterSet, sorterSet = mutantSorterSetR |> Result.ExtractOrThrow
 
       let cereal = 
             mutantSorterSet
@@ -75,17 +70,19 @@ type sorterSetDtoFixture() =
             |> MutantSorterSetDto.fromJson
 
       let mutantSorterSetBack = mutantSorterSetBackR |> Result.ExtractOrThrow
-
       
       Assert.IsTrue(CollectionProps.areEqual 
-                        (mutantSorterSet |> MutantSorterSet.getParentMap )
-                        (mutantSorterSetBack |> MutantSorterSet.getParentMap )
+                        (mutantSorterSet |> MutantSorterSetMap.getSorterParentMap )
+                        (mutantSorterSetBack |> MutantSorterSetMap.getSorterParentMap )
                    )
 
       Assert.IsTrue(CollectionProps.areEqual 
-                        (mutantSorterSet |> MutantSorterSet.getSorterSet )
-                        (mutantSorterSetBack |> MutantSorterSet.getSorterSet )
+                        (mutantSorterSet |> MutantSorterSetMap.getParentSorterSetId )
+                        (mutantSorterSetBack |> MutantSorterSetMap.getParentSorterSetId )
                    )
 
-
+      Assert.IsTrue(CollectionProps.areEqual 
+                        (mutantSorterSet |> MutantSorterSetMap.getMutantSorterSetId )
+                        (mutantSorterSetBack |> MutantSorterSetMap.getMutantSorterSetId )
+                   )
 

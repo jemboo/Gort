@@ -64,18 +64,19 @@ module RndDenovoSorterSetCfg =
 
 
     let getFileName
-            (rdsg:rndDenovoSorterSetCfg) 
+            (cfg:rndDenovoSorterSetCfg) 
         =
-        sprintf "%s_%s"
-            (rdsg |> getConfigName)
-            ( [|rdsg :> obj|] |> GuidUtils.guidFromObjs |> string)
+        cfg |> getSorterSetId |> SorterSetId.value |> string
+        //sprintf "%s_%s"
+        //    (rdsg |> getConfigName)
+        //    ( [|rdsg :> obj|] |> GuidUtils.guidFromObjs |> string)
 
 
     let getSorterCount (rdsg: rndDenovoSorterSetCfg) = 
             rdsg.sorterCount
 
 
-    let getSorterSet (rdsg: rndDenovoSorterSetCfg) = 
+    let makeSorterSet (rdsg: rndDenovoSorterSetCfg) = 
         let sorterStId = getSorterSetId rdsg
         let randy = rdsg.rngGen |> Rando.fromRngGen
         let nextRng () =
@@ -130,7 +131,7 @@ module SorterSetCfg =
         = 
         match ssCfg with
         | RndDenovo cCfg -> 
-            cCfg |> RndDenovoSorterSetCfg.getSorterSet
+            cCfg |> RndDenovoSorterSetCfg.makeSorterSet
 
 
     let getOrder

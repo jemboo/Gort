@@ -64,27 +64,75 @@ module SorterSetDto =
         sorterSt |> toDto |> Json.serialize
 
 
+type sorterParentMapDto  = {
+        id:Guid;
+        parentMap:Map<Guid, Guid>; 
+    }
+
+module SorterParentMapDto =
+
+    let fromDto (dto:sorterParentMapDto) =
+        result {
+            let id = dto.id |> SorterParentMapId.create
+            let parentMap = 
+                    dto.parentMap
+                    |> Map.toSeq
+                    |> Seq.map(fun (p,m) -> 
+                         (p |> SorterId.create, m |> SorterParentId.create))
+                    |> Map.ofSeq
+
+            return SorterParentMap.load
+                        id
+                        parentMap
+        }
+
+    let fromJson (jstr: string) =
+        result {
+            let! dto = Json.deserialize<sorterParentMapDto> jstr
+            return! fromDto dto
+        }
+
+    let toDto (sorterParentMap: sorterParentMap) =
+        {
+            id = sorterParentMap
+                 |> SorterParentMap.getId
+                 |> SorterParentMapId.value
+
+            parentMap =
+                sorterParentMap 
+                |> SorterParentMap.getParentMap
+                |> Map.toSeq
+                |> Seq.map(fun (p,m) -> 
+                        (p |> SorterId.value, m |> SorterParentId.value))
+                |> Map.ofSeq
+        }
+
+    let toJson (sorterParentMap: sorterParentMap) =
+        sorterParentMap |> toDto |> Json.serialize
+
+
+
 type mutantSorterSetDto = { 
-        sorterSetDto: sorterSetDto; 
+        sorterSetIdMutant: Guid; 
+        sorterSetIdParent: Guid; 
         sorterMutatorDto:sorterMutatorDto;
-        parentMap:Map<Guid, Guid>; }
+        sorterParentMapDto:sorterParentMapDto; }
 
 module MutantSorterSetDto =
 
     let fromDto (dto:mutantSorterSetDto) =
         result {
-            let! sorterSet = dto.sorterSetDto |> SorterSetDto.fromDto
+            let sorterSetIdMutant = dto.sorterSetIdMutant |> SorterSetId.create
+            let  sorterSetIdParent = dto.sorterSetIdParent |> SorterSetId.create
             let! sorterMutator = dto.sorterMutatorDto |> SorterMutatorDto.fromDto
-            let parentMap = 
-                dto.parentMap
-                |> Map.toSeq
-                |> Seq.map(fun (p,m) -> (p |> SorterId.create, m |> SorterId.create))
-                |> Map.ofSeq
+            let! sorterParentMap = dto.sorterParentMapDto |> SorterParentMapDto.fromDto
 
-            return MutantSorterSet.load
+
+            return MutantSorterSetMap.load
                         sorterMutator
-                        sorterSet
-                        parentMap
+                        sorterSetIdMutant
+                        sorterSetIdParent
+                        sorterParentMap
         }
 
     let fromJson (jstr: string) =
@@ -93,26 +141,28 @@ module MutantSorterSetDto =
             return! fromDto dto
         }
 
-    let toDto (mutantSorterSet: mutantSorterSet) =
-
+    let toDto (mutantSorterSet: mutantSorterSetMap) =
         {
-            sorterSetDto = 
+            sorterSetIdMutant =
                 mutantSorterSet 
-                |> MutantSorterSet.getSorterSet 
-                |> SorterSetDto.toDto
-            sorterMutatorDto = 
+                |> MutantSorterSetMap.getMutantSorterSetId
+                |> SorterSetId.value
+
+            sorterSetIdParent =
                 mutantSorterSet 
-                |> MutantSorterSet.getSorterMutator 
+                |> MutantSorterSetMap.getParentSorterSetId
+                |> SorterSetId.value
+
+            sorterMutatorDto =
+                mutantSorterSet 
+                |> MutantSorterSetMap.getSorterMutator
                 |> SorterMutatorDto.toDto
-            parentMap = 
+
+            sorterParentMapDto =
                 mutantSorterSet 
-                |> MutantSorterSet.getParentMap 
-                |> Map.toSeq
-                |> Seq.map(fun (p,m) -> (p |> SorterId.value, m |> SorterId.value))
-                |> Map.ofSeq
+                |> MutantSorterSetMap.getSorterParentMap
+                |> SorterParentMapDto.toDto
         }
 
-    let toJson (mutantSorterSet: mutantSorterSet) =
-        mutantSorterSet |> toDto |> Json.serialize
-
-
+    let toJson (mutantSorterSetMap: mutantSorterSetMap) =
+        mutantSorterSetMap |> toDto |> Json.serialize
