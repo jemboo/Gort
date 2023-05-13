@@ -156,15 +156,17 @@ module TwoCycle =
 
             { twoCycle.values = tca }
 
-        //let muts =
-        pairs
-        |> Seq.map (fun pr -> _mutato pr)
-        |> Seq.filter (_isMutatoCompatable)
-        |> Seq.head
-    //if muts.Length > 0 then
-    //    muts.[0]
-    //else
-    //    { tcp with values = tcp |> arrayValues |> Array.copy}
+        let muts =
+            pairs
+            |> Seq.map (fun pr -> _mutato pr)
+            |> Seq.take 5
+            |> Seq.filter (_isMutatoCompatable)
+            |> Seq.toList
+
+        if muts.Length > 0 then
+            muts.[0]
+        else
+            { tcp with values = tcp |> getArray |> Array.copy}
 
 
 

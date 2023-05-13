@@ -2,53 +2,52 @@
 
 open System
 
-type mutateSorterSetCfg = 
+type sorterSetMutateCfg = 
     private
         { 
           sorterSetMutator: sorterSetMutator
-          sorterSetParent: sorterSetCfg
+          sorterSetCfgParent: sorterSetCfg
         }
 
 
-module MutateSorterSetCfg =
+module SorterSetMutateCfg =
     let create (sorterSetMutator:sorterSetMutator)
                (sorterSetParent:sorterSetCfg)
         =
         {
             sorterSetMutator=sorterSetMutator;
-            sorterSetParent=sorterSetParent;
+            sorterSetCfgParent=sorterSetParent;
         }
 
 
-    let getSorterSetMutator (rdsg: mutateSorterSetCfg) = 
+    let getSorterSetMutator (rdsg: sorterSetMutateCfg) = 
             rdsg.sorterSetMutator
 
 
-    let getSorterSetParent (rdsg: mutateSorterSetCfg) = 
-            rdsg.sorterSetParent
+    let getSorterSetCfgParent (rdsg: sorterSetMutateCfg) = 
+            rdsg.sorterSetCfgParent
 
 
     let getParentMapFileName
             (pm:sorterParentMap) 
         =
-        pm |> SorterParentMap.getId |> string
+        pm |> SorterParentMap.getId |> SorterParentMapId.value |> string
 
 
     let createMutantSorterSetAndParentMap 
             (lookup: sorterSetCfg -> Result<sorterSet, string>)
-            (cfg: mutateSorterSetCfg)
+            (mutCfg: sorterSetMutateCfg)
         =
         let parentCfg = 
-            cfg 
-            |> getSorterSetParent
+            mutCfg 
+            |> getSorterSetCfgParent
 
         result {
             let! parentSorterSet = lookup parentCfg
             let! parentMap, mutantSet = 
                     parentSorterSet |>
                         SorterSetMutator.createMutantSorterSetAndParentMap
-                            (cfg |> getSorterSetMutator)
+                            (mutCfg |> getSorterSetMutator)
 
             return parentMap, mutantSet
         }
-            

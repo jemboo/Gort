@@ -4,26 +4,11 @@ open System
 
 module WsMutateSorterSets = 
 
-    let localFolder = "StandardSorterSets"
-
-    let appendLines (fileName:string) (data: string seq) =
-        WsCommon.appendLines localFolder fileName data
-
-    let writeToFile (fileName:string) (data: string) =
-        WsCommon.writeToFile localFolder fileName data
-
-    let readAllText (fileName:string) =
-        WsCommon.readAllText localFolder fileName
-
-    let readAllLines (fileName:string) =
-        WsCommon.readAllLines localFolder fileName
-
-
     let saveSorterSet
             (cfg:sorterSetCfg)
             (sst:sorterSet) 
         =
-        writeToFile 
+        WsFile.writeToFile wsFile.SorterSet
             (cfg |> SorterSetCfg.getFileName) 
             (sst |> SorterSetDto.toJson)
 
@@ -32,14 +17,14 @@ module WsMutateSorterSets =
             (fileName:string)
             (sst:sorterParentMap) 
         =
-        writeToFile 
+        WsFile.writeToFile wsFile.SorterSetMap
             fileName
             (sst |> SorterParentMapDto.toJson)
 
 
     let loadSorterSet (cfg:sorterSetCfg) =
           result {
-            let! txtD = readAllText  
+            let! txtD = WsFile.readAllText  wsFile.SorterSet
                             (cfg |> SorterSetCfg.getFileName)
             return! txtD |> SorterSetDto.fromJson
           }
@@ -50,7 +35,8 @@ module WsMutateSorterSets =
         =
         result {
             let sorterSet = SorterSetCfg.makeSorterSet cfg
-            let! res = sorterSet |> saveSorterSet cfg
+            let! res = sorterSet 
+                       |> saveSorterSet cfg
             return sorterSet
         }
 
@@ -65,28 +51,28 @@ module WsMutateSorterSets =
 
 
     let createMutantSorterSetAndParentMap 
-            (mCfg: mutateSorterSetCfg)
+            (mCfg: sorterSetMutateCfg)
         =
         let res = 
             result {
         
                 let! parentMap, mutantSet = 
                     mCfg 
-                    |> MutateSorterSetCfg.createMutantSorterSetAndParentMap
+                    |> SorterSetMutateCfg.createMutantSorterSetAndParentMap
                             getSorterSet
 
                 let mutantCfg = 
                     SorterSetCfgExplicit.create
-                        (mutantSet |> SorterSet.getOrder)
+                        (mutantSet |> SorterSet.getOrder|> Some)
                         (mutantSet |> SorterSet.getId)
                         "description"
-                        (mutantSet |> SorterSet.getSorterCount)
+                        (mutantSet |> SorterSet.getSorterCount |> Some)
                     |> sorterSetCfg.Explicit
 
 
                 let! resPm = 
                     saveSorterSetParentMap
-                        (parentMap |> MutateSorterSetCfg.getParentMapFileName )
+                        (parentMap |> SorterSetMutateCfg.getParentMapFileName )
                         parentMap
 
                 let! resMs = 
@@ -95,12 +81,18 @@ module WsMutateSorterSets =
                         mutantSet
 
 
-                return ()
+                return ( mutantSet |> SorterSet.getId |> SorterSetId.value |> string,
+                         mutantSet |> SorterSet.getOrder |> Order.value |> string)
             }
-        ()
+        let yab = res |> Result.bimap
+                            (fun (s, o) -> Console.WriteLine (sprintf "%s\t%s" s o))
+                            (fun s -> Console.WriteLine s)
+                
+        () //res
         
 
 
-    let makeEm (errLogger: string -> unit) =
-        WsCommon.allDenovoSorterSetCfgs ()
-        |> Array.map(getSorterSet)
+    let makeEm () =  //(errLogger: string -> unit) =
+        let allcfgs = WsCfgs.allSorterSetMutateCfgs ()
+        WsCfgs.allSorterSetMutateCfgs ()
+        |> Array.map(createMutantSorterSetAndParentMap)

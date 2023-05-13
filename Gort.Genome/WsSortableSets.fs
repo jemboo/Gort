@@ -2,33 +2,19 @@
 open System
 
 
-module WsBinarySortableSets = 
-
-    let localFolder = "BinarySortableSets"
-
-    let appendLines (fileName:string) (data: string seq) =
-        WsCommon.appendLines localFolder fileName data
-
-    let writeToFile (fileName:string) (data: string) =
-        WsCommon.writeToFile localFolder fileName data
-
-    let readAllText (fileName:string) =
-        WsCommon.readAllText localFolder fileName
-
-    let readAllLines (fileName:string) =
-        WsCommon.readAllLines localFolder fileName
+module WsSortableSets = 
 
     let saveSortableSet 
             (cfg:sortableSetCfg)
             (sst:sortableSet) 
         =
         let fileName = cfg |> SortableSetCfg.getFileName 
-        writeToFile fileName (sst |> SortableSetDto.toJson )
+        WsFile.writeToFile wsFile.SortableSet fileName (sst |> SortableSetDto.toJson )
 
 
     let loadSortableSet (cfg:sortableSetCfg) =
           result {
-            let! txtD = readAllText  
+            let! txtD = WsFile.readAllText  wsFile.SortableSet
                             (cfg |> SortableSetCfg.getFileName)
             return! txtD |> SortableSetDto.fromJson
           }
@@ -54,5 +40,5 @@ module WsBinarySortableSets =
 
 
     let makeEm () =
-        WsCommon.allSortableSetCfgs ()
+        WsCfgs.allSortableSetCfgs ()
         |> Array.map(getSortableSet)

@@ -113,18 +113,18 @@ module RndDenovoSorterSetCfg =
 type sorterSetCfgExplicit = 
     private
         { 
-          order: order
+          order: order option
           sorterSetId: sorterSetId
           description: string
-          sorterCount: sorterCount
+          sorterCount: sorterCount option
         }
 
 
 module SorterSetCfgExplicit =
-    let create (order:order)
+    let create (order:order option)
                (sorterSetId:sorterSetId)
                (description:string)
-               (sorterCount:sorterCount)
+               (sorterCount:sorterCount option)
         =
         {
             order=order;
@@ -134,7 +134,9 @@ module SorterSetCfgExplicit =
         }
 
     let getOrder (rdsg: sorterSetCfgExplicit) = 
-            rdsg.order
+            match rdsg.order with
+            | Some o -> o
+            | None -> -1 |> Order.createNr
 
     let getSorterSetId (rdsg: sorterSetCfgExplicit) = 
             rdsg.sorterSetId
@@ -145,8 +147,7 @@ module SorterSetCfgExplicit =
     let getConfigName 
             (rdsg:sorterSetCfgExplicit) 
         =
-        sprintf "%d_%s"
-            (rdsg |> getOrder |> Order.value)
+        sprintf "%s"
             (rdsg |> getDescription |> string)
 
 

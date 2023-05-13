@@ -4,33 +4,18 @@ open System
 
 module WsSorterSets = 
 
-    let localFolder = "StandardSorterSets"
-
-    let appendLines (fileName:string) (data: string seq) =
-        WsCommon.appendLines localFolder fileName data
-
-    let writeToFile (fileName:string) (data: string) =
-        WsCommon.writeToFile localFolder fileName data
-
-    let readAllText (fileName:string) =
-        WsCommon.readAllText localFolder fileName
-
-    let readAllLines (fileName:string) =
-        WsCommon.readAllLines localFolder fileName
-
-
     let saveSorterSet
             (cfg:sorterSetCfg)
             (sst:sorterSet) 
         =
-        writeToFile 
+        WsFile.writeToFile wsFile.SorterSet
             (cfg |> SorterSetCfg.getFileName) 
             (sst |> SorterSetDto.toJson)
 
 
     let loadSorterSet (cfg:sorterSetCfg) =
           result {
-            let! txtD = readAllText  
+            let! txtD = WsFile.readAllText  wsFile.SorterSet
                             (cfg |> SorterSetCfg.getFileName)
             return! txtD |> SorterSetDto.fromJson
           }
@@ -54,5 +39,5 @@ module WsSorterSets =
 
 
     let makeEm () =
-        WsCommon.allDenovoSorterSetCfgs ()
+        WsCfgs.allSorterSetCfgs ()
         |> Array.map(getSorterSet)

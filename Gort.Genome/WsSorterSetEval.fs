@@ -5,24 +5,9 @@ open System
 module WsSorterSetEval 
         =
 
-    let localFolder = "Eval_Standard_On_Binary"
-
-    let appendLines (fileName:string) (data: string seq) =
-        WsCommon.appendLines localFolder fileName data
-
-    let writeToFile (fileName:string) (data: string) =
-        WsCommon.writeToFile localFolder fileName data
-
-    let readAllText (fileName:string) =
-        WsCommon.readAllText localFolder fileName
-
-    let readAllLines (fileName:string) =
-        WsCommon.readAllLines localFolder fileName
-
-
     let getSortableSet (cfg:sortableSetCfg)
         =
-        WsBinarySortableSets.getSortableSet cfg
+        WsSortableSets.getSortableSet cfg
 
 
     let getSorterSet (cfg:sorterSetCfg)
@@ -30,17 +15,17 @@ module WsSorterSetEval
         WsSorterSets.getSorterSet cfg
 
 
-    let saveSortableSetEval
+    let saveSorterSetEval
             (cfg:sorterSetEvalCfg)
             (sst:sorterSetEval) 
         =
         let fileName = cfg |> SorterSetEvalCfg.getFileName 
-        writeToFile fileName (sst |> SorterSetEvalDto.toJson )
+        WsFile.writeToFile wsFile.SorterSetEval fileName (sst |> SorterSetEvalDto.toJson )
 
 
-    let loadSortableSetEval (cfg:sorterSetEvalCfg) =
+    let loadSorterSetEval (cfg:sorterSetEvalCfg) =
           result {
-            let! txtD = readAllText  
+            let! txtD = WsFile.readAllText  wsFile.SorterSetEval
                             (cfg |> SorterSetEvalCfg.getFileName)
             return! txtD |> SorterSetEvalDto.fromJson
           }
@@ -50,13 +35,13 @@ module WsSorterSetEval
         result {
             let! sorterSetEval =
                     SorterSetEvalCfg.makeSorterSetEval
-                        WsCommon.useParall
+                        WsCfgs.useParall
                         cfg
                         getSortableSet
                         getSorterSet
 
             let res = sorterSetEval 
-                        |> saveSortableSetEval cfg
+                        |> saveSorterSetEval cfg
                         |> Result.map(ignore)
             return sorterSetEval
         }
@@ -66,7 +51,7 @@ module WsSorterSetEval
             (cfg:sorterSetEvalCfg) 
         =
         result {
-            let loadRes = loadSortableSetEval cfg
+            let loadRes = loadSorterSetEval cfg
             match loadRes with
             | Ok ss -> return ss
             | Error _ -> return! (makeSorterSetEval cfg)
@@ -74,5 +59,5 @@ module WsSorterSetEval
 
 
     let makeEm () =
-        WsCommon.allSorterSetEvalCfgs ()
+        WsCfgs.allSorterSetEvalCfgs ()
         |> Array.map(getSorterSetEval)
