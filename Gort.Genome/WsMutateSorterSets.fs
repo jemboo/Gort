@@ -2,7 +2,7 @@
 open System
 
 
-module WsSorterSets = 
+module WsMutateSorterSets = 
 
     let localFolder = "StandardSorterSets"
 
@@ -28,6 +28,15 @@ module WsSorterSets =
             (sst |> SorterSetDto.toJson)
 
 
+    let saveSorterSetParentMap
+            (fileName:string)
+            (sst:sorterParentMap) 
+        =
+        writeToFile 
+            fileName
+            (sst |> SorterParentMapDto.toJson)
+
+
     let loadSorterSet (cfg:sorterSetCfg) =
           result {
             let! txtD = readAllText  
@@ -36,7 +45,9 @@ module WsSorterSets =
           }
 
 
-    let makeSorterSet (cfg) =
+    let makeSorterSet 
+            (cfg) 
+        =
         result {
             let sorterSet = SorterSetCfg.makeSorterSet cfg
             let! res = sorterSet |> saveSorterSet cfg
@@ -53,6 +64,43 @@ module WsSorterSets =
         }
 
 
-    let makeEm () =
+    let createMutantSorterSetAndParentMap 
+            (mCfg: mutateSorterSetCfg)
+        =
+        let res = 
+            result {
+        
+                let! parentMap, mutantSet = 
+                    mCfg 
+                    |> MutateSorterSetCfg.createMutantSorterSetAndParentMap
+                            getSorterSet
+
+                let mutantCfg = 
+                    SorterSetCfgExplicit.create
+                        (mutantSet |> SorterSet.getOrder)
+                        (mutantSet |> SorterSet.getId)
+                        "description"
+                        (mutantSet |> SorterSet.getSorterCount)
+                    |> sorterSetCfg.Explicit
+
+
+                let! resPm = 
+                    saveSorterSetParentMap
+                        (parentMap |> MutateSorterSetCfg.getParentMapFileName )
+                        parentMap
+
+                let! resMs = 
+                    saveSorterSet
+                        mutantCfg
+                        mutantSet
+
+
+                return ()
+            }
+        ()
+        
+
+
+    let makeEm (errLogger: string -> unit) =
         WsCommon.allDenovoSorterSetCfgs ()
         |> Array.map(getSorterSet)

@@ -13,6 +13,7 @@
     <Compile Include="SorterDto.fs" />
     <Compile Include="SorterMutatorDto.fs" />
     <Compile Include="SorterSetDto.fs" />
+    <Compile Include="SorterSetMutatorDto.fs" />
     <Compile Include="SortableSetDto.fs" />
     <Compile Include="SorterEvalDto.fs" />
     <Compile Include="RecordVersions.fs" />

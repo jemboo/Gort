@@ -38,6 +38,7 @@ type SorterSetFixture() =
       let switchCt = 20 |> SwitchCount.create
       let baseSorterCt = 2 |> SorterCount.create
       let mutantSorterCt = 6 |> SorterCount.create
+      let rngGen = RngGen.createLcg (123 |> RandomSeed.create)
       let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
       let rndGn () = 
         randy |> Rando.nextRngGen
@@ -68,14 +69,19 @@ type SorterSetFixture() =
         mutantSorterCt |> SorterCount.value, 
         sorterSetOfMutants |> SorterSet.getSorters |> Seq.length)
 
-
-      let mutantSorterSetR = 
-            MutantSorterSetMap.create
+      let sorterSetMutator = 
+            SorterSetMutator.load
                 sorterMutator
-                randy
-                mutantSorterCt
-                sorterStBase
+                (Some mutantSorterCt)
+                rngGen
 
-      let mutantSorterSet = mutantSorterSetR |> Result.ExtractOrThrow
+
+      let tupR =  
+        sorterStBase |> SorterSetMutator.createMutantSorterSetAndParentMap
+                            sorterSetMutator
+
+
+      let mss, pm =  tupR |> Result.ExtractOrThrow
+
 
       Assert.AreEqual(1,1)

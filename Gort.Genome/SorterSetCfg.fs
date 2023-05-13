@@ -1,6 +1,5 @@
 ﻿namespace global
 
-open System
 
 type rndDenovoSorterSetCfg = 
     private
@@ -111,9 +110,64 @@ module RndDenovoSorterSetCfg =
                 nextRng
             
 
+type sorterSetCfgExplicit = 
+    private
+        { 
+          order: order
+          sorterSetId: sorterSetId
+          description: string
+          sorterCount: sorterCount
+        }
+
+
+module SorterSetCfgExplicit =
+    let create (order:order)
+               (sorterSetId:sorterSetId)
+               (description:string)
+               (sorterCount:sorterCount)
+        =
+        {
+            order=order;
+            sorterSetId=sorterSetId;
+            description=description;
+            sorterCount=sorterCount;
+        }
+
+    let getOrder (rdsg: sorterSetCfgExplicit) = 
+            rdsg.order
+
+    let getSorterSetId (rdsg: sorterSetCfgExplicit) = 
+            rdsg.sorterSetId
+
+    let getDescription (rdsg: sorterSetCfgExplicit) = 
+            rdsg.description
+
+    let getConfigName 
+            (rdsg:sorterSetCfgExplicit) 
+        =
+        sprintf "%d_%s"
+            (rdsg |> getOrder |> Order.value)
+            (rdsg |> getDescription |> string)
+
+
+    let getFileName
+            (cfg:sorterSetCfgExplicit) 
+        =
+        cfg |> getSorterSetId |> SorterSetId.value |> string
+
+
+    let getSorterCount (rdsg: sorterSetCfgExplicit) = 
+            rdsg.sorterCount
+
+
+    let makeSorterSet (rdsg: sorterSetCfgExplicit) = 
+        failwith "not implemented"
+            
+
 
 type sorterSetCfg = 
      | RndDenovo of rndDenovoSorterSetCfg
+     | Explicit of sorterSetCfgExplicit
 
 
 module SorterSetCfg =
@@ -124,14 +178,18 @@ module SorterSetCfg =
         match ssCfg with
         | RndDenovo rdssCfg -> 
             rdssCfg |> RndDenovoSorterSetCfg.getSorterSetId
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.getSorterSetId
 
 
-    let getSorterSet
+    let makeSorterSet
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
         | RndDenovo cCfg -> 
             cCfg |> RndDenovoSorterSetCfg.makeSorterSet
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.makeSorterSet
 
 
     let getOrder
@@ -140,6 +198,8 @@ module SorterSetCfg =
         match ssCfg with
         | RndDenovo cCfg -> 
             cCfg |> RndDenovoSorterSetCfg.getOrder
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.getOrder
 
 
     let getCfgName
@@ -148,6 +208,8 @@ module SorterSetCfg =
         match ssCfg with
         | RndDenovo cCfg -> 
             cCfg |> RndDenovoSorterSetCfg.getConfigName
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.getConfigName
 
 
     let getFileName
@@ -156,3 +218,5 @@ module SorterSetCfg =
         match ssCfg with
         | RndDenovo cCfg -> 
             cCfg |> RndDenovoSorterSetCfg.getFileName
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.getFileName

@@ -11,11 +11,13 @@
     <Compile Include="GaSorterSet.fs" />
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
+    <Compile Include="MutateSorterSetCfg.fs" />
     <Compile Include="SorterSetEvalCfg.fs" />
     <Compile Include="SorterSetEvalReportCfg.fs" />
     <Compile Include="GaSorterSetCfg.fs" />
     <Compile Include="WsCommon.fs" />
     <Compile Include="WsSorterSets.fs" />
+    <Compile Include="WsMutateSorterSets.fs" />
     <Compile Include="WsSortableSets.fs" />
     <Compile Include="WsSorterSetEval.fs" />
     <Compile Include="WsSorterSetEvalReport.fs" />

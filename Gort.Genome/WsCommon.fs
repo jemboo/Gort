@@ -89,7 +89,7 @@ module WsCommon =
             (sorterCounts order)
 
 
-    let allSorterSetCfgs () =
+    let allDenovoSorterSetCfgs () =
         [| for ordr in orders do
              for genMode in switchGenModes do
                  for usePfx in [false] do
@@ -100,6 +100,22 @@ module WsCommon =
                         usePfx
                     |> sorterSetCfg.RndDenovo
         |]
+
+
+
+
+    let allMutateSorterSetCfgs () =
+        [| for ordr in orders do
+             for genMode in switchGenModes do
+                 for usePfx in [false] do
+                    makeRdnDenovoSorterSetCfg 
+                        genMode
+                        ordr
+                        rngGen1
+                        usePfx
+                    |> sorterSetCfg.RndDenovo
+        |]
+
 
 
 
