@@ -28,7 +28,6 @@ module WsSorterSetEvalReport
                 reportFileName 
                 repLines
 
-
     let makeEm () =
         WsCfgs.allSorterSetEvalReportCfgs ()
         |> Array.map(makeReport)

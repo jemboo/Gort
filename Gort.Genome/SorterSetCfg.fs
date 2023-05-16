@@ -157,9 +157,10 @@ module SorterSetCfgExplicit =
         cfg |> getSorterSetId |> SorterSetId.value |> string
 
 
-    let getSorterCount (rdsg: sorterSetCfgExplicit) = 
-            rdsg.sorterCount
-
+    let getSorterCount (rdsg: sorterSetCfgExplicit) =
+            match rdsg.sorterCount with
+            | Some o -> o
+            | None -> -1 |> SorterCount.create
 
     let makeSorterSet (rdsg: sorterSetCfgExplicit) = 
         failwith "not implemented"
@@ -201,6 +202,16 @@ module SorterSetCfg =
             cCfg |> RndDenovoSorterSetCfg.getOrder
         | Explicit eC ->
             eC |> SorterSetCfgExplicit.getOrder
+
+
+    let getSorterSetCt
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> RndDenovoSorterSetCfg.getSorterCount
+        | Explicit eC ->
+            eC |> SorterSetCfgExplicit.getSorterCount
 
 
     let getCfgName

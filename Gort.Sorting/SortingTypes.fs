@@ -57,6 +57,7 @@ module SorterCount =
     let value (SorterCount v) = v
     let create v = SorterCount v
     let add (a: sorterCount) (b: sorterCount) = create ((value a) + (value b))
+    let multiply (a: int) (b: sorterCount) = create (a * (value b))
 
 
 module SortableSetId =

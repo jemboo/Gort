@@ -18,7 +18,7 @@
     <Compile Include="WsFile.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsSorterSets.fs" />
-    <Compile Include="WsMutateSorterSets.fs" />
+    <Compile Include="WsSorterSetMutate.fs" />
     <Compile Include="WsSortableSets.fs" />
     <Compile Include="WsSorterSetEval.fs" />
     <Compile Include="WsSorterSetEvalReport.fs" />
