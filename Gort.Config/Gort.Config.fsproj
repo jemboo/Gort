@@ -7,12 +7,14 @@
 
   <ItemGroup>
     <Compile Include="SorterSetRndCfg.fs" />
-    <Compile Include="SortableSetCfg.fs" />
+    <Compile Include="SorterSetParentMapCfg.fs" />
     <Compile Include="SorterSetMutatedFromRndCfg.fs" />
+    <Compile Include="SorterSetCfg.fs" />
+    <Compile Include="SortableSetCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsFile.fs" />
-    <Compile Include="WsSorterSetsRnd.fs" />
+    <Compile Include="WsOps.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

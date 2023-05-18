@@ -52,7 +52,7 @@ module SorterParentMapDto =
 
             sorterSetIdMutant =
                 sorterParentMap 
-                |> SorterParentMap.getMutantSorterSetId
+                |> SorterParentMap.getChildSorterSetId
                 |> SorterSetId.value
 
             sorterSetIdParent =

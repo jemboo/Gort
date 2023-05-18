@@ -34,6 +34,19 @@ module SorterUniformMutator =
     
     let getSwitchCountFinal (sum: sorterUniformMutator) = sum.switchCountFinal
 
+    let getMutatorId 
+                (sum: sorterUniformMutator) 
+        = 
+        [| (sum.GetType()) :> obj;
+           (sum.switchGenMode) :> obj;
+           (sum.mutationRate) :> obj;
+           (sum.switchCountPfx) :> obj;
+           (sum.switchCountFinal) :> obj;
+        |] 
+            |> GuidUtils.guidFromObjs
+            |> SortableSetId.create
+
+
     let _switchMutator
             (mutRate:mutationRate) 
             (sorter: sorter)
@@ -143,11 +156,19 @@ module SorterMutator =
         | Uniform sum -> sum |> SorterUniformMutator.getMutatorFunc
 
 
+    let getMutatorId 
+            (sorterMutator:sorterMutator)
+        =
+        match sorterMutator with
+        | Uniform sum -> sum |> SorterUniformMutator.getMutatorId
+
+
     let getSwitchCountPfx
             (sorterMutator:sorterMutator)
         =
         match sorterMutator with
         | Uniform sum -> sum |> SorterUniformMutator.getMutatorFunc
+
 
     let getSwitchCountFinal
             (sorterMutator:sorterMutator)
@@ -156,7 +177,39 @@ module SorterMutator =
         | Uniform sum -> sum |> SorterUniformMutator.getSwitchCountFinal
 
 
-    let makeMutants 
+    let makeMutants2 
+            (sorterMutator:sorterMutator) 
+            (randy:IRando)
+            (parentIdMap:Map<sorterId, sorterParentId>)
+            (parents:sorter seq)
+        =
+        let parentSorterMap = 
+            parents 
+            |> Seq.map(fun s -> 
+                (s |> Sorter.getSorterId |> SorterParentId.toSorterParentId, s))
+            |> Map.ofSeq
+
+        let _pid_mutant (childId:sorterId) =
+            result {
+                
+                let parentSorterId = parentIdMap.Item childId
+                let parentSorter = parentSorterMap.Item parentSorterId
+                let! mutant =
+                    (sorterMutator |> getMutatorFunc)
+                            parentSorter
+                            childId
+                            randy
+                return mutant
+            }
+
+        parentIdMap 
+        |> Map.toSeq
+        |> Seq.map (fst >> _pid_mutant)
+        |> Seq.toList
+        |> Result.sequence
+
+
+    let makeMutants
             (sorterMutator:sorterMutator) 
             (randy:IRando)
             (sorterCount:sorterCount)

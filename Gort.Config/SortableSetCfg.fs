@@ -2,16 +2,16 @@
 
 open System
 
-type sortableSetCfgCertain =
+type sortableSetCertainCfg =
     | All_Bits of order
     | All_Bits_Reduced of order*array<switch>
     | Orbit of permutation
 
 
-module SortableSetCfgCertain =
+module SortableSetCertainCfg =
 
     let getOrder 
-            (sscc:sortableSetCfgCertain) 
+            (sscc:sortableSetCertainCfg) 
         = 
         match sscc with
         | All_Bits o -> o
@@ -20,7 +20,7 @@ module SortableSetCfgCertain =
 
 
     let getSortableSetId 
-                (cfg:sortableSetCfgCertain) 
+                (cfg:sortableSetCertainCfg) 
         = 
         [| (cfg.GetType()) :> obj;
             cfg :> obj|] |> GuidUtils.guidFromObjs
@@ -28,7 +28,7 @@ module SortableSetCfgCertain =
     
 
     let getConfigName 
-            (sscc:sortableSetCfgCertain) 
+            (sscc:sortableSetCertainCfg) 
         =
         match sscc with
             | All_Bits o -> 
@@ -48,7 +48,7 @@ module SortableSetCfgCertain =
 
 
     let getFileName
-            (sscc:sortableSetCfgCertain) 
+            (sscc:sortableSetCertainCfg) 
         =
         sscc |> getSortableSetId |> SortableSetId.value |> string
 
@@ -60,7 +60,7 @@ module SortableSetCfgCertain =
         result {
             let refinedSortableSetId = 
                 (ordr, (sortr |> Sorter.getSwitches))
-                        |> sortableSetCfgCertain.All_Bits_Reduced
+                        |> sortableSetCertainCfg.All_Bits_Reduced
                         |> getSortableSetId
             let! baseSortableSet = 
                 SortableSet.makeAllBits
@@ -80,7 +80,10 @@ module SortableSetCfgCertain =
             return refined
         }
 
-    let makeSortableSet (sscc:sortableSetCfgCertain) = 
+
+    let makeSortableSet 
+            (sscc:sortableSetCertainCfg) 
+        = 
         match sscc with
         | All_Bits o ->
             SortableSet.makeAllBits
@@ -108,9 +111,57 @@ module SortableSetCfgCertain =
                     perm
 
 
-    let makeStandardSwitchReducedOneStage (order:order) =
+    let makeStandardSwitchReducedOneStage 
+            (order:order) 
+        =
         let sws = TwoCycle.evenMode order 
                     |> Switch.fromTwoCycle
                     |> Seq.toArray
-        sortableSetCfgCertain.All_Bits_Reduced (order, sws)
+        sortableSetCertainCfg.All_Bits_Reduced (order, sws)
 
+
+
+type sortableSetCfg = 
+     | Certain of sortableSetCertainCfg
+
+
+module SortableSetCfg =
+
+    let getSortableSetId 
+            (ssCfg: sortableSetCfg) 
+        = 
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCertainCfg.getSortableSetId
+
+
+    let makeSortableSet
+            (ssCfg: sortableSetCfg) 
+        = 
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCertainCfg.makeSortableSet
+
+
+    let getOrder
+            (ssCfg: sortableSetCfg) 
+        = 
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCertainCfg.getOrder
+
+
+    let getCfgName
+            (ssCfg: sortableSetCfg) 
+        =
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCertainCfg.getConfigName
+
+
+    let getFileName
+            (ssCfg: sortableSetCfg) 
+        =
+        match ssCfg with
+        | Certain cCfg -> 
+            cCfg |> SortableSetCertainCfg.getFileName

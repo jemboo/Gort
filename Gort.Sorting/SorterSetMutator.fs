@@ -2,62 +2,6 @@
 
 open System
 
-type sorterParentMap = 
-        private {
-        id: sorterParentMapId;
-        mutantSetId:sorterSetId;
-        parentSetId:sorterSetId;
-        parentMap:Map<sorterId, sorterParentId> }
-
-module SorterParentMap =
-
-    let load
-            (id:sorterParentMapId)
-            (mutantSetId:sorterSetId)
-            (parentSetId:sorterSetId)
-            (parentMap:Map<sorterId, sorterParentId>)
-        =
-        {   
-            id=id
-            parentMap=parentMap
-            mutantSetId=mutantSetId
-            parentSetId=parentSetId
-        }
-
-    let getId
-            (sorterParentMap:sorterParentMap) 
-         =
-         sorterParentMap.id
-
-
-    let makeId
-            (parentSetId:sorterSetId)
-            (mutantSetId:sorterSetId)
-        =
-        [|parentSetId :> obj; mutantSetId :> obj|] 
-        |> GuidUtils.guidFromObjs
-        |> SorterParentMapId.create
-
-
-    let getParentMap 
-             (sorterParentMap:sorterParentMap) 
-         =
-         sorterParentMap.parentMap
-
-
-    let getMutantSorterSetId
-                (sorterParentMap:sorterParentMap) 
-         =
-         sorterParentMap.mutantSetId
-
-
-    let getParentSorterSetId
-                (sorterParentMap:sorterParentMap) 
-         =
-         sorterParentMap.parentSetId
-
-
-
 
 type sorterSetMutator = 
     private
@@ -84,15 +28,58 @@ module SorterSetMutator =
 
     let getRngGen (sum: sorterSetMutator) = sum.rngGen
 
-    let getSorterCountFinal (sum: sorterSetMutator) = sum.sorterCountFinal
+    let getSorterCountFinal (sum: sorterSetMutator) = 
+         sum.sorterCountFinal
 
     let getMutantSorterSetId
             (sorterSetMutator:sorterSetMutator)
             (parentSetId:sorterSetId)
         =
-        [|parentSetId :> obj; sorterSetMutator :> obj|] 
+        [|  
+            parentSetId :> obj;
+            (sorterSetMutator |> getRngGen) :> obj;
+            (sorterSetMutator
+                    |> getSorterMutator
+                    |> SorterMutator.getMutatorId):> obj
+        |] 
         |> GuidUtils.guidFromObjs
         |> SorterSetId.create
+
+
+    let makeSorterParentMap
+            (sorterSetMutator:sorterSetMutator)
+            (parentSet:sorterSet)
+        =
+        let mutantSetId = 
+            parentSet
+            |> SorterSet.getId
+            |> getMutantSorterSetId sorterSetMutator
+
+        let childSorterCount = 
+            match (sorterSetMutator |> getSorterCountFinal) with
+            | Some sc -> sc
+            | None -> parentSet |> SorterSet.getSorterCount
+
+        let sorterParentMapId = 
+                SorterParentMap.makeId
+                    (parentSet |> SorterSet.getId)
+                    mutantSetId
+
+        let parentMap =
+            parentSet
+            |> SorterSet.getSorters
+            |> Seq.map(Sorter.getSorterId >> SorterParentId.toSorterParentId)
+            |> CollectionOps.infinteLoop
+            |> Seq.allPairs (mutantSetId |> SorterSet.generateSorterIds)
+            |> Seq.take (childSorterCount |> SorterCount.value)
+            |> Map.ofSeq
+
+        SorterParentMap.load
+            sorterParentMapId
+            mutantSetId
+            (parentSet |> SorterSet.getId)
+            parentMap
+
 
 
     let createMutantSorterSetAndParentMap
@@ -147,6 +134,30 @@ module SorterSetMutator =
             return  sorterParentMap, mutantSet
 
         }
+
+
+    let createMutantSorterSetFromParentMap
+            (parentMap:sorterParentMap)
+            (sorterSetMutator:sorterSetMutator)
+            (parentSet:sorterSet)
+        =
+        result {
+            let! mutants = 
+                SorterMutator.makeMutants2
+                    (sorterSetMutator |> getSorterMutator)
+                    (sorterSetMutator |> getRngGen |> Rando.fromRngGen)
+                    (parentMap |> SorterParentMap.getParentMap)
+                    (parentSet |> SorterSet.getSorters)
+
+
+            return
+                SorterSet.load
+                    (parentMap |> SorterParentMap.getChildSorterSetId)
+                    (parentSet |> SorterSet.getOrder)
+                    mutants
+        }
+
+
 
 
 type mutantSorterSetMap = 

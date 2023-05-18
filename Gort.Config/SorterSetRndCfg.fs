@@ -12,6 +12,30 @@ type sorterSetRndCfg =
           sorterCount: sorterCount
         }
 
+type sorterSetMutatedFromRndCfg = 
+    private
+        { 
+          order: order
+          rngGenCreate: rngGen
+          switchGenMode: switchGenMode
+          switchCount: switchCount
+          sorterCountOriginal: sorterCount
+          rngGenMutate: rngGen
+          sorterCountMutated: sorterCount
+          mutationRate:mutationRate
+        }
+
+        
+type sorterSetCfg = 
+     | RndDenovo of sorterSetRndCfg
+     | RndDenovoMutated of sorterSetMutatedFromRndCfg
+
+
+
+
+
+
+
 
 module SorterSetRndCfg =
     let create (order:order)

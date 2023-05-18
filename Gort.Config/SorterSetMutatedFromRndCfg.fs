@@ -1,29 +1,14 @@
 ﻿namespace global
 
-open System
-
-type sorterSetMutatedFromRndCfg = 
-    private
-        { 
-          order: order
-          rngGenCreate: rngGen
-          switchGenMode: switchGenMode
-          switchCount: switchCount
-          sorterCountCreate: sorterCount
-          rngGenMutate: rngGen
-          sorterCountMutate: sorterCount
-          mutationRate:mutationRate
-        }
-
 
 module SorterSetMutatedFromRndCfg =
     let create (order:order)
                (rngGenCreate:rngGen)
                (switchGenMode:switchGenMode)
                (switchCount:switchCount)
-               (sorterCountCreate:sorterCount)
+               (sorterCountOriginal:sorterCount)
                (rngGenMutate:rngGen)
-               (sorterCountMutate:sorterCount)
+               (sorterCountMutated:sorterCount)
                (mutationRate:mutationRate)
         =
         {
@@ -31,23 +16,33 @@ module SorterSetMutatedFromRndCfg =
             rngGenCreate=rngGenCreate;
             switchGenMode=switchGenMode;
             switchCount=switchCount;
-            sorterCountCreate=sorterCountCreate;
+            sorterCountOriginal=sorterCountOriginal;
             rngGenMutate=rngGenMutate;
-            sorterCountMutate=sorterCountMutate;
+            sorterCountMutated=sorterCountMutated;
             mutationRate=mutationRate
         }
 
-    let getOrder (cfg: sorterSetMutatedFromRndCfg) = 
+    let getOrder (cfg: sorterSetMutatedFromRndCfg) =
             cfg.order
 
-    let getRngGenCreate (cfg: sorterSetMutatedFromRndCfg) = 
+    let getRngGenCreate (cfg: sorterSetMutatedFromRndCfg) =
             cfg.rngGenCreate
 
-    let getSwitchGenMode (cfg: sorterSetMutatedFromRndCfg) = 
+    let getSwitchGenMode (cfg: sorterSetMutatedFromRndCfg) =
             cfg.switchGenMode
 
-    let getSwitchCount (cfg: sorterSetMutatedFromRndCfg) = 
+    let getSwitchCount (cfg: sorterSetMutatedFromRndCfg) =
             cfg.switchCount
+
+    let getMutationRate (cfg: sorterSetMutatedFromRndCfg) =
+            cfg.mutationRate
+
+    let getSorterCountMutated (cfg: sorterSetMutatedFromRndCfg) =
+            cfg.sorterCountMutated
+
+    let getSorterCountOriginal (cfg: sorterSetMutatedFromRndCfg) =
+            cfg.sorterCountOriginal
+
 
     let getSorterSetOriginalCfg (cfg:sorterSetMutatedFromRndCfg)
         =
@@ -57,12 +52,13 @@ module SorterSetMutatedFromRndCfg =
             cfg.switchGenMode
             [||]
             cfg.switchCount
-            cfg.sorterCountCreate
+            cfg.sorterCountOriginal
 
 
-    let getOriginalSorterSetId (cfg: sorterSetMutatedFromRndCfg) 
+    let getSorterSetOriginalId (cfg: sorterSetMutatedFromRndCfg) 
         = 
-        cfg  |> getSorterSetOriginalCfg |> SorterSetRndCfg.getSorterSetId
+        cfg |> getSorterSetOriginalCfg
+            |> SorterSetRndCfg.getSorterSetId
 
 
     let getMutatedSorterSetId 
@@ -70,9 +66,28 @@ module SorterSetMutatedFromRndCfg =
         = 
         [|
           (cfg.GetType()) :> obj;
-          cfg :> obj;
+           cfg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
+
+    let getParentMapCfg
+            (cfg: sorterSetMutatedFromRndCfg) 
+        = 
+        SorterParentMap.create
+            (cfg |> getMutatedSorterSetId)
+            (cfg |> getSorterSetOriginalId)
+            (cfg |> getSorterCountMutated)
+            (cfg |> getSorterCountOriginal)
+
+
+
+    let getConfigName 
+            (rdsg:sorterSetMutatedFromRndCfg) 
+        =
+        sprintf "%d_%s_%f"
+            (rdsg |> getOrder |> Order.value)
+            (rdsg |> getSwitchGenMode |> string)
+            (rdsg |> getMutationRate |> MutationRate.value )
 
 
     let getMutatedSorterSetFileName
@@ -93,17 +108,15 @@ module SorterSetMutatedFromRndCfg =
 
         SorterSetMutator.load
             sorterUniformMutator
-            (Some cfg.sorterCountMutate)
+            (Some cfg.sorterCountMutated)
             cfg.rngGenMutate
 
 
-    let getParentMapId  (cfg: sorterSetMutatedFromRndCfg) 
-        = 
-        [|
-          (cfg |> getOriginalSorterSetId) :> obj;
-          (cfg |> getMutatedSorterSetId) :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterParentMapId.create
+    let getParentMapId (cfg:sorterSetMutatedFromRndCfg) 
+        =                     
+        SorterParentMap.makeId
+                        (cfg |> getSorterSetOriginalId)
+                        (cfg |> getMutatedSorterSetId)
 
 
     let getParentMapFileName
@@ -112,7 +125,7 @@ module SorterSetMutatedFromRndCfg =
         cfg |> getParentMapId |> SorterParentMapId.value |> string
 
 
-    let makeMutantSorterSetAndParentMap 
+    let makeMutantSorterSet
             (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
             (mutCfg: sorterSetMutatedFromRndCfg)
         =
@@ -122,10 +135,30 @@ module SorterSetMutatedFromRndCfg =
 
         result {
             let! parentSorterSet = lookup parentCfg
-            let! parentMap, mutantSet = 
+            let! mutantSet = 
                     parentSorterSet |>
-                        SorterSetMutator.createMutantSorterSetAndParentMap
+                        SorterSetMutator.createMutantSorterSetFromParentMap
+                            (mutCfg |> getParentMapCfg)
                             (mutCfg |> getSorterSetMutator)
+                            
+            return mutantSet
+        }  
 
-            return parentMap, mutantSet
-        }     
+
+    //let makeMutantSorterSetAndParentMap 
+    //        (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
+    //        (mutCfg: sorterSetMutatedFromRndCfg)
+    //    =
+    //    let parentCfg = 
+    //        mutCfg 
+    //        |> getSorterSetOriginalCfg
+
+    //    result {
+    //        let! parentSorterSet = lookup parentCfg
+    //        let! parentMap, mutantSet = 
+    //                parentSorterSet |>
+    //                    SorterSetMutator.createMutantSorterSetAndParentMap
+    //                        (mutCfg |> getSorterSetMutator)
+
+    //        return parentMap, mutantSet
+    //    }     

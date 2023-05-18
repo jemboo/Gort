@@ -13,10 +13,12 @@ type ssmfr_EvalAllBitsCfg =
           rngGenMutate: rngGen
           sorterCountMutate: sorterCount
           mutationRate:mutationRate
+          sorterEvalMode: sorterEvalMode
         }
 
 
-module Ssmfr_EvalAllBitsCfg =
+module Ssmfr_EvalAllBitsCfg 
+    =
     let create (order:order)
                (rngGenCreate:rngGen)
                (switchGenMode:switchGenMode)
@@ -25,6 +27,7 @@ module Ssmfr_EvalAllBitsCfg =
                (rngGenMutate:rngGen)
                (sorterCountMutate:sorterCount)
                (mutationRate:mutationRate)
+               (sorterEvalMode: sorterEvalMode)
         =
         {
             order=order;
@@ -35,6 +38,7 @@ module Ssmfr_EvalAllBitsCfg =
             rngGenMutate=rngGenMutate;
             sorterCountMutate=sorterCountMutate;
             mutationRate=mutationRate
+            sorterEvalMode=sorterEvalMode
         }
 
     let getOrder (cfg: ssmfr_EvalAllBitsCfg) = 
@@ -43,89 +47,29 @@ module Ssmfr_EvalAllBitsCfg =
     let getRngGenCreate (cfg: ssmfr_EvalAllBitsCfg) = 
             cfg.rngGenCreate
 
+    let getSorterEvalMode  (cfg: ssmfr_EvalAllBitsCfg) = 
+            cfg.sorterEvalMode
+
     let getSwitchGenMode (cfg: ssmfr_EvalAllBitsCfg) = 
             cfg.switchGenMode
 
     let getSwitchCount (cfg: ssmfr_EvalAllBitsCfg) = 
             cfg.switchCount
 
-    let getSorterSetOriginalCfg (cfg:ssmfr_EvalAllBitsCfg)
+    let getSortableSetCertainCfg
+            (cfg:ssmfr_EvalAllBitsCfg)
         =
-        SorterSetRndCfg.create 
+        cfg.order |> sortableSetCertainCfg.All_Bits
+
+    let getSorterSetMutatedFromRndCfg 
+            (cfg:ssmfr_EvalAllBitsCfg)
+        =
+        SorterSetMutatedFromRndCfg.create 
             cfg.order
             cfg.rngGenCreate
             cfg.switchGenMode
-            [||]
             cfg.switchCount
             cfg.sorterCountCreate
-
-
-    let getOriginalSorterSetId (cfg: ssmfr_EvalAllBitsCfg) 
-        = 
-        cfg  |> getSorterSetOriginalCfg |> SorterSetRndCfg.getSorterSetId
-
-
-    let getMutatedSorterSetId 
-            (cfg: ssmfr_EvalAllBitsCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-          cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetId.create
-
-
-    let getMutatedSorterSetFileName
-            (cfg: ssmfr_EvalAllBitsCfg) 
-        =
-        cfg |> getMutatedSorterSetId |> SorterSetId.value |> string
-
-
-    let getSorterSetMutator (cfg:ssmfr_EvalAllBitsCfg) 
-        =
-        let sorterUniformMutator = 
-            SorterUniformMutator.create
-                    None
-                    None
-                    cfg.switchGenMode
-                    cfg.mutationRate
-            |> sorterMutator.Uniform
-
-        SorterSetMutator.load
-            sorterUniformMutator
-            (Some cfg.sorterCountMutate)
             cfg.rngGenMutate
-
-
-    let getParentMapId  (cfg: ssmfr_EvalAllBitsCfg) 
-        = 
-        [|
-          (cfg |> getOriginalSorterSetId) :> obj;
-          (cfg |> getMutatedSorterSetId) :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterParentMapId.create
-
-
-    let getParentMapFileName
-            (cfg: ssmfr_EvalAllBitsCfg) 
-        =
-        cfg |> getParentMapId |> SorterParentMapId.value |> string
-
-
-    let makeMutantSorterSetAndParentMap 
-            (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
-            (mutCfg: ssmfr_EvalAllBitsCfg)
-        =
-        let parentCfg = 
-            mutCfg 
-            |> getSorterSetOriginalCfg
-
-        result {
-            let! parentSorterSet = lookup parentCfg
-            let! parentMap, mutantSet = 
-                    parentSorterSet |>
-                        SorterSetMutator.createMutantSorterSetAndParentMap
-                            (mutCfg |> getSorterSetMutator)
-
-            return parentMap, mutantSet
-        }     
+            cfg.sorterCountMutate
+            cfg.mutationRate

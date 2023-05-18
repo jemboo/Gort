@@ -26,8 +26,8 @@ module WsCfgs =
     let allSortableSetCfgs () =
         [| 
           for ordr in orders do
-            SortableSetCfgCertain.makeStandardSwitchReducedOneStage ordr
-
+            SortableSetCertainCfg.makeStandardSwitchReducedOneStage ordr
+            |> sortableSetCfg.Certain
 
           //for ordr in orders do
           //  sortableSetCfgCertain.All_Bits ordr

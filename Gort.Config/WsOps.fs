@@ -2,31 +2,30 @@
 open System
 
 
-module WsSorterSetsRnd = 
-
+module WsOps = 
 
 
     //********  SortableSet ****************
 
     let saveSortableSet 
-            (cfg:sortableSetCfgCertain)
+            (cfg:sortableSetCfg)
             (sst:sortableSet) 
         =
-        let fileName = cfg |> SortableSetCfgCertain.getFileName 
+        let fileName = cfg |> SortableSetCfg.getFileName 
         WsFile.writeToFile wsFile.SortableSet fileName (sst |> SortableSetDto.toJson )
 
 
-    let loadSortableSet (cfg:sortableSetCfgCertain) =
+    let loadSortableSet (cfg:sortableSetCfg) =
           result {
             let! txtD = WsFile.readAllText  wsFile.SortableSet
-                            (cfg |> SortableSetCfgCertain.getFileName)
+                            (cfg |> SortableSetCfg.getFileName)
             return! txtD |> SortableSetDto.fromJson
           }
 
 
-    let makeSortableSet (cfg:sortableSetCfgCertain) =
+    let makeSortableSet (cfg:sortableSetCfg) =
         result {
-            let! sortableSet = SortableSetCfgCertain.makeSortableSet cfg
+            let! sortableSet = SortableSetCfg.makeSortableSet cfg
             let res = sortableSet 
                         |> saveSortableSet cfg
                         |> Result.map(ignore)
@@ -34,7 +33,7 @@ module WsSorterSetsRnd =
         }
 
 
-    let getSortableSet (cfg:sortableSetCfgCertain) =
+    let getSortableSet (cfg:sortableSetCfg) =
         result {
             let loadRes = loadSortableSet cfg
             match loadRes with
@@ -95,7 +94,7 @@ module WsSorterSetsRnd =
             (cfg:sorterSetMutatedFromRndCfg)
             (sst:sorterParentMap) 
         =
-        WsFile.writeToFile wsFile.SorterSet
+        WsFile.writeToFile wsFile.SorterSetMap
             (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName) 
             (sst |> SorterParentMapDto.toJson)
 
@@ -112,42 +111,44 @@ module WsSorterSetsRnd =
 
 
     let loadSorterSetParentMap
-            (cfg:sorterSetMutatedFromRndCfg) =
+            (cfg:sorterSetMutatedFromRndCfg) 
+          =
           result {
             let! txtD = 
                 WsFile.readAllText  
-                    wsFile.SorterSet
+                    wsFile.SorterSetMap
                     (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName)
             return! txtD |> SorterParentMapDto.fromJson
           }
 
 
-    let makeMutantSorterSetAndParentMap (cfg:sorterSetMutatedFromRndCfg) =
+    let makeMutantSorterSet
+            (cfg:sorterSetMutatedFromRndCfg) 
+        =
         result {
-            let! parentMap, mutantSet = 
-                SorterSetMutatedFromRndCfg.makeMutantSorterSetAndParentMap 
-                    getSorterSet
-                    cfg
+            let! mutantSet = 
+                    SorterSetMutatedFromRndCfg.makeMutantSorterSet
+                        getSorterSet
+                        cfg
 
             let! resSs = mutantSet |> saveMutatedSorterSet cfg
-            let! resPm = parentMap |> saveSorterParentMap cfg
-            return parentMap, mutantSet
+            return mutantSet
         }
         
 
-    let getMutantSorterSetAndParentMap 
-            (cfg:sorterSetMutatedFromRndCfg) =
+    let getMutantSorterSet
+            (cfg:sorterSetMutatedFromRndCfg) 
+        =
         result {
             let loadRes  = 
                 result {
                     let! mut = loadMutatedSorterSet cfg
-                    let! map = loadSorterSetParentMap cfg
-                    return map, mut
+                    return mut
                 }
 
             match loadRes with
-            | Ok (map, mut) -> return map, mut
-            | Error _ -> return! (makeMutantSorterSetAndParentMap cfg)
+            | Ok mut -> return mut
+            | Error _ -> return! (makeMutantSorterSet cfg)
         }
 
 

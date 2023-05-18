@@ -28,7 +28,7 @@ module WsSorterSetMutate =
             sprintf "%s_%s"
                 (sst |> SorterParentMap.getParentSorterSetId
                      |> SorterSetId.value |> string)
-                (sst |> SorterParentMap.getMutantSorterSetId
+                (sst |> SorterParentMap.getChildSorterSetId
                      |> SorterSetId.value |> string)
                      
         WsFile.appendLines wsFile.SorterSetMap
