@@ -78,6 +78,12 @@ module SorterSetRndCfg =
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
+    let getFileName
+            (cfg:sorterSetRndCfg) 
+        =
+        cfg |> getSorterSetId |> SorterSetId.value |> string
+
+
     let getConfigName 
             (rdsg:sorterSetRndCfg) 
         =
@@ -85,12 +91,6 @@ module SorterSetRndCfg =
             (rdsg |> getOrder |> Order.value)
             (rdsg |> getSwitchGenMode |> string)
             (rdsg |> getSwitchPrefix |> Array.length)
-
-
-    let getFileName
-            (cfg:sorterSetRndCfg) 
-        =
-        cfg |> getSorterSetId |> SorterSetId.value |> string
 
 
     let getSorterCount (rdsg: sorterSetRndCfg) = 

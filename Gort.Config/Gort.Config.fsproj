@@ -11,6 +11,7 @@
     <Compile Include="SorterSetMutatedFromRndCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SortableSetCfg.fs" />
+    <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsFile.fs" />

@@ -43,7 +43,6 @@ module SorterSetMutatedFromRndCfg =
     let getSorterCountOriginal (cfg: sorterSetMutatedFromRndCfg) =
             cfg.sorterCountOriginal
 
-
     let getSorterSetOriginalCfg (cfg:sorterSetMutatedFromRndCfg)
         =
         SorterSetRndCfg.create 
@@ -70,7 +69,8 @@ module SorterSetMutatedFromRndCfg =
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
-    let getParentMapCfg
+
+    let makeSorterSetParentMap
             (cfg: sorterSetMutatedFromRndCfg) 
         = 
         SorterParentMap.create
@@ -138,27 +138,8 @@ module SorterSetMutatedFromRndCfg =
             let! mutantSet = 
                     parentSorterSet |>
                         SorterSetMutator.createMutantSorterSetFromParentMap
-                            (mutCfg |> getParentMapCfg)
+                            (mutCfg |> makeSorterSetParentMap)
                             (mutCfg |> getSorterSetMutator)
                             
             return mutantSet
         }  
-
-
-    //let makeMutantSorterSetAndParentMap 
-    //        (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
-    //        (mutCfg: sorterSetMutatedFromRndCfg)
-    //    =
-    //    let parentCfg = 
-    //        mutCfg 
-    //        |> getSorterSetOriginalCfg
-
-    //    result {
-    //        let! parentSorterSet = lookup parentCfg
-    //        let! parentMap, mutantSet = 
-    //                parentSorterSet |>
-    //                    SorterSetMutator.createMutantSorterSetAndParentMap
-    //                        (mutCfg |> getSorterSetMutator)
-
-    //        return parentMap, mutantSet
-    //    }     

@@ -4,7 +4,6 @@ open System
 
 module WsOps = 
 
-
     //********  SortableSet ****************
 
     let saveSortableSet 
@@ -79,7 +78,7 @@ module WsOps =
 
 
 
-    //********  SorterSetMutate and ParentMap  ****************
+    //********  SorterSetMutate  ****************
 
     let saveMutatedSorterSet
             (cfg:sorterSetMutatedFromRndCfg)
@@ -90,15 +89,6 @@ module WsOps =
             (sst |> SorterSetDto.toJson)
 
 
-    let saveSorterParentMap
-            (cfg:sorterSetMutatedFromRndCfg)
-            (sst:sorterParentMap) 
-        =
-        WsFile.writeToFile wsFile.SorterSetMap
-            (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName) 
-            (sst |> SorterParentMapDto.toJson)
-
-
     let loadMutatedSorterSet 
             (cfg:sorterSetMutatedFromRndCfg) =
           result {
@@ -107,18 +97,6 @@ module WsOps =
                     wsFile.SorterSet
                     (cfg |> SorterSetMutatedFromRndCfg.getMutatedSorterSetFileName)
             return! txtD |> SorterSetDto.fromJson
-          }
-
-
-    let loadSorterSetParentMap
-            (cfg:sorterSetMutatedFromRndCfg) 
-          =
-          result {
-            let! txtD = 
-                WsFile.readAllText  
-                    wsFile.SorterSetMap
-                    (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName)
-            return! txtD |> SorterParentMapDto.fromJson
           }
 
 
@@ -151,13 +129,149 @@ module WsOps =
             | Error _ -> return! (makeMutantSorterSet cfg)
         }
 
+          
+    //********  ParentMap  ****************
+    
+    let saveSorterParentMap
+            (cfg:sorterSetMutatedFromRndCfg)
+            (sst:sorterParentMap) 
+        =
+        WsFile.writeToFile wsFile.SorterSetMap
+            (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName) 
+            (sst |> SorterParentMapDto.toJson)
+
+
+
+    let loadSorterSetParentMap
+            (cfg:sorterSetMutatedFromRndCfg) 
+          =
+          result {
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSetMap
+                    (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName)
+            return! txtD |> SorterParentMapDto.fromJson
+          }
+
+
+    let makeSorterSetParentMap
+            (cfg:sorterSetMutatedFromRndCfg) 
+        =
+        result {
+            let parentMap = 
+                    SorterSetMutatedFromRndCfg.makeSorterSetParentMap
+                        cfg
+
+            let! resSs = parentMap |> saveSorterParentMap cfg
+            return parentMap
+        }
+
+
+    let getParentMap
+            (cfg:sorterSetMutatedFromRndCfg) 
+        =
+        result {
+            let loadRes  = 
+                result {
+                    let! mut = loadSorterSetParentMap cfg
+                    return mut
+                }
+
+            match loadRes with
+            | Ok mut -> return mut
+            | Error _ -> return! (makeSorterSetParentMap cfg)
+        }
+
+        
+    
+
+    //********  SorterSetMutate and ParentMap  ****************
+
+    let getMutantSorterSetAndParentMap
+            (cfg:sorterSetMutatedFromRndCfg) 
+        =
+        result {
+            let! mutantSet = getMutantSorterSet cfg
+            let! parentMap = getParentMap cfg
+
+            return mutantSet, parentMap
+        }
+
+
+
+    //********  ssmfr_EvalAllBitsCfg  ****************
+
+    let saveSorterSetEval
+            (cfg:ssmfr_EvalAllBitsCfg)
+            (sst:sorterSetEval) 
+        =
+        let fileName = cfg |> Ssmfr_EvalAllBitsCfg.getSorterSetEvalFileName 
+        WsFile.writeToFile 
+            wsFile.SorterSetEval 
+            fileName 
+            (sst |> SorterSetEvalDto.toJson )
+
+
+    let loadSsmfr_EvalAllBitsCfg
+            (cfg:ssmfr_EvalAllBitsCfg) 
+          =
+          result {
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSetEval
+                    (cfg |> Ssmfr_EvalAllBitsCfg.getSorterSetEvalFileName)
+            return! txtD |> SorterSetEvalDto.fromJson
+          }
+
+
+
+    let makeSsmfr_EvalAllBitsCfg
+            (cfg:ssmfr_EvalAllBitsCfg) 
+        =
+        result {
+            let! ssEval = 
+                    Ssmfr_EvalAllBitsCfg.makeSorterSetEval
+                        WsCfgs.useParall
+                        cfg
+                        getSortableSet
+                        getMutantSorterSet
+
+            let! resSs = ssEval |> saveSorterSetEval cfg
+            return ssEval
+        }
+
+
+    let getSsmfr_EvalAllBits
+            (cfg:ssmfr_EvalAllBitsCfg) 
+        =
+        result {
+            let loadRes  = 
+                result {
+                    let! ssEval = loadSsmfr_EvalAllBitsCfg cfg
+                    return ssEval
+                }
+
+            match loadRes with
+            | Ok ssEval -> return ssEval
+            | Error _ -> return! (makeSsmfr_EvalAllBitsCfg cfg)
+        }
+
+
+
+
 
     let makeEm () =
 
-        WsCfgs.allSortableSetCfgs ()
-        |> Array.map(getSortableSet)
+        //WsCfgs.allSortableSetCfgs ()
+        //|> Array.map(getSortableSet)
 
-        //WsCfgs.allSorterSetMutateCfgs ()
+
+        WsCfgs.allSsmfr_EvalAllBitsCfg ()
+        |> Array.map(getSsmfr_EvalAllBits)
+
+        
+
+        //WsCfgs.allSorterSetMutatedFromRndCfgs ()
         //|> Array.map(getMutantSorterSetAndParentMap)
         //WsCfgs.allSorterSetRndCfgs ()
         //|> Array.map(getSorterSet)

@@ -111,7 +111,7 @@ module SortableSetCertainCfg =
                     perm
 
 
-    let makeStandardSwitchReducedOneStage 
+    let makeAllBitsReducedOneStage 
             (order:order) 
         =
         let sws = TwoCycle.evenMode order 

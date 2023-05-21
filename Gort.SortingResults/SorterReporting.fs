@@ -19,8 +19,8 @@ module SorterPhenotypeBin
     let fromSorterEvals (sorterEvals: seq<sorterEval>) =
         let _makeBinFromSamePhenotypes 
                 (spId: sorterPhenotypeId) 
-                (sorterSpeeds: seq<sorterEval>) =
-            let memA = sorterSpeeds |> Seq.toArray
+                (sEvs: seq<sorterEval>) =
+            let memA = sEvs |> Seq.toArray
             { 
               sorterPhenotypeBin.sorterSpeed = memA.[0].sorterSpeed |> Option.get
               sorterPhenotypeBin.sortrIds = memA |> Array.map (fun sp -> sp.sortrId)

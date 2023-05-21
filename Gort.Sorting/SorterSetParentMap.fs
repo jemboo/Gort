@@ -48,7 +48,7 @@ module SorterParentMap =
         let parentMap =
             parentSorterIds
             |> CollectionOps.infinteLoop
-            |> Seq.allPairs (childSetId |> SorterSet.generateSorterIds)
+            |> Seq.zip (childSetId |> SorterSet.generateSorterIds)
             |> Seq.take (childSetCount |> SorterCount.value)
             |> Map.ofSeq
 

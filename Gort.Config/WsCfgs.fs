@@ -26,7 +26,7 @@ module WsCfgs =
     let allSortableSetCfgs () =
         [| 
           for ordr in orders do
-            SortableSetCertainCfg.makeStandardSwitchReducedOneStage ordr
+            SortableSetCertainCfg.makeAllBitsReducedOneStage ordr
             |> sortableSetCfg.Certain
 
           //for ordr in orders do
@@ -51,6 +51,17 @@ module WsCfgs =
         | _ -> failwith "not handled"
 
 
+    let sorterCountBase2 = 20
+
+    let sorterCounts2 (order:order) = 
+        match (order |> Order.value) with
+        | 14 -> sorterCountBase2 * 20 |> SorterCount.create
+        | 16 -> sorterCountBase2 * 5  |> SorterCount.create
+        | 18 -> sorterCountBase2 * 1  |> SorterCount.create
+        | 20 -> sorterCountBase2 * 25   |> SorterCount.create
+        | 22 -> sorterCountBase2 * 5    |> SorterCount.create
+        | 24 -> sorterCountBase2        |> SorterCount.create
+        | _ -> failwith "not handled"
 
     //let sorterCounts (order:order) = 
     //    match (order |> Order.value) with
@@ -100,7 +111,7 @@ module WsCfgs =
 
     let mutRate = 0.2 |> MutationRate.create
 
-    let allSorterSetMutateCfgs () =
+    let allSorterSetMutatedFromRndCfgs () =
         [| 
             for ordr in orders do
              for genMode in switchGenModes do
@@ -112,7 +123,7 @@ module WsCfgs =
                         (SwitchCount.orderTo999SwitchCount ordr)
                         (sorterCounts ordr)
                         rngGen2
-                        (sorterCounts ordr)
+                        (sorterCounts2 ordr)
                         mutRate
         |]
 
@@ -135,6 +146,9 @@ module WsCfgs =
                         rngGen2
                         (sorterCounts ordr)
                         mutRate
+                        sorterEvalMode.DontCheckSuccess
+                        (1 |> StageCount.create)
+                        sorterEvalReport.Full
          |]
 
 
