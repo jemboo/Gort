@@ -132,13 +132,13 @@ module WsOps =
           
     //********  ParentMap  ****************
     
-    let saveSorterParentMap
+    let saveSorterSetParentMap
             (cfg:sorterSetMutatedFromRndCfg)
-            (sst:sorterParentMap) 
+            (sst:sorterSetParentMap) 
         =
         WsFile.writeToFile wsFile.SorterSetMap
             (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName) 
-            (sst |> SorterParentMapDto.toJson)
+            (sst |> SorterSetParentMapDto.toJson)
 
 
 
@@ -150,7 +150,7 @@ module WsOps =
                 WsFile.readAllText  
                     wsFile.SorterSetMap
                     (cfg |> SorterSetMutatedFromRndCfg.getParentMapFileName)
-            return! txtD |> SorterParentMapDto.fromJson
+            return! txtD |> SorterSetParentMapDto.fromJson
           }
 
 
@@ -162,7 +162,7 @@ module WsOps =
                     SorterSetMutatedFromRndCfg.makeSorterSetParentMap
                         cfg
 
-            let! resSs = parentMap |> saveSorterParentMap cfg
+            let! resSs = parentMap |> saveSorterSetParentMap cfg
             return parentMap
         }
 
@@ -384,6 +384,41 @@ module WsOps =
                     | Error m -> Console.WriteLine(m)
                 )
 
+    //********  sorterSetRnd_EvalAllBitsMerge_ReportCfg  ****************
+
+    let make_ssmrMerge_Report 
+            (cfg:ssmfr_EvalAllBitsMerge_ReportCfg) 
+        =
+        let reportFileName = cfg |> Ssmfr_EvalAllBitsMerge_ReportCfg.getReportFileName
+
+        WsFile.writeLinesIfNew
+            wsFile.SorterEvalMergeReport
+            reportFileName 
+            [Ssmfr_EvalAllBitsMerge_ReportCfg.getReportHeader()]
+        |> Result.ExtractOrThrow |> ignore
+
+
+        let repLines_set =
+            Ssmfr_EvalAllBitsMerge_ReportCfg.makeSorterSetEvalReport
+                    cfg
+                    getSorterSetRnd_EvalAllBits
+                    getSsmfr_EvalAllBits
+                    getParentMap
+ 
+        repLines_set
+            |> Seq.iter(
+                fun res ->
+                    match res with
+                    | Ok repLines ->
+                            WsFile.appendLines
+                                    wsFile.SorterEvalMergeReport
+                                    reportFileName 
+                                    repLines
+                            |> Result.ExtractOrThrow |> ignore
+
+                    | Error m -> Console.WriteLine(m)
+                )
+
 
 
 
@@ -407,5 +442,8 @@ module WsOps =
         //WsCfgs.allSorterSetEvalReportCfgs ()
         //|> Array.map(make_sorterSetRnd_Report)
 
-        WsCfgs.allssmfrEvalReportCfgs ()
-        |> Array.map(make_ssmr_Report)
+        //WsCfgs.allssmfrEvalReportCfgs ()
+        //|> Array.map(make_ssmr_Report)
+
+        WsCfgs.allssmfrEvalMergeReportCfgs ()
+        |> Array.map(make_ssmrMerge_Report)

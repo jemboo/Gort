@@ -86,7 +86,7 @@ module Ssmfr_EvalAllBits_ReportCfg
             (cfg.switchCounts order)
             (cfg.sorterCountCreates order)
             rngGenMutate
-            (cfg.sorterCountCreates order)
+            (cfg.sorterCountMutates order)
             mutationRate
             cfg.sorterEvalMode
             cfg.stagePrefixCount
@@ -101,7 +101,7 @@ module Ssmfr_EvalAllBits_ReportCfg
     let getReportHeader ()
         =
         SorterEval.reportHeader
-            "eval_id\torder\tsorter_type\tsortable_type\tmutation_rate"
+            "eval_id\torder\tswitch_gen\tsortable_type\tmutation_rate"
 
     let getReportLines 
             (sorterSetEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
@@ -138,10 +138,11 @@ module Ssmfr_EvalAllBits_ReportCfg
             |> Ssmfr_EvalAllBitsCfg.getOrder
             |> Order.value
 
-        let sorterSetCfgName = 
+        let switchGen = 
             sorterSetEvalCfg 
             |> Ssmfr_EvalAllBitsCfg.getSorterSetMutatedFromRndCfg
-            |> SorterSetMutatedFromRndCfg.getConfigName
+            |> SorterSetMutatedFromRndCfg.getSwitchGenMode
+            |> string
 
         let sortableSetCfgName = 
             sorterSetEvalCfg 
@@ -152,7 +153,7 @@ module Ssmfr_EvalAllBits_ReportCfg
             sprintf "%s\t%d\t%s\t%s\t%f"
                 eval_id
                 order
-                sorterSetCfgName
+                switchGen
                 sortableSetCfgName
                 mutRate
 

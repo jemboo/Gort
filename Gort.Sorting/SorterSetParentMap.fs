@@ -2,17 +2,17 @@
 
 open System
 
-type sorterParentMap = 
+type sorterSetParentMap = 
         private {
-        id: sorterParentMapId;
+        id: sorterSetParentMapId;
         childSetId:sorterSetId;
         parentSetId:sorterSetId;
         parentMap:Map<sorterId, sorterParentId> }
 
-module SorterParentMap =
+module SorterSetParentMap =
 
     let load
-            (id:sorterParentMapId)
+            (id:sorterSetParentMapId)
             (childSetId:sorterSetId)
             (parentSetId:sorterSetId)
             (parentMap:Map<sorterId, sorterParentId>)
@@ -30,7 +30,7 @@ module SorterParentMap =
         =
         [|parentSetId :> obj; childSetId :> obj|] 
         |> GuidUtils.guidFromObjs
-        |> SorterParentMapId.create
+        |> SorterSetParentMapId.create
 
 
     let create
@@ -66,24 +66,24 @@ module SorterParentMap =
 
 
     let getId
-            (sorterParentMap:sorterParentMap) 
+            (sorterParentMap:sorterSetParentMap) 
          =
          sorterParentMap.id
 
     let getParentMap 
-             (sorterParentMap:sorterParentMap) 
+             (sorterParentMap:sorterSetParentMap) 
          =
          sorterParentMap.parentMap
 
 
     let getChildSorterSetId
-                (sorterParentMap:sorterParentMap) 
+                (sorterParentMap:sorterSetParentMap) 
          =
          sorterParentMap.childSetId
 
 
     let getParentSorterSetId
-                (sorterParentMap:sorterParentMap) 
+                (sorterParentMap:sorterSetParentMap) 
          =
          sorterParentMap.parentSetId
 

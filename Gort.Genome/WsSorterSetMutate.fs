@@ -15,20 +15,20 @@ module WsSorterSetMutate =
 
     let saveSorterSetParentMap
             (fileName:string)
-            (sst:sorterParentMap) 
+            (sst:sorterSetParentMap) 
         =
         WsFile.writeToFile wsFile.SorterSetMap
             fileName
-            (sst |> SorterParentMapDto.toJson)
+            (sst |> SorterSetParentMapDto.toJson)
 
     let saveSorterSetParentMapAsCsv
-            (sst:sorterParentMap) 
+            (sst:sorterSetParentMap) 
         =
         let fileName = 
             sprintf "%s_%s"
-                (sst |> SorterParentMap.getParentSorterSetId
+                (sst |> SorterSetParentMap.getParentSorterSetId
                      |> SorterSetId.value |> string)
-                (sst |> SorterParentMap.getChildSorterSetId
+                (sst |> SorterSetParentMap.getChildSorterSetId
                      |> SorterSetId.value |> string)
                      
         WsFile.appendLines wsFile.SorterSetMap
@@ -38,7 +38,7 @@ module WsSorterSetMutate =
 
         WsFile.appendLines wsFile.SorterSetMap
             fileName
-            (sst |> SorterParentMap.getParentMap 
+            (sst |> SorterSetParentMap.getParentMap 
                  |> Map.toSeq
                  |> Seq.map(fun (s, p) -> 
                         sprintf "%s\t%s" 
@@ -53,7 +53,7 @@ module WsSorterSetMutate =
         result {
             let! txtD = WsFile.readAllText  wsFile.SorterSetMap
                             fileName
-            return! txtD |> SorterParentMapDto.fromJson
+            return! txtD |> SorterSetParentMapDto.fromJson
         }
 
 

@@ -14,7 +14,7 @@ module WsCfgs =
     let rngGensMutate = [|rngGen1; rngGen2; |]
 
 
-    let orders = [|14; 16|] |> Array.map(Order.createNr)
+    let orders = [|14;|] |> Array.map(Order.createNr)
     
     let mutRates = [| 0.02; 0.05; 0.1; 0.2;|] 
                     |> Array.map(MutationRate.create)
@@ -51,7 +51,7 @@ module WsCfgs =
 
     let sorterCounts (order:order) = 
         match (order |> Order.value) with
-        | 14 -> sorterCountBase * 20 |> SorterCount.create
+        | 14 -> sorterCountBase * 10 |> SorterCount.create
         | 16 -> sorterCountBase * 5  |> SorterCount.create
         | 18 -> sorterCountBase * 1  |> SorterCount.create
         | 20 -> sorterCountBase * 25   |> SorterCount.create
@@ -194,6 +194,31 @@ module WsCfgs =
                     sorterCounts
                     rngGensMutate
                     sorterCounts
+                    [|mutR|]
+                    sorterEvalMode.DontCheckSuccess
+                    (1 |> StageCount.create)
+                    sorterEvalReport.Full
+                    (sprintf "%s_%d" "Jennifer" (ordr |> Order.value))
+        |]
+
+
+
+
+
+    ////********  ssmfr_EvalAllBitsMerge_ReportCfg  ****************
+
+    let allssmfrEvalMergeReportCfgs () =
+        [| 
+            for ordr in orders do
+                for mutR in mutRates do
+                  Ssmfr_EvalAllBitsMerge_ReportCfg.create
+                    [|ordr|]
+                    rngGensCreate
+                    switchGenModes
+                    SwitchCount.orderTo999SwitchCount
+                    sorterCounts
+                    rngGensMutate
+                    sorterCounts2
                     [|mutR|]
                     sorterEvalMode.DontCheckSuccess
                     (1 |> StageCount.create)

@@ -61,7 +61,7 @@ module SorterSetMutator =
             | None -> parentSet |> SorterSet.getSorterCount
 
         let sorterParentMapId = 
-                SorterParentMap.makeId
+                SorterSetParentMap.makeId
                     (parentSet |> SorterSet.getId)
                     mutantSetId
 
@@ -74,7 +74,7 @@ module SorterSetMutator =
             |> Seq.take (childSorterCount |> SorterCount.value)
             |> Map.ofSeq
 
-        SorterParentMap.load
+        SorterSetParentMap.load
             sorterParentMapId
             mutantSetId
             (parentSet |> SorterSet.getId)
@@ -111,7 +111,7 @@ module SorterSetMutator =
 
 
             let sorterParentMapId = 
-                    SorterParentMap.makeId
+                    SorterSetParentMap.makeId
                         parentSetId
                         mutantSetId
 
@@ -125,7 +125,7 @@ module SorterSetMutator =
 
 
             let sorterParentMap = 
-                SorterParentMap.load
+                SorterSetParentMap.load
                     sorterParentMapId
                     mutantSetId
                     parentSetId
@@ -137,7 +137,7 @@ module SorterSetMutator =
 
 
     let createMutantSorterSetFromParentMap
-            (parentMap:sorterParentMap)
+            (parentMap:sorterSetParentMap)
             (sorterSetMutator:sorterSetMutator)
             (parentSet:sorterSet)
         =
@@ -146,13 +146,13 @@ module SorterSetMutator =
                 SorterMutator.makeMutants2
                     (sorterSetMutator |> getSorterMutator)
                     (sorterSetMutator |> getRngGen |> Rando.fromRngGen)
-                    (parentMap |> SorterParentMap.getParentMap)
+                    (parentMap |> SorterSetParentMap.getParentMap)
                     (parentSet |> SorterSet.getSorters)
 
 
             return
                 SorterSet.load
-                    (parentMap |> SorterParentMap.getChildSorterSetId)
+                    (parentMap |> SorterSetParentMap.getChildSorterSetId)
                     (parentSet |> SorterSet.getOrder)
                     mutants
         }
@@ -165,7 +165,7 @@ type mutantSorterSetMap =
                mutantSetId:sorterSetId;
                parentSetId:sorterSetId;
                sorterSetMutator:sorterSetMutator;
-               sorterParentMap:sorterParentMap }
+               sorterParentMap:sorterSetParentMap }
 
 module MutantSorterSetMap =
 
@@ -173,7 +173,7 @@ module MutantSorterSetMap =
             (sorterSetMutator:sorterSetMutator) 
             (mutantSetId:sorterSetId)
             (parentSetId:sorterSetId)
-            (sorterParentMap:sorterParentMap)
+            (sorterParentMap:sorterSetParentMap)
         =
         {
             mutantSetId = mutantSetId;

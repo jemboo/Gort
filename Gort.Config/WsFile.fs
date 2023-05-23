@@ -6,11 +6,12 @@ type wsFile =
     | SorterSet
     | SorterSetEval
     | SorterEvalReport
+    | SorterEvalMergeReport
     | SorterSetMap
 
 module WsFile = 
 
-    let wsRootDir = "c:\\GortFiles2"
+    let wsRootDir = "c:\\GortFiles"
     let fileExt = "txt"
 
 
@@ -21,6 +22,7 @@ module WsFile =
         | SorterSet -> "SorterSets"
         | SorterSetEval -> "SorterSetEvals"
         | SorterEvalReport -> "SorterEvalReports"
+        | SorterEvalMergeReport -> "SorterEvalMergeReports"
         | SorterSetMap -> "SorterSetMaps"
 
 

@@ -265,6 +265,11 @@ module SorterEval =
         sprintf "%s\tErr\tStages\tSwitches\tSuccess\tSortedSetSize\tPhenotype\tSortable\tSorter"
             pfx
 
+    let reportHeaderP
+            (pfx:string)
+        =
+        sprintf "%s\tErrP\tStagesP\tSwitchesP\tSuccessP\tSortedSetSizeP\tPhenotypeP\tSortableP\tSorterP"
+            pfx
 
     let modifyForPrefix
             (ordr:order)

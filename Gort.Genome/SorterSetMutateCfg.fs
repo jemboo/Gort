@@ -29,9 +29,9 @@ module SorterSetMutateCfg =
 
 
     let getParentMapFileName
-            (pm:sorterParentMap) 
+            (pm:sorterSetParentMap) 
         =
-        pm |> SorterParentMap.getId |> SorterParentMapId.value |> string
+        pm |> SorterSetParentMap.getId |> SorterSetParentMapId.value |> string
 
 
     let createMutantSorterSetAndParentMap 

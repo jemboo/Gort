@@ -44,7 +44,7 @@ module SorterSetParentMapCfg =
     let makeParentMap 
             (cfg: sorterSetParentMapCfg) = 
 
-        SorterParentMap.create
+        SorterSetParentMap.create
             (cfg |> getChildSorterSetId)
             (cfg |> getParentSorterSetId)
             (cfg |> getChildSorterSetCount)

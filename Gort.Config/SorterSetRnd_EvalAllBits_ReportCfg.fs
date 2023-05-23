@@ -99,7 +99,7 @@ module SorterSetRnd_EvalAllBits_ReportCfg
     let getReportHeader ()
         =
         SorterEval.reportHeader
-            "eval_id\torder\tsorter_type\tsortable_type"
+            "eval_id\torder\tswitch_gen\tsortable_type"
 
     let getReportLines 
             (sorterSetEvalRet: sorterSetRnd_EvalAllBitsCfg->Result<sorterSetEval,string>)
@@ -126,10 +126,10 @@ module SorterSetRnd_EvalAllBits_ReportCfg
             |> SorterSetRnd_EvalAllBitsCfg.getOrder
             |> Order.value
 
-        let sorterSetCfgName = 
-            sorterSetEvalCfg 
-            |> SorterSetRnd_EvalAllBitsCfg.getSorterSetRndCfg
-            |> SorterSetRndCfg.getConfigName
+        let switchGen = 
+            sorterSetEvalCfg
+            |> SorterSetRnd_EvalAllBitsCfg.getSwitchGenMode
+            |> string
 
         let sortableSetCfgName = 
             sorterSetEvalCfg 
@@ -140,7 +140,7 @@ module SorterSetRnd_EvalAllBits_ReportCfg
             sprintf "%s\t%d\t%s\t%s"
                 eval_id
                 order
-                sorterSetCfgName
+                switchGen
                 sortableSetCfgName
              
         result {

@@ -2,18 +2,18 @@
 open System
 open Microsoft.FSharp.Core
 
-type sorterParentMapDto  = {
+type sorterSetParentMapDto  = {
         id:Guid;
         parentMap:Map<Guid, Guid>;
         sorterSetIdMutant: Guid; 
         sorterSetIdParent: Guid; 
     }
 
-module SorterParentMapDto =
+module SorterSetParentMapDto =
 
-    let fromDto (dto:sorterParentMapDto) =
+    let fromDto (dto:sorterSetParentMapDto) =
         result {
-            let id = dto.id |> SorterParentMapId.create            
+            let id = dto.id |> SorterSetParentMapId.create            
             let sorterSetIdMutant = dto.sorterSetIdMutant |> SorterSetId.create
             let  sorterSetIdParent = dto.sorterSetIdParent |> SorterSetId.create
             let parentMap = 
@@ -23,7 +23,7 @@ module SorterParentMapDto =
                          (p |> SorterId.create, m |> SorterParentId.create))
                     |> Map.ofSeq
 
-            return SorterParentMap.load
+            return SorterSetParentMap.load
                         id
                         sorterSetIdMutant
                         sorterSetIdParent
@@ -32,19 +32,19 @@ module SorterParentMapDto =
 
     let fromJson (jstr: string) =
         result {
-            let! dto = Json.deserialize<sorterParentMapDto> jstr
+            let! dto = Json.deserialize<sorterSetParentMapDto> jstr
             return! fromDto dto
         }
 
-    let toDto (sorterParentMap: sorterParentMap) =
+    let toDto (sorterParentMap: sorterSetParentMap) =
         {
             id = sorterParentMap
-                 |> SorterParentMap.getId
-                 |> SorterParentMapId.value
+                 |> SorterSetParentMap.getId
+                 |> SorterSetParentMapId.value
 
             parentMap =
                 sorterParentMap 
-                |> SorterParentMap.getParentMap
+                |> SorterSetParentMap.getParentMap
                 |> Map.toSeq
                 |> Seq.map(fun (p,m) -> 
                         (p |> SorterId.value, m |> SorterParentId.value))
@@ -52,17 +52,17 @@ module SorterParentMapDto =
 
             sorterSetIdMutant =
                 sorterParentMap 
-                |> SorterParentMap.getChildSorterSetId
+                |> SorterSetParentMap.getChildSorterSetId
                 |> SorterSetId.value
 
             sorterSetIdParent =
                 sorterParentMap 
-                |> SorterParentMap.getParentSorterSetId
+                |> SorterSetParentMap.getParentSorterSetId
                 |> SorterSetId.value
 
         }
 
-    let toJson (sorterParentMap: sorterParentMap) =
+    let toJson (sorterParentMap: sorterSetParentMap) =
         sorterParentMap |> toDto |> Json.serialize
 
 

@@ -73,7 +73,7 @@ module SorterSetMutatedFromRndCfg =
     let makeSorterSetParentMap
             (cfg: sorterSetMutatedFromRndCfg) 
         = 
-        SorterParentMap.create
+        SorterSetParentMap.create
             (cfg |> getMutatedSorterSetId)
             (cfg |> getSorterSetOriginalId)
             (cfg |> getSorterCountMutated)
@@ -114,7 +114,7 @@ module SorterSetMutatedFromRndCfg =
 
     let getParentMapId (cfg:sorterSetMutatedFromRndCfg) 
         =                     
-        SorterParentMap.makeId
+        SorterSetParentMap.makeId
                         (cfg |> getSorterSetOriginalId)
                         (cfg |> getMutatedSorterSetId)
 
@@ -122,7 +122,7 @@ module SorterSetMutatedFromRndCfg =
     let getParentMapFileName
             (cfg: sorterSetMutatedFromRndCfg) 
         =
-        cfg |> getParentMapId |> SorterParentMapId.value |> string
+        cfg |> getParentMapId |> SorterSetParentMapId.value |> string
 
 
     let makeMutantSorterSet

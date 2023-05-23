@@ -10,7 +10,7 @@ type sortableSetId = private SortableSetId of Guid
 type sortableSetCount = private SortableSetCount of int
 type setOfSortableSetId = private SetOfSortableSetId of Guid
 type sorterCount = private SorterCount of int
-type sorterParentMapId = private SorterParentMapId of Guid
+type sorterSetParentMapId = private SorterSetParentMapId of Guid
 type sorterSetId = private SorterSetId of Guid
 type stageCount = private StageCount of int
 type stageWindowSize = private StageWindowSize of int
@@ -48,9 +48,9 @@ module SorterSetId =
     let create id = SorterSetId id
 
 
-module SorterParentMapId =
-    let value (SorterParentMapId v) = v
-    let create id = SorterParentMapId id
+module SorterSetParentMapId =
+    let value (SorterSetParentMapId v) = v
+    let create id = SorterSetParentMapId id
 
 
 module SorterCount =
