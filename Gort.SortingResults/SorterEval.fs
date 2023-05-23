@@ -262,7 +262,7 @@ module SorterEval =
     let reportHeader
             (pfx:string)
         =
-        sprintf "%s\tErr\tStages\tSwitches\tSuccess\tSortedSetSize\tPhenotype\tSortable\tSorter\n"
+        sprintf "%s\tErr\tStages\tSwitches\tSuccess\tSortedSetSize\tPhenotype\tSortable\tSorter"
             pfx
 
 

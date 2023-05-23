@@ -9,15 +9,24 @@ module WsCfgs =
     let rngGen1 = RngGen.createLcg (12544 |> RandomSeed.create)
     let rngGen2 = RngGen.createLcg (72574 |> RandomSeed.create)
     let rngGen3 = RngGen.createLcg (82584 |> RandomSeed.create)
+    
+    let rngGensCreate = [|rngGen1; rngGen2; rngGen3;|]
+    let rngGensMutate = [|rngGen1; rngGen2; |]
 
-    let orders = [|16;|] |> Array.map(Order.createNr)
+
+    let orders = [|14; 16|] |> Array.map(Order.createNr)
+    
+    let mutRates = [| 0.02; 0.05; 0.1; 0.2;|] 
+                    |> Array.map(MutationRate.create)
+                    
+
 
     let switchGenModes =
-        [
+        [|
             switchGenMode.StageSymmetric; 
             switchGenMode.Switch; 
             switchGenMode.Stage
-        ]
+        |]
 
 
 
@@ -38,7 +47,7 @@ module WsCfgs =
 
     //********  SorterSet  ****************
 
-    let sorterCountBase = 10
+    let sorterCountBase = 1
 
     let sorterCounts (order:order) = 
         match (order |> Order.value) with
@@ -109,13 +118,12 @@ module WsCfgs =
 
     //********  SorterSetMutate  ****************
 
-    let mutRate = 0.2 |> MutationRate.create
 
     let allSorterSetMutatedFromRndCfgs () =
         [| 
             for ordr in orders do
              for genMode in switchGenModes do
-                 for usePfx in [false] do
+                 for mutRate in mutRates do
                     SorterSetMutatedFromRndCfg.create
                         ordr
                         rngGen1
@@ -136,7 +144,7 @@ module WsCfgs =
          [|
             for ordr in orders do
              for genMode in switchGenModes do
-                 for usePfx in [false] do
+                 for mutRate in mutRates do
                     Ssmfr_EvalAllBitsCfg.create
                         ordr
                         rngGen1
@@ -148,17 +156,47 @@ module WsCfgs =
                         mutRate
                         sorterEvalMode.DontCheckSuccess
                         (1 |> StageCount.create)
-                        sorterEvalReport.Full
          |]
 
 
 
-    ////********  SorterSetEvalReport  ****************
+    ////********  sorterSetRnd_EvalAllBits_ReportCfg  ****************
+
+    let allSorterSetEvalReportCfgs () =
+        [| 
+            for ordr in orders do
+              SorterSetRnd_EvalAllBits_ReportCfg.create
+                [|ordr|]
+                rngGensCreate
+                switchGenModes
+                SwitchCount.orderTo999SwitchCount
+                sorterCounts
+                sorterEvalMode.DontCheckSuccess
+                (1 |> StageCount.create)
+                sorterEvalReport.Full
+                (sprintf "%s_%d" "Jennifer" (ordr |> Order.value))
+        |]
 
 
-    //let allSorterSetEvalReportCfgs () =
-    //    [| 
-    //        for cfg in allSorterSetEvalCfgs() do
-    //            SorterSetEvalReportCfg.createFull
-    //                cfg
-    //    |]
+
+
+    ////********  ssmfr_EvalAllBits_ReportCfg  ****************
+
+    let allssmfrEvalReportCfgs () =
+        [| 
+            for ordr in orders do
+                for mutR in mutRates do
+                  Ssmfr_EvalAllBits_ReportCfg.create
+                    [|ordr|]
+                    rngGensCreate
+                    switchGenModes
+                    SwitchCount.orderTo999SwitchCount
+                    sorterCounts
+                    rngGensMutate
+                    sorterCounts
+                    [|mutR|]
+                    sorterEvalMode.DontCheckSuccess
+                    (1 |> StageCount.create)
+                    sorterEvalReport.Full
+                    (sprintf "%s_%d" "Jennifer" (ordr |> Order.value))
+        |]

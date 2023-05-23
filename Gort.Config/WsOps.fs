@@ -68,7 +68,7 @@ module WsOps =
         }
 
 
-    let getSorterSet (cfg:sorterSetRndCfg) =
+    let getSorterSetRnd (cfg:sorterSetRndCfg) =
         result {
             let loadRes = loadSorterSet cfg
             match loadRes with
@@ -106,7 +106,7 @@ module WsOps =
         result {
             let! mutantSet = 
                     SorterSetMutatedFromRndCfg.makeMutantSorterSet
-                        getSorterSet
+                        getSorterSetRnd
                         cfg
 
             let! resSs = mutantSet |> saveMutatedSorterSet cfg
@@ -198,10 +198,69 @@ module WsOps =
         }
 
 
+    //********  SorterSetRnd_EvalAllBitsCfg  ****************
+
+    let saveSorterSetEval
+            (cfg:sorterSetRnd_EvalAllBitsCfg)
+            (sst:sorterSetEval) 
+        =
+        let fileName = cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName 
+        WsFile.writeToFile 
+            wsFile.SorterSetEval 
+            fileName 
+            (sst |> SorterSetEvalDto.toJson )
+
+
+    let loadSorterSetRnd_EvalAllBitsCfg
+            (cfg:sorterSetRnd_EvalAllBitsCfg) 
+          =
+          result {
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSetEval
+                    (cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName)
+            return! txtD |> SorterSetEvalDto.fromJson
+          }
+
+
+
+    let makeSorterSetRnd_EvalAllBitsCfg
+            (cfg:sorterSetRnd_EvalAllBitsCfg) 
+        =
+        result {
+            let! ssEval = 
+                    SorterSetRnd_EvalAllBitsCfg.makeSorterSetEval
+                        WsCfgs.useParall
+                        cfg
+                        getSortableSet
+                        getSorterSetRnd
+
+            let! resSs = ssEval |> saveSorterSetEval cfg
+            return ssEval
+        }
+
+
+    let getSorterSetRnd_EvalAllBits
+            (cfg:sorterSetRnd_EvalAllBitsCfg) 
+        =
+        result {
+            let loadRes  = 
+                result {
+                    let! ssEval = loadSorterSetRnd_EvalAllBitsCfg cfg
+                    return ssEval
+                }
+
+            match loadRes with
+            | Ok ssEval -> return ssEval
+            | Error _ -> return! (makeSorterSetRnd_EvalAllBitsCfg cfg)
+        }
+
+
+
 
     //********  ssmfr_EvalAllBitsCfg  ****************
 
-    let saveSorterSetEval
+    let save_ssmfr_Eval
             (cfg:ssmfr_EvalAllBitsCfg)
             (sst:sorterSetEval) 
         =
@@ -236,7 +295,7 @@ module WsOps =
                         getSortableSet
                         getMutantSorterSet
 
-            let! resSs = ssEval |> saveSorterSetEval cfg
+            let! resSs = ssEval |> save_ssmfr_Eval cfg
             return ssEval
         }
 
@@ -258,6 +317,74 @@ module WsOps =
 
 
 
+    //********  sorterSetRnd_EvalAllBits_ReportCfg  ****************
+
+    let make_sorterSetRnd_Report 
+            (cfg:sorterSetRnd_EvalAllBits_ReportCfg) 
+        =
+        let reportFileName = cfg |> SorterSetRnd_EvalAllBits_ReportCfg.getReportFileName
+
+        WsFile.writeLinesIfNew
+            wsFile.SorterEvalReport
+            reportFileName 
+            [SorterSetRnd_EvalAllBits_ReportCfg.getReportHeader()]
+        |> Result.ExtractOrThrow |> ignore
+
+
+        let repLines_set =
+            SorterSetRnd_EvalAllBits_ReportCfg.makeSorterSetEvalReport
+                    cfg
+                    getSorterSetRnd_EvalAllBits
+
+        repLines_set
+            |> Seq.iter(
+                fun res ->
+                    match res with
+                    | Ok repLines ->
+                            WsFile.appendLines
+                                    wsFile.SorterEvalReport
+                                    reportFileName 
+                                    repLines
+                            |> Result.ExtractOrThrow |> ignore
+
+                    | Error m -> Console.WriteLine(m)
+                )
+
+
+    //********  sorterSetRnd_EvalAllBits_ReportCfg  ****************
+
+    let make_ssmr_Report 
+            (cfg:ssmfr_EvalAllBits_ReportCfg) 
+        =
+        let reportFileName = cfg |> Ssmfr_EvalAllBits_ReportCfg.getReportFileName
+
+        WsFile.writeLinesIfNew
+            wsFile.SorterEvalReport
+            reportFileName 
+            [Ssmfr_EvalAllBits_ReportCfg.getReportHeader()]
+        |> Result.ExtractOrThrow |> ignore
+
+
+        let repLines_set =
+            Ssmfr_EvalAllBits_ReportCfg.makeSorterSetEvalReport
+                    cfg
+                    getSsmfr_EvalAllBits
+
+        repLines_set
+            |> Seq.iter(
+                fun res ->
+                    match res with
+                    | Ok repLines ->
+                            WsFile.appendLines
+                                    wsFile.SorterEvalReport
+                                    reportFileName 
+                                    repLines
+                            |> Result.ExtractOrThrow |> ignore
+
+                    | Error m -> Console.WriteLine(m)
+                )
+
+
 
 
     let makeEm () =
@@ -265,13 +392,20 @@ module WsOps =
         //WsCfgs.allSortableSetCfgs ()
         //|> Array.map(getSortableSet)
 
-
-        WsCfgs.allSsmfr_EvalAllBitsCfg ()
-        |> Array.map(getSsmfr_EvalAllBits)
-
-        
-
         //WsCfgs.allSorterSetMutatedFromRndCfgs ()
         //|> Array.map(getMutantSorterSetAndParentMap)
         //WsCfgs.allSorterSetRndCfgs ()
         //|> Array.map(getSorterSet)
+
+
+        //WsCfgs.allSsmfr_EvalAllBitsCfg ()
+        //|> Array.map(getSsmfr_EvalAllBits)
+
+        //WsCfgs.allSsmfr_EvalAllBitsCfg ()
+        //|> Array.map(getSsmfr_EvalAllBits)
+
+        //WsCfgs.allSorterSetEvalReportCfgs ()
+        //|> Array.map(make_sorterSetRnd_Report)
+
+        WsCfgs.allssmfrEvalReportCfgs ()
+        |> Array.map(make_ssmr_Report)

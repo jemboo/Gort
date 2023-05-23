@@ -1,16 +1,4 @@
 ﻿namespace global
-open System
-
-type sorterEvalReport = 
-     | Full
-     | SpeedBin
-
-
-type sorterEvalReportId = private SorterEvalReportId of Guid
-
-module SorterEvalReportId =
-    let value (SorterEvalReportId v) = v
-    let create id = SorterEvalReportId id
 
 
 type sorterSetRnd_EvalAllBitsCfg = 
@@ -23,7 +11,6 @@ type sorterSetRnd_EvalAllBitsCfg =
           sorterCountCreate: sorterCount
           sorterEvalMode: sorterEvalMode
           stagePrefixCount: stageCount
-          sorterEvalReport : sorterEvalReport
         }
 
 
@@ -36,7 +23,6 @@ module SorterSetRnd_EvalAllBitsCfg
                (sorterCountCreate:sorterCount)
                (sorterEvalMode: sorterEvalMode)
                (stagePrefixCount: stageCount)
-               (sorterEvalReport: sorterEvalReport)
         =
         {
             order=order;
@@ -46,7 +32,6 @@ module SorterSetRnd_EvalAllBitsCfg
             sorterCountCreate=sorterCountCreate;
             sorterEvalMode=sorterEvalMode
             stagePrefixCount=stagePrefixCount;
-            sorterEvalReport=sorterEvalReport
         }
 
     let getOrder (cfg: sorterSetRnd_EvalAllBitsCfg) = 
@@ -67,27 +52,13 @@ module SorterSetRnd_EvalAllBitsCfg
     let getSwitchCount (cfg: sorterSetRnd_EvalAllBitsCfg) = 
             cfg.switchCount
 
-    let getSorterEvalReport (cfg: sorterSetRnd_EvalAllBitsCfg) = 
-            cfg.sorterEvalReport
-
     let getSortableSetCertainCfg
             (cfg:sorterSetRnd_EvalAllBitsCfg)
         =
         cfg.order |> SortableSetCertainCfg.makeAllBitsReducedOneStage
 
+
     let getSorterSetRndCfg 
-            (cfg:sorterSetRnd_EvalAllBitsCfg)
-        =
-        SorterSetRndCfg.create 
-            cfg.order
-            cfg.rngGenCreate
-            cfg.switchGenMode
-            [||]
-            cfg.switchCount
-            cfg.sorterCountCreate
-
-
-    let getSorterSetMutatedFromRndCfg 
             (cfg:sorterSetRnd_EvalAllBitsCfg)
         =
         SorterSetRndCfg.create 
@@ -120,12 +91,13 @@ module SorterSetRnd_EvalAllBitsCfg
     let makeSorterSetEval
             (up:useParallel)
             (cfg: sorterSetRnd_EvalAllBitsCfg)
-            (sortableSetCfgRet: sortableSetCertainCfg->Result<sortableSet,string>)
+            (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
             (sorterSetCfgRet: sorterSetRndCfg->Result<sorterSet,string>)
         =
         result {
             let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetRndCfg)
-            let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCertainCfg)
+            let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCertainCfg
+                                                      |> sortableSetCfg.Certain )
             let! ssEval = 
                    SorterSetEval.make
                         (getSorterSetEvalId cfg)

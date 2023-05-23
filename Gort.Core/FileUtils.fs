@@ -123,6 +123,33 @@ module TextIO =
             ("error in TextIO.appendLines: " + ex.Message) |> Result.Error
 
 
+    let writeLinesIfNew
+            (ext:string) 
+            (root:string option) 
+            (folder:string) 
+            (file:string)
+            (data: seq<string>)
+        =
+        try
+            let fne = sprintf "%s.%s" file ext
+            let fldr = 
+                match root with
+                | Some p ->
+                     Path.Combine(p, folder)
+                | None ->
+                    folder
+
+            Directory.CreateDirectory(fldr) |> ignore
+            let fp = Path.Combine(fldr, fne)
+            if File.Exists(fp) then
+                true |> Ok
+            else
+                File.AppendAllLines(fp, data)
+                true |> Ok
+        with ex ->
+            ("error in TextIO.appendLines: " + ex.Message) |> Result.Error
+
+
     let writeToFile
             (ext:string) 
             (root:string option) 

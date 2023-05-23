@@ -1,7 +1,5 @@
 ﻿namespace global
 
-open System
-
 type ssmfr_EvalAllBitsCfg = 
     private
         { 
@@ -15,7 +13,6 @@ type ssmfr_EvalAllBitsCfg =
           mutationRate:mutationRate
           sorterEvalMode: sorterEvalMode
           stagePrefixCount: stageCount
-          sorterEvalReport : sorterEvalReport
         }
 
 
@@ -31,7 +28,6 @@ module Ssmfr_EvalAllBitsCfg
                (mutationRate:mutationRate)
                (sorterEvalMode: sorterEvalMode)
                (stagePrefixCount: stageCount)
-               (sorterEvalReport: sorterEvalReport)
         =
         {
             order=order;
@@ -44,8 +40,10 @@ module Ssmfr_EvalAllBitsCfg
             mutationRate=mutationRate
             sorterEvalMode=sorterEvalMode
             stagePrefixCount=stagePrefixCount;
-            sorterEvalReport=sorterEvalReport
         }
+
+    let getMutationRate (cfg: ssmfr_EvalAllBitsCfg) = 
+            cfg.mutationRate
 
     let getOrder (cfg: ssmfr_EvalAllBitsCfg) = 
             cfg.order
