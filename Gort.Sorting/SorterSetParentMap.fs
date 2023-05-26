@@ -2,6 +2,15 @@
 
 open System
 
+
+type generation = private Generation of int
+
+module Generation =
+    let value (Generation v) = v
+    let create dex = Generation dex
+    let next (Generation v) = Generation (v + 1)
+
+
 type sorterSetParentMap = 
         private {
         id: sorterSetParentMapId;
@@ -10,6 +19,29 @@ type sorterSetParentMap =
         parentMap:Map<sorterId, sorterParentId> }
 
 module SorterSetParentMap =
+
+    let getId
+            (sorterParentMap:sorterSetParentMap) 
+         =
+         sorterParentMap.id
+
+
+    let getParentMap 
+             (sorterParentMap:sorterSetParentMap) 
+         =
+         sorterParentMap.parentMap
+
+
+    let getChildSorterSetId
+                (sorterParentMap:sorterSetParentMap) 
+         =
+         sorterParentMap.childSetId
+
+
+    let getParentSorterSetId
+                (sorterParentMap:sorterSetParentMap) 
+         =
+         sorterParentMap.parentSetId
 
     let load
             (id:sorterSetParentMapId)
@@ -28,7 +60,10 @@ module SorterSetParentMap =
             (parentSetId:sorterSetId)
             (childSetId:sorterSetId)
         =
-        [|parentSetId :> obj; childSetId :> obj|] 
+        [|
+            "sorterSetParentMap" :> obj
+            parentSetId :> obj; childSetId :> obj
+        |] 
         |> GuidUtils.guidFromObjs
         |> SorterSetParentMapId.create
 
@@ -63,27 +98,135 @@ module SorterSetParentMap =
             parentSetId
             parentMap
 
+    let makeMergeMap
+            (ssParent:sorterSet) 
+            (sspm:sorterSetParentMap)
+        =
+        ssParent 
+        |> SorterSet.getSorters
+        |> Seq.map(
+            fun sorter -> 
+                (
+                    sorter |> Sorter.getSorterId,
+                    sorter |> Sorter.getSorterId |> SorterParentId.toSorterParentId
+                )
+            )
+        |> Seq.append
+            (sspm |> getParentMap |> Map.toSeq)
+        |> Map.ofSeq
+        
+
+    // adds self-mapping of the parent sorterId's
+    let extendToParents
+            (sspm:sorterSetParentMap)
+        =
+            sspm 
+            |> getParentMap
+            |> Map.values
+            |> Seq.distinct
+            |> Seq.map(fun v -> (v |> SorterParentId.toSorterId, v))
+            |> Seq.append
+                (sspm |> getParentMap |> Map.toSeq)
+            |> Map.ofSeq
 
 
-    let getId
-            (sorterParentMap:sorterSetParentMap) 
-         =
-         sorterParentMap.id
 
-    let getParentMap 
-             (sorterParentMap:sorterSetParentMap) 
-         =
-         sorterParentMap.parentMap
+type sorterAncestry =
+        private {
+        sorterId: sorterId
+        ancestors: List<(sorterId*generation)>
+        }
 
 
-    let getChildSorterSetId
-                (sorterParentMap:sorterSetParentMap) 
-         =
-         sorterParentMap.childSetId
+module SorterAncestry =
+
+    let getSorterId (sa:sorterAncestry) =
+        sa.sorterId
+
+    let getAncestors (sa:sorterAncestry) =
+        sa.ancestors
+
+    let create (sorterId:sorterId) =
+        {
+            sorterAncestry.sorterId = sorterId;
+            ancestors = [(sorterId, Generation.create 0)]
+        }
+
+    let update 
+            (sa:sorterAncestry) 
+            (sorterId:sorterId) 
+            (gen:generation) =
+        {
+            sorterAncestry.sorterId = sorterId;
+            ancestors = (sorterId, gen) :: sa.ancestors
+        }
 
 
-    let getParentSorterSetId
-                (sorterParentMap:sorterSetParentMap) 
-         =
-         sorterParentMap.parentSetId
+type sorterSetAncestryId = private SorterSetAncestryId of Guid
+module SorterSetAncestryId =
+    let value (SorterSetAncestryId v) = v
+    let create (v: Guid) = SorterSetAncestryId v
+
+
+type sorterSetAncestry =
+        private {
+        id: sorterSetAncestryId;
+        generation:generation;
+        ancestorMap:Map<sorterId, sorterAncestry>
+        }
+
+
+module SorterSetAncestry =
+
+    let getId (sa:sorterSetAncestry) =
+        sa.id
+
+    let getAncestorMap (sa:sorterSetAncestry) =
+        sa.ancestorMap
+
+    let create (id:sorterSetAncestryId) 
+               (sorterIds:sorterId seq) 
+        =
+        {
+            id = id;
+            generation = 0 |> Generation.create; 
+            ancestorMap = 
+                sorterIds
+                |> Seq.map(fun sid -> (sid, SorterAncestry.create sid))
+                |> Map.ofSeq
+        }
+
+    let update 
+            (newId:sorterSetAncestryId)
+            (parentMap:Map<sorterId, sorterParentId>)
+            (sorterSetAncestry:sorterSetAncestry) 
+        =
+        let nextGen = (sorterSetAncestry.generation |> Generation.next)
+
+        let _update (sorterId, sorterParentId) =
+            if (sorterId |> SorterId.value) = (sorterParentId |> SorterParentId.value) 
+               then
+                (sorterId, sorterSetAncestry.ancestorMap.[sorterId])
+               else
+                let parentAncestry = 
+                    sorterSetAncestry.ancestorMap.[sorterParentId |> SorterParentId.toSorterId]
+                (
+                    sorterId,
+                    SorterAncestry.update 
+                        parentAncestry 
+                        sorterId
+                        nextGen
+                  )
+
+        let newAncestorMap = 
+            parentMap
+            |> Map.toSeq 
+            |> Seq.map(_update)
+            |> Map.ofSeq
+
+        {
+            id = newId;
+            generation = nextGen; 
+            ancestorMap = newAncestorMap
+        }
 

@@ -181,10 +181,10 @@ module SorterMutator =
             (sorterMutator:sorterMutator) 
             (randy:IRando)
             (parentIdMap:Map<sorterId, sorterParentId>)
-            (parents:sorter seq)
+            (sortersToMutate:sorter seq)
         =
-        let parentSorterMap = 
-            parents 
+        let sortersToMutateLookup = 
+            sortersToMutate 
             |> Seq.map(fun s -> 
                 (s |> Sorter.getSorterId |> SorterParentId.toSorterParentId, s))
             |> Map.ofSeq
@@ -193,7 +193,7 @@ module SorterMutator =
             result {
                 
                 let parentSorterId = parentIdMap.Item childId
-                let parentSorter = parentSorterMap.Item parentSorterId
+                let parentSorter = sortersToMutateLookup.Item parentSorterId
                 let! mutant =
                     (sorterMutator |> getMutatorFunc)
                             parentSorter

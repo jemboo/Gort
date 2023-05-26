@@ -12,30 +12,6 @@ type sorterSetRndCfg =
           sorterCount: sorterCount
         }
 
-type sorterSetMutatedFromRndCfg = 
-    private
-        { 
-          order: order
-          rngGenCreate: rngGen
-          switchGenMode: switchGenMode
-          switchCount: switchCount
-          sorterCountOriginal: sorterCount
-          rngGenMutate: rngGen
-          sorterCountMutated: sorterCount
-          mutationRate:mutationRate
-        }
-
-        
-type sorterSetCfg = 
-     | RndDenovo of sorterSetRndCfg
-     | RndDenovoMutated of sorterSetMutatedFromRndCfg
-
-
-
-
-
-
-
 
 module SorterSetRndCfg =
     let create (order:order)
@@ -69,7 +45,7 @@ module SorterSetRndCfg =
     let getSwitchCount (rdsg: sorterSetRndCfg) = 
             rdsg.switchCount
 
-    let getSorterSetId 
+    let getId 
             (cfg: sorterSetRndCfg) 
         = 
         [|
@@ -81,7 +57,7 @@ module SorterSetRndCfg =
     let getFileName
             (cfg:sorterSetRndCfg) 
         =
-        cfg |> getSorterSetId |> SorterSetId.value |> string
+        cfg |> getId |> SorterSetId.value |> string
 
 
     let getConfigName 
@@ -98,7 +74,7 @@ module SorterSetRndCfg =
 
 
     let makeSorterSet (rdsg: sorterSetRndCfg) = 
-        let sorterStId = getSorterSetId rdsg
+        let sorterStId = getId rdsg
         let randy = rdsg.rngGen |> Rando.fromRngGen
         let nextRng () =
             randy |> Rando.nextRngGen

@@ -14,6 +14,7 @@
     <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBits_ReportCfg.fs" />
+    <Compile Include="Ss_ShcCfg.fs" />
     <Compile Include="Ssmr_EvalAllBits_ReportCfg.fs" />
     <Compile Include="Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
     <Compile Include="WsCfgs.fs" />

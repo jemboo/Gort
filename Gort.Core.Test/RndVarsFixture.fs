@@ -6,6 +6,18 @@ open System
 type RndGenFixture() =
 
     [<TestMethod>]
+    member this.indexedRngGen() =
+        let rngGen = RngGen.lcgFromNow ()
+
+        let rngGen0 = Rando.indexedRngGen 0 rngGen
+        let rngGen1 = Rando.indexedRngGen 1 rngGen
+        let rngGen2 = Rando.indexedRngGen 2 rngGen
+        let rngGen1a = Rando.indexedRngGen 1 rngGen
+        let rngGen100a = Rando.indexedRngGen 10000 rngGen
+
+        Assert.IsTrue(true)
+
+    [<TestMethod>]
     member this.rndGuidsLcg() =
         let arrayLen = 10
         let gud = new Guid()

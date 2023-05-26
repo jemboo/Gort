@@ -39,51 +39,31 @@ module Energy =
     let isBetterThan (lhs: Energy) (rhs: Energy) = (value lhs) < (value rhs)
 
 
-type Temp = private Temp of float
+type temp = private Temp of float
 
 module Temp =
     let value (Temp v) = v
     let create v = Temp v
-//let fromKey (m:Map<'a, obj>) (key:'a) =
-//    result {
-//        let! gv = ResultMap.read key m
-//        return! create "" (gv:?>float)
-//    }
 
-type StepNumber = private StepNumber of int
+type stepNumber = private StepNumber of int
 
 module StepNumber =
     let value (StepNumber v) = v
     let create v = StepNumber v
     let increment gen = create ((value gen) + 1)
-//let logReporting (StepNumber totSteps) (ticsPerLog) =
-//    IntSeries.logTics ticsPerLog (totSteps * 2)
-//                |> Seq.map(fromInt)
-//                |> Seq.toArray
-//let fromKey (m:Map<'a, obj>) (key:'a) =
-//    result {
-//        let! gv = ResultMap.read key m
-//        return! create "" (gv:?>int)
-//    }
 
 
-type RevNumber = private RevNumber of int
+type revNumber = private RevNumber of int
 
 module RevNumber =
     let value (RevNumber v) = v
     let create fieldName v = RevNumber v
     let increment gen = create ((value gen) + 1)
-//let fromKey (m:Map<'a, obj>) (key:'a) =
-//    result {
-//        let! gv = ResultMap.read key m
-//        return! create "" (gv:?>int)
-//    }
-
 
 
 type annealerSpec =
-    | Constant of Temp
-    | Exp of Temp * float
+    | Constant of temp
+    | Exp of temp * float
 
 module AnnealerSpec =
     let report (a: annealerSpec) =
@@ -94,7 +74,7 @@ module AnnealerSpec =
 
 module Annealer =
 
-    let makeConst (temp: Temp) =
+    let makeConst (temp: temp) =
         fun curEnergy newEnergy (caster: unit -> float) _ ->
             let cfv = curEnergy |> Energy.value
             let nfv = newEnergy |> Energy.value
@@ -108,7 +88,7 @@ module Annealer =
                 curTry < curThresh
 
 
-    let makeExp (temp: Temp) (decay: float) =
+    let makeExp (temp: temp) (decay: float) =
         fun curEnergy newEnergy (caster: unit -> float) step ->
             let cfv = curEnergy |> Energy.value
             let nfv = newEnergy |> Energy.value

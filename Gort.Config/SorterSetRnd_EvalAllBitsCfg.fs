@@ -52,25 +52,7 @@ module SorterSetRnd_EvalAllBitsCfg
     let getSwitchCount (cfg: sorterSetRnd_EvalAllBitsCfg) = 
             cfg.switchCount
 
-    let getSortableSetCertainCfg
-            (cfg:sorterSetRnd_EvalAllBitsCfg)
-        =
-        cfg.order |> SortableSetCertainCfg.makeAllBitsReducedOneStage
-
-
-    let getSorterSetRndCfg 
-            (cfg:sorterSetRnd_EvalAllBitsCfg)
-        =
-        SorterSetRndCfg.create 
-            cfg.order
-            cfg.rngGenCreate
-            cfg.switchGenMode
-            [||]
-            cfg.switchCount
-            cfg.sorterCountCreate
-
-
-    let getSorterSetEvalId
+    let getlId
             (cfg: sorterSetRnd_EvalAllBitsCfg) 
         = 
         [|
@@ -83,9 +65,27 @@ module SorterSetRnd_EvalAllBitsCfg
     let getFileName
             (cfg:sorterSetRnd_EvalAllBitsCfg) 
         =
-        cfg |> getSorterSetEvalId 
+        cfg |> getlId 
             |> SorterSetEvalId.value 
             |> string
+
+
+    let getSortableSetCfg
+            (cfg:sorterSetRnd_EvalAllBitsCfg)
+        =
+        cfg.order |> SortableSetCertainCfg.makeAllBitsReducedOneStage
+
+
+    let getSorterSetCfg 
+            (cfg:sorterSetRnd_EvalAllBitsCfg)
+        =
+        SorterSetRndCfg.create 
+            cfg.order
+            cfg.rngGenCreate
+            cfg.switchGenMode
+            [||]
+            cfg.switchCount
+            cfg.sorterCountCreate
 
 
     let makeSorterSetEval
@@ -95,12 +95,12 @@ module SorterSetRnd_EvalAllBitsCfg
             (sorterSetCfgRet: sorterSetRndCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetRndCfg)
-            let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCertainCfg
+            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)
+            let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCfg
                                                       |> sortableSetCfg.Certain )
             let! ssEval = 
                    SorterSetEval.make
-                        (getSorterSetEvalId cfg)
+                        (getlId cfg)
                         (getSorterEvalMode cfg)
                         sorterSet
                         sortableSet

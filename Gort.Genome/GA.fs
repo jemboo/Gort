@@ -48,14 +48,6 @@ module GaId =
     let create dex = GaId dex
 
 
-type generation = private Generation of int
-
-module Generation =
-    let value (Generation v) = v
-    let create dex = Generation dex
-    let next (Generation v) = Generation (v + 1)
-
-
 //type reporter<'R> = 'R -> unit
 
 type ga<'T> = 

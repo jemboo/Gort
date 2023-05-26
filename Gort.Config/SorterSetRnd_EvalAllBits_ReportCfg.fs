@@ -117,7 +117,7 @@ module SorterSetRnd_EvalAllBits_ReportCfg
 
         let eval_id = 
             sorterSetEvalCfg
-            |> SorterSetRnd_EvalAllBitsCfg.getSorterSetEvalId
+            |> SorterSetRnd_EvalAllBitsCfg.getlId
             |> SorterSetEvalId.value
             |> string
 
@@ -133,7 +133,7 @@ module SorterSetRnd_EvalAllBits_ReportCfg
 
         let sortableSetCfgName = 
             sorterSetEvalCfg 
-            |> SorterSetRnd_EvalAllBitsCfg.getSortableSetCertainCfg
+            |> SorterSetRnd_EvalAllBitsCfg.getSortableSetCfg
             |> SortableSetCertainCfg.getConfigName
 
         let linePfx = 

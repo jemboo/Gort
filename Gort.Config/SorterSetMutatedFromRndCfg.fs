@@ -1,5 +1,17 @@
 ﻿namespace global
 
+type sorterSetMutatedFromRndCfg = 
+    private
+        { 
+          order: order
+          rngGenCreate: rngGen
+          switchGenMode: switchGenMode
+          switchCount: switchCount
+          sorterCountOriginal: sorterCount
+          rngGenMutate: rngGen
+          sorterCountMutated: sorterCount
+          mutationRate:mutationRate
+        }
 
 module SorterSetMutatedFromRndCfg =
     let create (order:order)
@@ -43,6 +55,31 @@ module SorterSetMutatedFromRndCfg =
     let getSorterCountOriginal (cfg: sorterSetMutatedFromRndCfg) =
             cfg.sorterCountOriginal
 
+    let getId 
+            (cfg: sorterSetMutatedFromRndCfg) 
+        = 
+        [|
+          (cfg.GetType()) :> obj;
+           cfg :> obj;
+        |] |> GuidUtils.guidFromObjs
+           |> SorterSetId.create
+
+
+    let getFileName
+            (cfg: sorterSetMutatedFromRndCfg) 
+        =
+        cfg |> getId |> SorterSetId.value |> string
+
+
+    let getConfigName 
+            (rdsg:sorterSetMutatedFromRndCfg) 
+        =
+        sprintf "%d_%s_%f"
+            (rdsg |> getOrder |> Order.value)
+            (rdsg |> getSwitchGenMode |> string)
+            (rdsg |> getMutationRate |> MutationRate.value )
+
+
     let getSorterSetOriginalCfg (cfg:sorterSetMutatedFromRndCfg)
         =
         SorterSetRndCfg.create 
@@ -57,43 +94,16 @@ module SorterSetMutatedFromRndCfg =
     let getSorterSetOriginalId (cfg: sorterSetMutatedFromRndCfg) 
         = 
         cfg |> getSorterSetOriginalCfg
-            |> SorterSetRndCfg.getSorterSetId
+            |> SorterSetRndCfg.getId
 
 
-    let getMutatedSorterSetId 
-            (cfg: sorterSetMutatedFromRndCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetId.create
-
-
-    let makeSorterSetParentMap
-            (cfg: sorterSetMutatedFromRndCfg) 
-        = 
-        SorterSetParentMap.create
-            (cfg |> getMutatedSorterSetId)
+    let getSorterSetParentMapCfg (cfg:sorterSetMutatedFromRndCfg)
+        =
+        SorterSetParentMapCfg.create 
             (cfg |> getSorterSetOriginalId)
-            (cfg |> getSorterCountMutated)
             (cfg |> getSorterCountOriginal)
-
-
-
-    let getConfigName 
-            (rdsg:sorterSetMutatedFromRndCfg) 
-        =
-        sprintf "%d_%s_%f"
-            (rdsg |> getOrder |> Order.value)
-            (rdsg |> getSwitchGenMode |> string)
-            (rdsg |> getMutationRate |> MutationRate.value )
-
-
-    let getMutatedSorterSetFileName
-            (cfg: sorterSetMutatedFromRndCfg) 
-        =
-        cfg |> getMutatedSorterSetId |> SorterSetId.value |> string
+            (cfg |> getId)
+            (cfg |> getSorterCountMutated)
 
 
     let getSorterSetMutator (cfg:sorterSetMutatedFromRndCfg) 
@@ -112,19 +122,6 @@ module SorterSetMutatedFromRndCfg =
             cfg.rngGenMutate
 
 
-    let getParentMapId (cfg:sorterSetMutatedFromRndCfg) 
-        =                     
-        SorterSetParentMap.makeId
-                        (cfg |> getSorterSetOriginalId)
-                        (cfg |> getMutatedSorterSetId)
-
-
-    let getParentMapFileName
-            (cfg: sorterSetMutatedFromRndCfg) 
-        =
-        cfg |> getParentMapId |> SorterSetParentMapId.value |> string
-
-
     let makeMutantSorterSet
             (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
             (mutCfg: sorterSetMutatedFromRndCfg)
@@ -138,7 +135,9 @@ module SorterSetMutatedFromRndCfg =
             let! mutantSet = 
                     parentSorterSet |>
                         SorterSetMutator.createMutantSorterSetFromParentMap
-                            (mutCfg |> makeSorterSetParentMap)
+                            (mutCfg 
+                                |> getSorterSetParentMapCfg
+                                |> SorterSetParentMapCfg.makeParentMap)
                             (mutCfg |> getSorterSetMutator)
                             
             return mutantSet

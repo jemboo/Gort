@@ -40,8 +40,8 @@ type TestClass () =
                         mutationRate
 
 
-        let ssId1 = ssmfrc1 |> SorterSetMutatedFromRndCfg.getMutatedSorterSetId
-        let ssId2 = ssmfrc2 |> SorterSetMutatedFromRndCfg.getMutatedSorterSetId
+        let ssId1 = ssmfrc1 |> SorterSetMutatedFromRndCfg.getId
+        let ssId2 = ssmfrc2 |> SorterSetMutatedFromRndCfg.getId
 
         Assert.AreEqual(ssId1, ssId2)
 
@@ -58,7 +58,7 @@ type TestClass () =
 
 
 
-        let ssIdA = ssmfrcA |> SorterSetMutatedFromRndCfg.getMutatedSorterSetId
+        let ssIdA = ssmfrcA |> SorterSetMutatedFromRndCfg.getId
         Assert.AreEqual(ssId1, ssIdA)
 
 
@@ -76,7 +76,7 @@ type TestClass () =
                         mutationRate
 
 
-        let ssIdB = ssmfrcB |> SorterSetMutatedFromRndCfg.getMutatedSorterSetId
+        let ssIdB = ssmfrcB |> SorterSetMutatedFromRndCfg.getId
 
 
         Assert.IsTrue(true);

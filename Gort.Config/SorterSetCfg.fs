@@ -1,5 +1,8 @@
 ﻿namespace global
       
+//type sorterSetCfg = 
+//     | RndDenovo of sorterSetRndCfg
+//     | RndDenovoMutated of sorterSetMutatedFromRndCfg
 
 //module SorterSetCfg =
 

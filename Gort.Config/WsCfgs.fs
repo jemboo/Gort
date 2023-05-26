@@ -9,14 +9,17 @@ module WsCfgs =
     let rngGen1 = RngGen.createLcg (12544 |> RandomSeed.create)
     let rngGen2 = RngGen.createLcg (72574 |> RandomSeed.create)
     let rngGen3 = RngGen.createLcg (82584 |> RandomSeed.create)
+    let rngGen4 = RngGen.createLcg (1544 |> RandomSeed.create)
+    let rngGen5 = RngGen.createLcg (7254 |> RandomSeed.create)
+    let rngGen6 = RngGen.createLcg (8284 |> RandomSeed.create)
     
-    let rngGensCreate = [|rngGen1; rngGen2; rngGen3;|]
-    let rngGensMutate = [|rngGen1; rngGen2; |]
+    let rngGensCreate = [|rngGen1;|]
+    let rngGensMutate = [|rngGen1; rngGen2; rngGen3; rngGen4; rngGen5; rngGen6;|]
 
 
     let orders = [|14;|] |> Array.map(Order.createNr)
     
-    let mutRates = [| 0.02; 0.05; 0.1; 0.2;|] 
+    let mutRates = [| 0.10; 0.15; 0.20;|] 
                     |> Array.map(MutationRate.create)
                     
 
@@ -60,7 +63,7 @@ module WsCfgs =
         | _ -> failwith "not handled"
 
 
-    let sorterCountBase2 = 20
+    let sorterCountBase2 = 5
 
     let sorterCounts2 (order:order) = 
         match (order |> Order.value) with

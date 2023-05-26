@@ -137,23 +137,23 @@ module SorterSetMutator =
 
 
     let createMutantSorterSetFromParentMap
-            (parentMap:sorterSetParentMap)
+            (sorterSetParentMap:sorterSetParentMap)
             (sorterSetMutator:sorterSetMutator)
-            (parentSet:sorterSet)
+            (sortersToMutate:sorterSet)
         =
         result {
             let! mutants = 
                 SorterMutator.makeMutants2
                     (sorterSetMutator |> getSorterMutator)
                     (sorterSetMutator |> getRngGen |> Rando.fromRngGen)
-                    (parentMap |> SorterSetParentMap.getParentMap)
-                    (parentSet |> SorterSet.getSorters)
+                    (sorterSetParentMap |> SorterSetParentMap.getParentMap)
+                    (sortersToMutate |> SorterSet.getSorters)
 
 
             return
                 SorterSet.load
-                    (parentMap |> SorterSetParentMap.getChildSorterSetId)
-                    (parentSet |> SorterSet.getOrder)
+                    (sorterSetParentMap |> SorterSetParentMap.getChildSorterSetId)
+                    (sortersToMutate |> SorterSet.getOrder)
                     mutants
         }
 

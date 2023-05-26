@@ -15,6 +15,7 @@
     <Compile Include="SwitchFixture.fs" />
     <Compile Include="StageFixture.fs" />
     <Compile Include="SorterSetFixture.fs" />
+    <Compile Include="SorterSetParentMapFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

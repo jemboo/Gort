@@ -123,7 +123,7 @@ module Ssmfr_EvalAllBits_ReportCfg
 
         let eval_id = 
             sorterSetEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getSorterSetEvalId
+            |> Ssmfr_EvalAllBitsCfg.getId
             |> SorterSetEvalId.value
             |> string
 
@@ -140,13 +140,13 @@ module Ssmfr_EvalAllBits_ReportCfg
 
         let switchGen = 
             sorterSetEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSorterSetMutatedFromRndCfg
+            |> Ssmfr_EvalAllBitsCfg.getSorterSetCfg
             |> SorterSetMutatedFromRndCfg.getSwitchGenMode
             |> string
 
         let sortableSetCfgName = 
             sorterSetEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSortableSetCertainCfg
+            |> Ssmfr_EvalAllBitsCfg.getSortableSetCfg
             |> SortableSetCertainCfg.getConfigName
 
         let linePfx = 

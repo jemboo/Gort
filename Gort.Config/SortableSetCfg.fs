@@ -19,13 +19,20 @@ module SortableSetCertainCfg =
         | Orbit p -> p |> Permutation.getOrder
 
 
-    let getSortableSetId 
+    let getId 
                 (cfg:sortableSetCertainCfg) 
         = 
         [| (cfg.GetType()) :> obj;
             cfg :> obj|] |> GuidUtils.guidFromObjs
         |> SortableSetId.create
     
+
+    let getFileName
+            (sscc:sortableSetCertainCfg) 
+        =
+        sscc |> getId |> SortableSetId.value |> string
+
+
 
     let getConfigName 
             (sscc:sortableSetCertainCfg) 
@@ -47,12 +54,6 @@ module SortableSetCertainCfg =
                     (perm |> Permutation.powers None |> Seq.length)
 
 
-    let getFileName
-            (sscc:sortableSetCertainCfg) 
-        =
-        sscc |> getSortableSetId |> SortableSetId.value |> string
-
-
     let switchReduceBits
             (ordr:order)
             (sortr:sorter)
@@ -61,7 +62,7 @@ module SortableSetCertainCfg =
             let refinedSortableSetId = 
                 (ordr, (sortr |> Sorter.getSwitches))
                         |> sortableSetCertainCfg.All_Bits_Reduced
-                        |> getSortableSetId
+                        |> getId
             let! baseSortableSet = 
                 SortableSet.makeAllBits
                     (Guid.Empty |> SortableSetId.create)
@@ -87,7 +88,7 @@ module SortableSetCertainCfg =
         match sscc with
         | All_Bits o ->
             SortableSet.makeAllBits
-                (sscc |> getSortableSetId)
+                (sscc |> getId)
                 rolloutFormat.RfBs64
                 o
 
@@ -106,7 +107,7 @@ module SortableSetCertainCfg =
 
         | Orbit perm -> 
                 SortableSet.makeOrbits
-                    (sscc |> getSortableSetId)
+                    (sscc |> getId)
                     None
                     perm
 
@@ -132,7 +133,7 @@ module SortableSetCfg =
         = 
         match ssCfg with
         | Certain cCfg -> 
-            cCfg |> SortableSetCertainCfg.getSortableSetId
+            cCfg |> SortableSetCertainCfg.getId
 
 
     let makeSortableSet

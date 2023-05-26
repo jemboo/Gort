@@ -1,6 +1,12 @@
 ﻿namespace global
 
-type ssmfr_EvalAllBitsCfg = 
+type shcSubStep =
+     | Mutate
+     | Eval
+     | Merge
+
+
+type ss_ShcCfg = 
     private
         { 
           order: order
@@ -13,10 +19,14 @@ type ssmfr_EvalAllBitsCfg =
           mutationRate:mutationRate
           sorterEvalMode: sorterEvalMode
           stagePrefixCount: stageCount
+          stageWeight:stageWeight
+          temp:temp
+          generation:generation
+          shcSubStep:shcSubStep
         }
 
 
-module Ssmfr_EvalAllBitsCfg 
+module Ss_ShcCfg 
     =
     let create (order:order)
                (rngGenCreate:rngGen)
@@ -28,6 +38,10 @@ module Ssmfr_EvalAllBitsCfg
                (mutationRate:mutationRate)
                (sorterEvalMode: sorterEvalMode)
                (stagePrefixCount: stageCount)
+               (stageWeight: stageWeight)
+               (temp: temp)
+               (generation: generation)
+               (shcSubStep: shcSubStep)
         =
         {
             order=order;
@@ -40,55 +54,42 @@ module Ssmfr_EvalAllBitsCfg
             mutationRate=mutationRate
             sorterEvalMode=sorterEvalMode
             stagePrefixCount=stagePrefixCount;
+            stageWeight=stageWeight
+            temp=temp
+            generation=generation;
+            shcSubStep=shcSubStep;
         }
 
-    let getMutationRate (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getMutationRate (cfg: ss_ShcCfg) = 
             cfg.mutationRate
 
-    let getOrder (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getOrder (cfg: ss_ShcCfg) = 
             cfg.order
 
-    let getRngGenCreate (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getRngGenCreate (cfg: ss_ShcCfg) = 
             cfg.rngGenCreate
 
-    let getSorterEvalMode  (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getSorterEvalMode  (cfg: ss_ShcCfg) = 
             cfg.sorterEvalMode
 
-    let getStagePrefixCount  (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getStagePrefixCount  (cfg: ss_ShcCfg) = 
             cfg.stagePrefixCount
 
-    let getSwitchGenMode (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getSwitchGenMode (cfg: ss_ShcCfg) = 
             cfg.switchGenMode
 
-    let getSwitchCount (cfg: ssmfr_EvalAllBitsCfg) = 
+    let getSwitchCount (cfg: ss_ShcCfg) = 
             cfg.switchCount
 
 
-    let getId
-            (cfg: ssmfr_EvalAllBitsCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetEvalId.create
-
-
-    let getFileName
-            (cfg:ssmfr_EvalAllBitsCfg) 
-        =
-        cfg |> getId 
-            |> SorterSetEvalId.value 
-            |> string
-
 
     let getSortableSetCfg
-            (cfg:ssmfr_EvalAllBitsCfg)
+            (cfg:ss_ShcCfg)
         =
         cfg.order |> SortableSetCertainCfg.makeAllBitsReducedOneStage
 
-    let getSorterSetCfg 
-            (cfg:ssmfr_EvalAllBitsCfg)
+    let getSorterSetMutatedFromRndCfg 
+            (cfg:ss_ShcCfg)
         =
         SorterSetMutatedFromRndCfg.create 
             cfg.order
@@ -101,20 +102,38 @@ module Ssmfr_EvalAllBitsCfg
             cfg.mutationRate
 
 
+    let getlId
+            (cfg: ss_ShcCfg) 
+        = 
+        [|
+          (cfg.GetType()) :> obj;
+           cfg :> obj;
+        |] |> GuidUtils.guidFromObjs
+           |> SorterSetEvalId.create
+
+
+    let getFileName
+            (cfg:ss_ShcCfg) 
+        =
+        cfg |> getlId 
+            |> SorterSetEvalId.value 
+            |> string
+
+
     let makeSorterSetEval
             (up:useParallel)
-            (cfg: ssmfr_EvalAllBitsCfg)
+            (cfg: ss_ShcCfg)
             (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
             (sorterSetCfgRet: sorterSetMutatedFromRndCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)
+            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetMutatedFromRndCfg)
             let! sortableSet = sortableSetCfgRet 
-                                ( cfg |> getSortableSetCfg
-                                      |> sortableSetCfg.Certain   )
+                                (cfg |> getSortableSetCfg
+                                     |> sortableSetCfg.Certain   )
             let! ssEval = 
                    SorterSetEval.make
-                        (getId cfg)
+                        (getlId cfg)
                         (getSorterEvalMode cfg)
                         sorterSet
                         sortableSet
