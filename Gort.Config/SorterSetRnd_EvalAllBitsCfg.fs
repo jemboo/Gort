@@ -83,7 +83,6 @@ module SorterSetRnd_EvalAllBitsCfg
             cfg.order
             cfg.rngGenCreate
             cfg.switchGenMode
-            [||]
             cfg.switchCount
             cfg.sorterCountCreate
 

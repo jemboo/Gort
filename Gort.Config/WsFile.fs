@@ -11,7 +11,7 @@ type wsFile =
 
 module WsFile = 
 
-    let wsRootDir = "c:\\GortFilesT"
+    let wsRootDir = "c:\\GortFilesR"
     let fileExt = "txt"
 
 

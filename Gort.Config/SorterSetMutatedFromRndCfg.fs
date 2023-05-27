@@ -86,7 +86,6 @@ module SorterSetMutatedFromRndCfg =
             cfg.order
             cfg.rngGenCreate
             cfg.switchGenMode
-            [||]
             cfg.switchCount
             cfg.sorterCountOriginal
 

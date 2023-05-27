@@ -7,7 +7,6 @@ type sorterSetRndCfg =
           order: order
           rngGen: rngGen
           switchGenMode: switchGenMode
-          switchPrefix: switch[]
           switchCount: switchCount
           sorterCount: sorterCount
         }
@@ -17,7 +16,6 @@ module SorterSetRndCfg =
     let create (order:order)
                (rngGen:rngGen)
                (switchGenMode:switchGenMode)
-               (switchPrefix:switch[])
                (switchCount:switchCount)
                (sorterCount:sorterCount)
         =
@@ -25,7 +23,6 @@ module SorterSetRndCfg =
             order=order;
             rngGen=rngGen;
             switchGenMode=switchGenMode;
-            switchPrefix=switchPrefix;
             switchCount=switchCount;
             sorterCount=sorterCount;
         }
@@ -38,9 +35,6 @@ module SorterSetRndCfg =
 
     let getSwitchGenMode (rdsg: sorterSetRndCfg) = 
             rdsg.switchGenMode
-
-    let getSwitchPrefix (rdsg: sorterSetRndCfg) = 
-            rdsg.switchPrefix
 
     let getSwitchCount (rdsg: sorterSetRndCfg) = 
             rdsg.switchCount
@@ -63,10 +57,9 @@ module SorterSetRndCfg =
     let getConfigName 
             (rdsg:sorterSetRndCfg) 
         =
-        sprintf "%d_%s_%d"
+        sprintf "%d_%s"
             (rdsg |> getOrder |> Order.value)
             (rdsg |> getSwitchGenMode |> string)
-            (rdsg |> getSwitchPrefix |> Array.length)
 
 
     let getSorterCount (rdsg: sorterSetRndCfg) = 
@@ -85,7 +78,7 @@ module SorterSetRndCfg =
                 sorterStId
                 rdsg.sorterCount
                 rdsg.order
-                rdsg.switchPrefix
+                []
                 rdsg.switchCount
                 nextRng
 
@@ -94,7 +87,7 @@ module SorterSetRndCfg =
                 sorterStId
                 rdsg.sorterCount
                 rdsg.order
-                rdsg.switchPrefix
+                []
                 rdsg.switchCount
                 nextRng
 
@@ -103,7 +96,7 @@ module SorterSetRndCfg =
                 sorterStId
                 rdsg.sorterCount
                 rdsg.order
-                rdsg.switchPrefix
+                []
                 rdsg.switchCount
                 nextRng
            

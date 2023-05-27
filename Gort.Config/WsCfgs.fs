@@ -90,19 +90,11 @@ module WsCfgs =
             (switchGenMode:switchGenMode)
             (order:order)
             (rngGen:rngGen)
-            (usePfx:bool)
-            =
-        let pfx = 
-            match usePfx with
-            | true ->
-                TwoCycle.evenMode order
-                |> Switch.fromTwoCycle
-                |> Seq.toArray
-            | false ->
-                [||]
-                    
+        =
         SorterSetRndCfg.create 
-            order rngGen switchGenMode pfx
+            order 
+            rngGen 
+            switchGenMode
             (SwitchCount.orderTo999SwitchCount order)
             (sorterCounts order)
 
@@ -115,7 +107,6 @@ module WsCfgs =
                         genMode
                         ordr
                         rngGen1
-                        usePfx
         |]
 
 
