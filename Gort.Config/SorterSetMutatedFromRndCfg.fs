@@ -13,6 +13,7 @@ type sorterSetMutatedFromRndCfg =
           mutationRate:mutationRate
         }
 
+
 module SorterSetMutatedFromRndCfg =
     let create (order:order)
                (rngGenCreate:rngGen)
@@ -55,12 +56,32 @@ module SorterSetMutatedFromRndCfg =
     let getSorterCountOriginal (cfg: sorterSetMutatedFromRndCfg) =
             cfg.sorterCountOriginal
 
+    let getSorterSetOriginalCfg (cfg:sorterSetMutatedFromRndCfg)
+        =
+        SorterSetRndCfg.create 
+            cfg.order
+            cfg.rngGenCreate
+            cfg.switchGenMode
+            cfg.switchCount
+            cfg.sorterCountOriginal
+
+
+    let getSorterSetMutatorCfg (cfg:sorterSetMutatedFromRndCfg)
+        =
+        SorterSetMutatorCfg.create 
+            cfg.order
+            cfg.switchGenMode
+            cfg.rngGenMutate
+            cfg.sorterCountMutated
+            cfg.mutationRate
+
+
     let getId 
             (cfg: sorterSetMutatedFromRndCfg) 
         = 
         [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
+          (cfg |> getSorterSetOriginalCfg) :> obj;
+          (cfg |> getSorterSetMutatorCfg) :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
@@ -80,16 +101,6 @@ module SorterSetMutatedFromRndCfg =
             (rdsg |> getMutationRate |> MutationRate.value )
 
 
-    let getSorterSetOriginalCfg (cfg:sorterSetMutatedFromRndCfg)
-        =
-        SorterSetRndCfg.create 
-            cfg.order
-            cfg.rngGenCreate
-            cfg.switchGenMode
-            cfg.switchCount
-            cfg.sorterCountOriginal
-
-
     let getSorterSetOriginalId (cfg: sorterSetMutatedFromRndCfg) 
         = 
         cfg |> getSorterSetOriginalCfg
@@ -107,18 +118,8 @@ module SorterSetMutatedFromRndCfg =
 
     let getSorterSetMutator (cfg:sorterSetMutatedFromRndCfg) 
         =
-        let sorterUniformMutator = 
-            SorterUniformMutator.create
-                    None
-                    None
-                    cfg.switchGenMode
-                    cfg.mutationRate
-            |> sorterMutator.Uniform
-
-        SorterSetMutator.load
-            sorterUniformMutator
-            (Some cfg.sorterCountMutated)
-            cfg.rngGenMutate
+        cfg |> getSorterSetMutatorCfg 
+            |> SorterSetMutatorCfg.getSorterSetMutator
 
 
     let makeMutantSorterSet

@@ -52,24 +52,6 @@ module SorterSetRnd_EvalAllBitsCfg
     let getSwitchCount (cfg: sorterSetRnd_EvalAllBitsCfg) = 
             cfg.switchCount
 
-    let getlId
-            (cfg: sorterSetRnd_EvalAllBitsCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetEvalId.create
-
-
-    let getFileName
-            (cfg:sorterSetRnd_EvalAllBitsCfg) 
-        =
-        cfg |> getlId 
-            |> SorterSetEvalId.value 
-            |> string
-
-
     let getSortableSetCfg
             (cfg:sorterSetRnd_EvalAllBitsCfg)
         =
@@ -85,6 +67,25 @@ module SorterSetRnd_EvalAllBitsCfg
             cfg.switchGenMode
             cfg.switchCount
             cfg.sorterCountCreate
+
+
+    let getlId
+            (cfg: sorterSetRnd_EvalAllBitsCfg) 
+        = 
+        [|
+          (cfg |> getSorterSetCfg) :> obj;
+          (cfg |> getSortableSetCfg) :> obj;
+          (cfg |> getSorterEvalMode) :> obj;
+        |] |> GuidUtils.guidFromObjs
+           |> SorterSetEvalId.create
+
+
+    let getFileName
+            (cfg:sorterSetRnd_EvalAllBitsCfg) 
+        =
+        cfg |> getlId 
+            |> SorterSetEvalId.value 
+            |> string
 
 
     let makeSorterSetEval

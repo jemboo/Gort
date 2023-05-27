@@ -385,7 +385,7 @@ module WsOps =
                     | Error m -> Console.WriteLine(m)
                 )
 
-    //********  sorterSetRnd_EvalAllBitsMerge_ReportCfg  ****************
+    //********  ssmfr_EvalAllBitsMerge_ReportCfg  ****************
 
     let make_ssmrMerge_Report 
             (cfg:ssmfr_EvalAllBitsMerge_ReportCfg) 

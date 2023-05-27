@@ -63,25 +63,6 @@ module Ssmfr_EvalAllBitsCfg
     let getSwitchCount (cfg: ssmfr_EvalAllBitsCfg) = 
             cfg.switchCount
 
-
-    let getId
-            (cfg: ssmfr_EvalAllBitsCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetEvalId.create
-
-
-    let getFileName
-            (cfg:ssmfr_EvalAllBitsCfg) 
-        =
-        cfg |> getId 
-            |> SorterSetEvalId.value 
-            |> string
-
-
     let getSortableSetCfg
             (cfg:ssmfr_EvalAllBitsCfg)
         =
@@ -99,6 +80,25 @@ module Ssmfr_EvalAllBitsCfg
             cfg.rngGenMutate
             cfg.sorterCountMutate
             cfg.mutationRate
+
+
+    let getId
+            (cfg: ssmfr_EvalAllBitsCfg) 
+        = 
+        [|
+          (cfg |> getSorterSetCfg) :> obj;
+          (cfg |> getSortableSetCfg) :> obj;
+          (cfg |> getSorterEvalMode) :> obj;
+        |] |> GuidUtils.guidFromObjs
+           |> SorterSetEvalId.create
+
+
+    let getFileName
+            (cfg:ssmfr_EvalAllBitsCfg) 
+        =
+        cfg |> getId 
+            |> SorterSetEvalId.value 
+            |> string
 
 
     let makeSorterSetEval

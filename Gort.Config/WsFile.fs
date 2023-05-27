@@ -15,7 +15,6 @@ module WsFile =
     let fileExt = "txt"
 
 
-
     let getFolder (fileType:wsFile) =
         match fileType with
         | SortableSet -> "SortableSets"
