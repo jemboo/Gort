@@ -116,4 +116,3 @@ module SorterSetRnd_EvalAllBitsCfg
                     (ssEval |> SorterSetEval.getSorterEvals  
                         |> Array.map(SorterEval.modifyForPrefix ordr tCmod))
         }
-               

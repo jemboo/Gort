@@ -41,101 +41,63 @@ module WsOps =
         }
 
 
+
+
     //********  SorterSet ****************
 
     let saveSorterSet
-            (cfg:sorterSetRndCfg)
+            (fileName:string)
             (sst:sorterSet) 
         =
         WsFile.writeToFile wsFile.SorterSet
-            (cfg |> SorterSetRndCfg.getFileName) 
+            fileName
             (sst |> SorterSetDto.toJson)
 
 
-    let loadSorterSet (cfg:sorterSetRndCfg) =
+    let loadSorterSet (fileName:string) =
           result {
-            let! txtD = WsFile.readAllText  wsFile.SorterSet
-                            (cfg |> SorterSetRndCfg.getFileName)
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSet
+                    fileName
             return! txtD |> SorterSetDto.fromJson
           }
 
 
-    let makeSorterSet (cfg) =
+    let makeSorterSet (cfg:sorterSetRndCfg) =
         result {
             let sorterSet = SorterSetRndCfg.makeSorterSet cfg
-            let! res = sorterSet |> saveSorterSet cfg
+            let! res = sorterSet 
+                       |> saveSorterSet
+                            (cfg |> SorterSetRndCfg.getFileName)
             return sorterSet
         }
 
 
     let getSorterSetRnd (cfg:sorterSetRndCfg) =
         result {
-            let loadRes = loadSorterSet cfg
+            let loadRes = loadSorterSet (cfg |> SorterSetRndCfg.getFileName)
             match loadRes with
             | Ok ss -> return ss
             | Error _ -> return! (makeSorterSet cfg)
         }
 
 
-
-    //********  SorterSetMutate  ****************
-
-    let saveMutatedSorterSet
-            (cfg:sorterSetMutatedFromRndCfg)
-            (sst:sorterSet) 
-        =
-        WsFile.writeToFile wsFile.SorterSet
-            (cfg |> SorterSetMutatedFromRndCfg.getFileName) 
-            (sst |> SorterSetDto.toJson)
-
-
-    let loadMutatedSorterSet 
-            (cfg:sorterSetMutatedFromRndCfg) =
-          result {
-            let! txtD = 
-                WsFile.readAllText  
-                    wsFile.SorterSet
-                    (cfg |> SorterSetMutatedFromRndCfg.getFileName)
-            return! txtD |> SorterSetDto.fromJson
-          }
-
-
-    let makeMutantSorterSet
-            (cfg:sorterSetMutatedFromRndCfg) 
-        =
-        result {
-            let! mutantSet = 
-                    SorterSetMutatedFromRndCfg.makeMutantSorterSet
-                        getSorterSetRnd
-                        cfg
-
-            let! resSs = mutantSet |> saveMutatedSorterSet cfg
-            return mutantSet
-        }
-        
-
-    let getMutantSorterSet
-            (cfg:sorterSetMutatedFromRndCfg) 
-        =
-        result {
-            let loadRes  = 
-                result {
-                    let! mut = loadMutatedSorterSet cfg
-                    return mut
-                }
-
-            match loadRes with
-            | Ok mut -> return mut
-            | Error _ -> return! (makeMutantSorterSet cfg)
-        }
-
-
     let getSorterSet
-            (cfg:sorterSetCfg) 
+            (cfg:sorterSetCfg)
         =
         match cfg with
-        | RndDenovo ssr -> getSorterSetRnd ssr
-        | RndDenovoMutated ssmfr -> getMutantSorterSet ssmfr
+        | RndDenovo ssr -> 
+                SorterSetRndCfg.getSorterSet2
+                    loadSorterSet
+                    saveSorterSet
+                    ssr
+        | RndDenovoMutated ssmfr -> 
+                SorterSetMutatedFromRndCfg.getMutantSorterSet2 
+                    loadSorterSet
+                    saveSorterSet
+                    ssmfr
+
 
 
     //********  ParentMap  ****************
@@ -282,12 +244,16 @@ module WsOps =
             (cfg:ssmfr_EvalAllBitsCfg) 
         =
         result {
+            let getMutantSsF = 
+                SorterSetMutatedFromRndCfg.getMutantSorterSet2
+                                        loadSorterSet
+                                        saveSorterSet
             let! ssEval = 
                     Ssmfr_EvalAllBitsCfg.makeSorterSetEval
                         WsCfgs.useParall
                         cfg
                         getSortableSet
-                        getMutantSorterSet
+                        getMutantSsF
 
             let! resSs = ssEval |> save_ssmfr_Eval cfg
             return ssEval

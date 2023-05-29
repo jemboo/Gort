@@ -99,4 +99,64 @@ module SorterSetRndCfg =
                 []
                 rdsg.switchCount
                 nextRng
-           
+
+
+
+    let makeSorterSet2 
+            (save: string -> sorterSet -> Result<bool, string>)
+            (rdsg: sorterSetRndCfg) 
+        = 
+        let sorterStId = getId rdsg
+        let randy = rdsg.rngGen |> Rando.fromRngGen
+        let nextRng () =
+            randy |> Rando.nextRngGen
+        result {
+            let ssRet =
+                match rdsg.switchGenMode with
+                | Switch -> 
+                    SorterSet.createRandomSwitches
+                        sorterStId
+                        rdsg.sorterCount
+                        rdsg.order
+                        []
+                        rdsg.switchCount
+                        nextRng
+
+                | Stage -> 
+                    SorterSet.createRandomStages2
+                        sorterStId
+                        rdsg.sorterCount
+                        rdsg.order
+                        []
+                        rdsg.switchCount
+                        nextRng
+
+                | StageSymmetric -> 
+                    SorterSet.createRandomSymmetric
+                        sorterStId
+                        rdsg.sorterCount
+                        rdsg.order
+                        []
+                        rdsg.switchCount
+                        nextRng
+            let! wasSaved = save (rdsg |> getFileName) ssRet
+            return ssRet
+        }
+
+
+    let getSorterSet2
+            (lookup: string -> Result<sorterSet, string>)
+            (save: string -> sorterSet -> Result<bool, string>)
+            (rdsg: sorterSetRndCfg)
+        =
+        result {
+            let loadRes  = 
+                result {
+                    let! mut = lookup (rdsg |> getFileName)
+                    return mut
+                }
+
+            match loadRes with
+            | Ok mut -> return mut
+            | Error _ -> return! (makeSorterSet2 save rdsg)
+        }

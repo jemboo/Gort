@@ -22,6 +22,7 @@
     <Compile Include="Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsFile.fs" />
+    <Compile Include="WsOps2.fs" />
     <Compile Include="WsOps.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
