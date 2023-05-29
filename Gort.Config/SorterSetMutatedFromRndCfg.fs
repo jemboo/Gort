@@ -76,11 +76,11 @@ module SorterSetMutatedFromRndCfg =
             cfg.mutationRate
 
 
-    let getId 
+    let getId
             (cfg: sorterSetMutatedFromRndCfg) 
         = 
         [|
-          (cfg |> getSorterSetOriginalCfg) :> obj;
+          (cfg |> getSorterSetOriginalCfg |> SorterSetRndCfg.getId |> SorterSetId.value) :> obj;
           (cfg |> getSorterSetMutatorCfg) :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create

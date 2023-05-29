@@ -43,7 +43,7 @@ module SorterSetRndCfg =
             (cfg: sorterSetRndCfg) 
         = 
         [|
-          (cfg.GetType()) :> obj;
+          "sorterSetRndCfg" :> obj;
            cfg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create

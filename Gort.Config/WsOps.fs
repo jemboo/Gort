@@ -129,7 +129,15 @@ module WsOps =
             | Error _ -> return! (makeMutantSorterSet cfg)
         }
 
-          
+
+    let getSorterSet
+            (cfg:sorterSetCfg) 
+        =
+        match cfg with
+        | RndDenovo ssr -> getSorterSetRnd ssr
+        | RndDenovoMutated ssmfr -> getMutantSorterSet ssmfr
+
+
     //********  ParentMap  ****************
     
     let saveSorterSetParentMap
@@ -182,21 +190,6 @@ module WsOps =
             | Error _ -> return! (makeSorterSetParentMap cfg)
         }
 
-        
-    
-
-    //********  SorterSetMutate and ParentMap  ****************
-
-    let getMutantSorterSetAndParentMap
-            (cfg:sorterSetMutatedFromRndCfg) 
-        =
-        result {
-            let! mutantSet = getMutantSorterSet cfg
-            let! parentMap = getParentMap 
-                                (cfg |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg)
-
-            return mutantSet, parentMap
-        }
 
 
     //********  SorterSetRnd_EvalAllBitsCfg  ****************

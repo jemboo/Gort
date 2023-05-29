@@ -170,7 +170,7 @@ module Ssmfr_EvalAllBits_ReportCfg
 
     let makeSorterSetEvalReport
             (cfg: ssmfr_EvalAllBits_ReportCfg)
-            (sortableSetCfgRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
         =
              seq {
                     for ordr in cfg.orders do
@@ -179,7 +179,7 @@ module Ssmfr_EvalAllBits_ReportCfg
                                 for rgnM in cfg.rngGenMutates do
                                     for mutR in cfg.mutationRates do
                                         getReportLines
-                                            sortableSetCfgRet
+                                            sorterSetEvalRet
                                             cfg
                                             ordr
                                             sgm

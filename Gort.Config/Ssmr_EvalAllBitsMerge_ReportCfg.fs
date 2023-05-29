@@ -251,7 +251,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
     let makeSorterSetEvalReport
             (cfg: ssmfr_EvalAllBitsMerge_ReportCfg)
             (sorterSetParentEvalRet: sorterSetRnd_EvalAllBitsCfg->Result<sorterSetEval,string>)
-            (sortableSetMutantRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetMutantEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
             (sorterParentMapRet: sorterSetParentMapCfg->Result<sorterSetParentMap,string>)
         =
              seq {
@@ -262,7 +262,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
                                     for mutR in cfg.mutationRates do
                                         getReportLines
                                             sorterSetParentEvalRet
-                                            sortableSetMutantRet
+                                            sorterSetMutantEvalRet
                                             sorterParentMapRet
                                             cfg
                                             ordr

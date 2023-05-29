@@ -86,8 +86,8 @@ module Ssmfr_EvalAllBitsCfg
             (cfg: ssmfr_EvalAllBitsCfg) 
         = 
         [|
-          (cfg |> getSorterSetCfg) :> obj;
-          (cfg |> getSortableSetCfg) :> obj;
+          (cfg |> getSorterSetCfg |> SorterSetMutatedFromRndCfg.getId |> SorterSetId.value) :> obj;
+          (cfg |> getSortableSetCfg |> SortableSetCertainCfg.getId |> SortableSetId.value) :> obj;
           (cfg |> getSorterEvalMode) :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetEvalId.create

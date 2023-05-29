@@ -43,7 +43,7 @@ module SorterSetMutatorCfg =
             (cfg: sorterSetMutatorCfg) 
         = 
         [|
-          (cfg.GetType()) :> obj;
+          "sorterSetMutatorCfg" :> obj;
            cfg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
@@ -58,7 +58,8 @@ module SorterSetMutatorCfg =
             (rdsg |> getMutationRate |> MutationRate.value )
 
 
-    let getSorterSetMutator (cfg:sorterSetMutatorCfg) 
+    let getSorterSetMutator 
+            (cfg:sorterSetMutatorCfg) 
         =
         let sorterUniformMutator = 
             SorterUniformMutator.create

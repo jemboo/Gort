@@ -1,13 +1,10 @@
 ﻿namespace global
 
-type ss_ShcCfg = 
+type ss_ShcRunCfg = 
     private
         { 
           order: order
-          rngGenCreate: rngGen
           switchGenMode: switchGenMode
-          switchCount: switchCount
-          sorterCountCreate: sorterCount
           rngGenMutate: rngGen
           sorterCountMutate: sorterCount
           mutationRate:mutationRate
@@ -15,17 +12,15 @@ type ss_ShcCfg =
           stagePrefixCount: stageCount
           stageWeight:stageWeight
           temp:temp
-          generation:generation
+          generationCount:generation
+          ssInitId:sorterSetId
         }
 
 
-module Ss_ShcCfg 
+module Ss_ShcRunCfg 
     =
     let create (order:order)
-               (rngGenCreate:rngGen)
                (switchGenMode:switchGenMode)
-               (switchCount:switchCount)
-               (sorterCountCreate:sorterCount)
                (rngGenMutate:rngGen)
                (sorterCountMutate:sorterCount)
                (mutationRate:mutationRate)
@@ -33,14 +28,12 @@ module Ss_ShcCfg
                (stagePrefixCount: stageCount)
                (stageWeight: stageWeight)
                (temp: temp)
-               (generation: generation)
+               (generationCount: generation)
+               (ssInitId: sorterSetId)
         =
         {
             order=order;
-            rngGenCreate=rngGenCreate;
             switchGenMode=switchGenMode;
-            switchCount=switchCount;
-            sorterCountCreate=sorterCountCreate;
             rngGenMutate=rngGenMutate;
             sorterCountMutate=sorterCountMutate;
             mutationRate=mutationRate
@@ -48,38 +41,33 @@ module Ss_ShcCfg
             stagePrefixCount=stagePrefixCount;
             stageWeight=stageWeight
             temp=temp
-            generation=generation;
+            generationCount=generationCount;
+            ssInitId=ssInitId;
         }
 
-    let getMutationRate (cfg: ss_ShcCfg) = 
+    let getMutationRate (cfg: ss_ShcRunCfg) = 
             cfg.mutationRate
 
-    let getOrder (cfg: ss_ShcCfg) = 
+    let getOrder (cfg: ss_ShcRunCfg) = 
             cfg.order
 
-    let getRngGenCreate (cfg: ss_ShcCfg) = 
-            cfg.rngGenCreate
-
-    let getSorterEvalMode  (cfg: ss_ShcCfg) = 
+    let getSorterEvalMode  (cfg: ss_ShcRunCfg) = 
             cfg.sorterEvalMode
 
-    let getStagePrefixCount  (cfg: ss_ShcCfg) = 
+    let getStagePrefixCount  (cfg: ss_ShcRunCfg) = 
             cfg.stagePrefixCount
 
-    let getSwitchGenMode (cfg: ss_ShcCfg) = 
+    let getSwitchGenMode (cfg: ss_ShcRunCfg) = 
             cfg.switchGenMode
 
-    let getSwitchCount (cfg: ss_ShcCfg) = 
-            cfg.switchCount
-
     let getSortableSetCfg
-            (cfg:ss_ShcCfg)
+            (cfg:ss_ShcRunCfg)
         =
         cfg.order |> SortableSetCertainCfg.makeAllBitsReducedOneStage
 
 
     let getlId
-            (cfg: ss_ShcCfg) 
+            (cfg: ss_ShcRunCfg) 
         = 
         [|
           "ss_ShcCfg" :> obj;
@@ -89,7 +77,7 @@ module Ss_ShcCfg
 
 
     let getFileName
-            (cfg:ss_ShcCfg) 
+            (cfg:ss_ShcRunCfg) 
         =
         cfg |> getlId 
             |> SorterSetEvalId.value 
@@ -97,7 +85,7 @@ module Ss_ShcCfg
 
 
     let getSs_GenStepCfg
-            (cfg:ss_ShcCfg)
+            (cfg:ss_ShcRunCfg)
         =
         Ss_GenStepCfg.create 
             cfg.order
@@ -110,13 +98,9 @@ module Ss_ShcCfg
             cfg.temp
 
 
-    let getSorterSetOriginalCfg 
-            (cfg:ss_ShcCfg)
-        =
-        SorterSetRndCfg.create 
-            cfg.order
-            cfg.rngGenCreate
-            cfg.switchGenMode
-            cfg.switchCount
-            cfg.sorterCountCreate
-   
+
+
+
+
+
+             

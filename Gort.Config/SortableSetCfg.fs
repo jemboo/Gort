@@ -22,7 +22,7 @@ module SortableSetCertainCfg =
     let getId 
                 (cfg:sortableSetCertainCfg) 
         = 
-        [| (cfg.GetType()) :> obj;
+        [| "sortableSetCertainCfg" :> obj;
             cfg :> obj|] |> GuidUtils.guidFromObjs
         |> SortableSetId.create
     
@@ -128,7 +128,7 @@ type sortableSetCfg =
 
 module SortableSetCfg =
 
-    let getSortableSetId 
+    let getId 
             (ssCfg: sortableSetCfg) 
         = 
         match ssCfg with

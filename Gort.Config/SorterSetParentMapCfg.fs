@@ -41,13 +41,13 @@ module SorterSetParentMapCfg =
             cfg.childSorterSetCount
 
 
-    let getId (cfg:sorterSetParentMapCfg) 
-        = 
-        [|
-          (cfg.GetType()) :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetParentMapId.create
+    let getId 
+            (cfg:sorterSetParentMapCfg) 
+        =
+        SorterSetParentMap.makeId
+            (cfg |> getParentSorterSetId)
+            (cfg |> getChildSorterSetId)
+
 
     let getFileName
             (cfg: sorterSetParentMapCfg) 

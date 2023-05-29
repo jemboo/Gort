@@ -73,8 +73,8 @@ module SorterSetRnd_EvalAllBitsCfg
             (cfg: sorterSetRnd_EvalAllBitsCfg) 
         = 
         [|
-          (cfg |> getSorterSetCfg) :> obj;
-          (cfg |> getSortableSetCfg) :> obj;
+          (cfg |> getSorterSetCfg |> SorterSetRndCfg.getId |> SorterSetId.value) :> obj;
+          (cfg |> getSortableSetCfg |> SortableSetCertainCfg.getId |> SortableSetId.value ) :> obj;
           (cfg |> getSorterEvalMode) :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetEvalId.create

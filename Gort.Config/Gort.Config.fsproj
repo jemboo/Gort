@@ -7,14 +7,16 @@
 
   <ItemGroup>
     <Compile Include="SorterSetRndCfg.fs" />
-    <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SorterSetMutatorCfg.fs" />
     <Compile Include="SorterSetParentMapCfg.fs" />
     <Compile Include="SorterSetMutatedFromRndCfg.fs" />
+    <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBits_ReportCfg.fs" />
+    <Compile Include="Ss_GenStepCfg.fs" />
+    <Compile Include="Ss_ShcRunCfg.fs" />
     <Compile Include="Ss_ShcCfg.fs" />
     <Compile Include="Ssmr_EvalAllBits_ReportCfg.fs" />
     <Compile Include="Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
