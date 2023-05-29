@@ -105,10 +105,10 @@ module Ssmfr_EvalAllBitsCfg
             (up:useParallel)
             (cfg: ssmfr_EvalAllBitsCfg)
             (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
-            (sorterSetCfgRet: sorterSetMutatedFromRndCfg->Result<sorterSet,string>)
+            (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)
+            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg |> sorterSetCfg.RndDenovoMutated)
             let! sortableSet = sortableSetCfgRet 
                                 ( cfg |> getSortableSetCfg
                                       |> sortableSetCfg.Certain   )

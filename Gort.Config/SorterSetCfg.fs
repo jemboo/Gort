@@ -15,33 +15,6 @@ module SorterSetCfg =
         | RndDenovoMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getId
 
-
-    let makeSorterSet
-            (ssCfg: sorterSetCfg) 
-            (lookup: (sorterSetCfg -> Result<sorterSet, string>) option)
-        = 
-        match ssCfg with
-        | RndDenovo cCfg -> 
-            cCfg |> SorterSetRndCfg.makeSorterSet |> Ok
-        | RndDenovoMutated cfg -> 
-            match lookup with
-            | Some lk ->
-                result {
-                    let! parentSorterSet = lk ssCfg
-                    let! mutantSet = 
-                            parentSorterSet |>
-                                SorterSetMutator.createMutantSorterSetFromParentMap
-                                    (cfg 
-                                        |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg
-                                        |> SorterSetParentMapCfg.makeParentMap)
-                                    (cfg |> SorterSetMutatedFromRndCfg.getSorterSetMutator)
-                            
-                    return mutantSet
-                }
-            | None -> failwith "" 
-
-
-
     let getOrder
             (ssCfg: sorterSetCfg) 
         = 
@@ -82,4 +55,40 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getFileName
         | RndDenovoMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getFileName
+
+
+    let rec getSorterSet
+            (save: string -> sorterSet -> Result<bool, string>)
+            (sorterSetLookup: string -> Result<sorterSet, string>)
+            (getParentMap: sorterSetParentMapCfg -> Result<sorterSetParentMap, string>)
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo cCfg -> 
+            cCfg |> SorterSetRndCfg.getSorterSet sorterSetLookup save
+        | RndDenovoMutated cfg -> 
+            result {
+                let parentCfg = 
+                        cfg |> SorterSetMutatedFromRndCfg.getSorterSetParentCfg
+                            |> sorterSetCfg.RndDenovo
+
+                let! parentSorterSet = getSorterSet save sorterSetLookup getParentMap parentCfg
+                let! parentMap = (cfg 
+                                    |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg
+                                    |> getParentMap)
+
+                let mutantSorterSetFileName = (cfg |> SorterSetMutatedFromRndCfg.getFileName)
+                let mutantSorterSetFinding = sorterSetLookup mutantSorterSetFileName
+
+                match mutantSorterSetFinding with
+                | Ok mutantSS -> return mutantSS
+                | Error _ -> 
+                    let! mutantSorterSet = 
+                            parentSorterSet |>
+                                SorterSetMutator.createMutantSorterSetFromParentMap
+                                    parentMap
+                                    (cfg |> SorterSetMutatedFromRndCfg.getSorterSetMutator)
+                    let! isSaved = save mutantSorterSetFileName  mutantSorterSet
+                    return mutantSorterSet
+            }
 

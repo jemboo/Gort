@@ -122,29 +122,7 @@ module SorterSetMutatedFromRndCfg =
             |> SorterSetMutatorCfg.getSorterSetMutator
 
 
-    //let makeMutantSorterSet
-    //        (lookup: sorterSetRndCfg -> Result<sorterSet, string>)
-    //        (mutCfg: sorterSetMutatedFromRndCfg)
-    //    =
-    //    let parentCfg = 
-    //        mutCfg 
-    //        |> getSorterSetOriginalCfg
-
-    //    result {
-    //        let! parentSorterSet = lookup parentCfg
-    //        let! mutantSet = 
-    //                parentSorterSet |>
-    //                    SorterSetMutator.createMutantSorterSetFromParentMap
-    //                        (mutCfg 
-    //                            |> getSorterSetParentMapCfg
-    //                            |> SorterSetParentMapCfg.makeParentMap)
-    //                        (mutCfg |> getSorterSetMutator)
-                            
-    //        return mutantSet
-    //    }  
-
-
-    let makeMutantSorterSet2
+    let makeMutantSorterSet
             (lookup: string -> Result<sorterSet, string>)
             (save: string -> sorterSet -> Result<bool, string>)
             (mutCfg: sorterSetMutatedFromRndCfg)
@@ -171,19 +149,19 @@ module SorterSetMutatedFromRndCfg =
         }
 
 
-    let getMutantSorterSet2
-            (lookup: string -> Result<sorterSet, string>)
+    let getMutantSorterSet
+            (ssGet: string -> Result<sorterSet, string>)
             (save: string -> sorterSet -> Result<bool, string>)
             (mutCfg: sorterSetMutatedFromRndCfg)
         =
         result {
             let loadRes  = 
                 result {
-                    let! mut = lookup (mutCfg |> getFileName)
+                    let! mut = ssGet (mutCfg |> getFileName)
                     return mut
                 }
 
             match loadRes with
             | Ok mut -> return mut
-            | Error _ -> return! (makeMutantSorterSet2 lookup save mutCfg)
+            | Error _ -> return! (makeMutantSorterSet ssGet save mutCfg)
         }

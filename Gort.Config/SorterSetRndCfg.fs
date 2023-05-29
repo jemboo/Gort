@@ -66,43 +66,8 @@ module SorterSetRndCfg =
             rdsg.sorterCount
 
 
-    let makeSorterSet (rdsg: sorterSetRndCfg) = 
-        let sorterStId = getId rdsg
-        let randy = rdsg.rngGen |> Rando.fromRngGen
-        let nextRng () =
-            randy |> Rando.nextRngGen
 
-        match rdsg.switchGenMode with
-        | Switch -> 
-            SorterSet.createRandomSwitches
-                sorterStId
-                rdsg.sorterCount
-                rdsg.order
-                []
-                rdsg.switchCount
-                nextRng
-
-        | Stage -> 
-            SorterSet.createRandomStages2
-                sorterStId
-                rdsg.sorterCount
-                rdsg.order
-                []
-                rdsg.switchCount
-                nextRng
-
-        | StageSymmetric -> 
-            SorterSet.createRandomSymmetric
-                sorterStId
-                rdsg.sorterCount
-                rdsg.order
-                []
-                rdsg.switchCount
-                nextRng
-
-
-
-    let makeSorterSet2 
+    let makeSorterSet
             (save: string -> sorterSet -> Result<bool, string>)
             (rdsg: sorterSetRndCfg) 
         = 
@@ -144,7 +109,7 @@ module SorterSetRndCfg =
         }
 
 
-    let getSorterSet2
+    let getSorterSet
             (lookup: string -> Result<sorterSet, string>)
             (save: string -> sorterSet -> Result<bool, string>)
             (rdsg: sorterSetRndCfg)
@@ -158,5 +123,5 @@ module SorterSetRndCfg =
 
             match loadRes with
             | Ok mut -> return mut
-            | Error _ -> return! (makeSorterSet2 save rdsg)
+            | Error _ -> return! (makeSorterSet save rdsg)
         }

@@ -41,65 +41,6 @@ module WsOps =
         }
 
 
-
-
-    //********  SorterSet ****************
-
-    let saveSorterSet
-            (fileName:string)
-            (sst:sorterSet) 
-        =
-        WsFile.writeToFile wsFile.SorterSet
-            fileName
-            (sst |> SorterSetDto.toJson)
-
-
-    let loadSorterSet (fileName:string) =
-          result {
-            let! txtD = 
-                WsFile.readAllText  
-                    wsFile.SorterSet
-                    fileName
-            return! txtD |> SorterSetDto.fromJson
-          }
-
-
-    let makeSorterSet (cfg:sorterSetRndCfg) =
-        result {
-            let sorterSet = SorterSetRndCfg.makeSorterSet cfg
-            let! res = sorterSet 
-                       |> saveSorterSet
-                            (cfg |> SorterSetRndCfg.getFileName)
-            return sorterSet
-        }
-
-
-    let getSorterSetRnd (cfg:sorterSetRndCfg) =
-        result {
-            let loadRes = loadSorterSet (cfg |> SorterSetRndCfg.getFileName)
-            match loadRes with
-            | Ok ss -> return ss
-            | Error _ -> return! (makeSorterSet cfg)
-        }
-
-
-    let getSorterSet
-            (cfg:sorterSetCfg)
-        =
-        match cfg with
-        | RndDenovo ssr -> 
-                SorterSetRndCfg.getSorterSet2
-                    loadSorterSet
-                    saveSorterSet
-                    ssr
-        | RndDenovoMutated ssmfr -> 
-                SorterSetMutatedFromRndCfg.getMutantSorterSet2 
-                    loadSorterSet
-                    saveSorterSet
-                    ssmfr
-
-
-
     //********  ParentMap  ****************
     
     let saveSorterSetParentMap
@@ -153,6 +94,37 @@ module WsOps =
         }
 
 
+    //********  SorterSet ****************
+
+    let saveSorterSet
+            (fileName:string)
+            (sst:sorterSet) 
+        =
+        WsFile.writeToFile wsFile.SorterSet
+            fileName
+            (sst |> SorterSetDto.toJson)
+
+
+    let loadSorterSet (fileName:string) =
+          result {
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSet
+                    fileName
+            return! txtD |> SorterSetDto.fromJson
+          }
+
+
+
+
+    let getSorterSet
+            (cfg:sorterSetCfg)
+        =
+        SorterSetCfg.getSorterSet
+                saveSorterSet
+                loadSorterSet
+                getParentMap
+                cfg
 
     //********  SorterSetRnd_EvalAllBitsCfg  ****************
 
@@ -189,7 +161,7 @@ module WsOps =
                         WsCfgs.useParall
                         cfg
                         getSortableSet
-                        getSorterSetRnd
+                        getSorterSet
 
             let! resSs = ssEval |> saveSorterSetEval cfg
             return ssEval
@@ -244,16 +216,12 @@ module WsOps =
             (cfg:ssmfr_EvalAllBitsCfg) 
         =
         result {
-            let getMutantSsF = 
-                SorterSetMutatedFromRndCfg.getMutantSorterSet2
-                                        loadSorterSet
-                                        saveSorterSet
             let! ssEval = 
                     Ssmfr_EvalAllBitsCfg.makeSorterSetEval
                         WsCfgs.useParall
                         cfg
                         getSortableSet
-                        getMutantSsF
+                        getSorterSet
 
             let! resSs = ssEval |> save_ssmfr_Eval cfg
             return ssEval
@@ -383,27 +351,29 @@ module WsOps =
 
 
     let makeEm () =
+        let res =
+            //WsCfgs.allSortableSetCfgs ()
+            //|> Array.map(getSortableSet)
 
-        //WsCfgs.allSortableSetCfgs ()
-        //|> Array.map(getSortableSet)
+            //WsCfgs.allSorterSetMutatedFromRndCfgs ()
+            //|> Array.map(sorterSetCfg.RndDenovoMutated)
+            //|> Array.map(getSorterSet)
 
-        //WsCfgs.allSorterSetMutatedFromRndCfgs ()
-        //|> Array.map(getMutantSorterSetAndParentMap)
-        //WsCfgs.allSorterSetRndCfgs ()
-        //|> Array.map(getSorterSetRnd)
+            //WsCfgs.allSorterSetRndCfgs ()
+            //|> Array.map(getSorterSetRnd)
 
 
-        //WsCfgs.allSsmfr_EvalAllBitsCfg ()
-        //|> Array.map(getSsmfr_EvalAllBits)
+            //WsCfgs.allSsmfr_EvalAllBitsCfg ()
+            //|> Array.map(getSsmfr_EvalAllBits)
 
-        //WsCfgs.allSsmfr_EvalAllBitsCfg ()
-        //|> Array.map(getSsmfr_EvalAllBits)
 
-        //WsCfgs.allSorterSetEvalReportCfgs ()
-        //|> Array.map(make_sorterSetRnd_Report)
+            //WsCfgs.allSorterSetEvalReportCfgs ()
+            //|> Array.map(make_sorterSetRnd_Report)
 
-        //WsCfgs.allssmfrEvalReportCfgs ()
-        //|> Array.map(make_ssmr_Report)
+            //WsCfgs.allssmfrEvalReportCfgs ()
+            //|> Array.map(make_ssmr_Report)
 
-        WsCfgs.allssmfrEvalMergeReportCfgs ()
-        |> Array.map(make_ssmrMerge_Report)
+            WsCfgs.allssmfrEvalMergeReportCfgs ()
+            |> Array.map(make_ssmrMerge_Report)
+
+        res

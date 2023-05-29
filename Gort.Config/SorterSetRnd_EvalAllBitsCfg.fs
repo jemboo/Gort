@@ -92,10 +92,10 @@ module SorterSetRnd_EvalAllBitsCfg
             (up:useParallel)
             (cfg: sorterSetRnd_EvalAllBitsCfg)
             (sortableSetCfgRet: sortableSetCfg->Result<sortableSet,string>)
-            (sorterSetCfgRet: sorterSetRndCfg->Result<sorterSet,string>)
+            (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg)
+            let! sorterSet = sorterSetCfgRet (cfg  |> getSorterSetCfg |> sorterSetCfg.RndDenovo)
             let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCfg
                                                       |> sortableSetCfg.Certain )
             let! ssEval = 
