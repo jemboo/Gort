@@ -76,7 +76,8 @@ module Sorter =
     let prependSwitches 
             (sorterD:sorterId)
             (newSwitches: seq<switch>) 
-            (sorter: sorter) =
+            (sorter: sorter) 
+        =
         let newSwitches = sorter.switches |> Seq.append newSwitches |> Seq.toArray
         fromSwitches sorterD (sorter |> getOrder) newSwitches
 
@@ -84,7 +85,8 @@ module Sorter =
     let removeSwitchesFromTheStart
             (sorterD:sorterId)
             (newLength: switchCount) 
-            (sortr: sorter) =
+            (sortr: sorter) 
+        =
         let curSwitchCt = sortr |> getSwitchCount |> SwitchCount.value
         let numSwitchesToRemove = curSwitchCt - (SwitchCount.value newLength)
 
@@ -103,7 +105,8 @@ module Sorter =
     let removeSwitchesFromTheEnd
             (sorterD:sorterId)
             (newLength: switchCount) 
-            (sortr: sorter) =
+            (sortr: sorter) 
+        =
         let curSwitchCt = sortr |> getSwitchCount |> SwitchCount.value
         let numSwitchesToRemove = curSwitchCt - (SwitchCount.value newLength)
 
@@ -114,7 +117,10 @@ module Sorter =
             fromSwitches sorterD (sortr |> getOrder) trimmedSwitches |> Ok
 
 
-    let getSwitchesFromFirstStages (stageCount: stageCount) (sorter: sorter) =
+    let getSwitchesFromFirstStages 
+            (stageCount: stageCount) 
+            (sorter: sorter) 
+        =
         sorter.switches
         |> Stage.fromSwitches sorter.order
         |> Seq.take (StageCount.value stageCount)
@@ -127,7 +133,8 @@ module Sorter =
             (order: order) 
             (switchCtTarget: switchCount) 
             (wPfx: switch seq) 
-            (twoCycleSeq: twoCycle seq) =
+            (twoCycleSeq: twoCycle seq) 
+        =
         let switches =
             twoCycleSeq |> Seq.map (fun tc -> Switch.fromTwoCycle tc) |> Seq.concat
 
@@ -138,7 +145,8 @@ module Sorter =
             (sorterD:sorterId)
             (order: order) 
             (wPfx: switch seq) 
-            (switchCount: switchCount) =
+            (switchCount: switchCount) 
+        =
         let switches =
             TwoCycle.makeAltEvenOdd order (Permutation.identity order)
             |> Seq.map (fun tc -> Switch.fromTwoCycle tc)

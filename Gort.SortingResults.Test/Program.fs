@@ -30,7 +30,7 @@ module Program =
         let rndGn () = 
             randy |> Rando.nextRngGen
 
-        let sorterSt = SorterSet.createRandomOrbitDraws sorterSetId sorterCt coreTwoCyc permSeed [||] switchCt rndGn
+        let sorterSt = SorterSet.createRandomOrbitDraws sorterSetId sorterCt coreTwoCyc permSeed None [||] switchCt rndGn
 
         let rolloutFormt = rolloutFormat.RfBs64
         let sortableStId = SortableSetId.create (Guid.NewGuid())
@@ -86,7 +86,8 @@ module Program =
                             sorterSetId 
                             sorterBatchCt 
                             coreTwoCyc 
-                            sorterPermRoot 
+                            sorterPermRoot
+                            None
                             [||] 
                             switchCt 
                             rndGn2

@@ -115,8 +115,6 @@ module WsOps =
           }
 
 
-
-
     let getSorterSet
             (cfg:sorterSetCfg)
         =

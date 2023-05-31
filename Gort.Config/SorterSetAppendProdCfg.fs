@@ -1,7 +1,9 @@
 ﻿namespace global
 
+open System
 
-type sorterSetRndCfg = 
+
+type sorterSetAppendProdCfg = 
     private
         { 
           order: order
@@ -12,7 +14,7 @@ type sorterSetRndCfg =
         }
 
 
-module SorterSetRndCfg =
+module SorterSetAppendProdCfg =
     let create (order:order)
                (rngGen:rngGen)
                (switchGenMode:switchGenMode)
@@ -27,7 +29,7 @@ module SorterSetRndCfg =
             sorterCount=sorterCount;
         }
 
-    let getProperties (rdsg: sorterSetRndCfg) = 
+    let getProperties (rdsg: sorterSetAppendProdCfg) = 
         [|
             ("order", rdsg.order :> obj);
             ("rngGen", rdsg.rngGen :> obj);
@@ -36,20 +38,19 @@ module SorterSetRndCfg =
             ("sorterCount", rdsg.sorterCount :> obj);
         |]
 
-    let getOrder (rdsg: sorterSetRndCfg) = 
+    let getOrder (rdsg: sorterSetAppendProdCfg) = 
             rdsg.order
 
-    let getRngGen (rdsg: sorterSetRndCfg) = 
+    let getRngGen (rdsg: sorterSetAppendProdCfg) = 
             rdsg.rngGen
 
-    let getSwitchGenMode (rdsg: sorterSetRndCfg) = 
+    let getSwitchGenMode (rdsg: sorterSetAppendProdCfg) = 
             rdsg.switchGenMode
 
-    let getSwitchCount (rdsg: sorterSetRndCfg) = 
+    let getSwitchCount (rdsg: sorterSetAppendProdCfg) = 
             rdsg.switchCount
 
-    let getId 
-            (cfg: sorterSetRndCfg) 
+    let getBaseId (cfg: sorterSetAppendProdCfg) 
         = 
         [|
           "sorterSetRndCfg" :> obj;
@@ -57,38 +58,47 @@ module SorterSetRndCfg =
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
-    let getFileName
-            (cfg:sorterSetRndCfg) 
+    let getId (cfg: sorterSetAppendProdCfg) 
+        = 
+        [|
+          "sorterSetAppendProdCfg" :> obj;
+           cfg :> obj;
+        |] |> GuidUtils.guidFromObjs
+           |> SorterSetId.create
+
+    let getFileName (cfg:sorterSetAppendProdCfg) 
         =
         cfg |> getId |> SorterSetId.value |> string
 
 
     let getConfigName 
-            (rdsg:sorterSetRndCfg) 
+            (rdsg:sorterSetAppendProdCfg) 
         =
         sprintf "%d_%s"
             (rdsg |> getOrder |> Order.value)
             (rdsg |> getSwitchGenMode |> string)
 
 
-    let getSorterCount (rdsg: sorterSetRndCfg) = 
+    let getSorterCount (rdsg: sorterSetAppendProdCfg) 
+        =
             rdsg.sorterCount
 
 
     let makeSorterSet
             (save: string -> sorterSet -> Result<bool, string>)
-            (rdsg: sorterSetRndCfg) 
-        = 
+            (rdsg: sorterSetAppendProdCfg) 
+        =
+        let sorterStIdBase = getBaseId rdsg
         let sorterStId = getId rdsg
         let randy = rdsg.rngGen |> Rando.fromRngGen
         let nextRng () =
             randy |> Rando.nextRngGen
         result {
-            let ssRet =
+            let ssBase =
                 match rdsg.switchGenMode with
                 | Switch -> 
                     SorterSet.createRandomSwitches
-                        sorterStId
+                        sorterStIdBase
                         rdsg.sorterCount
                         rdsg.order
                         []
@@ -97,7 +107,7 @@ module SorterSetRndCfg =
 
                 | Stage -> 
                     SorterSet.createRandomStages2
-                        sorterStId
+                        sorterStIdBase
                         rdsg.sorterCount
                         rdsg.order
                         []
@@ -106,12 +116,19 @@ module SorterSetRndCfg =
 
                 | StageSymmetric -> 
                     SorterSet.createRandomSymmetric
-                        sorterStId
+                        sorterStIdBase
                         rdsg.sorterCount
                         rdsg.order
                         []
                         rdsg.switchCount
                         nextRng
+
+            let mapping, ssRet = 
+                sorterStId 
+                        |> SorterSet.createAppendSet 
+                            (ssBase |> SorterSet.getSorters)
+                            rdsg.order
+
             let! wasSaved = save (rdsg |> getFileName) ssRet
             return ssRet
         }
@@ -120,7 +137,7 @@ module SorterSetRndCfg =
     let getSorterSet
             (lookup: string -> Result<sorterSet, string>)
             (save: string -> sorterSet -> Result<bool, string>)
-            (rdsg: sorterSetRndCfg)
+            (rdsg: sorterSetAppendProdCfg)
         =
         result {
             let loadRes  = 

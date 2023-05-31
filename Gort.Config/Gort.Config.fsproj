@@ -6,10 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Components\SorterSetParentMapCfg.fs" />
+    <Compile Include="Components\SorterSetMutatorCfg.fs" />
     <Compile Include="SorterSetRndCfg.fs" />
-    <Compile Include="SorterSetMutatorCfg.fs" />
-    <Compile Include="SorterSetParentMapCfg.fs" />
     <Compile Include="SorterSetMutatedFromRndCfg.fs" />
+    <Compile Include="SorterSetAppendProdCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />

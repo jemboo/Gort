@@ -33,6 +33,12 @@ module SorterSet =
             |> Seq.filter(fun ov -> ov |> Option.isSome)
             |> Seq.map(fun ov -> ov |> Option.get)
             |> CollectionOps.takeUpto (maxCt |> SorterCount.value)
+    
+    let getSorterById
+            (id: sorterId) 
+            (sorterSet: sorterSet)
+        =
+        sorterSet.sorterMap.TryFind id
 
 
     let generateSorterIds 
@@ -172,12 +178,13 @@ module SorterSet =
             (sorterCt: sorterCount)
             (coreTc:twoCycle) 
             (permSeed:permutation)
+            (maxOrbit:int option)
             (wPfx: switch seq)
             (switchCount: switchCount)
             (rnGen: unit -> rngGen)   
         =
         let perms = permSeed 
-                    |> Permutation.powers None
+                    |> Permutation.powers maxOrbit
                     |> Seq.toArray
         let order = (coreTc |> TwoCycle.getOrder)
         createRandom 
@@ -242,3 +249,63 @@ module SorterSet =
         |> Seq.take(sorterCt |> SorterCount.value)
         |> load sorterStId order
 
+
+    // creates a Map<mergeId*(pfxId*sfxId)>
+    let createAppendSetMap
+            (sorterStIdPfx:sorterSetId)
+            (sorterCtPfx:sorterCount)
+            (sorterStIdSfx:sorterSetId)
+            (sorterCtSfx:sorterCount)
+            (sorterStIdAppendSet:sorterSetId)
+        =
+        let sorterIdsPfx = 
+                generateSorterIds sorterStIdPfx 
+                    |> Seq.take (sorterCtPfx |> SorterCount.value) 
+                    |> Seq.toArray
+
+        let sorterIdsSfx = 
+                generateSorterIds sorterStIdSfx 
+                    |> Seq.take (sorterCtSfx |> SorterCount.value) 
+                    |> Seq.toArray
+
+        let sorterIdInputs = 
+            CollectionOps.cartesianProduct sorterIdsPfx sorterIdsSfx
+            |> Seq.toArray
+
+        let sorterIdMerged = generateSorterIds sorterStIdAppendSet
+
+        sorterIdInputs
+        |> Seq.zip sorterIdMerged
+        |> Seq.toArray
+        |> Map.ofSeq
+
+
+    let createAppendSet 
+            (sorterSetPfx: sorterSet)
+            (sorterSetSfx: sorterSet)
+            (sorterSetIdAppendSet:sorterSetId)
+        =
+        let appendSetMap = 
+            createAppendSetMap
+                (sorterSetPfx |> getId)
+                (sorterSetPfx |> getSorterCount)
+                (sorterSetSfx |> getId)
+                (sorterSetSfx |> getSorterCount)
+                sorterSetIdAppendSet
+
+        let _mergeEm mergeId pfxId sfxId =
+            let sPfx = sorterSetPfx |> getSorterById pfxId
+            let sSfx = sorterSetPfx |> getSorterById sfxId
+            match sPfx, sSfx with
+            | Some pfx, Some sfx -> 
+                pfx |> Sorter.appendSwitches mergeId (sfx |> Sorter.getSwitches) |> Ok
+            | _ -> "sorter not found" |> Error
+
+
+        let mergedSorters =
+                appendSetMap 
+                |> Map.toSeq
+                |> Seq.map(fun (mergeId, (pfxId, sfxId)) -> _mergeEm mergeId pfxId sfxId)
+                |> Seq.toList
+                |> Result.sequence
+        mergedSorters

@@ -6,6 +6,16 @@ type sorterSetCfg =
 
 module SorterSetCfg =
 
+    let getProperties 
+            (ssCfg: sorterSetCfg) 
+        = 
+        match ssCfg with
+        | RndDenovo rdssCfg -> 
+            rdssCfg |> SorterSetRndCfg.getProperties
+        | RndDenovoMutated cfg -> 
+            cfg |> SorterSetMutatedFromRndCfg.getProperties
+
+
     let getId 
             (ssCfg: sorterSetCfg) 
         = 
@@ -23,7 +33,6 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getOrder
         | RndDenovoMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getOrder
-
 
 
     let getSorterSetCt
