@@ -130,6 +130,24 @@ module WsCfgs =
         |]
 
 
+    ////********  sorterSetRnd_EvalAllBitsCfg  ****************
+
+    let allSorterSetRnd_EvalAllBitsCfg () =
+         [|
+            for ordr in orders do
+             for genMode in switchGenModes do
+                 for mutRate in mutRates do
+                    SorterSetRnd_EvalAllBitsCfg.create
+                        ordr
+                        rngGen1
+                        genMode
+                        (SwitchCount.orderTo999SwitchCount ordr)
+                        (sorterCounts ordr)
+                        sorterEvalMode.DontCheckSuccess
+                        (1 |> StageCount.create)
+         |]
+
+
 
 
     ////********  Ssmfr_EvalAllBitsCfg  ****************

@@ -15,6 +15,7 @@
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
+    <Compile Include="SorterSet_EvalCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBits_ReportCfg.fs" />
     <Compile Include="Ss_GenStepCfg.fs" />
     <Compile Include="Ss_ShcRunCfg.fs" />

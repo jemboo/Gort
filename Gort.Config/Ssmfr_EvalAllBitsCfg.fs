@@ -108,7 +108,7 @@ module Ssmfr_EvalAllBitsCfg
             (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg |> sorterSetCfg.RndDenovoMutated)
+            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg |> sorterSetCfg.RndMutated)
             let! sortableSet = sortableSetCfgRet 
                                 ( cfg |> getSortableSetCfg
                                       |> sortableSetCfg.Certain   )

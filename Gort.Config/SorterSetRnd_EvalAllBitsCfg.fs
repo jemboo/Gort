@@ -1,6 +1,5 @@
 ﻿namespace global
 
-
 type sorterSetRnd_EvalAllBitsCfg = 
     private
         { 
@@ -95,7 +94,7 @@ module SorterSetRnd_EvalAllBitsCfg
             (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg  |> getSorterSetCfg |> sorterSetCfg.RndDenovo)
+            let! sorterSet = sorterSetCfgRet (cfg  |> getSorterSetCfg |> sorterSetCfg.Rnd)
             let! sortableSet = sortableSetCfgRet (cfg |> getSortableSetCfg
                                                       |> sortableSetCfg.Certain )
             let! ssEval = 

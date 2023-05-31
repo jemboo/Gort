@@ -1,8 +1,9 @@
 ﻿namespace global
       
 type sorterSetCfg = 
-     | RndDenovo of sorterSetRndCfg
-     | RndDenovoMutated of sorterSetMutatedFromRndCfg
+     | Rnd of sorterSetRndCfg
+     | RndMutated of sorterSetMutatedFromRndCfg
+
 
 module SorterSetCfg =
 
@@ -10,9 +11,9 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo rdssCfg -> 
+        | Rnd rdssCfg -> 
             rdssCfg |> SorterSetRndCfg.getProperties
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getProperties
 
 
@@ -20,18 +21,18 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo rdssCfg -> 
+        | Rnd rdssCfg -> 
             rdssCfg |> SorterSetRndCfg.getId
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getId
 
     let getOrder
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo cCfg -> 
+        | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getOrder
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getOrder
 
 
@@ -39,9 +40,9 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo cCfg -> 
+        | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getSorterCount
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getSorterCountMutated
 
 
@@ -50,9 +51,9 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo cCfg -> 
+        | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getConfigName
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getConfigName
 
 
@@ -60,9 +61,9 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo cCfg -> 
+        | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getFileName
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getFileName
 
 
@@ -73,18 +74,18 @@ module SorterSetCfg =
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | RndDenovo cCfg -> 
+        | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getSorterSet sorterSetLookup save
-        | RndDenovoMutated cfg -> 
+        | RndMutated cfg -> 
             result {
                 let parentCfg = 
                         cfg |> SorterSetMutatedFromRndCfg.getSorterSetParentCfg
-                            |> sorterSetCfg.RndDenovo
+                            |> sorterSetCfg.Rnd
 
                 let! parentSorterSet = getSorterSet save sorterSetLookup getParentMap parentCfg
-                let! parentMap = (cfg 
-                                    |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg
-                                    |> getParentMap)
+                let! parentMap = ( cfg 
+                                   |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg
+                                   |> getParentMap )
 
                 let mutantSorterSetFileName = (cfg |> SorterSetMutatedFromRndCfg.getFileName)
                 let mutantSorterSetFinding = sorterSetLookup mutantSorterSetFileName

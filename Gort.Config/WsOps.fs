@@ -124,36 +124,51 @@ module WsOps =
                 getParentMap
                 cfg
 
-    //********  SorterSetRnd_EvalAllBitsCfg  ****************
+
+    //********  SorterSet_Eval  ****************
+
 
     let saveSorterSetEval
-            (cfg:sorterSetRnd_EvalAllBitsCfg)
+            (fileName:string)
             (sst:sorterSetEval) 
         =
-        let fileName = cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName 
         WsFile.writeToFile 
             wsFile.SorterSetEval 
             fileName 
             (sst |> SorterSetEvalDto.toJson )
 
 
-    let loadSorterSetRnd_EvalAllBitsCfg
-            (cfg:sorterSetRnd_EvalAllBitsCfg) 
-          =
-          result {
+    let loadSorterSet_Eval (fileName:string) 
+        =
+        result {
             let! txtD = 
                 WsFile.readAllText  
                     wsFile.SorterSetEval
-                    (cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName)
+                    fileName
             return! txtD |> SorterSetEvalDto.fromJson
-          }
+        }
 
 
+    let getSorterSetEval
+            (up:useParallel)
+            (cfg:sorterSet_EvalCfg) 
+        =
+        SorterSet_EvalCfg.getSorterSetEval
+            getSortableSet
+            getSorterSet
+            saveSorterSetEval
+            loadSorterSet_Eval
+            up
+            cfg
+
+
+    //********  SorterSetRnd_EvalAllBitsCfg  ****************
 
     let makeSorterSetRnd_EvalAllBitsCfg
             (cfg:sorterSetRnd_EvalAllBitsCfg) 
         =
         result {
+            let fileName = cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName 
             let! ssEval = 
                     SorterSetRnd_EvalAllBitsCfg.makeSorterSetEval
                         WsCfgs.useParall
@@ -161,7 +176,7 @@ module WsOps =
                         getSortableSet
                         getSorterSet
 
-            let! resSs = ssEval |> saveSorterSetEval cfg
+            let! resSs = ssEval |> saveSorterSetEval fileName
             return ssEval
         }
 
@@ -172,7 +187,8 @@ module WsOps =
         result {
             let loadRes  = 
                 result {
-                    let! ssEval = loadSorterSetRnd_EvalAllBitsCfg cfg
+                    let fileName = cfg |> SorterSetRnd_EvalAllBitsCfg.getFileName
+                    let! ssEval = fileName |> loadSorterSet_Eval
                     return ssEval
                 }
 
@@ -186,34 +202,11 @@ module WsOps =
 
     //********  ssmfr_EvalAllBitsCfg  ****************
 
-    let save_ssmfr_Eval
-            (cfg:ssmfr_EvalAllBitsCfg)
-            (sst:sorterSetEval) 
-        =
-        let fileName = cfg |> Ssmfr_EvalAllBitsCfg.getFileName 
-        WsFile.writeToFile 
-            wsFile.SorterSetEval 
-            fileName 
-            (sst |> SorterSetEvalDto.toJson )
-
-
-    let loadSsmfr_EvalAllBitsCfg
-            (cfg:ssmfr_EvalAllBitsCfg) 
-          =
-          result {
-            let! txtD = 
-                WsFile.readAllText  
-                    wsFile.SorterSetEval
-                    (cfg |> Ssmfr_EvalAllBitsCfg.getFileName)
-            return! txtD |> SorterSetEvalDto.fromJson
-          }
-
-
-
     let makeSsmfr_EvalAllBitsCfg
             (cfg:ssmfr_EvalAllBitsCfg) 
         =
         result {
+            let fileName = cfg |> Ssmfr_EvalAllBitsCfg.getFileName 
             let! ssEval = 
                     Ssmfr_EvalAllBitsCfg.makeSorterSetEval
                         WsCfgs.useParall
@@ -221,7 +214,7 @@ module WsOps =
                         getSortableSet
                         getSorterSet
 
-            let! resSs = ssEval |> save_ssmfr_Eval cfg
+            let! resSs = ssEval |> saveSorterSetEval fileName
             return ssEval
         }
 
@@ -232,7 +225,8 @@ module WsOps =
         result {
             let loadRes  = 
                 result {
-                    let! ssEval = loadSsmfr_EvalAllBitsCfg cfg
+                    let fileName = cfg |> Ssmfr_EvalAllBitsCfg.getFileName
+                    let! ssEval = fileName |> loadSorterSet_Eval
                     return ssEval
                 }
 
@@ -354,11 +348,21 @@ module WsOps =
             //|> Array.map(getSortableSet)
 
             //WsCfgs.allSorterSetMutatedFromRndCfgs ()
-            //|> Array.map(sorterSetCfg.RndDenovoMutated)
+            //|> Array.map(sorterSetCfg.RndMutated)
             //|> Array.map(getSorterSet)
 
             //WsCfgs.allSorterSetRndCfgs ()
-            //|> Array.map(getSorterSetRnd)
+            //|> Array.map(sorterSetCfg.Rnd)
+            //|> Array.map(getSorterSet)
+
+            
+            //WsCfgs.allSorterSetRnd_EvalAllBitsCfg ()
+            //|> Array.map(sorterSet_EvalCfg.Rnd)
+            //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
+
+            WsCfgs.allSsmfr_EvalAllBitsCfg ()
+            |> Array.map(sorterSet_EvalCfg.RndMutated)
+            |> Array.map(getSorterSetEval ( true |> UseParallel.create))
 
 
             //WsCfgs.allSsmfr_EvalAllBitsCfg ()
@@ -371,7 +375,7 @@ module WsOps =
             //WsCfgs.allssmfrEvalReportCfgs ()
             //|> Array.map(make_ssmr_Report)
 
-            WsCfgs.allssmfrEvalMergeReportCfgs ()
-            |> Array.map(make_ssmrMerge_Report)
+            //WsCfgs.allssmfrEvalMergeReportCfgs ()
+            //|> Array.map(make_ssmrMerge_Report)
 
         res

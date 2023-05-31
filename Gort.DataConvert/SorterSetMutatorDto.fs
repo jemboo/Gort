@@ -4,9 +4,9 @@ open Microsoft.FSharp.Core
 
 type sorterSetParentMapDto  = {
         id:Guid;
-        parentMap:Map<Guid, Guid>;
         sorterSetIdMutant: Guid; 
         sorterSetIdParent: Guid; 
+        parentMap:Map<Guid, Guid>;
     }
 
 module SorterSetParentMapDto =
