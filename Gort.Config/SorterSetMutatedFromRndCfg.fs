@@ -9,7 +9,7 @@ type sorterSetMutatedFromRndCfg =
           switchCount: switchCount
           sorterCountOriginal: sorterCount
           rngGenMutate: rngGen
-          sorterCountMutated: sorterCount
+          sorterCount: sorterCount
           mutationRate:mutationRate
         }
 
@@ -21,7 +21,7 @@ module SorterSetMutatedFromRndCfg =
                (switchCount:switchCount)
                (sorterCountOriginal:sorterCount)
                (rngGenMutate:rngGen)
-               (sorterCountMutated:sorterCount)
+               (sorterCount:sorterCount)
                (mutationRate:mutationRate)
         =
         {
@@ -31,9 +31,10 @@ module SorterSetMutatedFromRndCfg =
             switchCount=switchCount;
             sorterCountOriginal=sorterCountOriginal;
             rngGenMutate=rngGenMutate;
-            sorterCountMutated=sorterCountMutated;
+            sorterCount=sorterCount;
             mutationRate=mutationRate
         }
+
 
     let getProperties (cfg: sorterSetMutatedFromRndCfg) = 
         [|
@@ -42,9 +43,8 @@ module SorterSetMutatedFromRndCfg =
             ("switchGenMode", cfg.switchGenMode :> obj);
             ("switchCount", cfg.switchCount :> obj);
             ("sorterCountOriginal", cfg.sorterCountOriginal :> obj);
-            ("sorterCountOriginal", cfg.sorterCountOriginal :> obj);
             ("rngGenMutate", cfg.rngGenMutate :> obj);
-            ("sorterCountMutated", cfg.sorterCountMutated :> obj);
+            ("sorterCount", cfg.sorterCount :> obj);
             ("mutationRate", cfg.mutationRate :> obj);
         |]
 
@@ -64,8 +64,8 @@ module SorterSetMutatedFromRndCfg =
     let getMutationRate (cfg: sorterSetMutatedFromRndCfg) =
             cfg.mutationRate
 
-    let getSorterCountMutated (cfg: sorterSetMutatedFromRndCfg) =
-            cfg.sorterCountMutated
+    let getSorterCount (cfg: sorterSetMutatedFromRndCfg) =
+            cfg.sorterCount
 
     let getSorterCountOriginal (cfg: sorterSetMutatedFromRndCfg) =
             cfg.sorterCountOriginal
@@ -86,12 +86,11 @@ module SorterSetMutatedFromRndCfg =
             cfg.order
             cfg.switchGenMode
             cfg.rngGenMutate
-            cfg.sorterCountMutated
+            cfg.sorterCount
             cfg.mutationRate
 
 
-    let getId
-            (cfg: sorterSetMutatedFromRndCfg) 
+    let getId (cfg: sorterSetMutatedFromRndCfg) 
         = 
         [|
           (cfg |> getSorterSetParentCfg |> SorterSetRndCfg.getId |> SorterSetId.value) :> obj;
@@ -127,7 +126,7 @@ module SorterSetMutatedFromRndCfg =
             (cfg |> getSorterSetOriginalId)
             (cfg |> getSorterCountOriginal)
             (cfg |> getId)
-            (cfg |> getSorterCountMutated)
+            (cfg |> getSorterCount)
 
 
     let getSorterSetMutator (cfg:sorterSetMutatedFromRndCfg) 

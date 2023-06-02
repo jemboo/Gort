@@ -91,19 +91,20 @@ type SorterSetFixture() =
 
     [<TestMethod>]
     member this.createAppendSet() = 
-      let sorterSetIdBase = Guid.NewGuid() |> SorterSetId.create
-      let sorterSetIdAppendSet = Guid.NewGuid() |> SorterSetId.create
+      let sorterSetBaseId = Guid.NewGuid() |> SorterSetId.create
+      let sorterSetAppendedId = Guid.NewGuid() |> SorterSetId.create
       let ordr = 16 |> Order.createNr
       let wPfx = Seq.empty<switch>
       let swFreq = 1.0 |> SwitchFrequency.create
-      let switchCt = 2 |> SwitchCount.create
+      let switchCt = 20 |> SwitchCount.create
       let baseSorterCt = 2 |> SorterCount.create
       let randy = Rando.create rngType.Lcg (123 |> RandomSeed.create)
       let rndGn () = 
         randy |> Rando.nextRngGen
 
-      let sorterStBase = SorterSet.createRandomStages 
-                                sorterSetIdBase 
+      let sorterStBase = 
+        SorterSet.createRandomStages 
+                                sorterSetBaseId 
                                 baseSorterCt 
                                 swFreq 
                                 ordr 
@@ -111,19 +112,20 @@ type SorterSetFixture() =
                                 switchCt 
                                 rndGn
 
+
       let appendSet = 
         SorterSet.createAppendSet
                     sorterStBase
                     sorterStBase
-                    sorterSetIdAppendSet
-        |> Result.ExtractOrThrow
-
-      let appendSetMap =
+                    sorterSetAppendedId
+                    
+      let appendSetMap = 
             SorterSet.createAppendSetMap
-                sorterSetIdBase
+                sorterSetBaseId
                 baseSorterCt
-                sorterSetIdBase
+                sorterSetBaseId
                 baseSorterCt
-                sorterSetIdAppendSet
+                sorterSetAppendedId
+
 
       Assert.AreEqual(1,1)

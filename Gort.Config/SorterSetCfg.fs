@@ -3,7 +3,7 @@
 type sorterSetCfg = 
      | Rnd of sorterSetRndCfg
      | RndMutated of sorterSetMutatedFromRndCfg
-
+     | AppendProd of sorterSetAppendCfg
 
 module SorterSetCfg =
 
@@ -15,7 +15,8 @@ module SorterSetCfg =
             rdssCfg |> SorterSetRndCfg.getProperties
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getProperties
-
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getProperties
 
     let getId 
             (ssCfg: sorterSetCfg) 
@@ -25,6 +26,9 @@ module SorterSetCfg =
             rdssCfg |> SorterSetRndCfg.getId
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getId
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getId
+
 
     let getOrder
             (ssCfg: sorterSetCfg) 
@@ -34,6 +38,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getOrder
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getOrder
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getOrder
 
 
     let getSorterSetCt
@@ -43,8 +49,9 @@ module SorterSetCfg =
         | Rnd cCfg -> 
             cCfg |> SorterSetRndCfg.getSorterCount
         | RndMutated cfg -> 
-            cfg |> SorterSetMutatedFromRndCfg.getSorterCountMutated
-
+            cfg |> SorterSetMutatedFromRndCfg.getSorterCount
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getSorterCount
 
 
     let getCfgName
@@ -55,6 +62,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getConfigName
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getConfigName
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getConfigName
 
 
     let getFileName
@@ -65,6 +74,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getFileName
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getFileName
+        | AppendProd cfg -> 
+            cfg |> SorterSetAppendCfg.getFileName
 
 
     let rec getSorterSet

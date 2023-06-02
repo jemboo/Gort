@@ -11,11 +11,12 @@
     <Compile Include="Switch.fs" />
     <Compile Include="SwitchGen.fs" />
     <Compile Include="Stage.fs" />
-    <Compile Include="Sorter.fs" />
-    <Compile Include="SorterMutator.fs" />
-    <Compile Include="SorterSet.fs" />
-    <Compile Include="SorterSetParentMap.fs" />
-    <Compile Include="SorterSetMutator.fs" />
+    <Compile Include="Sorter\Sorter.fs" />
+    <Compile Include="Sorter\SorterMutator.fs" />
+    <Compile Include="Sorter\SorterSet.fs" />
+    <Compile Include="Sorter\SorterSetParentMap.fs" />
+    <Compile Include="Sorter\SorterSetMutator.fs" />
+    <Compile Include="Sorter\SorterSetAppendMap.fs" />
     <Compile Include="SortableArrays.fs" />
     <Compile Include="SortableSet.fs" />
     <Compile Include="SortersFromData.fs" />

@@ -46,42 +46,6 @@ module SorterSetMutator =
         |> SorterSetId.create
 
 
-    let makeSorterParentMap
-            (sorterSetMutator:sorterSetMutator)
-            (parentSet:sorterSet)
-        =
-        let mutantSetId = 
-            parentSet
-            |> SorterSet.getId
-            |> getMutantSorterSetId sorterSetMutator
-
-        let childSorterCount = 
-            match (sorterSetMutator |> getSorterCountFinal) with
-            | Some sc -> sc
-            | None -> parentSet |> SorterSet.getSorterCount
-
-        let sorterParentMapId = 
-                SorterSetParentMap.makeId
-                    (parentSet |> SorterSet.getId)
-                    mutantSetId
-
-        let parentMap =
-            parentSet
-            |> SorterSet.getSorters
-            |> Seq.map(Sorter.getSorterId >> SorterParentId.toSorterParentId)
-            |> CollectionOps.infinteLoop
-            |> Seq.allPairs (mutantSetId |> SorterSet.generateSorterIds)
-            |> Seq.take (childSorterCount |> SorterCount.value)
-            |> Map.ofSeq
-
-        SorterSetParentMap.load
-            sorterParentMapId
-            mutantSetId
-            (parentSet |> SorterSet.getId)
-            parentMap
-
-
-
     let createMutantSorterSetAndParentMap
             (sorterSetMutator:sorterSetMutator)
             (parentSet:sorterSet)
@@ -109,12 +73,10 @@ module SorterSetMutator =
                         (parentSet |> SorterSet.getOrder)
                         (tupes |> Seq.map(snd))
 
-
             let sorterParentMapId = 
                     SorterSetParentMap.makeId
                         parentSetId
                         mutantSetId
-
 
             let parentMap =
                 tupes 
@@ -122,7 +84,6 @@ module SorterSetMutator =
                           srtr |> Sorter.getSorterId, 
                           parentId |> SorterParentId.toSorterParentId )
                 |> Map.ofSeq
-
 
             let sorterParentMap = 
                 SorterSetParentMap.load
@@ -132,7 +93,6 @@ module SorterSetMutator =
                     parentMap
 
             return  sorterParentMap, mutantSet
-
         }
 
 
@@ -156,62 +116,4 @@ module SorterSetMutator =
                     (sortersToMutate |> SorterSet.getOrder)
                     mutants
         }
-
-
-
-
-type mutantSorterSetMap = 
-    private {  
-               mutantSetId:sorterSetId;
-               parentSetId:sorterSetId;
-               sorterSetMutator:sorterSetMutator;
-               sorterParentMap:sorterSetParentMap }
-
-module MutantSorterSetMap =
-
-    let load
-            (sorterSetMutator:sorterSetMutator) 
-            (mutantSetId:sorterSetId)
-            (parentSetId:sorterSetId)
-            (sorterParentMap:sorterSetParentMap)
-        =
-        {
-            mutantSetId = mutantSetId;
-            parentSetId = parentSetId;
-            sorterSetMutator = sorterSetMutator;
-            sorterParentMap = sorterParentMap
-        }
-
-
-    let create
-            (sorterSetMutator:sorterSetMutator)
-            (parentSet:sorterSet)
-        =
-        result {
-            let! sorterParentMap, mutantSet = 
-                    SorterSetMutator.createMutantSorterSetAndParentMap
-                        sorterSetMutator
-                        parentSet
-
-            return ( load
-                          sorterSetMutator
-                          (mutantSet |> SorterSet.getId)
-                          (parentSet |> SorterSet.getId)
-                          sorterParentMap,
-                     mutantSet )
-         }
-
-
-    let getSorterSetMutator 
-                (mutantSorterSet:mutantSorterSetMap) 
-         =
-         mutantSorterSet.sorterSetMutator
-
-
-    let getSorterParentMap
-                (mutantSorterSet:mutantSorterSetMap) 
-         =
-         mutantSorterSet.sorterParentMap
-
-
 

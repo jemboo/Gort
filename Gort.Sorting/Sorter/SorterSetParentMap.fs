@@ -62,7 +62,8 @@ module SorterSetParentMap =
         =
         [|
             "sorterSetParentMap" :> obj
-            parentSetId :> obj; childSetId :> obj
+            parentSetId |> SorterSetId.value :> obj; 
+            childSetId |> SorterSetId.value :> obj
         |] 
         |> GuidUtils.guidFromObjs
         |> SorterSetParentMapId.create
@@ -91,7 +92,6 @@ module SorterSetParentMap =
                 makeId
                    parentSetId
                    childSetId
-
         load
             sorterParentMapId
             childSetId

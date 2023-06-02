@@ -1,56 +1,61 @@
 ﻿namespace global
 
-open System
 
-
-type sorterSetAppendProdCfg = 
+type sorterSetAppendCfg = 
     private
         { 
           order: order
           rngGen: rngGen
           switchGenMode: switchGenMode
           switchCount: switchCount
+          sorterCountFactor: sorterCount
           sorterCount: sorterCount
         }
 
 
-module SorterSetAppendProdCfg =
+module SorterSetAppendCfg =
     let create (order:order)
                (rngGen:rngGen)
                (switchGenMode:switchGenMode)
                (switchCount:switchCount)
-               (sorterCount:sorterCount)
+               (sorterCountFactor:sorterCount)
         =
         {
             order=order;
             rngGen=rngGen;
             switchGenMode=switchGenMode;
             switchCount=switchCount;
-            sorterCount=sorterCount;
+            sorterCountFactor=sorterCountFactor;
+            sorterCount= 
+                ((SorterCount.value sorterCountFactor)
+                *
+                (SorterCount.value sorterCountFactor))
+                |> SorterCount.create;
         }
 
-    let getProperties (rdsg: sorterSetAppendProdCfg) = 
+    let getProperties (rdsg: sorterSetAppendCfg) = 
         [|
             ("order", rdsg.order :> obj);
             ("rngGen", rdsg.rngGen :> obj);
             ("switchGenMode", rdsg.switchGenMode :> obj);
             ("switchCount", rdsg.switchCount :> obj);
+            ("sorterCountFactor", rdsg.sorterCountFactor :> obj);
             ("sorterCount", rdsg.sorterCount :> obj);
         |]
 
-    let getOrder (rdsg: sorterSetAppendProdCfg) = 
+    let getOrder (rdsg: sorterSetAppendCfg) = 
             rdsg.order
 
-    let getRngGen (rdsg: sorterSetAppendProdCfg) = 
+    let getRngGen (rdsg: sorterSetAppendCfg) = 
             rdsg.rngGen
 
-    let getSwitchGenMode (rdsg: sorterSetAppendProdCfg) = 
+    let getSwitchGenMode (rdsg: sorterSetAppendCfg) = 
             rdsg.switchGenMode
 
-    let getSwitchCount (rdsg: sorterSetAppendProdCfg) = 
+    let getSwitchCount (rdsg: sorterSetAppendCfg) = 
             rdsg.switchCount
 
-    let getBaseId (cfg: sorterSetAppendProdCfg) 
+    let getBaseId (cfg: sorterSetAppendCfg) 
         = 
         [|
           "sorterSetRndCfg" :> obj;
@@ -58,27 +63,38 @@ module SorterSetAppendProdCfg =
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
-    let getId (cfg: sorterSetAppendProdCfg) 
+    let getId (cfg: sorterSetAppendCfg) 
         = 
         [|
-          "sorterSetAppendProdCfg" :> obj;
+          "sorterSetAppendCfg" :> obj;
            cfg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
-    let getFileName (cfg:sorterSetAppendProdCfg) 
+    let getFileName (cfg:sorterSetAppendCfg) 
         =
         cfg |> getId |> SorterSetId.value |> string
 
 
     let getConfigName 
-            (rdsg:sorterSetAppendProdCfg) 
+            (rdsg:sorterSetAppendCfg) 
         =
         sprintf "%d_%s"
             (rdsg |> getOrder |> Order.value)
             (rdsg |> getSwitchGenMode |> string)
 
 
-    let getSorterCount (rdsg: sorterSetAppendProdCfg) 
+    let getSorterCount (rdsg: sorterSetAppendCfg) 
         =
-            rdsg.sorterCount
+        rdsg.sorterCount
+
+
+    let getSorterSetFactorCfg (cfg:sorterSetAppendCfg)
+        =
+        SorterSetRndCfg.create 
+            cfg.order
+            cfg.rngGen
+            cfg.switchGenMode
+            cfg.switchCount
+            cfg.sorterCount
+

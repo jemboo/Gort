@@ -6,22 +6,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Components\SorterSetAppendMapCfg.fs" />
     <Compile Include="Components\SorterSetParentMapCfg.fs" />
     <Compile Include="Components\SorterSetMutatorCfg.fs" />
     <Compile Include="SorterSetRndCfg.fs" />
     <Compile Include="SorterSetMutatedFromRndCfg.fs" />
-    <Compile Include="SorterSetAppendProdCfg.fs" />
+    <Compile Include="SorterSetAppendCfg.fs" />
     <Compile Include="SorterSetCfg.fs" />
     <Compile Include="SortableSetCfg.fs" />
     <Compile Include="SorterSetRnd_EvalAllBitsCfg.fs" />
     <Compile Include="Ssmfr_EvalAllBitsCfg.fs" />
     <Compile Include="SorterSet_EvalCfg.fs" />
-    <Compile Include="SorterSetRnd_EvalAllBits_ReportCfg.fs" />
     <Compile Include="Ss_GenStepCfg.fs" />
     <Compile Include="Ss_ShcRunCfg.fs" />
     <Compile Include="Ss_ShcCfg.fs" />
-    <Compile Include="Ssmr_EvalAllBits_ReportCfg.fs" />
-    <Compile Include="Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
+    <Compile Include="Reports\SorterSetRnd_EvalAllBits_ReportCfg.fs" />
+    <Compile Include="Reports\Ssmr_EvalAllBits_ReportCfg.fs" />
+    <Compile Include="Reports\Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsFile.fs" />
     <Compile Include="WsOps.fs" />

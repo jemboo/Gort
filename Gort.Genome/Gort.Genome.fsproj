@@ -15,14 +15,6 @@
     <Compile Include="SorterSetEvalCfg.fs" />
     <Compile Include="SorterSetEvalReportCfg.fs" />
     <Compile Include="GaSorterSetCfg.fs" />
-    <Compile Include="WsFile.fs" />
-    <Compile Include="WsCfgs.fs" />
-    <Compile Include="WsSorterSets.fs" />
-    <Compile Include="WsSorterSetMutate.fs" />
-    <Compile Include="WsSortableSets.fs" />
-    <Compile Include="WsSorterSetEval.fs" />
-    <Compile Include="WsSorterSetEvalReport.fs" />
-    <Compile Include="WsGaSorterSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
