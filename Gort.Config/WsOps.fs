@@ -47,7 +47,7 @@ module WsOps =
             (cfg:sorterSetParentMapCfg)
             (sst:sorterSetParentMap) 
         =
-        WsFile.writeToFile wsFile.SorterSetMap
+        WsFile.writeToFile wsFile.SorterSetParentMap
             (cfg |> SorterSetParentMapCfg.getFileName) 
             (sst |> SorterSetParentMapDto.toJson)
 
@@ -59,7 +59,7 @@ module WsOps =
           result {
             let! txtD = 
                 WsFile.readAllText  
-                    wsFile.SorterSetMap
+                    wsFile.SorterSetParentMap
                     (cfg |> SorterSetParentMapCfg.getFileName)
             return! txtD |> SorterSetParentMapDto.fromJson
           }
@@ -94,6 +94,60 @@ module WsOps =
         }
 
 
+
+    //********  ConcatMap  ****************
+    
+    let saveSorterSetConcatMap
+            (cfg:sorterSetSelfAppendCfg)
+            (sst:sorterSetConcatMap) 
+        =
+        WsFile.writeToFile wsFile.SorterSetConcatMap
+            (cfg |> SorterSetSelfAppendCfg.getSorterSetConcatFileName) 
+            (sst |> SorterSetConcatMapDto.toJson)
+
+
+
+    let loadSorterSetConcatMap
+            (cfg:sorterSetSelfAppendCfg) 
+          =
+          result {
+            let! txtD = 
+                WsFile.readAllText  
+                    wsFile.SorterSetConcatMap
+                    (cfg |> SorterSetSelfAppendCfg.getSorterSetConcatFileName)
+            return! txtD |> SorterSetConcatMapDto.fromJson
+          }
+
+
+    let makeSorterSetConcatMap
+            (cfg:sorterSetSelfAppendCfg) 
+        =
+        result {
+            let parentMap = 
+                    SorterSetSelfAppendCfg.makeSorterSetConcatMap
+                        cfg
+
+            let! resSs = parentMap |> saveSorterSetConcatMap cfg
+            return parentMap
+        }
+
+
+    let getConcatMap
+            (cfg:sorterSetSelfAppendCfg) 
+        =
+        result {
+            let loadRes  = 
+                result {
+                    let! mut = loadSorterSetConcatMap cfg
+                    return mut
+                }
+
+            match loadRes with
+            | Ok mut -> return mut
+            | Error _ -> return! (makeSorterSetConcatMap cfg)
+        }
+
+
     //********  SorterSet ****************
 
     let saveSorterSet
@@ -122,6 +176,7 @@ module WsOps =
                 saveSorterSet
                 loadSorterSet
                 getParentMap
+                getConcatMap
                 cfg
 
 
@@ -196,8 +251,6 @@ module WsOps =
             | Ok ssEval -> return ssEval
             | Error _ -> return! (makeSorterSetRnd_EvalAllBitsCfg cfg)
         }
-
-
 
 
     //********  ssmfr_EvalAllBitsCfg  ****************
@@ -356,14 +409,19 @@ module WsOps =
             //|> Array.map(sorterSetCfg.Rnd)
             //|> Array.map(getSorterSet)
 
-            
+            WsCfgs.allSorterSetSelfAppendCfgs ()
+            |> Array.map(sorterSetCfg.SelfAppend)
+            |> Array.map(getSorterSet)
+
+
+
             //WsCfgs.allSorterSetRnd_EvalAllBitsCfg ()
             //|> Array.map(sorterSet_EvalCfg.Rnd)
             //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
 
-            WsCfgs.allSsmfr_EvalAllBitsCfg ()
-            |> Array.map(sorterSet_EvalCfg.RndMutated)
-            |> Array.map(getSorterSetEval ( true |> UseParallel.create))
+            //WsCfgs.allSsmfr_EvalAllBitsCfg ()
+            //|> Array.map(sorterSet_EvalCfg.RndMutated)
+            //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
 
 
             //WsCfgs.allSsmfr_EvalAllBitsCfg ()

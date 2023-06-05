@@ -12,8 +12,10 @@
     <Compile Include="RolloutDto.fs" />
     <Compile Include="SorterDto.fs" />
     <Compile Include="SorterMutatorDto.fs" />
-    <Compile Include="SorterSetDto.fs" />
-    <Compile Include="SorterSetMutatorDto.fs" />
+    <Compile Include="SorterSet\SorterSetDto.fs" />
+    <Compile Include="SorterSet\SorterSetParentMapDto.fs" />
+    <Compile Include="SorterSet\SorterSetConcatMapDto.fs" />
+    <Compile Include="SorterSet\SorterSetMutatorDto.fs" />
     <Compile Include="SortableSetDto.fs" />
     <Compile Include="SorterEvalDto.fs" />
     <Compile Include="RecordVersions.fs" />

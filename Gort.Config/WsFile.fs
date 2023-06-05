@@ -1,5 +1,4 @@
 ﻿namespace global
-open System
 
 type wsFile = 
     | SortableSet
@@ -7,11 +6,13 @@ type wsFile =
     | SorterSetEval
     | SorterEvalReport
     | SorterEvalMergeReport
-    | SorterSetMap
+    | SorterSetConcatMap
+    | SorterSetParentMap
+
 
 module WsFile = 
 
-    let wsRootDir = "c:\\GortFiles1"
+    let wsRootDir = "c:\\GortFiles2"
     let fileExt = "txt"
 
 
@@ -22,7 +23,8 @@ module WsFile =
         | SorterSetEval -> "SorterSetEvals"
         | SorterEvalReport -> "SorterEvalReports"
         | SorterEvalMergeReport -> "SorterEvalMergeReports"
-        | SorterSetMap -> "SorterSetMaps"
+        | SorterSetConcatMap -> "SorterSetConcatMaps"
+        | SorterSetParentMap -> "SorterSetParentMaps"
 
 
     let writeToFile (fileType:wsFile) (fileName:string) (data: string) =

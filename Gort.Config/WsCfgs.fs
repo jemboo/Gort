@@ -130,6 +130,24 @@ module WsCfgs =
         |]
 
 
+
+    //********  SorterSetSelfAppend  ****************
+
+
+    let allSorterSetSelfAppendCfgs () =
+        [| 
+            for ordr in orders do
+             for genMode in switchGenModes do
+                    SorterSetSelfAppendCfg.create
+                        ordr
+                        rngGen1
+                        genMode
+                        (SwitchCount.orderTo999SwitchCount ordr)
+                        (sorterCounts ordr)
+        |]
+
+
+
     ////********  sorterSetRnd_EvalAllBitsCfg  ****************
 
     let allSorterSetRnd_EvalAllBitsCfg () =

@@ -3,7 +3,7 @@
 type sorterSetCfg = 
      | Rnd of sorterSetRndCfg
      | RndMutated of sorterSetMutatedFromRndCfg
-     | AppendProd of sorterSetAppendCfg
+     | SelfAppend of sorterSetSelfAppendCfg
 
 module SorterSetCfg =
 
@@ -15,8 +15,8 @@ module SorterSetCfg =
             rdssCfg |> SorterSetRndCfg.getProperties
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getProperties
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getProperties
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getProperties
 
     let getId 
             (ssCfg: sorterSetCfg) 
@@ -26,8 +26,8 @@ module SorterSetCfg =
             rdssCfg |> SorterSetRndCfg.getId
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getId
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getId
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getSorterSetConcatId
 
 
     let getOrder
@@ -38,8 +38,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getOrder
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getOrder
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getOrder
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getOrder
 
 
     let getSorterSetCt
@@ -50,8 +50,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getSorterCount
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getSorterCount
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getSorterCount
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getSorterSetConcatCount
 
 
     let getCfgName
@@ -62,8 +62,8 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getConfigName
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getConfigName
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getConfigName
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getConfigName
 
 
     let getFileName
@@ -74,31 +74,37 @@ module SorterSetCfg =
             cCfg |> SorterSetRndCfg.getFileName
         | RndMutated cfg -> 
             cfg |> SorterSetMutatedFromRndCfg.getFileName
-        | AppendProd cfg -> 
-            cfg |> SorterSetAppendCfg.getFileName
+        | SelfAppend cfg -> 
+            cfg |> SorterSetSelfAppendCfg.getSorterSetConcatFileName
 
 
     let rec getSorterSet
-            (save: string -> sorterSet -> Result<bool, string>)
+            (sorterSetSave: string -> sorterSet -> Result<bool, string>)
             (sorterSetLookup: string -> Result<sorterSet, string>)
             (getParentMap: sorterSetParentMapCfg -> Result<sorterSetParentMap, string>)
+            (getConcatMap: sorterSetSelfAppendCfg -> Result<sorterSetConcatMap, string>)
             (ssCfg: sorterSetCfg) 
         = 
         match ssCfg with
-        | Rnd cCfg -> 
-            cCfg |> SorterSetRndCfg.getSorterSet sorterSetLookup save
-        | RndMutated cfg -> 
+        | Rnd rCfg -> 
+            rCfg |> SorterSetRndCfg.getSorterSet sorterSetLookup sorterSetSave
+        | RndMutated rmCfg -> 
             result {
                 let parentCfg = 
-                        cfg |> SorterSetMutatedFromRndCfg.getSorterSetParentCfg
-                            |> sorterSetCfg.Rnd
+                        rmCfg |> SorterSetMutatedFromRndCfg.getSorterSetParentCfg
+                              |> sorterSetCfg.Rnd
 
-                let! parentSorterSet = getSorterSet save sorterSetLookup getParentMap parentCfg
-                let! parentMap = ( cfg 
+                let! parentSorterSet = getSorterSet 
+                                        sorterSetSave 
+                                        sorterSetLookup 
+                                        getParentMap
+                                        getConcatMap
+                                        parentCfg
+                let! parentMap = ( rmCfg 
                                    |> SorterSetMutatedFromRndCfg.getSorterSetParentMapCfg
                                    |> getParentMap )
 
-                let mutantSorterSetFileName = (cfg |> SorterSetMutatedFromRndCfg.getFileName)
+                let mutantSorterSetFileName = (rmCfg |> SorterSetMutatedFromRndCfg.getFileName)
                 let mutantSorterSetFinding = sorterSetLookup mutantSorterSetFileName
 
                 match mutantSorterSetFinding with
@@ -108,8 +114,31 @@ module SorterSetCfg =
                             parentSorterSet |>
                                 SorterSetMutator.createMutantSorterSetFromParentMap
                                     parentMap
-                                    (cfg |> SorterSetMutatedFromRndCfg.getSorterSetMutator)
-                    let! isSaved = save mutantSorterSetFileName  mutantSorterSet
+                                    (rmCfg |> SorterSetMutatedFromRndCfg.getSorterSetMutator)
+                    let! isSaved = sorterSetSave 
+                                    mutantSorterSetFileName  
+                                    mutantSorterSet
                     return mutantSorterSet
             }
+        | SelfAppend saCfg ->
+            result {
+                let factorCfg = saCfg |> SorterSetSelfAppendCfg.getSorterSetFactorCfg
+                let! ssFactor = factorCfg |> SorterSetRndCfg.getSorterSet sorterSetLookup sorterSetSave
 
+                let selfAppendSSFileName =
+                        saCfg |> SorterSetSelfAppendCfg.getSorterSetConcatFileName
+                let selfAppendSSFinding = sorterSetLookup selfAppendSSFileName
+
+                match selfAppendSSFinding with
+                | Ok saSS -> return saSS
+                | Error _ -> 
+                    let! ssConcatMap = saCfg |> getConcatMap
+                    let! selfAppendSS =       
+                            SorterSetConcatMap.createSorterSetAppend
+                                    ssFactor
+                                    (saCfg |> SorterSetSelfAppendCfg.getSorterSetConcatId)
+                    let! isSaved = sorterSetSave 
+                                    (saCfg |> SorterSetSelfAppendCfg.getSorterSetConcatFileName)  
+                                    selfAppendSS
+                    return selfAppendSS
+            }

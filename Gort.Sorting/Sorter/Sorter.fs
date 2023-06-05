@@ -72,6 +72,16 @@ module Sorter =
         let newSwitches = switchesToAppend |> Seq.append sorter.switches |> Seq.toArray
         fromSwitches sorterD (sorter |> getOrder) newSwitches
 
+
+    // concats the switches from all of the sorters into one.
+    let concatSwitches
+            (sorterD:sorterId)
+            (order:order)
+            (sorters: sorter seq) =
+        let newSwitches = sorters |> Seq.map(getSwitches) |> Seq.concat
+        fromSwitches sorterD order newSwitches
+
+
     // creates a longer sorter with the switches added to the beginning.
     let prependSwitches 
             (sorterD:sorterId)

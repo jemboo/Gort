@@ -1,7 +1,7 @@
 ﻿namespace global
 
 
-type sorterSetAppendCfg = 
+type sorterSetSelfAppendCfg = 
     private
         { 
           order: order
@@ -13,7 +13,7 @@ type sorterSetAppendCfg =
         }
 
 
-module SorterSetAppendCfg =
+module SorterSetSelfAppendCfg =
     let create (order:order)
                (rngGen:rngGen)
                (switchGenMode:switchGenMode)
@@ -33,7 +33,7 @@ module SorterSetAppendCfg =
                 |> SorterCount.create;
         }
 
-    let getProperties (rdsg: sorterSetAppendCfg) = 
+    let getProperties (rdsg: sorterSetSelfAppendCfg) = 
         [|
             ("order", rdsg.order :> obj);
             ("rngGen", rdsg.rngGen :> obj);
@@ -43,53 +43,45 @@ module SorterSetAppendCfg =
             ("sorterCount", rdsg.sorterCount :> obj);
         |]
 
-    let getOrder (rdsg: sorterSetAppendCfg) = 
+    let getOrder (rdsg: sorterSetSelfAppendCfg) = 
             rdsg.order
 
-    let getRngGen (rdsg: sorterSetAppendCfg) = 
+    let getRngGen (rdsg: sorterSetSelfAppendCfg) = 
             rdsg.rngGen
 
-    let getSwitchGenMode (rdsg: sorterSetAppendCfg) = 
+    let getSwitchGenMode (rdsg: sorterSetSelfAppendCfg) = 
             rdsg.switchGenMode
 
-    let getSwitchCount (rdsg: sorterSetAppendCfg) = 
+    let getSwitchCount (rdsg: sorterSetSelfAppendCfg) = 
             rdsg.switchCount
 
-    let getBaseId (cfg: sorterSetAppendCfg) 
+    let getSorterSetConcatId (cfg: sorterSetSelfAppendCfg) 
         = 
         [|
-          "sorterSetRndCfg" :> obj;
+          "sorterSetSelfAppendCfg" :> obj;
            cfg :> obj;
         |] |> GuidUtils.guidFromObjs
            |> SorterSetId.create
 
-    let getId (cfg: sorterSetAppendCfg) 
-        = 
-        [|
-          "sorterSetAppendCfg" :> obj;
-           cfg :> obj;
-        |] |> GuidUtils.guidFromObjs
-           |> SorterSetId.create
-
-    let getFileName (cfg:sorterSetAppendCfg) 
+    let getSorterSetConcatFileName (cfg:sorterSetSelfAppendCfg) 
         =
-        cfg |> getId |> SorterSetId.value |> string
+        cfg |> getSorterSetConcatId |> SorterSetId.value |> string
 
 
     let getConfigName 
-            (rdsg:sorterSetAppendCfg) 
+            (rdsg:sorterSetSelfAppendCfg) 
         =
         sprintf "%d_%s"
             (rdsg |> getOrder |> Order.value)
             (rdsg |> getSwitchGenMode |> string)
 
 
-    let getSorterCount (rdsg: sorterSetAppendCfg) 
+    let getSorterSetConcatCount (rdsg: sorterSetSelfAppendCfg) 
         =
         rdsg.sorterCount
 
 
-    let getSorterSetFactorCfg (cfg:sorterSetAppendCfg)
+    let getSorterSetFactorCfg (cfg:sorterSetSelfAppendCfg)
         =
         SorterSetRndCfg.create 
             cfg.order
@@ -97,4 +89,19 @@ module SorterSetAppendCfg =
             cfg.switchGenMode
             cfg.switchCount
             cfg.sorterCount
+
+
+    let getSorterSetFactorId (cfg: sorterSetSelfAppendCfg) 
+        = 
+        cfg |> getSorterSetFactorCfg |> SorterSetRndCfg.getId
+
+
+    let makeSorterSetConcatMap
+            (cfg:sorterSetSelfAppendCfg)
+        =
+        SorterSetConcatMap.createForAppendSet
+                (cfg |> getSorterSetFactorId)
+                cfg.sorterCountFactor
+                (cfg |> getSorterSetConcatId)
+
 

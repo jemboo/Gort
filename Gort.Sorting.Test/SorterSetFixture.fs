@@ -104,28 +104,18 @@ type SorterSetFixture() =
 
       let sorterStBase = 
         SorterSet.createRandomStages 
-                                sorterSetBaseId 
-                                baseSorterCt 
-                                swFreq 
-                                ordr 
-                                wPfx 
-                                switchCt 
-                                rndGn
-
-
-      let appendSet = 
-        SorterSet.createAppendSet
-                    sorterStBase
-                    sorterStBase
-                    sorterSetAppendedId
+            sorterSetBaseId 
+            baseSorterCt 
+            swFreq 
+            ordr 
+            wPfx 
+            switchCt 
+            rndGn
                     
       let appendSetMap = 
-            SorterSet.createAppendSetMap
-                sorterSetBaseId
-                baseSorterCt
-                sorterSetBaseId
-                baseSorterCt
+            SorterSetConcatMap.createSorterSetAppend
+                sorterStBase
                 sorterSetAppendedId
-
+           |> Result.ExtractOrThrow
 
       Assert.AreEqual(1,1)

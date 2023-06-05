@@ -8,13 +8,6 @@
   <ItemGroup>
     <Compile Include="SorterGenome.fs" />
     <Compile Include="Ga.fs" />
-    <Compile Include="GaSorterSet.fs" />
-    <Compile Include="SortableSetCfg.fs" />
-    <Compile Include="SorterSetCfg.fs" />
-    <Compile Include="SorterSetMutateCfg.fs" />
-    <Compile Include="SorterSetEvalCfg.fs" />
-    <Compile Include="SorterSetEvalReportCfg.fs" />
-    <Compile Include="GaSorterSetCfg.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
