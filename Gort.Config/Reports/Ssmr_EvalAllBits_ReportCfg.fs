@@ -71,7 +71,7 @@ module Ssmfr_EvalAllBits_ReportCfg
             cfg.sorterEvalReport
 
 
-    let getSsmfr_EvalAllBitsCfg
+    let getSsMfr_EvalAllBitsCfg
             (order:order)
             (switchGenMode:switchGenMode)
             (rngGenCreate:rngGen)
@@ -79,7 +79,7 @@ module Ssmfr_EvalAllBits_ReportCfg
             (mutationRate:mutationRate)
             (cfg:ssmfr_EvalAllBits_ReportCfg)
         =
-        Ssmfr_EvalAllBitsCfg.create 
+        SsMfr_EvalAllBitsCfg.create 
             order
             rngGenCreate
             switchGenMode
@@ -104,7 +104,7 @@ module Ssmfr_EvalAllBits_ReportCfg
             "eval_id\torder\tswitch_gen\tsortable_type\tmutation_rate"
 
     let getReportLines 
-            (sorterSetEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetEvalRet: ssMfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
             (cfg: ssmfr_EvalAllBits_ReportCfg)
             (order:order)
             (switchGenMode:switchGenMode)
@@ -114,7 +114,7 @@ module Ssmfr_EvalAllBits_ReportCfg
         =
         let sorterSetEvalCfg = 
             cfg 
-            |> getSsmfr_EvalAllBitsCfg
+            |> getSsMfr_EvalAllBitsCfg
                 order
                 switchGenMode
                 rngGenCreate
@@ -123,30 +123,30 @@ module Ssmfr_EvalAllBits_ReportCfg
 
         let eval_id = 
             sorterSetEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getId
+            |> SsMfr_EvalAllBitsCfg.getId
             |> SorterSetEvalId.value
             |> string
 
 
         let mutRate = 
             sorterSetEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getMutationRate
+            |> SsMfr_EvalAllBitsCfg.getMutationRate
             |> MutationRate.value
 
         let order = 
             sorterSetEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getOrder
+            |> SsMfr_EvalAllBitsCfg.getOrder
             |> Order.value
 
         let switchGen = 
             sorterSetEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSorterSetCfg
+            |> SsMfr_EvalAllBitsCfg.getSorterSetCfg
             |> SorterSetMutatedFromRndCfg.getSwitchGenMode
             |> string
 
         let sortableSetCfgName = 
             sorterSetEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSortableSetCfg
+            |> SsMfr_EvalAllBitsCfg.getSortableSetCfg
             |> SortableSetCertainCfg.getConfigName
 
         let linePfx = 
@@ -170,7 +170,7 @@ module Ssmfr_EvalAllBits_ReportCfg
 
     let makeSorterSetEvalReport
             (cfg: ssmfr_EvalAllBits_ReportCfg)
-            (sorterSetEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetEvalRet: ssMfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
         =
              seq {
                     for ordr in cfg.orders do

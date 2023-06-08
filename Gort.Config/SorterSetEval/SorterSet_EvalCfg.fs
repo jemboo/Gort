@@ -2,7 +2,8 @@
 
 type sorterSet_EvalCfg = 
      | Rnd of sorterSetRnd_EvalAllBitsCfg
-     | RndMutated of ssmfr_EvalAllBitsCfg
+     | RndMutated of ssMfr_EvalAllBitsCfg
+     | RndAppended of ssAfr_EvalAllBitsCfg
 
 
 module SorterSet_EvalCfg =
@@ -14,7 +15,9 @@ module SorterSet_EvalCfg =
         | Rnd rCfg -> 
             rCfg |> SorterSetRnd_EvalAllBitsCfg.getlId
         | RndMutated rmCfg ->
-            rmCfg |> Ssmfr_EvalAllBitsCfg.getId
+            rmCfg |> SsMfr_EvalAllBitsCfg.getId        
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getId
 
     let getFileName
             (cfg:sorterSet_EvalCfg) 
@@ -23,7 +26,9 @@ module SorterSet_EvalCfg =
         | Rnd cCfg -> 
             cCfg |> SorterSetRnd_EvalAllBitsCfg.getFileName
         | RndMutated cfg -> 
-            cfg |> Ssmfr_EvalAllBitsCfg.getFileName
+            cfg |> SsMfr_EvalAllBitsCfg.getFileName
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getFileName
 
     let getOrder
             (cfg:sorterSet_EvalCfg) 
@@ -32,7 +37,9 @@ module SorterSet_EvalCfg =
         | Rnd cCfg -> 
             cCfg |> SorterSetRnd_EvalAllBitsCfg.getOrder
         | RndMutated cfg -> 
-            cfg |> Ssmfr_EvalAllBitsCfg.getOrder
+            cfg |> SsMfr_EvalAllBitsCfg.getOrder
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getOrder
 
     let getSortableSetCfg
             (cfg:sorterSet_EvalCfg)
@@ -41,7 +48,10 @@ module SorterSet_EvalCfg =
         | Rnd rCfg -> 
             rCfg |> SorterSetRnd_EvalAllBitsCfg.getSortableSetCfg
         | RndMutated rmCfg ->
-            rmCfg |> Ssmfr_EvalAllBitsCfg.getSortableSetCfg
+            rmCfg |> SsMfr_EvalAllBitsCfg.getSortableSetCfg
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getSortableSetCfg
+
 
     let getSorterSetCfg
             (cfg:sorterSet_EvalCfg)
@@ -51,9 +61,11 @@ module SorterSet_EvalCfg =
             rCfg |> SorterSetRnd_EvalAllBitsCfg.getSorterSetCfg
                  |> sorterSetCfg.Rnd
         | RndMutated rmCfg ->
-            rmCfg |> Ssmfr_EvalAllBitsCfg.getSorterSetCfg
+            rmCfg |> SsMfr_EvalAllBitsCfg.getSorterSetCfg
                   |> sorterSetCfg.RndMutated
-
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getSorterSetCfg
+                  |> sorterSetCfg.SelfAppend
 
     let getSorterEvalMode
             (cfg:sorterSet_EvalCfg)
@@ -62,7 +74,9 @@ module SorterSet_EvalCfg =
         | Rnd rCfg -> 
             rCfg |> SorterSetRnd_EvalAllBitsCfg.getSorterEvalMode
         | RndMutated rmCfg ->
-            rmCfg |> Ssmfr_EvalAllBitsCfg.getSorterEvalMode
+            rmCfg |> SsMfr_EvalAllBitsCfg.getSorterEvalMode
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getSorterEvalMode
 
 
     let getStagePrefixCount
@@ -72,7 +86,9 @@ module SorterSet_EvalCfg =
         | Rnd rCfg -> 
             rCfg |> SorterSetRnd_EvalAllBitsCfg.getStagePrefixCount
         | RndMutated rmCfg ->
-            rmCfg |> Ssmfr_EvalAllBitsCfg.getStagePrefixCount
+            rmCfg |> SsMfr_EvalAllBitsCfg.getStagePrefixCount
+        | RndAppended amCfg ->
+            amCfg |> SsAfr_EvalAllBitsCfg.getStagePrefixCount
 
 
     let makeSorterSetEval

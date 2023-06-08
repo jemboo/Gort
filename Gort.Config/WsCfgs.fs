@@ -168,14 +168,14 @@ module WsCfgs =
 
 
 
-    ////********  Ssmfr_EvalAllBitsCfg  ****************
+    ////********  SsMfr_EvalAllBitsCfg  ****************
 
-    let allSsmfr_EvalAllBitsCfg () =
+    let allSsMfr_EvalAllBitsCfg () =
          [|
             for ordr in orders do
              for genMode in switchGenModes do
                  for mutRate in mutRates do
-                    Ssmfr_EvalAllBitsCfg.create
+                    SsMfr_EvalAllBitsCfg.create
                         ordr
                         rngGen1
                         genMode
@@ -187,6 +187,26 @@ module WsCfgs =
                         sorterEvalMode.DontCheckSuccess
                         (1 |> StageCount.create)
          |]
+
+
+
+    ////********  SsAfr_EvalAllBitsCfg  ****************
+
+    let allSsAfr_EvalAllBitsCfg () =
+         [|
+            for ordr in orders do
+             for genMode in switchGenModes do
+                    SsAfr_EvalAllBitsCfg.create
+                        ordr
+                        rngGen1
+                        genMode
+                        (StageCount.toSwitchCount ordr (2 |> StageCount.create ))
+                        (sorterCounts ordr)
+                        sorterEvalMode.GetSortedSetCount
+                        (0 |> StageCount.create)
+         |]
+
+
 
 
 

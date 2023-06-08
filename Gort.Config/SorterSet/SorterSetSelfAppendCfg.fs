@@ -88,7 +88,7 @@ module SorterSetSelfAppendCfg =
             cfg.rngGen
             cfg.switchGenMode
             cfg.switchCount
-            cfg.sorterCount
+            cfg.sorterCountFactor
 
 
     let getSorterSetFactorId (cfg: sorterSetSelfAppendCfg) 

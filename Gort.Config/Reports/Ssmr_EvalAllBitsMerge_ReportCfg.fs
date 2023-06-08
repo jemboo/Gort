@@ -71,7 +71,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
             cfg.sorterEvalReport
 
 
-    let getSsmfr_EvalAllBitsCfg
+    let getSsMfr_EvalAllBitsCfg
             (order:order)
             (rngGenCreate:rngGen)
             (switchGenMode:switchGenMode)
@@ -79,7 +79,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
             (mutationRate:mutationRate)
             (cfg:ssmfr_EvalAllBitsMerge_ReportCfg)
         =
-        Ssmfr_EvalAllBitsCfg.create 
+        SsMfr_EvalAllBitsCfg.create 
             order
             rngGenCreate
             switchGenMode
@@ -124,7 +124,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
 
     let getReportLines 
             (sorterSetParentEvalRet: sorterSetRnd_EvalAllBitsCfg->Result<sorterSetEval,string>)
-            (sorterSetMutantEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetMutantEvalRet: ssMfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
             (sorterParentMapRet: sorterSetParentMapCfg->Result<sorterSetParentMap,string>)
             (cfg: ssmfr_EvalAllBitsMerge_ReportCfg)
             (order:order)
@@ -143,7 +143,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
 
         let sorterSetMutantEvalCfg = 
             cfg 
-            |> getSsmfr_EvalAllBitsCfg
+            |> getSsMfr_EvalAllBitsCfg
                 order
                 rngGenCreate
                 switchGenMode
@@ -153,34 +153,34 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
 
         let sorterSetMutatedFromRndCfg = 
             sorterSetMutantEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getSorterSetCfg
+            |> SsMfr_EvalAllBitsCfg.getSorterSetCfg
 
 
         let eval_id = 
             sorterSetMutantEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getId
+            |> SsMfr_EvalAllBitsCfg.getId
             |> SorterSetEvalId.value
             |> string
 
         let mutRate = 
             sorterSetMutantEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getMutationRate
+            |> SsMfr_EvalAllBitsCfg.getMutationRate
             |> MutationRate.value
 
         let order = 
             sorterSetMutantEvalCfg
-            |> Ssmfr_EvalAllBitsCfg.getOrder
+            |> SsMfr_EvalAllBitsCfg.getOrder
             |> Order.value
 
         let switchGen = 
             sorterSetMutantEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSorterSetCfg
+            |> SsMfr_EvalAllBitsCfg.getSorterSetCfg
             |> SorterSetMutatedFromRndCfg.getSwitchGenMode
             |> string
 
         let sortableSetCfgName =
             sorterSetMutantEvalCfg 
-            |> Ssmfr_EvalAllBitsCfg.getSortableSetCfg
+            |> SsMfr_EvalAllBitsCfg.getSortableSetCfg
             |> SortableSetCertainCfg.getConfigName
 
         let linePfx = 
@@ -251,7 +251,7 @@ module Ssmfr_EvalAllBitsMerge_ReportCfg
     let makeSorterSetEvalReport
             (cfg: ssmfr_EvalAllBitsMerge_ReportCfg)
             (sorterSetParentEvalRet: sorterSetRnd_EvalAllBitsCfg->Result<sorterSetEval,string>)
-            (sorterSetMutantEvalRet: ssmfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
+            (sorterSetMutantEvalRet: ssMfr_EvalAllBitsCfg->Result<sorterSetEval,string>)
             (sorterParentMapRet: sorterSetParentMapCfg->Result<sorterSetParentMap,string>)
         =
              seq {
