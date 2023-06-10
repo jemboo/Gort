@@ -13,7 +13,7 @@ module WsCfgs =
     let rngGen5 = RngGen.createLcg (7254 |> RandomSeed.create)
     let rngGen6 = RngGen.createLcg (8284 |> RandomSeed.create)
     
-    let rngGensCreate = [|rngGen1;|]
+    let rngGensCreate = [|rngGen2;|]
     let rngGensMutate = [|rngGen1; rngGen2; rngGen3; rngGen4; rngGen5; rngGen6;|]
 
 
@@ -54,7 +54,7 @@ module WsCfgs =
 
     let sorterCounts (order:order) = 
         match (order |> Order.value) with
-        | 14 -> sorterCountBase * 10 |> SorterCount.create
+        | 14 -> sorterCountBase * 50 |> SorterCount.create
         | 16 -> sorterCountBase * 5  |> SorterCount.create
         | 18 -> sorterCountBase * 1  |> SorterCount.create
         | 20 -> sorterCountBase * 25   |> SorterCount.create
@@ -200,7 +200,7 @@ module WsCfgs =
                         ordr
                         rngGen1
                         genMode
-                        (StageCount.toSwitchCount ordr (2 |> StageCount.create ))
+                        (StageCount.toSwitchCount ordr (1 |> StageCount.create ))
                         (sorterCounts ordr)
                         sorterEvalMode.GetSortedSetCount
                         (0 |> StageCount.create)
@@ -230,13 +230,13 @@ module WsCfgs =
 
 
 
-    ////********  ssmfr_EvalAllBits_ReportCfg  ****************
+    ////********  ssMfr_EvalAllBits_ReportCfg  ****************
 
-    let allssmfrEvalReportCfgs () =
+    let allssMfrEvalReportCfgs () =
         [| 
             for ordr in orders do
                 for mutR in mutRates do
-                  Ssmfr_EvalAllBits_ReportCfg.create
+                  SsMfr_EvalAllBits_ReportCfg.create
                     [|ordr|]
                     rngGensCreate
                     switchGenModes
@@ -252,16 +252,33 @@ module WsCfgs =
         |]
 
 
+    ////********  ssAfr_EvalAllBits_ReportCfg  ****************
+
+    let allssAfrEvalReportCfgs () =
+        [| 
+            for ordr in orders do
+                  SsAfr_EvalAllBits_ReportCfg.create
+                    [|ordr|]
+                    rngGensCreate
+                    switchGenModes
+                    (fun ordr -> 2 |> StageCount.create |> StageCount.toSwitchCount ordr)
+                    sorterCounts
+                    sorterEvalMode.GetSortedSetCount
+                    (1 |> StageCount.create)
+                    sorterEvalReport.Full
+                    (sprintf "%s_%d" "Jennifer" (ordr |> Order.value))
+        |]
 
 
 
-    ////********  ssmfr_EvalAllBitsMerge_ReportCfg  ****************
 
-    let allssmfrEvalMergeReportCfgs () =
+    ////********  ssMfr_EvalAllBitsMerge_ReportCfg  ****************
+
+    let allssMfrEvalMergeReportCfgs () =
         [| 
             for ordr in orders do
                 for mutR in mutRates do
-                  Ssmfr_EvalAllBitsMerge_ReportCfg.create
+                  SsMfr_EvalAllBitsMerge_ReportCfg.create
                     [|ordr|]
                     rngGensCreate
                     switchGenModes

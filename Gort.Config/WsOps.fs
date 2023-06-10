@@ -304,6 +304,12 @@ module WsOps =
                         getSortableSet
                         getSorterSet
 
+
+            //WsCfgs.allSsAfr_EvalAllBitsCfg ()
+            //|> Array.map(sorterSet_EvalCfg.RndAppended)
+            //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
+
+
             let! resSs = ssEval |> saveSorterSetEval fileName
             return ssEval
         }
@@ -364,20 +370,20 @@ module WsOps =
 
     //********  sorterSetRnd_EvalAllBits_ReportCfg  ****************
 
-    let make_ssmr_Report 
-            (cfg:ssmfr_EvalAllBits_ReportCfg) 
+    let make_ssMfr_Report 
+            (cfg:ssMfr_EvalAllBits_ReportCfg) 
         =
-        let reportFileName = cfg |> Ssmfr_EvalAllBits_ReportCfg.getReportFileName
+        let reportFileName = cfg |> SsMfr_EvalAllBits_ReportCfg.getReportFileName
 
         WsFile.writeLinesIfNew
             wsFile.SorterEvalReport
             reportFileName 
-            [Ssmfr_EvalAllBits_ReportCfg.getReportHeader()]
+            [SsMfr_EvalAllBits_ReportCfg.getReportHeader()]
         |> Result.ExtractOrThrow |> ignore
 
 
         let repLines_set =
-            Ssmfr_EvalAllBits_ReportCfg.makeSorterSetEvalReport
+            SsMfr_EvalAllBits_ReportCfg.makeSorterSetEvalReport
                     cfg
                     getSsMfr_EvalAllBits
 
@@ -396,22 +402,65 @@ module WsOps =
                 )
 
 
-    //********  ssmfr_EvalAllBitsMerge_ReportCfg  ****************
+    //********  ssAfr_EvalAllBits_ReportCfg  ****************
 
-    let make_ssmrMerge_Report 
-            (cfg:ssmfr_EvalAllBitsMerge_ReportCfg) 
+    let make_ssAfr_Report 
+            (cfg:ssAfr_EvalAllBits_ReportCfg) 
         =
-        let reportFileName = cfg |> Ssmfr_EvalAllBitsMerge_ReportCfg.getReportFileName
+        let reportFileName = cfg |> SsAfr_EvalAllBits_ReportCfg.getReportFileName
+
+        WsFile.writeLinesIfNew
+            wsFile.SorterEvalReport
+            reportFileName 
+            [SsAfr_EvalAllBits_ReportCfg.getReportHeader()]
+        |> Result.ExtractOrThrow |> ignore
+
+
+
+        
+            //WsCfgs.allSsAfr_EvalAllBitsCfg ()
+            //|> Array.map(sorterSet_EvalCfg.RndAppended)
+            //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
+
+
+
+        let repLines_set =
+            SsAfr_EvalAllBits_ReportCfg.makeSorterSetEvalReport
+                    cfg
+                    getSsAfr_EvalAllBits
+                    getConcatMap
+
+        repLines_set
+            |> Seq.iter(
+                fun res ->
+                    match res with
+                    | Ok repLines ->
+                            WsFile.appendLines
+                                    wsFile.SorterEvalReport
+                                    reportFileName 
+                                    repLines
+                            |> Result.ExtractOrThrow |> ignore
+
+                    | Error m -> Console.WriteLine(m)
+                )
+
+
+    //********  ssMfr_EvalAllBitsMerge_ReportCfg  ****************
+
+    let make_ssMfrMerge_Report 
+            (cfg:ssMfr_EvalAllBitsMerge_ReportCfg) 
+        =
+        let reportFileName = cfg |> SsMfr_EvalAllBitsMerge_ReportCfg.getReportFileName
 
         WsFile.writeLinesIfNew
             wsFile.SorterEvalMergeReport
             reportFileName 
-            [Ssmfr_EvalAllBitsMerge_ReportCfg.getReportHeader()]
+            [SsMfr_EvalAllBitsMerge_ReportCfg.getReportHeader()]
         |> Result.ExtractOrThrow |> ignore
 
 
         let repLines_set =
-            Ssmfr_EvalAllBitsMerge_ReportCfg.makeSorterSetEvalReport
+            SsMfr_EvalAllBitsMerge_ReportCfg.makeSorterSetEvalReport
                     cfg
                     getSorterSetRnd_EvalAllBits
                     getSsMfr_EvalAllBits
@@ -462,12 +511,9 @@ module WsOps =
             //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
 
 
-            WsCfgs.allSsAfr_EvalAllBitsCfg ()
-            |> Array.map(sorterSet_EvalCfg.RndAppended)
-            |> Array.map(getSorterSetEval ( true |> UseParallel.create))
-
-
-
+            //WsCfgs.allSsAfr_EvalAllBitsCfg ()
+            //|> Array.map(sorterSet_EvalCfg.RndAppended)
+            //|> Array.map(getSorterSetEval ( true |> UseParallel.create))
 
 
             //WsCfgs.allSsMfr_EvalAllBitsCfg ()
@@ -478,7 +524,10 @@ module WsOps =
             //|> Array.map(make_sorterSetRnd_Report)
 
             //WsCfgs.allssmfrEvalReportCfgs ()
-            //|> Array.map(make_ssmr_Report)
+            //|> Array.map(make_ssMfr_Report)
+
+            WsCfgs.allssAfrEvalReportCfgs ()
+            |> Array.map(make_ssAfr_Report)
 
             //WsCfgs.allssmfrEvalMergeReportCfgs ()
             //|> Array.map(make_ssmrMerge_Report)

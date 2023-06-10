@@ -79,8 +79,6 @@ module SsAfr_EvalAllBitsCfg
            |> SorterSetEvalId.create
 
 
-
-
     let getFileName
             (cfg:ssAfr_EvalAllBitsCfg) 
         =
@@ -96,7 +94,9 @@ module SsAfr_EvalAllBitsCfg
             (sorterSetCfgRet: sorterSetCfg->Result<sorterSet,string>)
         =
         result {
-            let! sorterSet = sorterSetCfgRet (cfg |> getSorterSetCfg |> sorterSetCfg.SelfAppend)
+            let! sorterSet = sorterSetCfgRet 
+                                ( cfg |> getSorterSetCfg 
+                                      |> sorterSetCfg.SelfAppend)
             let! sortableSet = sortableSetCfgRet 
                                 ( cfg |> getSortableSetCfg
                                       |> sortableSetCfg.Certain )

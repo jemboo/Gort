@@ -54,3 +54,12 @@ module SorterOpOutput =
         |> getRefinedSortableSet (Guid.Empty |> SortableSetId.create) 
         |> Result.map(SortableSet.getRollout >> Rollout.getArrayCount >> 
                         ArrayCount.value >> SortableCount.create)
+
+
+    //let getRefinedSortableCount (sorterOpOutput: sorterOpOutput) =
+    //    let rSs = sorterOpOutput  |> getRefinedSortableSet (Guid.Empty |> SortableSetId.create)
+    //                |> Result.ExtractOrThrow
+    //    let rollout = rSs |> SortableSet.getRollout
+    //    let ac = rollout |> Rollout.getArrayCount
+    //    ac |> ArrayCount.value |> SortableCount.create |> Ok
+

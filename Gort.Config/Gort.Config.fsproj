@@ -22,8 +22,9 @@
     <Compile Include="Ss_ShcRunCfg.fs" />
     <Compile Include="Ss_ShcCfg.fs" />
     <Compile Include="Reports\SorterSetRnd_EvalAllBits_ReportCfg.fs" />
-    <Compile Include="Reports\Ssmr_EvalAllBits_ReportCfg.fs" />
-    <Compile Include="Reports\Ssmr_EvalAllBitsMerge_ReportCfg.fs" />
+    <Compile Include="Reports\SsMfr_EvalAllBits_ReportCfg.fs" />
+    <Compile Include="Reports\SsMfr_EvalAllBitsMerge_ReportCfg.fs" />
+    <Compile Include="Reports\SsAfr_EvalAllBits_ReportCfg.fs" />
     <Compile Include="WsCfgs.fs" />
     <Compile Include="WsFile.fs" />
     <Compile Include="WsOps.fs" />
